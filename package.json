@@ -8,10 +8,10 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@types/node": "^18.17.1",
-    "nuxt": "^3.6.5",
     "@babel/core": "^7.22.5",
     "@babel/eslint-parser": "^7.22.5",
+    "@iconify/vue": "^4.1.1",
+    "@types/node": "^18.17.1",
     "autoprefixer": "^10.4.14",
     "babel-eslint": "^10.1.0",
     "eslint": "^8.42.0",
@@ -19,8 +19,18 @@
     "eslint-loader": "^4.0.2",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.14.1",
+    "nuxt": "^3.6.5",
     "postcss": "^8.4.24",
     "prettier": "^2.8.8",
     "tailwindcss": "^3.3.2"
+  },
+  "dependencies": {
+    "chart.js": "^4.3.2",
+    "d3-array": "^3.2.4",
+    "d3-scale": "^4.0.2",
+    "deck.gl": "^8.9.22",
+    "mapbox-gl": "^2.15.0",
+    "parcoord-es": "^2.2.10",
+    "vue-chart-3": "^3.1.8"
   }
 }
