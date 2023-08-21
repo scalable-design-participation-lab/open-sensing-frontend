@@ -10,6 +10,6 @@ useHead({
 
 <template>
   <div>
-    <NuxtWelcome />
+    <NuxtPage />
   </div>
 </template>

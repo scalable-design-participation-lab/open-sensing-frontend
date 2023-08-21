@@ -142,10 +142,10 @@ Quick Selection
         />
 
         <main id="main-container">
-          <ParallelCoords
+          <!-- <ParallelCoords
             v-if="analysisChecked"
             :developments-props="developmentsProps"
-          />
+          /> -->
         </main>
       </a-layout-content>
     </a-layout>
@@ -158,12 +158,14 @@ import { Icon } from '@iconify/vue'
 import { onMounted, ref, computed } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { GeoJsonLayer } from '@deck.gl/layers'
-// import {
+// // import {
 //   Document,
 //   Menu as IconMenu,
 //   Location,
 //   Setting,
 // } from '@element-plus/icons-vue'
+import { Layout, Menu, Slider, Radio, Checkbox } from 'ant-design-vue';
+
 
 // Mapbox imports
 import mapboxgl from 'mapbox-gl'
@@ -171,7 +173,7 @@ import acsNYCHA from '~/static/ACS_NYCHA_2.json'
 
 // COMPONENTS
 import DataPopUp from '~~/components/DataPopUp'
-import ParallelCoords from '~~/components/ParallelCoords'
+// import ParallelCoords from '~~/components/ParallelCoords'
 
 const accessToken =
   'pk.eyJ1IjoiY3NhbmRvdmEiLCJhIjoiY2pqZWJjajY2NGxsczNrcDE0anZmY3A1MCJ9.Dq2Pukxp_L_o-j4Zz22srQ'
