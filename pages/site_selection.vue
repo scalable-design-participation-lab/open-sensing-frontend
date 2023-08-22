@@ -11,9 +11,7 @@
         background: 'rgb(0, 78, 50)',
       }"
     >
-      <div class="text-left text-orange-600">
-Green City Force
-</div>
+      <div class="text-left text-white">Green City Force</div>
       <a-menu
         v-model:openKeys="state.openKeys"
         v-model:selectedKeys="state.selectedKeys"
@@ -28,9 +26,7 @@ Green City Force
             background: 'rgb(0, 78, 50)',
           }"
         >
-          <template #title>
-Filters
-</template>
+          <template #title> Filters </template>
 
           <a-sub-menu
             key="demographics"
@@ -60,9 +56,8 @@ Filters
           </a-sub-menu>
 
           <a-sub-menu key="access">
-            <template #title>
-Transportation Accessibility
-</template><a-menu-item key="demographics">
+            <template #title> Transportation Accessibility </template
+            ><a-menu-item key="demographics">
               <a-slider
                 id="min60"
                 v-model:value="rangeAccess"
@@ -73,24 +68,16 @@ Transportation Accessibility
             </a-menu-item>
           </a-sub-menu>
           <a-sub-menu key="flood">
-            <template #title>
-Flood Risk
-</template>
+            <template #title> Flood Risk </template>
             <a-radio-group v-model:value="floodValue">
               <a-radio :value="1"> 10% </a-radio>
               <a-radio :value="2"> 25% </a-radio>
-              <a-radio :value="3">
-50%
-</a-radio>
-              <a-radio :value="4">
-100%
-</a-radio>
+              <a-radio :value="3"> 50% </a-radio>
+              <a-radio :value="4"> 100% </a-radio>
             </a-radio-group>
           </a-sub-menu>
           <a-sub-menu key="unbuilt">
-            <template #title>
-Unbuilt Area
-</template>
+            <template #title> Unbuilt Area </template>
             <a-menu-item key="unbuilt">
               <a-slider
                 id="unbuilt"
@@ -102,17 +89,11 @@ Unbuilt Area
           <a-menu-item key="congressional">
             Congressional District
           </a-menu-item>
-          <a-menu-item key="city-council">
-City Councul District
-</a-menu-item>
-          <a-menu-item key="food">
-Food Access
-</a-menu-item>
+          <a-menu-item key="city-council"> City Councul District </a-menu-item>
+          <a-menu-item key="food"> Food Access </a-menu-item>
         </a-sub-menu>
         <a-sub-menu>
-          <template #title>
-Quick Selection
-</template>
+          <template #title> Quick Selection </template>
           <a-menu-item
             v-for="(developmentObj, name) in sampleDevelopments"
             :key="developmentObj.name"
@@ -164,8 +145,6 @@ import { GeoJsonLayer } from '@deck.gl/layers'
 //   Location,
 //   Setting,
 // } from '@element-plus/icons-vue'
-import { Layout, Menu, Slider, Radio, Checkbox } from 'ant-design-vue';
-
 
 // Mapbox imports
 import mapboxgl from 'mapbox-gl'
