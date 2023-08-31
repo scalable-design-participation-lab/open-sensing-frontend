@@ -1,7 +1,10 @@
 <script setup>
 import { ElDropdown, ElCollapse, ElCollapseItem } from 'element-plus'
-import { ArrowDown } from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
+import { ArrowDown } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+
+const activeName = ref('1')
 
 const props = defineProps({
   location: { type: String, default: () => '' },

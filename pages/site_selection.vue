@@ -12,106 +12,103 @@
       }"
     >
       <div class="text-left text-white">Green City Force</div>
-      <a-menu
-        v-model:openKeys="state.openKeys"
-        v-model:selectedKeys="state.selectedKeys"
-        mode="inline"
-        :style="{
-          background: 'rgb(0, 78, 50)',
-        }"
+      <el-menu
+        default-active="2"
+        class="el-menu-vertical-demo"
+        background-color="rgb(0, 78, 50)"
       >
-        <a-sub-menu
-          key="sub1"
-          :style="{
-            background: 'rgb(0, 78, 50)',
-          }"
-        >
-          <template #title> Filters </template>
-
-          <a-sub-menu
-            key="demographics"
-            :style="{
-              background: 'rgb(0, 78, 50)',
-            }"
-          >
-            <template #title>
-              {{
-                openKeys.includes('demographics')
-                  ? 'Minimum Age Ranges'
-                  : 'Demographics'
-              }}
-            </template>
-            <a-menu-item key="min17">
-              <a-slider id="min17" v-model:value="min17" :marks="marksMin17" />
-            </a-menu-item>
-            <a-menu-item key="min18">
-              <a-slider id="min18" v-model:value="min18" :marks="marksMin18" />
-            </a-menu-item>
-            <a-menu-item key="demographics">
-              <a-slider id="min25" v-model:value="min25" :marks="marksMin25" />
-            </a-menu-item>
-            <a-menu-item key="demographics">
-              <a-slider id="min60" v-model:value="min60" :marks="marksMin60" />
-            </a-menu-item>
-          </a-sub-menu>
-
-          <a-sub-menu key="access">
-            <template #title> Transportation Accessibility </template
-            ><a-menu-item key="demographics">
-              <a-slider
-                id="min60"
-                v-model:value="rangeAccess"
-                :range="rangeAccess"
-                :marks="marksAccess"
-                :max="75000"
-              />
-            </a-menu-item>
-          </a-sub-menu>
-          <a-sub-menu key="flood">
-            <template #title> Flood Risk </template>
-            <a-radio-group v-model:value="floodValue">
-              <a-radio :value="1"> 10% </a-radio>
-              <a-radio :value="2"> 25% </a-radio>
-              <a-radio :value="3"> 50% </a-radio>
-              <a-radio :value="4"> 100% </a-radio>
-            </a-radio-group>
-          </a-sub-menu>
-          <a-sub-menu key="unbuilt">
-            <template #title> Unbuilt Area </template>
-            <a-menu-item key="unbuilt">
-              <a-slider
-                id="unbuilt"
-                v-model:value="unbuilt"
-                :marks="marksUnbuilt"
-              />
-            </a-menu-item>
-          </a-sub-menu>
-          <a-menu-item key="congressional">
+        <el-sub-menu index="1">
+          <template #title>
+            <span>Filters</span>
+          </template>
+          <el-sub-menu index="demographics">
+            <template #title>Demographics</template>
+            <el-menu-item index="min17">
+              <div>
+                <span>0-17 years old</span>
+                <el-slider v-model="min17" />
+              </div>
+            </el-menu-item>
+            <el-menu-item index="min18">
+              <div>
+                <span>18-24 years old</span>
+                <el-slider v-model="marksMin18" />
+              </div>
+            </el-menu-item>
+            <el-menu-item index="min25">
+              <div>
+                <span>25-59 years old</span>
+                <el-slider v-model="min25" />
+              </div>
+            </el-menu-item>
+            <el-menu-item index="min60">
+              <div>
+                <span>Older than 60 years</span>
+                <el-slider v-model="min60" />
+              </div>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="access">
+            <template #title>Transportation Accessibility</template>
+            <el-menu-item index="range-access">
+              <div>
+                <el-slider
+                  v-model="rangeAccess"
+                  range
+                  :max="75000"
+                  :marks="marksAccess"
+                />
+              </div>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="flood">
+            <template #title>Flood Risk</template>
+            <el-menu-item index="flood-radio">
+              <el-radio-group v-model="floodValue">
+                <el-radio :size="'small'" :label="1"> 10% </el-radio>
+                <el-radio :size="'small'" :label="2"> 25% </el-radio>
+                <el-radio :size="'small'" :label="3"> 50% </el-radio>
+                <el-radio :size="'small'" :label="4"> 100% </el-radio>
+              </el-radio-group>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="unbuilt">
+            <template #title>Unbuilt Areas</template>
+            <el-menu-item index="unbuilt-slider">
+              <div>
+                <span>Minimum Available Area (Sq.Ft.)</span>
+                <el-slider v-model="unbuilt" :max="10000" />
+              </div>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-menu-item key="congressional">
             Congressional District
-          </a-menu-item>
-          <a-menu-item key="city-council"> City Councul District </a-menu-item>
-          <a-menu-item key="food"> Food Access </a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu>
+          </el-menu-item>
+          <el-menu-item key="city-council">
+            City Councul District
+          </el-menu-item>
+          <el-menu-item key="food"> Food Access </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="quick-selection">
           <template #title> Quick Selection </template>
-          <a-menu-item
+          <el-menu-item
             v-for="(developmentObj, name) in sampleDevelopments"
             :key="developmentObj.name"
             @click="selectDevelopment(name)"
           >
             {{ developmentObj.name }}
-          </a-menu-item>
-        </a-sub-menu>
-        <a-input-search
-          v-model:value="value"
+          </el-menu-item>
+        </el-sub-menu>
+        <el-input
+          v-model="value"
           placeholder="Search by address"
-          style="width: 200px, background: 'rgb(0, 78, 50)'"
-          @search="onSearch"
+          :suffix-icon="Search"
         />
-        <a-checkbox v-model:checked="analysisChecked">
-          Advanced Site Analysis Mode
-        </a-checkbox>
-      </a-menu>
+        <el-checkbox
+          v-model="analysisChecked"
+          label="Advanced Site Analysis Mode"
+        />
+      </el-menu>
     </a-layout-sider>
     <a-layout :style="{ marginLeft: '200px' }">
       <a-layout-header :style="{ background: 'rgb(0, 78, 50)', padding: 0 }" />
@@ -139,12 +136,18 @@ import { Icon } from '@iconify/vue'
 import { onMounted, ref, computed } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { GeoJsonLayer } from '@deck.gl/layers'
-// // import {
-//   Document,
-//   Menu as IconMenu,
-//   Location,
-//   Setting,
-// } from '@element-plus/icons-vue'
+import {
+  ElMenu,
+  ElSubMenu,
+  ElMenuItem,
+  ElSlider,
+  ElRadio,
+  ElRadioGroup,
+  ElInput,
+  ElCheckbox,
+} from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
+import 'element-plus/dist/index.css'
 
 // Mapbox imports
 import mapboxgl from 'mapbox-gl'
