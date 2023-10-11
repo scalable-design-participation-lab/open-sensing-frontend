@@ -13,12 +13,7 @@ const props = defineProps({
 
 <template>
   <el-dropdown>
-    <span class="el-dropdown-link">
-      Dropdown List
-      <el-icon class="el-icon--right">
-        <arrow-down />
-      </el-icon>
-    </span>
+    <span class="el-dropdown-link"> Dropdown List </span>
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item>Action 1</el-dropdown-item>
