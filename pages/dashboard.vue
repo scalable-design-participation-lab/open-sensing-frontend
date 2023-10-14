@@ -1,6 +1,6 @@
 <script setup>
 // IMPORTS
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { GeoJsonLayer, IconLayer } from '@deck.gl/layers'
 import {
@@ -28,13 +28,13 @@ const accessToken =
 // Card for interaction;
 const selectedSite = ref('')
 const selectedSiteProps = ref({})
-const sampleDevelopments = ref({
-  HOWARD: { name: 'Howard Houses' },
-  'BAY VIEW': { name: 'Bay View Houses' },
-  ASTORIA: { name: 'Astoria Houses' },
-  WAGNER: { name: 'Wagner Houses' },
-  FOREST: { name: 'Forest Houses Farm' },
-  "MARINER'S HARBOR": { name: "Mariner's Harbor Houses Farm" },
+const sampleDevelopments = reactive({
+  HOWARD: { name: 'Howard Houses', checked: false },
+  'BAY VIEW': { name: 'Bay View Houses', checked: false },
+  ASTORIA: { name: 'Astoria Houses', checked: false },
+  WAGNER: { name: 'Wagner Houses', checked: false },
+  FOREST: { name: 'Forest Houses Farm', checked: false },
+  "MARINER'S HARBOR": { name: "Mariner's Harbor Houses Farm", checked: false },
 })
 const sampleMetrics = ref({
   Temperature: { name: 'Temperature', units: '°F', checked: false },
@@ -43,9 +43,10 @@ const sampleMetrics = ref({
   Moisture: { name: 'Soil Moisture', units: '% Moisture', checked: false },
   Solar: { name: 'Solar Input', units: 'Amps', checked: false },
 })
-const analysisChecked = ref(false)
+
 const developmentsProps = ref([])
 const address = ref('')
+const dataDashboard = ref(false)
 
 let map
 
@@ -67,6 +68,11 @@ acsNYCHA.features.forEach((feature, index) => {
 })
 
 const selectDevelopment = (development) => {
+  console.log(
+    development,
+    sampleDevelopments[development].checked,
+    sampleDevelopments
+  )
   const selectedDevelopmet =
     acsNYCHA.features[devNamesIndex[development].id].geometry.coordinates.flat(
       2
@@ -128,31 +134,13 @@ const loadMapDraw = () => {
 
     map.addLayer(
       new MapboxLayer({
-        id: 'ny-marker',
-        type: IconLayer,
-        data: Eco_Hubs.features,
-        pickable: true,
-        // iconAtlas and iconMapping are required
-        // getIcon: return a string
-        iconAtlas:
-          'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-        iconMapping: ICON_MAPPING,
-        getIcon: (d) => 'marker',
-        getPosition: (d) => d.geometry.coordinates,
-        getSize: (d) => 60,
-        getColor: [255, 0, 0], //(d) => [Math.sqrt(d.exits), 140, 0],
-      })
-    )
-
-    map.addLayer(
-      new MapboxLayer({
         id: 'ny-geojson',
         type: GeoJsonLayer,
         data: acsNYCHA,
         pickable: true,
         stroked: false,
         filled: true,
-        extruded: true,
+        extruded: false,
         pointType: 'circle',
         lineWidthScale: 20,
         lineWidthMinPixels: 2,
@@ -167,6 +155,24 @@ const loadMapDraw = () => {
           selectedSite.value = info.object.properties.CNN
           selectedSiteProps.value = info.object.properties
         },
+      })
+    )
+
+    map.addLayer(
+      new MapboxLayer({
+        id: 'ny-marker',
+        type: IconLayer,
+        data: Eco_Hubs.features,
+        pickable: true,
+        // iconAtlas and iconMapping are required
+        // getIcon: return a string
+        iconAtlas:
+          'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+        iconMapping: ICON_MAPPING,
+        getIcon: (d) => 'marker',
+        getPosition: (d) => d.geometry.coordinates,
+        getSize: (d) => 60,
+        getColor: [255, 0, 0], //(d) => [Math.sqrt(d.exits), 140, 0],
       })
     )
   })
@@ -198,9 +204,12 @@ const loadMapDraw = () => {
           <el-menu-item
             v-for="(developmentObj, name) in sampleDevelopments"
             :key="developmentObj.name"
-            @click="selectDevelopment(name)"
           >
-            {{ developmentObj.name }}
+            <el-checkbox
+              v-model="sampleDevelopments[name].checked"
+              :label="developmentObj.name"
+              @change="selectDevelopment(name)"
+            />
           </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="data">
@@ -214,10 +223,7 @@ const loadMapDraw = () => {
           placeholder="Search by address"
           :suffix-icon="Search"
         />
-        <el-checkbox
-          v-model="analysisChecked"
-          label="Advanced Site Analysis Mode"
-        />
+        <el-checkbox v-model="dataDashboard" label="Data Dashboard" />
       </el-menu>
     </div>
     <div :style="{ marginLeft: '200px' }">
@@ -230,13 +236,7 @@ const loadMapDraw = () => {
           :dev-props="selectedSiteProps"
           @closePopUp="selectedSiteProps = {}"
         />
-
-        <main id="main-container">
-          <!-- <ParallelCoords
-            v-if="analysisChecked"
-            :developments-props="developmentsProps"
-          /> -->
-        </main>
+        <main v-show="!dataDashboard" id="main-container" />
       </div>
     </div>
   </div>
