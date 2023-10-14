@@ -1,82 +1,12 @@
-<template>
-  <a-layout has-sider>
-    <a-layout-sider
-      :style="{
-        overflow: 'auto',
-        height: '100vh',
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        background: 'rgb(0, 78, 50)',
-      }"
-    >
-      <div class="text-left text-white">Green City Force</div>
-      <el-menu
-        default-active="2"
-        class="el-menu-vertical-demo"
-        background-color="rgb(0, 78, 50)"
-      >
-        <el-sub-menu index="locations">
-          <template #title> Locations </template>
-          <el-menu-item
-            v-for="(developmentObj, name) in sampleDevelopments"
-            :key="developmentObj.name"
-            @click="selectDevelopment(name)"
-          >
-            {{ developmentObj.name }}
-          </el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="data">
-          <template #title> Data </template>
-          <el-menu-item v-for="metric in sampleMetrics" :key="metric.name">
-            <el-checkbox v-model="metric.checked" :label="metric.name" />
-          </el-menu-item>
-        </el-sub-menu>
-        <el-input
-          v-model="value"
-          placeholder="Search by address"
-          :suffix-icon="Search"
-        />
-        <el-checkbox
-          v-model="analysisChecked"
-          label="Advanced Site Analysis Mode"
-        />
-      </el-menu>
-    </a-layout-sider>
-    <a-layout :style="{ marginLeft: '200px' }">
-      <a-layout-header :style="{ background: 'rgb(0, 78, 50)', padding: 0 }" />
-      <a-layout-content>
-        <DataPopUp
-          v-if="Object.keys(selectedSiteProps).length > 0"
-          :dev-props="selectedSiteProps"
-          @closePopUp="selectedSiteProps = {}"
-        />
-
-        <main id="main-container">
-          <!-- <ParallelCoords
-            v-if="analysisChecked"
-            :developments-props="developmentsProps"
-          /> -->
-        </main>
-      </a-layout-content>
-    </a-layout>
-  </a-layout>
-</template>
-
 <script setup>
 // IMPORTS
-import { Icon } from '@iconify/vue'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
-import { GeoJsonLayer } from '@deck.gl/layers'
+import { GeoJsonLayer, IconLayer } from '@deck.gl/layers'
 import {
   ElMenu,
   ElSubMenu,
   ElMenuItem,
-  ElSlider,
-  ElRadio,
-  ElRadioGroup,
   ElInput,
   ElCheckbox,
 } from 'element-plus'
@@ -86,6 +16,7 @@ import 'element-plus/dist/index.css'
 // Mapbox imports
 import mapboxgl from 'mapbox-gl'
 import acsNYCHA from '~/static/ACS_NYCHA_2.json'
+import Eco_Hubs from '~/static/Eco_Hubs.json'
 
 // COMPONENTS
 import DataPopUp from '~~/components/DataPopUp'
@@ -95,8 +26,6 @@ const accessToken =
   'pk.eyJ1IjoiY3NhbmRvdmEiLCJhIjoiY2pqZWJjajY2NGxsczNrcDE0anZmY3A1MCJ9.Dq2Pukxp_L_o-j4Zz22srQ'
 
 // Card for interaction;
-const activeKey = ref([])
-const searchValue = ref('')
 const selectedSite = ref('')
 const selectedSiteProps = ref({})
 const sampleDevelopments = ref({
@@ -116,10 +45,7 @@ const sampleMetrics = ref({
 })
 const analysisChecked = ref(false)
 const developmentsProps = ref([])
-const state = reactive({
-  selectedKeys: ['1'],
-  openKeys: ['demographics'],
-})
+const address = ref('')
 
 let map
 
@@ -165,8 +91,6 @@ const selectDevelopment = (development) => {
  * Loads mapbox map and Deck.gl
  */
 const loadMapDraw = () => {
-  let mouseLocation = false
-
   // 2) mapbox token
   mapboxgl.accessToken = accessToken
 
@@ -198,9 +122,31 @@ const loadMapDraw = () => {
       .layers.find((layer) => layer.type === 'symbol').id
     console.log('loaded.....')
 
+    const ICON_MAPPING = {
+      marker: { x: 0, y: 0, width: 128, height: 128, mask: true },
+    }
+
     map.addLayer(
       new MapboxLayer({
-        id: 'sf-geojson',
+        id: 'ny-marker',
+        type: IconLayer,
+        data: Eco_Hubs.features,
+        pickable: true,
+        // iconAtlas and iconMapping are required
+        // getIcon: return a string
+        iconAtlas:
+          'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+        iconMapping: ICON_MAPPING,
+        getIcon: (d) => 'marker',
+        getPosition: (d) => d.geometry.coordinates,
+        getSize: (d) => 60,
+        getColor: [255, 0, 0], //(d) => [Math.sqrt(d.exits), 140, 0],
+      })
+    )
+
+    map.addLayer(
+      new MapboxLayer({
+        id: 'ny-geojson',
         type: GeoJsonLayer,
         data: acsNYCHA,
         pickable: true,
@@ -226,6 +172,75 @@ const loadMapDraw = () => {
   })
 }
 </script>
+
+<template>
+  <div>
+    <div
+      :style="{
+        overflow: 'auto',
+        height: '100vh',
+        width: '200px',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        background: 'rgb(0, 78, 50)',
+      }"
+    >
+      <div class="text-left text-white">Green City Force</div>
+      <el-menu
+        default-active="2"
+        class="el-menu-vertical-demo"
+        background-color="rgb(0, 78, 50)"
+      >
+        <el-sub-menu index="locations">
+          <template #title> Locations </template>
+          <el-menu-item
+            v-for="(developmentObj, name) in sampleDevelopments"
+            :key="developmentObj.name"
+            @click="selectDevelopment(name)"
+          >
+            {{ developmentObj.name }}
+          </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="data">
+          <template #title> Data </template>
+          <el-menu-item v-for="metric in sampleMetrics" :key="metric.name">
+            <el-checkbox v-model="metric.checked" :label="metric.name" />
+          </el-menu-item>
+        </el-sub-menu>
+        <el-input
+          v-model="address"
+          placeholder="Search by address"
+          :suffix-icon="Search"
+        />
+        <el-checkbox
+          v-model="analysisChecked"
+          label="Advanced Site Analysis Mode"
+        />
+      </el-menu>
+    </div>
+    <div :style="{ marginLeft: '200px' }">
+      <div
+        :style="{ height: '50px', background: 'rgb(0, 78, 50)', padding: 0 }"
+      />
+      <div>
+        <DataPopUp
+          v-if="Object.keys(selectedSiteProps).length > 0"
+          :dev-props="selectedSiteProps"
+          @closePopUp="selectedSiteProps = {}"
+        />
+
+        <main id="main-container">
+          <!-- <ParallelCoords
+            v-if="analysisChecked"
+            :developments-props="developmentsProps"
+          /> -->
+        </main>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="postcss" scoped>
 html * {
@@ -259,29 +274,5 @@ body {
   min-height: 100vh;
   margin: 0;
   flex-direction: column;
-}
-
-.interact {
-  padding: 0;
-  margin-top: 2%;
-  position: fixed;
-  right: 1.25%;
-  z-index: 10;
-}
-
-.line {
-  width: 100%;
-  border-bottom: 1.75px solid black;
-  margin-bottom: 4%;
-  /*position: relative;*/
-}
-
-#components-layout-demo-fixed-sider .logo {
-  height: 32px;
-  background: rgba(255, 255, 255, 0.2);
-  margin: 16px;
-}
-
-.menu-title {
 }
 </style>
