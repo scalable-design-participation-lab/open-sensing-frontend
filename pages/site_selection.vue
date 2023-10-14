@@ -1,135 +1,3 @@
-<template>
-  <a-layout has-sider>
-    <a-layout-sider
-      :style="{
-        overflow: 'auto',
-        height: '100vh',
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        background: 'rgb(0, 78, 50)',
-      }"
-    >
-      <div class="text-left text-white">Green City Force</div>
-      <el-menu
-        default-active="2"
-        class="el-menu-vertical-demo"
-        background-color="rgb(0, 78, 50)"
-      >
-        <el-sub-menu index="1">
-          <template #title>
-            <span>Filters</span>
-          </template>
-          <el-sub-menu index="demographics">
-            <template #title>Demographics</template>
-            <el-menu-item index="min17">
-              <div>
-                <span>0-17 years old</span>
-                <el-slider v-model="min17" />
-              </div>
-            </el-menu-item>
-            <el-menu-item index="min18">
-              <div>
-                <span>18-24 years old</span>
-                <el-slider v-model="marksMin18" />
-              </div>
-            </el-menu-item>
-            <el-menu-item index="min25">
-              <div>
-                <span>25-59 years old</span>
-                <el-slider v-model="min25" />
-              </div>
-            </el-menu-item>
-            <el-menu-item index="min60">
-              <div>
-                <span>Older than 60 years</span>
-                <el-slider v-model="min60" />
-              </div>
-            </el-menu-item>
-          </el-sub-menu>
-          <el-sub-menu index="access">
-            <template #title>Transportation Accessibility</template>
-            <el-menu-item index="range-access">
-              <div>
-                <el-slider
-                  v-model="rangeAccess"
-                  range
-                  :max="75000"
-                  :marks="marksAccess"
-                />
-              </div>
-            </el-menu-item>
-          </el-sub-menu>
-          <el-sub-menu index="flood">
-            <template #title>Flood Risk</template>
-            <el-menu-item index="flood-radio">
-              <el-radio-group v-model="floodValue">
-                <el-radio :size="'small'" :label="1"> 10% </el-radio>
-                <el-radio :size="'small'" :label="2"> 25% </el-radio>
-                <el-radio :size="'small'" :label="3"> 50% </el-radio>
-                <el-radio :size="'small'" :label="4"> 100% </el-radio>
-              </el-radio-group>
-            </el-menu-item>
-          </el-sub-menu>
-          <el-sub-menu index="unbuilt">
-            <template #title>Unbuilt Areas</template>
-            <el-menu-item index="unbuilt-slider">
-              <div>
-                <span>Minimum Available Area (Sq.Ft.)</span>
-                <el-slider v-model="unbuilt" :max="10000" />
-              </div>
-            </el-menu-item>
-          </el-sub-menu>
-          <el-menu-item key="congressional">
-            Congressional District
-          </el-menu-item>
-          <el-menu-item key="city-council">
-            City Councul District
-          </el-menu-item>
-          <el-menu-item key="food"> Food Access </el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="quick-selection">
-          <template #title> Quick Selection </template>
-          <el-menu-item
-            v-for="(developmentObj, name) in sampleDevelopments"
-            :key="developmentObj.name"
-            @click="selectDevelopment(name)"
-          >
-            {{ developmentObj.name }}
-          </el-menu-item>
-        </el-sub-menu>
-        <el-input
-          v-model="value"
-          placeholder="Search by address"
-          :suffix-icon="Search"
-        />
-        <el-checkbox
-          v-model="analysisChecked"
-          label="Advanced Site Analysis Mode"
-        />
-      </el-menu>
-    </a-layout-sider>
-    <a-layout :style="{ marginLeft: '200px' }">
-      <a-layout-header :style="{ background: 'rgb(0, 78, 50)', padding: 0 }" />
-      <a-layout-content>
-        <DataPopUp
-          v-if="Object.keys(selectedSiteProps).length > 0"
-          :dev-props="selectedSiteProps"
-          @closePopUp="selectedSiteProps = {}"
-        />
-
-        <main id="main-container">
-          <!-- <ParallelCoords
-            v-if="analysisChecked"
-            :developments-props="developmentsProps"
-          /> -->
-        </main>
-      </a-layout-content>
-    </a-layout>
-  </a-layout>
-</template>
-
 <script setup>
 // IMPORTS
 import { Icon } from '@iconify/vue'
@@ -359,6 +227,143 @@ const loadMapDraw = () => {
   })
 }
 </script>
+
+<template>
+  <div>
+    <div
+      :style="{
+        overflow: 'auto',
+        height: '100vh',
+        width: '200px',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        background: 'rgb(0, 78, 50)',
+      }"
+    >
+      <div class="text-left text-white">Green City Force</div>
+      <el-menu
+        default-active="2"
+        class="el-menu-vertical-demo"
+        background-color="rgb(0, 78, 50)"
+      >
+        <el-sub-menu index="1">
+          <template #title>
+            <span>Filters</span>
+          </template>
+          <el-sub-menu index="demographics">
+            <template #title>Demographics</template>
+            <el-menu-item index="min17">
+              <div>
+                <span>0-17 years old</span>
+                <el-slider v-model="min17" />
+              </div>
+            </el-menu-item>
+            <el-menu-item index="min18">
+              <div>
+                <span>18-24 years old</span>
+                <el-slider v-model="marksMin18" />
+              </div>
+            </el-menu-item>
+            <el-menu-item index="min25">
+              <div>
+                <span>25-59 years old</span>
+                <el-slider v-model="min25" />
+              </div>
+            </el-menu-item>
+            <el-menu-item index="min60">
+              <div>
+                <span>Older than 60 years</span>
+                <el-slider v-model="min60" />
+              </div>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="access">
+            <template #title>Transportation Accessibility</template>
+            <el-menu-item index="range-access">
+              <div>
+                <el-slider
+                  v-model="rangeAccess"
+                  range
+                  :max="75000"
+                  :marks="marksAccess"
+                />
+              </div>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="flood">
+            <template #title>Flood Risk</template>
+            <el-menu-item index="flood-radio">
+              <el-radio-group v-model="floodValue">
+                <el-radio :size="'small'" :label="1"> 10% </el-radio>
+                <el-radio :size="'small'" :label="2"> 25% </el-radio>
+                <el-radio :size="'small'" :label="3"> 50% </el-radio>
+                <el-radio :size="'small'" :label="4"> 100% </el-radio>
+              </el-radio-group>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="unbuilt">
+            <template #title>Unbuilt Areas</template>
+            <el-menu-item index="unbuilt-slider">
+              <div>
+                <span>Minimum Available Area (Sq.Ft.)</span>
+                <el-slider v-model="unbuilt" :max="10000" />
+              </div>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-menu-item key="congressional">
+            Congressional District
+          </el-menu-item>
+          <el-menu-item key="city-council">
+            City Councul District
+          </el-menu-item>
+          <el-menu-item key="food"> Food Access </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="quick-selection">
+          <template #title> Quick Selection </template>
+          <el-menu-item
+            v-for="(developmentObj, name) in sampleDevelopments"
+            :key="developmentObj.name"
+            @click="selectDevelopment(name)"
+          >
+            {{ developmentObj.name }}
+          </el-menu-item>
+        </el-sub-menu>
+        <el-input
+          v-model="value"
+          placeholder="Search by address"
+          :suffix-icon="Search"
+        />
+        <el-checkbox
+          v-model="analysisChecked"
+          label="Advanced Site Analysis Mode"
+        />
+      </el-menu>
+    </div>
+    <div :style="{ marginLeft: '200px' }">
+      <div
+        :style="{ height: '50px', background: 'rgb(0, 78, 50)', padding: 0 }"
+      />
+      <div>
+        <div>
+          <DataPopUp
+            v-if="Object.keys(selectedSiteProps).length > 0"
+            :dev-props="selectedSiteProps"
+            @closePopUp="selectedSiteProps = {}"
+          />
+
+          <main id="main-container">
+            <!-- <ParallelCoords
+            v-if="analysisChecked"
+            :developments-props="developmentsProps"
+          /> -->
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="postcss" scoped>
 html * {
