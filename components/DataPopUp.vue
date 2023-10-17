@@ -1,3 +1,23 @@
+<script setup>
+import { DoughnutChart } from 'vue-chart-3'
+import { Chart, registerables } from 'chart.js'
+Chart.register(...registerables)
+
+const props = defineProps({
+  devProps: Object,
+})
+
+const testData = {
+  datasets: [
+    {
+      data: [30, 40, 60, 70, 5],
+      backgroundColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
+      borderColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
+    },
+  ],
+}
+</script>
+
 <template>
   <div id="pop-up" class="absolute w-3/12 h-2/4 p-8 bg-[#004E32]">
     <div class="cursor-pointer" @click="$emit('closePopUp', {})">X</div>
@@ -38,26 +58,6 @@
     </table>
   </div>
 </template>
-
-<script setup>
-import { DoughnutChart } from 'vue-chart-3'
-import { Chart, registerables } from 'chart.js'
-Chart.register(...registerables)
-
-const props = defineProps({
-  devProps: Object,
-})
-
-const testData = {
-  datasets: [
-    {
-      data: [30, 40, 60, 70, 5],
-      backgroundColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
-      borderColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
-    },
-  ],
-}
-</script>
 
 <style>
 #pop-up {

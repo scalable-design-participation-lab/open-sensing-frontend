@@ -226,17 +226,23 @@ const loadMapDraw = () => {
         <el-checkbox v-model="dataDashboard" label="Data Dashboard" />
       </el-menu>
     </div>
-    <div :style="{ marginLeft: '200px' }">
+    <div :style="{ height: '100%', marginLeft: '200px' }">
       <div
+        id="header"
         :style="{ height: '50px', background: 'rgb(0, 78, 50)', padding: 0 }"
-      />
-      <div>
+      >
+        <h2 class="text-white text-left" style="padding-left: 20px">
+          Sensor Dashboard
+        </h2>
+      </div>
+      <div class="h-full">
         <DataPopUp
           v-if="Object.keys(selectedSiteProps).length > 0"
           :dev-props="selectedSiteProps"
           @closePopUp="selectedSiteProps = {}"
         />
-        <main v-show="!dataDashboard" id="main-container" />
+        <main v-show="dataDashboard" id="main-container" />
+        <SensorDashboard v-show="!dataDashboard" />
       </div>
     </div>
   </div>

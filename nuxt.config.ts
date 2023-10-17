@@ -14,6 +14,13 @@ export default defineNuxtConfig({
     // '@/plugins/_',
     { src: '@/plugins/antd-ui', mode: 'client' },
   ],
+
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
   // Element
   // modules: ['@element-plus/nuxt'],
 })
