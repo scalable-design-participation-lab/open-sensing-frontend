@@ -27,6 +27,7 @@
   "dependencies": {
     "ant-design-vue": "4.x",
     "chart.js": "^4.3.2",
+    "d3": "^7.8.5",
     "d3-array": "^3.2.4",
     "d3-scale": "^4.0.2",
     "deck.gl": "8.8",
