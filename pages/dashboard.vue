@@ -50,6 +50,8 @@ const dataDashboard = ref(false)
 
 let map
 
+console.log(useDashboardUIStore(), 293923923923)
+
 onMounted(() => loadMapDraw())
 
 const devNamesIndex = {}
@@ -67,8 +69,9 @@ acsNYCHA.features.forEach((feature, index) => {
   )
 })
 
-const selectDevelopment = (development) => {
+const selectDevelopment = (val, development) => {
   console.log(
+    val,
     development,
     sampleDevelopments[development].checked,
     sampleDevelopments
@@ -208,7 +211,7 @@ const loadMapDraw = () => {
             <el-checkbox
               v-model="sampleDevelopments[name].checked"
               :label="developmentObj.name"
-              @change="selectDevelopment(name)"
+              @change="(val) => selectDevelopment(val, name)"
             />
           </el-menu-item>
         </el-sub-menu>

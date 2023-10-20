@@ -56,35 +56,36 @@ const metrics = [
 const getClass = (metric) => {
   {
     const tailwindClass = 'mt-8 bg-[#41715C] overflow-x-scroll'
-    if (metric != 'temperature') return tailwindClass + ' w-1/2'
-    else return tailwindClass
+    // if (metric != 'temperature') return tailwindClass + ' w-1/2'
+    // else return tailwindClass
+    return tailwindClass
   }
 }
 </script>
 
 <template>
   <div
-    class="w-full px-4 bg-[#004E32] overflow-x-scroll"
+    class="px-4 bg-[#004E32] overflow-auto"
     :style="{ height: 'calc(100vh - 50px)' }"
   >
-    <div class="bg-[#41715C] overflow-x-scroll">
+    <div class="bg-[#41715C] pb-4 px-4">
       <h1 class="p-4">Overview</h1>
-      <table>
-        <tr>
-          <td v-for="name in devNames" :key="name" class="pl-4 pb-4">
-            <OverviewCard />
-          </td>
-        </tr>
-      </table>
+      <div class="flex overflow-auto gap-4">
+        <div v-for="name in devNames" :key="name">
+          <OverviewCard class="" />
+        </div>
+      </div>
     </div>
 
-    <div
-      v-for="(metricData, metric) in chartData"
-      :key="metric"
-      :class="getClass(metric)"
-    >
-      <h1 class="p-4">{{ metric }}</h1>
-      <DataCard :chart-data="metricData" />
+    <div class="columns-2 gap-4 mt-8">
+      <div
+        v-for="(metricData, metric) in chartData"
+        :key="metric"
+        class="bg-[#41715C] overflow-y-auto w-full mb-8"
+      >
+        <h1 class="p-4">{{ metric }}</h1>
+        <DataCard :chart-data="metricData" />
+      </div>
     </div>
   </div>
 </template>

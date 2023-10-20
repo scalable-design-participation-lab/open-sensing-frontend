@@ -15,6 +15,11 @@ export default defineNuxtConfig({
     { src: '@/plugins/antd-ui', mode: 'client' },
   ],
 
+  modules: [
+    // ...
+    '@pinia/nuxt',
+  ],
+
   components: [
     {
       path: '~/components',

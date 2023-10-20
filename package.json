@@ -25,6 +25,7 @@
     "tailwindcss": "^3.3.2"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
     "ant-design-vue": "4.x",
     "chart.js": "^4.3.2",
     "d3": "^7.8.5",
@@ -34,6 +35,7 @@
     "element-plus": "^2.3.12",
     "mapbox-gl": "^2.15.0",
     "parcoord-es": "^2.2.10",
+    "pinia": "^2.1.7",
     "vue-chart-3": "^3.1.8"
   }
 }
