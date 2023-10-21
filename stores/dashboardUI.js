@@ -1,32 +1,45 @@
 export const useDashboardUIStore = defineStore('dashboardUI', () => {
   // State Properties
-  const existingHubs = ref({})
-  const existingDatasets = ref({})
+  const existingHubs = ref({
+    HOWARD: true,
+    'BAY VIEW': true,
+    ASTORIA: true,
+    WAGNER: true,
+    FOREST: true,
+    "MARINER'S HARBOR": true,
+  })
+  const existingDatasets = ref({
+    temperature: true,
+    heat_index: true,
+    relative_humidity: true,
+    pm25: true,
+    pm10: true,
+  })
   const dataDashboard = ref(false)
 
   // Setters
   // Set the list of existing Eco-Hubs
   const updateExistingHubs = (hub, val) => {
-    existingHubs.value[hub] = val
+    if (val === false) {
+      delete existingHubs.value[hub]
+    } else {
+      existingHubs.value[hub] = val
+    }
   }
   // Set the list of existing Datasets
   const updateExistingDatasets = (dataset, val) => {
-    existingDatasets.value[dataset] = val
+    if (val === false) {
+      delete existingDatasets.value[dataset]
+    } else {
+      existingDatasets.value[dataset] = val
+    }
   }
 
   // Getters
   // Get the list of Selected Eco-Hubs
-  const selectedHubs = computed(() =>
-    Object.keys(existingHubs.value).filter(
-      (hub) => existingHubs.value[hub] === true
-    )
-  )
+  const selectedHubs = computed(() => Object.keys(existingHubs.value))
   // Get the list of Selected Datasets
-  const selectedDatasets = computed(() =>
-    Object.keys(existingDatasets.value).filter(
-      (dataset) => existingDatasets.value[dataset] === true
-    )
-  )
+  const selectedDatasets = computed(() => Object.keys(existingDatasets.value))
 
   return {
     existingHubs,

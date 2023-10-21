@@ -46,11 +46,22 @@ const sampleMetrics = ref({
 
 const developmentsProps = ref([])
 const address = ref('')
-const dataDashboard = ref(false)
+
+// Store
+const store = useDashboardUIStore()
+const {
+  existingHubs,
+  existingDatasets,
+  dataDashboard,
+  updateExistingHubs,
+  updateExistingDatasets,
+  selectedHubs,
+  selectedDatasets,
+} = storeToRefs(store)
+
+console.log(existingHubs)
 
 let map
-
-console.log(useDashboardUIStore(), 293923923923)
 
 onMounted(() => loadMapDraw())
 
