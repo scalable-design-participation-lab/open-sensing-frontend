@@ -3,9 +3,12 @@ import { DoughnutChart } from 'vue-chart-3'
 import { Chart, registerables } from 'chart.js'
 Chart.register(...registerables)
 
-// const props = defineProps({
-//   devProps: Object,
-// })
+const props = defineProps({
+  // give name a default value
+
+  name: { type: String, default: '' },
+  devProps: { type: Object, default: () => {} },
+})
 
 const testData = {
   datasets: [
@@ -22,7 +25,7 @@ const testData = {
   <div id="overview-card" class="w-96 h-52 p-4 bg-white">
     <div class="border-black flex flex-row">
       <div class="basis-2/3">
-        <h1>{{ 'Queensbridge Houses' }}</h1>
+        <h1>{{ props.name }}</h1>
       </div>
       <div class="basis-1/3">
         <div class="flex flex-row">

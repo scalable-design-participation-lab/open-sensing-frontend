@@ -4,7 +4,7 @@ import { Chart, registerables } from 'chart.js'
 Chart.register(...registerables)
 
 const props = defineProps({
-  devProps: Object,
+  devProps: { type: Object, default: () => {} },
 })
 
 const testData = {

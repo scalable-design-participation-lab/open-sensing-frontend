@@ -4,11 +4,15 @@ import { csv } from 'd3'
 
 const chartData = ref({})
 
+// Store
+const store = useDashboardUIStore()
+const { selectedHubs, selectedDatasets } = storeToRefs(store)
+
 onMounted(async () => {
   const allData = await csv('/sensorData.csv')
   const labels = allData.map((d) => d['timestamp'])
   // loop through all the elements in metrics
-  metrics.forEach((metric) => {
+  selectedDatasets.value.forEach((metric) => {
     chartData.value[metric] = {
       labels,
       datasets: [
@@ -36,23 +40,6 @@ onMounted(async () => {
   })
 })
 
-const devNames = ref([
-  'HOWARD',
-  'BAY VIEW',
-  'ASTORIA',
-  'WAGNER',
-  'FOREST',
-  "MARINER'S HARBOR",
-])
-
-const metrics = [
-  'temperature',
-  'heat_index',
-  'relative_humidity',
-  'pm25',
-  'pm10',
-]
-
 const getClass = (metric) => {
   {
     const tailwindClass = 'mt-8 bg-[#41715C] overflow-x-scroll'
@@ -71,20 +58,22 @@ const getClass = (metric) => {
     <div class="bg-[#41715C] pb-4 px-4">
       <h1 class="p-4">Overview</h1>
       <div class="flex overflow-auto gap-4">
-        <div v-for="name in devNames" :key="name">
-          <OverviewCard class="" />
+        <div v-for="name in selectedHubs" :key="name">
+          <OverviewCard class="" :name="name" />
         </div>
       </div>
     </div>
 
     <div class="columns-2 gap-4 mt-8">
       <div
-        v-for="(metricData, metric) in chartData"
+        v-for="metric in selectedDatasets"
         :key="metric"
         class="bg-[#41715C] overflow-y-auto w-full mb-8"
       >
         <h1 class="p-4">{{ metric }}</h1>
-        <DataCard :chart-data="metricData" />
+        <DataCard
+          :chart-data="chartData[metric] !== undefined ? chartData[metric] : {}"
+        />
       </div>
     </div>
   </div>

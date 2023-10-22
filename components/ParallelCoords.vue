@@ -17,7 +17,7 @@ var blue_to_brown = scaleLinear()
 // .interpolate(interpolateLab)
 
 const props = defineProps({
-  developmentsProps: Array,
+  developmentsProps: { type: Array, default: () => [] },
 })
 
 onMounted(() => {

@@ -28,22 +28,6 @@ const accessToken =
 // Card for interaction;
 const selectedSite = ref('')
 const selectedSiteProps = ref({})
-const sampleDevelopments = reactive({
-  HOWARD: { name: 'Howard Houses', checked: false },
-  'BAY VIEW': { name: 'Bay View Houses', checked: false },
-  ASTORIA: { name: 'Astoria Houses', checked: false },
-  WAGNER: { name: 'Wagner Houses', checked: false },
-  FOREST: { name: 'Forest Houses Farm', checked: false },
-  "MARINER'S HARBOR": { name: "Mariner's Harbor Houses Farm", checked: false },
-})
-const sampleMetrics = ref({
-  Temperature: { name: 'Temperature', units: '°F', checked: false },
-  Particles: { name: 'Particulate Matter', units: 'μg/m3', checked: false },
-  Humidity: { name: 'Relative Humidity', units: '%RH', checked: false },
-  Moisture: { name: 'Soil Moisture', units: '% Moisture', checked: false },
-  Solar: { name: 'Solar Input', units: 'Amps', checked: false },
-})
-
 const developmentsProps = ref([])
 const address = ref('')
 
@@ -59,7 +43,13 @@ const {
   selectedDatasets,
 } = storeToRefs(store)
 
-console.log(existingHubs)
+const sampleMetrics = {
+  Temperature: { name: 'Temperature', units: '°F' },
+  Particles: { name: 'Particulate Matter', units: 'μg/m3' },
+  Humidity: { name: 'Relative Humidity', units: '%RH' },
+  Moisture: { name: 'Soil Moisture', units: '% Moisture' },
+  Solar: { name: 'Solar Input', units: 'Amps' },
+}
 
 let map
 
@@ -81,12 +71,6 @@ acsNYCHA.features.forEach((feature, index) => {
 })
 
 const selectDevelopment = (val, development) => {
-  console.log(
-    val,
-    development,
-    sampleDevelopments[development].checked,
-    sampleDevelopments
-  )
   const selectedDevelopmet =
     acsNYCHA.features[devNamesIndex[development].id].geometry.coordinates.flat(
       2
@@ -215,21 +199,21 @@ const loadMapDraw = () => {
       >
         <el-sub-menu index="locations">
           <template #title> Locations </template>
-          <el-menu-item
-            v-for="(developmentObj, name) in sampleDevelopments"
-            :key="developmentObj.name"
-          >
+          <el-menu-item v-for="name in Object.keys(existingHubs)" :key="name">
             <el-checkbox
-              v-model="sampleDevelopments[name].checked"
-              :label="developmentObj.name"
+              v-model="existingHubs[name]"
+              :label="name"
               @change="(val) => selectDevelopment(val, name)"
             />
           </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="data">
           <template #title> Data </template>
-          <el-menu-item v-for="metric in sampleMetrics" :key="metric.name">
-            <el-checkbox v-model="metric.checked" :label="metric.name" />
+          <el-menu-item
+            v-for="dataset in Object.keys(existingDatasets)"
+            :key="dataset"
+          >
+            <el-checkbox v-model="existingDatasets[dataset]" :label="dataset" />
           </el-menu-item>
         </el-sub-menu>
         <el-input
