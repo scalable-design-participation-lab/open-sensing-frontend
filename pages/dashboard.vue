@@ -33,15 +33,7 @@ const address = ref('')
 
 // Store
 const store = useDashboardUIStore()
-const {
-  existingHubs,
-  existingDatasets,
-  dataDashboard,
-  updateExistingHubs,
-  updateExistingDatasets,
-  selectedHubs,
-  selectedDatasets,
-} = storeToRefs(store)
+const { existingHubs, existingDatasets, dataDashboard } = storeToRefs(store)
 
 const sampleMetrics = {
   Temperature: { name: 'Temperature', units: '°F' },
