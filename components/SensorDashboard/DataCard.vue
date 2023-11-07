@@ -12,7 +12,13 @@ const props = defineProps({
 
 <template>
   <!-- <div id="overview-card" class="w-96 h-52 p-4 bg-white"> -->
-  <div>
+  <div class="px-4">
+    <div class="relative pb-4">
+      <select class="absolute right-0 bg-[#FFFFFF]/[.6]">
+        <option value="all">All Data</option>
+        <option value="dailyMean">Daily Averages</option>
+      </select>
+    </div>
     <LineChart :chart-data="chartData" />
   </div>
   <!-- </div> -->

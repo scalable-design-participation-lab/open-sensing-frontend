@@ -17,15 +17,18 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     relative_humidity: true,
   })
   const dataDashboard = ref(false)
+  const selectedSite = ref('')
+  const selectedSiteProps = ref({})
+  const development = ref('')
 
   // Setters
   // Set the list of existing Eco-Hubs
-  const updateExistingHubs = (hub, val) => {
-    existingHubs.value[hub] = val
+  function updateExistingHubs(hub, val) {
+    return (existingHubs.value[hub] = val)
   }
   // Set the list of existing Datasets
-  const updateExistingDatasets = (dataset, val) => {
-    existingDatasets.value[dataset] = val
+  function updateExistingDatasets(dataset, val) {
+    return (existingDatasets.value[dataset] = val)
   }
 
   // Getters
@@ -41,14 +44,19 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
       (dataset) => existingDatasets.value[dataset] == true
     )
   )
+  const hubsList = computed(() => Object.keys(existingHubs.value))
 
   return {
     existingHubs,
     existingDatasets,
     dataDashboard,
+    selectedSite,
+    selectedSiteProps,
+    development,
     updateExistingHubs,
     updateExistingDatasets,
     selectedHubs,
     selectedDatasets,
+    hubsList,
   }
 })

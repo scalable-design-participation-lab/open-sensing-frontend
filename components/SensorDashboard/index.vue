@@ -6,7 +6,7 @@ const chartData = ref({})
 
 // Store
 const store = useDashboardUIStore()
-const { selectedHubs, selectedDatasets } = storeToRefs(store)
+const { selectedDatasets, hubsList, existingHubs } = storeToRefs(store)
 
 onMounted(async () => {
   const allData = await csv('/sensorData.csv')
@@ -58,13 +58,20 @@ const getClass = (metric) => {
     <div class="bg-[#41715C] pb-4 px-4">
       <h1 class="p-4">Overview</h1>
       <div class="flex overflow-auto gap-4">
-        <div v-for="name in selectedHubs" :key="name">
-          <OverviewCard class="" :name="name" />
+        <div v-for="name in hubsList" :key="name">
+          <OverviewCard
+            class="border-4 cursor-pointer"
+            :class="
+              existingHubs[name] ? 'border-[#DBFF00]' : 'border-[#41715C]'
+            "
+            :name="name"
+            @click="existingHubs[name] = !existingHubs[name]"
+          />
         </div>
       </div>
     </div>
 
-    <div class="columns-2 gap-4 mt-8">
+    <div class="mt-8">
       <div
         v-for="metric in selectedDatasets"
         :key="metric"

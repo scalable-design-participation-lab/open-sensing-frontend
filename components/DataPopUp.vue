@@ -3,9 +3,9 @@ import { DoughnutChart } from 'vue-chart-3'
 import { Chart, registerables } from 'chart.js'
 Chart.register(...registerables)
 
-const props = defineProps({
-  devProps: { type: Object, default: () => {} },
-})
+// Store
+const store = useDashboardUIStore()
+const { selectedSiteProps } = storeToRefs(store)
 
 const testData = {
   datasets: [
@@ -21,7 +21,7 @@ const testData = {
 <template>
   <div id="pop-up" class="absolute w-3/12 h-2/4 p-8 bg-[#004E32]">
     <div class="cursor-pointer" @click="$emit('closePopUp', {})">X</div>
-    <h1>{{ devProps.DEVELOPMEN }}</h1>
+    <h1>{{ selectedSiteProps.DEVELOPMEN }}</h1>
     <DoughnutChart :chart-data="testData" :width="150" :height="150" />
     <table class="table-fixed table">
       <tbody class="text-white">
@@ -30,8 +30,12 @@ const testData = {
           <td id="text-right">
             {{
               parseFloat(
-                ((devProps.pop20t24P + devProps.pop20t24P / 2) / 100) *
-                  parseFloat(devProps['TOTAL POPULATION'].replace(/,/g, ''))
+                ((selectedSiteProps.pop20t24P +
+                  selectedSiteProps.pop20t24P / 2) /
+                  100) *
+                  parseFloat(
+                    selectedSiteProps['TOTAL POPULATION'].replace(/,/g, '')
+                  )
               ).toFixed(2)
             }}
           </td>
@@ -39,19 +43,19 @@ const testData = {
         <tr>
           <td>City district</td>
           <td id="text-right">
-            {{ devProps['NY CITY COUNCIL DISTRICT'] }}
+            {{ selectedSiteProps['NY CITY COUNCIL DISTRICT'] }}
           </td>
         </tr>
         <tr>
           <td>Congressional District</td>
           <td id="text-right">
-            {{ 'NY-' + devProps['US CONGRESSIONAL DISTRICT'] }}
+            {{ 'NY-' + selectedSiteProps['US CONGRESSIONAL DISTRICT'] }}
           </td>
         </tr>
         <tr>
           <td>Available Area</td>
           <td id="text-right">
-            {{ devProps['suit_area'].toFixed(2) }}
+            {{ selectedSiteProps['suit_area'].toFixed(2) }}
           </td>
         </tr>
       </tbody>
