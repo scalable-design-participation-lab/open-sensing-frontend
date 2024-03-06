@@ -7,7 +7,7 @@ const props = defineProps({
   // give name a default value
 
   name: { type: String, default: '' },
-  devProps: { type: Object, default: () => {} },
+  devProps: { type: Object, default: () => { } },
 })
 
 const testData = {
@@ -30,19 +30,12 @@ const testData = {
         </div>
         <div class="flex justify-between items-center gap-2">
           <div class="">{{ 'OPERATIONAL' }}</div>
-          <div
-            class="h-[12px] w-[12px] bg-lime-300 rounded-full border border-[#004E32]"
-          ></div>
+          <div class="h-[12px] w-[12px] bg-lime-300 rounded-full border border-[#004E32]"></div>
         </div>
       </div>
       <div class="flex flex-row items-center gap-4 w-full">
         <div class="items-center basis-1/4">
-          <DoughnutChart
-            class="mb-2"
-            :chart-data="testData"
-            :width="100"
-            :height="100"
-          />
+          <DoughnutChart class="mb-2" :chart-data="testData" :width="100" :height="100" />
           <div class="text-center">GOOD</div>
         </div>
 
@@ -87,8 +80,10 @@ const testData = {
 }
 
 .table {
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.75rem; /* 28px */
+  font-size: 1.125rem;
+  /* 18px */
+  line-height: 1.75rem;
+  /* 28px */
 }
 
 #text-right {
