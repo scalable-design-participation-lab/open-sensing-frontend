@@ -1,6 +1,8 @@
 <template>
   <!-- <main class="font-sans font-normal flex flex-col h-screen"> -->
-  <header><GCFHeader /></header>
+  <header>
+    <GCFHeader />
+  </header>
 
   <section class="design-widgets">
     <SidebarNav :location="`Test Location`" class="overflow-y-scroll" />
@@ -8,10 +10,7 @@
 
   <!-- Mapbox/DeckGl Canvas -->
   <section>
-    <main
-      id="main-container"
-      class="font-sans font-normal flex flex-col h-screen"
-    ></main>
+    <main id="main-container" class="font-sans font-normal flex flex-col h-screen"></main>
   </section>
 </template>
 
@@ -246,6 +245,7 @@ html {
   height: 100%;
   overflow: hidden;
 }
+
 body {
   background-color: #fffdf8;
 }

@@ -72,8 +72,10 @@ const loadMapDraw = () => {
     container: 'main-container',
     style: 'mapbox://styles/mapbox/light-v9',
     bounds: [
-      [-74.1651917975229651, 40.5716103812675328],
-      [-73.7311475563883505, 40.888293221510196],
+      [-71.088492, 42.338523],
+      [-71.098492, 42.348523],
+
+
     ],
     attributionControl: false,
   })

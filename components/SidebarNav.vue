@@ -12,30 +12,10 @@ const props = defineProps({
 </script>
 
 <template>
-  <el-dropdown>
-    <span class="el-dropdown-link"> Dropdown List </span>
-    <template #dropdown>
-      <el-dropdown-menu>
-        <el-dropdown-item>Action 1</el-dropdown-item>
-        <el-dropdown-item>Action 2</el-dropdown-item>
-        <el-dropdown-item>Action 3</el-dropdown-item>
-        <el-dropdown-item disabled>Action 4</el-dropdown-item>
-        <el-dropdown-item divided>Action 5</el-dropdown-item>
-      </el-dropdown-menu>
-    </template>
-  </el-dropdown>
-
-  <div
-    class="absolute bg-white/90 px-3 py-3 w-1/6 overflow-y-auto h-[calc(100vh-5rem)]"
-    style="background-color: #026341"
-  >
-    <div class="border-b-2 border-black py-4" style="background-color: #026341">
-      <p class="text-xl font-bold text-white">
+  <div class="absolute bg-black/90 px-3 py-3 w-1/6" style="background-color: #609F80">
+    <div class="border-b-8 border-white py-4" style="background-color: #609F80">
+      <p class="text-xl font-bold text-black">
         {{ location }}
-      </p>
-
-      <p class="text-xs font-extralight pt-2 text-white">
-        TODO: Insert dropdown menus
       </p>
 
       <el-collapse v-model="activeName" accordion>
