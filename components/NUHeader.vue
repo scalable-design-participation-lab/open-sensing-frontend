@@ -2,6 +2,7 @@
 
 <template>
   <div class="fixed top-0 left-0 white px-5 py-5 w-full h-20 text-black"
+
     style="background-color: rgba(255, 255, 255, 0.5) ">
     <p class="float-left text-4xl font-bold">PROJECT NAME</p>
     <nav>
@@ -15,7 +16,6 @@
 </template>
 
 <style scoped>
-
 .navigation {
   list-style-type: none;
   margin: 0;
