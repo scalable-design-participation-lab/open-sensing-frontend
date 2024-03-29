@@ -31,11 +31,11 @@
     "d3": "^7.8.5",
     "d3-array": "^3.2.4",
     "d3-scale": "^4.0.2",
-    "deck.gl": "8.8",
-    "element-plus": "^2.3.12",
+    "element-plus": "^2.6.0",
     "mapbox-gl": "^2.15.0",
     "parcoord-es": "^2.2.10",
     "pinia": "^2.1.7",
-    "vue-chart-3": "^3.1.8"
+    "vue-chart-3": "^3.1.8",
+    "deck.gl": "8.8"
   }
 }

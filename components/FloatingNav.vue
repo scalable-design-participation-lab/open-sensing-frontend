@@ -1,6 +1,5 @@
 <template>
-    <el-menu default-active="2" class="el-menu-vertical-demo" background-color="#609F80" text-color="white"
-        style="position: absolute; z-index: 1000; border-radius:15px; left: 20px; top: 100px; width: 300px; box-shadow: 10px 10px 35px rgba(0,0,0,0.35 );">
+    <el-menu default-active="2" class="el-menu-vertical-demo">
         <el-sub-menu index="locations">
             <template #title> LOCATION SELECTION </template>
             <el-menu-item v-for="name in Object.keys(existingHubs)" :key="name">
@@ -21,6 +20,78 @@
         </el-sub-menu>
     </el-menu>
 </template>
+
+
+<style>
+.el-menu-vertical-demo {
+    width: 300px;
+    border-radius: 15px;
+    position: absolute;
+    z-index: 1000;
+    left: 20px;
+    top: 100px;
+    box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
+    background-color: #609F80;
+}
+.el-sub-menu__title {
+    font-size: 1rem;
+    border-radius: 15px;
+    color: white;
+   
+}
+.el-sub-menu__title:hover {
+    color: #609F80;
+    
+}
+
+.el-menu-item {
+    font-size: 0.8rem;
+    background-color: #609F80;
+    color: white;
+    margin: 0;
+    padding: 0 0 0 20px;
+    
+}
+
+.el-menu-item:hover {
+    color: white;
+    font-weight: bold;
+    background-color: #609F80;
+    
+}
+
+.el-checkbox {
+    color: white;
+    
+}
+
+.el-checkbox:hover {
+    color: white;
+    font-weight: bold;
+    background-color: #609F80;
+
+}
+.el-checkbox input:checked ~ .el-checkbox__label {
+    color: white;
+    font-weight: bold  ;
+    
+}
+.el-checkbox__inner {
+    border: 1px solid white;
+    background-color: #609F80;
+}
+
+
+.el-checkbox input:checked ~ .el-checkbox__inner {
+    background-color: white;
+    border-color: white;
+    
+}
+
+
+
+
+</style>
 
 <script setup>
 // IMPORTS
