@@ -21,6 +21,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   const selectedSiteProps = ref({})
   const development = ref('')
 
+  const dataDashboardValues = ref({ time: [0, 24], temperature: [], heat_index: [], relative_humidity: [], pm25: [], pm10: [] })
+
   // Setters
   // Set the list of existing Eco-Hubs
   function updateExistingHubs(hub, val) {
@@ -50,6 +52,7 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     existingHubs,
     existingDatasets,
     dataDashboard,
+    dataDashboardValues,
     selectedSite,
     selectedSiteProps,
     development,

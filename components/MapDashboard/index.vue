@@ -10,7 +10,7 @@ import acsNYCHA from '~/static/ACS_NYCHA_2.json'
 import Eco_Hubs from '~/static/Eco_Hubs.json'
 
 const accessToken =
-  'pk.eyJ1IjoiY3NhbmRvdmEiLCJhIjoiY2pqZWJjajY2NGxsczNrcDE0anZmY3A1MCJ9.Dq2Pukxp_L_o-j4Zz22srQ'
+  'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
 
 // Card for interaction;
 const developmentsProps = ref([])
@@ -71,12 +71,8 @@ const loadMapDraw = () => {
   map = new mapboxgl.Map({
     container: 'main-container',
     style: 'mapbox://styles/mapbox/light-v9',
-    bounds: [
-      [-71.088492, 42.338523],
-      [-71.098492, 42.348523],
-
-
-    ],
+    center: [-71.090953, 42.338512],
+    zoom: 16.3,
     attributionControl: false,
   })
 

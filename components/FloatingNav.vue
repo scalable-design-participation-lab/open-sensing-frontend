@@ -1,3 +1,56 @@
+<script setup>
+// IMPORTS
+import {
+    ElMenu,
+    ElSubMenu,
+    ElMenuItem,
+    ElCheckbox,
+    ElDatePicker,
+    ElSlider,
+} from 'element-plus'
+import 'element-plus/dist/index.css'
+
+// import ParallelCoords from '~~/components/ParallelCoords'
+
+// Store
+const store = useDashboardUIStore()
+const {
+    existingHubs,
+    existingDatasets,
+    dataDashboard,
+    dataDashboardValues,
+    selectedSiteProps,
+    development,
+} = storeToRefs(store)
+
+existingHubs.value = Object.keys(existingHubs.value).reduce((acc, key) => {
+    acc[key] = false
+    return acc
+}, {})
+
+existingDatasets.value = Object.keys(existingDatasets.value).reduce((acc, key) => {
+    acc[key] = false
+    return acc
+}, {})
+
+function applyDateFilter(period) {
+}
+
+const formatTimeTooltip = (val) => {
+    const hours = Math.floor(val);
+    const minutes = Math.floor((val % 1) * 60).toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+};
+
+const sampleMetrics = {
+    Temperature: { name: 'Temperature', units: '°F' },
+    Particles: { name: 'Particulate Matter', units: 'μg/m3' },
+    Humidity: { name: 'Relative Humidity', units: '%RH' },
+    Moisture: { name: 'Soil Moisture', units: '% Moisture' },
+    Solar: { name: 'Solar Input', units: 'Amps' },
+}
+</script>
+
 <template>
     <el-menu default-active="2" class="el-menu-vertical-demo">
         <el-sub-menu index="locations">
@@ -17,6 +70,12 @@
             <el-menu-item>
                 <el-date-picker v-model="dataDashboard.dateRange" type="daterange" range-separator="to"
                     start-placeholder="Start Date" end-placeholder="End Date" align="right" unlink-panels />
+            </el-menu-item>
+            <el-menu-item>
+                <div style="margin-right: 20px;">Time</div>
+                <el-slider v-model="dataDashboardValues.time" range :min="0" :max="24" :step="0.5" show-stops
+                    :format-tooltip="formatTimeTooltip">
+                </el-slider>
             </el-menu-item>
             <el-menu-item class="preset-date-filters">
                 <button class="date-filter-button" @click="applyDateFilter('today')">Today</button>
@@ -92,6 +151,11 @@
     font-weight: bold !important;
 }
 
+:deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
+    color: #609F80 !important;
+    border-color: #609F80 !important;
+
+}
 
 .el-menu-vertical-demo :deep(.el-date-editor) {
     background-color: #609F80;
@@ -101,6 +165,10 @@
 .el-menu-vertical-demo :deep(.el-date-editor .el-input__icon) {
     color: white;
 
+}
+
+.time-slider-container {
+    padding-top: 10px;
 }
 
 .preset-date-filters {
@@ -136,50 +204,3 @@
     outline: none;
 }
 </style>
-
-<script setup>
-// IMPORTS
-import {
-    ElMenu,
-    ElSubMenu,
-    ElMenuItem,
-    ElCheckbox,
-    ElDatePicker,
-} from 'element-plus'
-import 'element-plus/dist/index.css'
-
-// import ParallelCoords from '~~/components/ParallelCoords'
-
-// Store
-const store = useDashboardUIStore()
-const {
-    existingHubs,
-    existingDatasets,
-    dataDashboard,
-    selectedSiteProps,
-    development,
-} = storeToRefs(store)
-
-existingHubs.value = Object.keys(existingHubs.value).reduce((acc, key) => {
-    acc[key] = false
-    return acc
-}, {})
-
-existingDatasets.value = Object.keys(existingDatasets.value).reduce((acc, key) => {
-    acc[key] = false
-    return acc
-}, {})
-
-function applyDateFilter(period) {
-    // logic to set `dataDashboard.dateRange` based on the selected period
-    // 'today', 'week', 'month' could be handled here
-}
-
-const sampleMetrics = {
-    Temperature: { name: 'Temperature', units: '°F' },
-    Particles: { name: 'Particulate Matter', units: 'μg/m3' },
-    Humidity: { name: 'Relative Humidity', units: '%RH' },
-    Moisture: { name: 'Soil Moisture', units: '% Moisture' },
-    Solar: { name: 'Solar Input', units: 'Amps' },
-}
-</script>
