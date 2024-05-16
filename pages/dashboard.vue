@@ -25,19 +25,12 @@ const sampleMetrics = {
 
 <template>
   <section>
-
-  </section>
-
-  <section>
-    <FloatingNav />
-  </section>
-
-
-  <section>
     <NUHeader />
+
     <DataPopUp v-if="Object.keys(selectedSiteProps).length > 0" @closePopUp="selectedSiteProps = {}" />
     <MapDashboard v-show="!dataDashboard" />
     <SensorDashboard v-show="dataDashboard" />
+
     <NUFooter />
   </section>
 </template>

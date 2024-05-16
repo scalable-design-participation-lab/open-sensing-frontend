@@ -52,7 +52,7 @@ const sampleMetrics = {
 </script>
 
 <template>
-    <el-menu default-active="2" class="el-menu-vertical-demo">
+    <el-menu default-active="2" class="el-menu-vertical-demo" unique-opened>
         <el-sub-menu index="locations">
             <template #title> LOCATION SELECTION </template>
             <el-menu-item v-for="name in Object.keys(existingHubs)" :key="name">
@@ -87,6 +87,7 @@ const sampleMetrics = {
                 <button class="date-filter-button" @click="applyDateFilter('Year')">This Year</button>
                 <button class="date-filter-button" @click="applyDateFilter('Last365days')">Last 365 Days</button>
             </el-menu-item>
+
         </el-sub-menu>
     </el-menu>
 </template>
@@ -98,18 +99,14 @@ const sampleMetrics = {
     border-radius: 15px;
     position: absolute;
     z-index: 1000;
-    left: 20px;
-    top: 100px;
-    box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
+    left: 0px;
+    top: 0px;
     background-color: #609F80;
     font-weight: bold;
+    height: 100%;
 
 }
 
-.el-menu-vertical-demo :deep(.el-sub-menu:last-child .el-menu-item:last-child) {
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-}
 
 .el-menu-vertical-demo :deep(.el-sub-menu:hover .el-sub-menu__title) {
     color: white;
@@ -123,7 +120,7 @@ const sampleMetrics = {
 .el-menu-item {
     font-size: 0.8rem;
     background-color: #609F80;
-    color: white;
+    color: black;
     margin: 0;
 }
 

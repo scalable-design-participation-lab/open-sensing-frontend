@@ -54,7 +54,7 @@ const testData = {
               </td>
             </tr>
             <tr class="border-b border-b-[#004E32]">
-              <td>Spoil Moisture</td>
+              <td>Soil Moisture</td>
               <td id="text-right">
                 {{ '42%' }}
               </td>

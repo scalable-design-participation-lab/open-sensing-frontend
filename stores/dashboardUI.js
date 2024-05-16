@@ -14,7 +14,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     relative_humidity: true,
     pm25: true,
     pm10: true,
-    relative_humidity: true,
   })
   const dataDashboard = ref(false)
   const selectedSite = ref('')

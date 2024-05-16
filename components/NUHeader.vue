@@ -1,11 +1,43 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue';
+import Dashboard from './Dashboard.vue';
+import AboutModal from './About.vue';
+
+const isDashboardVisible = ref(false);
+const isAboutVisible = ref(false);
+
+const navigate = (section) => {
+  if (section === 'dashboard') {
+    isDashboardVisible.value = true;
+    isAboutVisible.value = false;
+  } else if (section === 'about') {
+    isDashboardVisible.value = false;
+    isAboutVisible.value = true;
+  }
+};
+
+const closeModals = () => {
+  isDashboardVisible.value = false;
+  isAboutVisible.value = false;
+};
+</script>
 
 <template>
   <div class="fixed top-0 left-0 white px-5 py-5 w-full h-20 text-black"
-    style="background-color: rgba(255, 255, 255, 0.5) ">
-    <p class="float-left text-4xl font-bold">PROJECT NAME</p>
-
+    style="background-color: rgba(255, 255, 255, 0.5)">
+    <p class="float-left text-4xl font-bold">ARBORETUM SENSORS</p>
+    <ul class="navigation">
+      <li>
+        <a href="#" @click="navigate('dashboard')" :class="{ active: isDashboardVisible }">DASHBOARD</a>
+      </li>
+      <li>
+        <a href="#" @click="navigate('about')" :class="{ active: isAboutVisible }">ABOUT</a>
+      </li>
+    </ul>
   </div>
+
+  <Dashboard v-if="isDashboardVisible" @close="closeModals" />
+  <AboutModal v-if="isAboutVisible" @close="closeModals" />
 </template>
 
 <style scoped>
@@ -30,8 +62,11 @@
   text-decoration: none;
 }
 
-.navigation li a:active {
+.navigation li a:active,
+.navigation li a:hover,
+.navigation li a.active {
   color: #609F80;
-  font-weight: bold;
+  font-weight: 900;
+
 }
 </style>
