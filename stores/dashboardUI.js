@@ -9,10 +9,13 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     "MARINER'S HARBOR": true,
   })
   const existingDatasets = ref({
-    temperature: true,
-    heat_index: true,
-    relative_humidity: true,
-    pm25: true,
+    Temperature: true,
+    'Relative Humidity': true,
+    'VOC (ppb)': true,
+    'NOx (ppb)': true,
+    pm1: true,
+    'pm2.5': true,
+    pm4: true,
     pm10: true,
   })
   const dataDashboard = ref(false)
@@ -47,6 +50,16 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   )
   const hubsList = computed(() => Object.keys(existingHubs.value))
 
+  // Toggle visibility of datasets
+  function toggleDataset(datasetKey) {
+    existingDatasets.value[datasetKey] = !existingDatasets.value[datasetKey];
+  }
+
+  // Toggle visibility of hubs
+  function toggleHub(hubKey) {
+    existingHubs.value[hubKey] = !existingHubs.value[hubKey];
+  }
+
   return {
     existingHubs,
     existingDatasets,
@@ -60,5 +73,7 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedHubs,
     selectedDatasets,
     hubsList,
+    toggleDataset,
+    toggleHub,
   }
 })

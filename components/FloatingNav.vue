@@ -9,6 +9,7 @@ import {
     ElSlider,
 } from 'element-plus'
 import 'element-plus/dist/index.css'
+import { useDashboardUIStore } from '@/stores/dashboardUI';
 
 // import ParallelCoords from '~~/components/ParallelCoords'
 
@@ -21,6 +22,8 @@ const {
     dataDashboardValues,
     selectedSiteProps,
     development,
+    toggleHub,
+    toggleDataset,
 } = storeToRefs(store)
 
 existingHubs.value = Object.keys(existingHubs.value).reduce((acc, key) => {
@@ -55,14 +58,14 @@ const sampleMetrics = {
     <el-menu default-active="2" class="el-menu-vertical-demo" unique-opened>
         <el-sub-menu index="locations">
             <template #title> LOCATION SELECTION </template>
-            <el-menu-item v-for="name in Object.keys(existingHubs)" :key="name">
-                <el-checkbox v-model="existingHubs[name]" :label="name" @change="(val) => (development = name)" />
+            <el-menu-item v-for="(isActive, name) in existingHubs" :key="name">
+                <el-checkbox :label="name" v-model="existingHubs[name]" @change="toggleHub(name)" />
             </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="data">
             <template #title> DATA SELECTIONS </template>
-            <el-menu-item v-for="dataset in Object.keys(existingDatasets)" :key="dataset">
-                <el-checkbox v-model="existingDatasets[dataset]" :label="dataset" />
+            <el-menu-item v-for="(isActive, dataset) in existingDatasets" :key="dataset">
+                <el-checkbox :label="dataset" v-model="existingDatasets[dataset]" @change="toggleDataset(dataset)" />
             </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="filter">

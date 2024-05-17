@@ -9,7 +9,9 @@
 <script setup>
 import * as d3 from 'd3';
 import { ref, onMounted } from 'vue';
+import { useDashboardUIStore } from '@/stores/dashboardUI';
 
+const { existingDatasets } = storeToRefs(useDashboardUIStore());
 const scrollContainer = ref(null);
 
 const createLineCharts = (data) => {
@@ -24,6 +26,7 @@ const createLineCharts = (data) => {
         { name: 'pm10', label: 'PM10 (µg/m³)' }
     ];
 
+    scrollContainer.value.innerHTML = '';
     const containerWidth = scrollContainer.value.clientWidth;
     const chartHeight = 300; // Fixed height for each chart
 
@@ -252,6 +255,10 @@ const parseCSV = async () => {
 };
 
 onMounted(() => {
+    parseCSV();
+});
+
+watchEffect(() => {
     parseCSV();
 });
 
