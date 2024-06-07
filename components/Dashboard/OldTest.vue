@@ -11,27 +11,36 @@ import * as d3 from 'd3'
 import { ref, onMounted } from 'vue'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 
-const { existingDatasets } = storeToRefs(useDashboardUIStore())
+const store = useDashboardUIStore()
+const { existingDatasets } = storeToRefs(store)
+
+const parsedData = ref([])
+const metrics = ref([
+  { name: 'temperature', label: 'Temperature (°C)' },
+  { name: 'relative_humidity', label: 'Relative Humidity (%)' },
+  { name: 'voc', label: 'VOC (ppb)' },
+  { name: 'nox', label: 'NOx (ppb)' },
+  { name: 'pm1', label: 'PM1 (µg/m³)' },
+  { name: 'pm25', label: 'PM2.5 (µg/m³)' },
+  { name: 'pm4', label: 'PM4 (µg/m³)' },
+  { name: 'pm10', label: 'PM10 (µg/m³)' },
+])
+
+const containerWidth = ref(0)
+
+watch(existingDatasets, (newDatasets) => {
+  console.log('Datasets changed', newDatasets)
+})
+
 const scrollContainer = ref(null)
 
 const createLineCharts = (data) => {
-  const metrics = [
-    { name: 'temperature', label: 'Temperature (°C)' },
-    { name: 'relative_humidity', label: 'Relative Humidity (%)' },
-    { name: 'voc', label: 'VOC (ppb)' },
-    { name: 'nox', label: 'NOx (ppb)' },
-    { name: 'pm1', label: 'PM1 (µg/m³)' },
-    { name: 'pm25', label: 'PM2.5 (µg/m³)' },
-    { name: 'pm4', label: 'PM4 (µg/m³)' },
-    { name: 'pm10', label: 'PM10 (µg/m³)' },
-  ]
-
-  scrollContainer.value.innerHTML = ''
-  const containerWidth = scrollContainer.value.clientWidth
   const chartHeight = 300 // Fixed height for each chart
 
-  metrics.forEach((metric) => {
+  metrics.value.forEach((metric) => {
+    console.log('Creating chart for', metric)
     const chartDiv = document.createElement('div')
+    chartDiv.id = metric.name
     chartDiv.style.height = `${chartHeight}px`
     chartDiv.style.marginBottom = '50px'
     scrollContainer.value.appendChild(chartDiv)
@@ -42,8 +51,9 @@ const createLineCharts = (data) => {
     chartDiv.appendChild(resetButton)
 
     const margin = { top: 30, right: 30, bottom: 50, left: 60 },
-      width = containerWidth - margin.left - margin.right,
+      width = containerWidth.value - margin.left - margin.right,
       height = chartHeight - margin.top - margin.bottom
+    console.log('Width', width, containerWidth.value)
 
     const svg = d3
       .select(chartDiv)
@@ -252,22 +262,32 @@ const createLineCharts = (data) => {
       .attr('font-size', '12px')
       .text(metric.label)
   })
+  d3.selectAll('#temperature').remove() //.attr('visibility', 'hidden')
 }
 
 const parseCSV = async () => {
   const response = await fetch('/sensorData.csv')
   const text = await response.text()
-  const data = d3.csvParse(text, (d) => ({
-    date: d3.timeParse('%Y-%m-%d %H:%M:%S')(d.timestamp),
-    temperature: +d.temperature,
-    relative_humidity: +d.relative_humidity,
-    voc: +d.voc,
-    nox: +d.nox,
-    pm1: +d.pm1,
-    pm25: +d.pm25,
-    pm4: +d.pm4,
-    pm10: +d.pm10,
-  }))
+  const data = d3.csvParse(text, (d) => {
+    return {
+      date: new Date(d.timestamp), //d3.timeParse('%Y-%m-%d %H:%M:%S')(d.timestamp),
+      temperature: +d.temperature,
+      relative_humidity: +d.relative_humidity,
+      voc: +d.voc,
+      nox: +d.nox,
+      pm1: +d.pm1,
+      pm25: +d.pm25,
+      pm4: +d.pm4,
+      pm10: +d.pm10,
+    }
+  })
+
+  data.sort((a, b) => a.date - b.date)
+  parsedData.value = data
+
+  scrollContainer.value.innerHTML = ''
+  containerWidth.value = scrollContainer.value.clientWidth
+
   createLineCharts(data)
 }
 

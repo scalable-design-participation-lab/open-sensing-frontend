@@ -1,37 +1,47 @@
 <script setup>
-import { ref } from 'vue';
-import Dashboard from './Dashboard.vue';
-import AboutModal from './About.vue';
+import { ref } from 'vue'
+import Dashboard from './Dashboard'
+import AboutModal from './About.vue'
 
-const isDashboardVisible = ref(false);
-const isAboutVisible = ref(false);
+const isDashboardVisible = ref(false)
+const isAboutVisible = ref(false)
 
 const navigate = (section) => {
   if (section === 'dashboard') {
-    isDashboardVisible.value = true;
-    isAboutVisible.value = false;
+    isDashboardVisible.value = true
+    isAboutVisible.value = false
   } else if (section === 'about') {
-    isDashboardVisible.value = false;
-    isAboutVisible.value = true;
+    isDashboardVisible.value = false
+    isAboutVisible.value = true
   }
-};
+}
 
 const closeModals = () => {
-  isDashboardVisible.value = false;
-  isAboutVisible.value = false;
-};
+  isDashboardVisible.value = false
+  isAboutVisible.value = false
+}
 </script>
 
 <template>
-  <div class="fixed top-0 left-0 white px-5 py-5 w-full h-20 text-black"
-    style="background-color: rgba(255, 255, 255, 0.5)">
+  <div
+    class="fixed top-0 left-0 white px-5 py-5 w-full h-20 text-black"
+    style="background-color: rgba(255, 255, 255, 0.5)"
+  >
     <p class="float-left text-4xl font-bold">ARBORETUM SENSORS</p>
     <ul class="navigation">
       <li>
-        <a href="#" @click="navigate('dashboard')" :class="{ active: isDashboardVisible }">DASHBOARD</a>
+        <a
+          href="#"
+          :class="{ active: isDashboardVisible }"
+          @click="navigate('dashboard')"
+        >DASHBOARD</a>
       </li>
       <li>
-        <a href="#" @click="navigate('about')" :class="{ active: isAboutVisible }">ABOUT</a>
+        <a
+          href="#"
+          :class="{ active: isAboutVisible }"
+          @click="navigate('about')"
+        >ABOUT</a>
       </li>
     </ul>
   </div>
@@ -54,7 +64,7 @@ const closeModals = () => {
 .navigation li {
   margin-left: 20px;
   font-size: 1.2rem;
-  font-family: "Segoe UI Symbol", sans-serif;
+  font-family: 'Segoe UI Symbol', sans-serif;
 }
 
 .navigation li a {
@@ -65,8 +75,7 @@ const closeModals = () => {
 .navigation li a:active,
 .navigation li a:hover,
 .navigation li a.active {
-  color: #609F80;
+  color: #609f80;
   font-weight: 900;
-
 }
 </style>

@@ -2,12 +2,11 @@
 // IMPORTS
 import { onMounted, ref } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
-import { GeoJsonLayer, IconLayer } from '@deck.gl/layers'
+import { IconLayer } from '@deck.gl/layers'
 
 // Mapbox imports
 import mapboxgl from 'mapbox-gl'
-import acsNYCHA from '~/static/ACS_NYCHA_2.json'
-import Eco_Hubs from '~/static/Eco_Hubs.json'
+import sensorLocations from '~/static/Sensor_Locations_NEU.json'
 
 const accessToken =
   'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
@@ -25,7 +24,7 @@ onMounted(() => loadMapDraw())
 
 watch(development, (newDevelopment) => {
   const selectedDevelopmet =
-    acsNYCHA.features[
+    sensorLocations.features[
       devNamesIndex[newDevelopment].id
     ].geometry.coordinates.flat(2)
 
@@ -45,7 +44,7 @@ watch(development, (newDevelopment) => {
 })
 
 const devNamesIndex = {}
-acsNYCHA.features.forEach((feature, index) => {
+sensorLocations.features.forEach((feature, index) => {
   devNamesIndex[feature.properties['DEVELOPMENT']] = {
     id: index,
     tdsNum: feature.properties['TDS_NUM'],
@@ -93,35 +92,9 @@ const loadMapDraw = () => {
 
     map.addLayer(
       new MapboxLayer({
-        id: 'ny-geojson',
-        type: GeoJsonLayer,
-        data: acsNYCHA,
-        pickable: true,
-        stroked: false,
-        filled: true,
-        extruded: false,
-        pointType: 'circle',
-        lineWidthScale: 20,
-        lineWidthMinPixels: 2,
-        getLineColor: [0, 78, 50], //88,24,13 brown, 255,255,255 white
-        getFillColor: [0, 78, 50],
-        getPointRadius: 100,
-        getLineWidth: 1,
-        getElevation: 30,
-        autoHighlight: true,
-        highlightColor: [178, 235, 242, 200],
-        onClick: (info) => {
-          selectedSite.value = info.object.properties.CNN
-          selectedSiteProps.value = info.object.properties
-        },
-      })
-    )
-
-    map.addLayer(
-      new MapboxLayer({
         id: 'ny-marker',
         type: IconLayer,
-        data: Eco_Hubs.features,
+        data: sensorLocations.features,
         pickable: true,
         // iconAtlas and iconMapping are required
         // getIcon: return a string
