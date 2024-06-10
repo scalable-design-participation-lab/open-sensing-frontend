@@ -1,32 +1,14 @@
-<!-- <template>
-  <div ref="currentContainer" class="current-container"></div>
-</template> -->
+<template>
+  <!-- <div ref="currentContainer" class="current-container"></div> -->
+  <div id="chart" />
+</template>
 
 <script setup>
 import * as d3 from 'd3'
 import { ref, onMounted } from 'vue'
 import { useParentElement } from '@vueuse/core'
 
-import { useDashboardUIStore } from '@/stores/dashboardUI'
-
 const currentContainer = useParentElement()
-
-const chartHeight = 300 // Fixed height for each chart
-
-// watch(existingDatasets, (newDatasets) => {
-//   console.log('Datasets changed', newDatasets)
-// })
-
-onUpdated(() => {
-  // text content should be the same as current `count.value`
-  //   console.log(
-  //     parentEl.value.clientWidth,
-  //     'updatedddd',
-  //     props.height,
-  //     props.width
-  //   )
-  createLineCharts()
-})
 
 const props = defineProps({
   metric: { type: Object, default: () => {} },
@@ -39,17 +21,13 @@ const props = defineProps({
   },
 })
 
-// const props = defineProps(['visible'])
-// const emit = defineEmits(['close'])
+const chartHeight = 300 // Fixed height for each chart
 
-// const closeModal = () => {
-//   emit('close')
-// }
 const createLineCharts = () => {
-  //   console.log('Creating line charts', props.metric)
   if (props.width <= 0) return
-  const chartDiv = document.createElement('div')
-  chartDiv.id = props.metric.name
+  //   const chartDiv = document.createElement('div')
+  const chartDiv = d3.select('#chart').node()
+  //   chartDiv.id = props.metric.name
   chartDiv.style.height = `${chartHeight}px`
   chartDiv.style.marginBottom = '50px'
 
@@ -57,10 +35,6 @@ const createLineCharts = () => {
   resetButton.textContent = 'Reset'
   resetButton.style.marginBottom = '10px'
   chartDiv.appendChild(resetButton)
-
-  //   const margin = { top: 30, right: 30, bottom: 50, left: 60 },
-  //     width = currentContainer.value.clientWidth - margin.left - margin.right,
-  //     height = chartHeight - margin.top - margin.bottom
 
   const svg = d3
     .select(chartDiv)
@@ -82,13 +56,8 @@ const createLineCharts = () => {
     .attr('transform', `translate(0,${props.height})`)
   svg.append('g').attr('class', 'y-axis')
 
-  const metricData = props.data.map((d) => ({
-    date: d.date,
-    value: d[props.metric.name],
-  }))
-
-  x.domain(d3.extent(metricData, (d) => d.date))
-  y.domain([0, d3.max(metricData, (d) => d.value)])
+  x.domain(d3.extent(props.data, (d) => d.date))
+  y.domain([0, d3.max(props.data, (d) => d.value)])
 
   svg.select('.x-axis').call(xAxis)
   svg.select('.y-axis').call(yAxis)
@@ -100,7 +69,7 @@ const createLineCharts = () => {
 
   svg
     .append('path')
-    .data([metricData])
+    .data([props.data])
     .attr('class', 'line')
     .attr('fill', 'none')
     .attr('stroke', 'steelblue')
@@ -115,7 +84,7 @@ const createLineCharts = () => {
 
   svg
     .selectAll('dot')
-    .data(metricData)
+    .data(props.data)
     .enter()
     .append('circle')
     .attr('r', 1)
@@ -158,7 +127,7 @@ const createLineCharts = () => {
     // Add the updated line
     svg
       .append('path')
-      .data([metricData])
+      .data([props.data])
       .attr('class', 'line')
       .attr('fill', 'none')
       .attr('stroke', 'steelblue')
@@ -168,7 +137,7 @@ const createLineCharts = () => {
     // Add updated circles
     svg
       .selectAll('dot')
-      .data(metricData)
+      .data(props.data)
       .enter()
       .append('circle')
       .attr('r', 3) // Smaller radius for circles
@@ -194,7 +163,7 @@ const createLineCharts = () => {
 
   function resetChart() {
     // Reset x domain to the original extent
-    x.domain(d3.extent(metricData, (d) => d.date))
+    x.domain(d3.extent(props.data, (d) => d.date))
 
     // Remove existing line and circles
     svg.selectAll('.line').remove()
@@ -203,7 +172,7 @@ const createLineCharts = () => {
     // Add the original line
     svg
       .append('path')
-      .data([metricData])
+      .data([props.data])
       .attr('class', 'line')
       .attr('fill', 'none')
       .attr('stroke', 'steelblue')
@@ -213,7 +182,7 @@ const createLineCharts = () => {
     // Add original circles
     svg
       .selectAll('dot')
-      .data(metricData)
+      .data(props.data)
       .enter()
       .append('circle')
       .attr('r', 3) // Smaller radius for circles
@@ -270,71 +239,17 @@ const createLineCharts = () => {
     .text(props.metric.label)
   currentContainer.value.appendChild(chartDiv)
 }
+
+onMounted(() => {
+  createLineCharts()
+})
+
+// watchEffect(() => {
+//   createLineCharts()
+// })
 </script>
 
 <style scoped>
-.chart-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 53%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95%;
-  height: 85%;
-  background-color: white;
-  border-radius: 15px;
-  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
-  z-index: 10;
-  overflow: hidden;
-}
-
-.close-btn {
-  position: absolute;
-  top: 5px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  font-weight: bold;
-  color: lightgray;
-  cursor: pointer;
-}
-
-.close-btn:hover {
-  color: #609f80;
-}
-
-.current-container {
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  width: calc(100% - 320px);
-  height: 95%;
-  padding: 5px;
-  margin-left: 300px;
-  margin-top: 50px;
-  margin-bottom: 30px;
-}
-
-.current-container::-webkit-scrollbar {
-  width: 10px;
-  background-color: transparent;
-}
-
-.current-container::-webkit-scrollbar-thumb {
-  background-color: #609f80;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background-clip: padding-box;
-}
-
-.current-container::-webkit-scrollbar-button {
-  display: none;
-}
-
 .tooltip {
   position: absolute;
   text-align: center;

@@ -1,40 +1,47 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div ref="chartContainer" class="chart-container">
     <button class="close-btn" @click="closeModal">&times;</button>
     <FloatingNav />
     <div ref="scrollContainer" class="scroll-container">
-      <LineChart
-        v-for="metric in metrics"
-        :key="metric.name"
-        :metric="metric"
-        :data="parsedData"
-        :margin="margin"
-        :width="width"
-        :height="height"
-      />
+      <div v-if="mounted">
+        <LineChart
+          v-for="(metric, metricName) in metrics"
+          :key="metricName"
+          :class="{ innactive: !selectedDatasets.includes(metricName) }"
+          :metric="metric"
+          :data="sensorData[metricName]"
+          :margin="margin"
+          :width="width"
+          :height="height"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import * as d3 from 'd3'
 import { ref, onMounted } from 'vue'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 const store = useDashboardUIStore()
-const { existingDatasets } = storeToRefs(store)
+const { selectedDatasets, sensorData } = storeToRefs(store)
+const mounted = ref(false)
 
-const parsedData = ref([])
-const metrics = ref([
-  { name: 'temperature', label: 'Temperature (°C)' },
-  { name: 'relative_humidity', label: 'Relative Humidity (%)' },
-  { name: 'voc', label: 'VOC (ppb)' },
-  { name: 'nox', label: 'NOx (ppb)' },
-  { name: 'pm1', label: 'PM1 (µg/m³)' },
-  { name: 'pm25', label: 'PM2.5 (µg/m³)' },
-  { name: 'pm4', label: 'PM4 (µg/m³)' },
-  { name: 'pm10', label: 'PM10 (µg/m³)' },
-])
+const metrics = ref({
+  Temperature: { name: 'temperature', label: 'Temperature (°C)' },
+  'Relative Humidity': {
+    name: 'relative_humidity',
+    label: 'Relative Humidity (%)',
+  },
+  'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
+  'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
+  pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
+  'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
+  pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
+  pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
+})
+
 const margin = ref({ top: 30, right: 30, bottom: 50, left: 60 })
 const height = ref(0)
 const width = ref(0)
@@ -43,42 +50,15 @@ const scrollContainer = ref(null)
 
 const chartHeight = 300 // Fixed height for each chart
 
-const parseCSV = async () => {
-  const response = await fetch('/sensorData.csv')
-  const text = await response.text()
-  const data = d3.csvParse(text, (d) => {
-    return {
-      date: new Date(d.timestamp), //d3.timeParse('%Y-%m-%d %H:%M:%S')(d.timestamp),
-      temperature: +d.temperature,
-      relative_humidity: +d.relative_humidity,
-      voc: +d.voc,
-      nox: +d.nox,
-      pm1: +d.pm1,
-      pm25: +d.pm25,
-      pm4: +d.pm4,
-      pm10: +d.pm10,
-    }
-  })
-
-  data.sort((a, b) => a.date - b.date)
-  parsedData.value = data
-
-  scrollContainer.value.innerHTML = ''
+onMounted(() => {
   containerWidth.value = scrollContainer.value.clientWidth
-
   width.value = containerWidth.value - margin.value.left - margin.value.right
   height.value = chartHeight - margin.value.top - margin.value.bottom
-}
 
-onMounted(() => {
-  parseCSV()
+  mounted.value = true
 })
 
-watchEffect(() => {
-  parseCSV()
-})
-
-const props = defineProps(['visible'])
+// const props = defineProps(['visible'])
 const emit = defineEmits(['close'])
 
 const closeModal = () => {
@@ -87,6 +67,9 @@ const closeModal = () => {
 </script>
 
 <style scoped>
+.innactive {
+  display: none;
+}
 .chart-container {
   display: flex;
   justify-content: center;
@@ -147,34 +130,5 @@ const closeModal = () => {
 
 .scroll-container::-webkit-scrollbar-button {
   display: none;
-}
-
-.tooltip {
-  position: absolute;
-  text-align: center;
-  width: 60px;
-  height: 28px;
-  padding: 2px;
-  font: 12px sans-serif;
-  background: lightsteelblue;
-  border: 0px;
-  border-radius: 8px;
-  pointer-events: none;
-}
-
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
-
-.circle {
-  fill: steelblue;
-  stroke: none;
-}
-
-.brush .selection {
-  fill: steelblue;
-  fill-opacity: 0.3;
 }
 </style>

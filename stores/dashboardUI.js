@@ -23,7 +23,16 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   const selectedSiteProps = ref({})
   const development = ref('')
 
-  const dataDashboardValues = ref({ time: [0, 24], temperature: [], heat_index: [], relative_humidity: [], pm25: [], pm10: [] })
+  const dataDashboardValues = ref({
+    time: [0, 24],
+    temperature: [],
+    heat_index: [],
+    relative_humidity: [],
+    pm25: [],
+    pm10: [],
+  })
+
+  const sensorData = ref({})
 
   // Setters
   // Set the list of existing Eco-Hubs
@@ -32,7 +41,23 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   }
   // Set the list of existing Datasets
   function updateExistingDatasets(dataset, val) {
-    return (existingDatasets.value[dataset] = val)
+    existingDatasets.value[dataset] = val
+    console.log(dataset, val, existingDatasets.value[dataset])
+  }
+
+  // Toggle visibility of datasets
+  function toggleDataset(datasetKey) {
+    existingDatasets.value[datasetKey] = !existingDatasets.value[datasetKey]
+  }
+
+  // Toggle visibility of hubs
+  function toggleHub(hubKey) {
+    existingHubs.value[hubKey] = !existingHubs.value[hubKey]
+  }
+
+  // Load the data for the sensor
+  function loadSensorData(data) {
+    sensorData.value = data
   }
 
   // Getters
@@ -43,37 +68,33 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     )
   )
   // Get the list of Selected Datasets
-  const selectedDatasets = computed(() =>
-    Object.keys(existingDatasets.value).filter(
-      (dataset) => existingDatasets.value[dataset] == true
-    )
-  )
+  const selectedDatasets = computed(() => {
+    if (Object.keys(existingDatasets.value).length === 0) return []
+    else
+      return Object.keys(existingDatasets.value).filter(
+        (dataset) => existingDatasets.value[dataset] === true
+      )
+  })
+
+  // Get the list of Eco-Hubs
   const hubsList = computed(() => Object.keys(existingHubs.value))
-
-  // Toggle visibility of datasets
-  function toggleDataset(datasetKey) {
-    existingDatasets.value[datasetKey] = !existingDatasets.value[datasetKey];
-  }
-
-  // Toggle visibility of hubs
-  function toggleHub(hubKey) {
-    existingHubs.value[hubKey] = !existingHubs.value[hubKey];
-  }
 
   return {
     existingHubs,
     existingDatasets,
     dataDashboard,
     dataDashboardValues,
+    sensorData,
     selectedSite,
     selectedSiteProps,
     development,
-    updateExistingHubs,
-    updateExistingDatasets,
     selectedHubs,
     selectedDatasets,
     hubsList,
     toggleDataset,
     toggleHub,
+    updateExistingHubs,
+    updateExistingDatasets,
+    loadSensorData,
   }
 })

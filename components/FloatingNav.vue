@@ -20,24 +20,14 @@ const {
   existingDatasets,
   dataDashboard,
   dataDashboardValues,
-  selectedSiteProps,
-  development,
   toggleHub,
-  toggleDataset,
 } = storeToRefs(store)
+const { updateExistingDatasets } = store
 
 existingHubs.value = Object.keys(existingHubs.value).reduce((acc, key) => {
   acc[key] = false
   return acc
 }, {})
-
-// existingDatasets.value = Object.keys(existingDatasets.value).reduce(
-//   (acc, key) => {
-//     acc[key] = false
-//     return acc
-//   },
-//   {}
-// )
 
 function applyDateFilter(period) {}
 
@@ -77,6 +67,10 @@ const sampleMetrics = {
         :key="dataset"
       >
         <el-checkbox v-model="existingDatasets[dataset]" :label="dataset" />
+        <!-- <el-checkbox
+          :label="dataset"
+          @change="(value) => updateExistingDatasets(dataset, value)"
+        /> -->
       </el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="filter">
