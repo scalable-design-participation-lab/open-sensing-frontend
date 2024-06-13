@@ -22,7 +22,7 @@ const {
   dataDashboardValues,
   toggleHub,
 } = storeToRefs(store)
-const { updateExistingDatasets } = store
+const { updateExistingDatasets, updateDateRangeUpdate } = store
 
 existingHubs.value = Object.keys(existingHubs.value).reduce((acc, key) => {
   acc[key] = false
@@ -77,13 +77,14 @@ const sampleMetrics = {
       <template #title> DATE & TIME </template>
       <el-menu-item>
         <el-date-picker
-          v-model="dataDashboard.dateRange"
+          v-model="dataDashboardValues.dateRange"
           type="daterange"
           range-separator="to"
           start-placeholder="Start Date"
           end-placeholder="End Date"
           align="right"
           unlink-panels
+          @change="updateDateRangeUpdate(new Date())"
         />
       </el-menu-item>
       <el-menu-item>

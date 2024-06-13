@@ -1,12 +1,18 @@
 <template>
   <!-- <div ref="currentContainer" class="current-container"></div> -->
-  <div id="chart" />
+  <div id="chart">
+    <el-button id="reset-button" round>Reset Chart</el-button>
+  </div>
 </template>
 
 <script setup>
 import * as d3 from 'd3'
-import { ref, onMounted } from 'vue'
 import { useParentElement } from '@vueuse/core'
+import { ElButton } from 'element-plus'
+
+const store = useDashboardUIStore()
+const { dataDashboardValues, dateRangeUpdate } = storeToRefs(store)
+const { updateDataDashboardValues } = store
 
 const currentContainer = useParentElement()
 
@@ -21,7 +27,27 @@ const props = defineProps({
   },
 })
 
+const updateChartGlobal = ref(null)
+const brushGlobalDOM = ref(null)
+const brushGlobal = ref(null)
+
+watch(
+  () => dateRangeUpdate.value,
+  (n) => {
+    console.log(n, ' value changed')
+    programmaticUpdate()
+  }
+)
+
 const chartHeight = 300 // Fixed height for each chart
+
+const programmaticUpdate = () => {
+  updateChartGlobal.value(undefined, dataDashboardValues.value.dateRange)
+  // brushGlobalDOM.value.call(
+  //   brushGlobal.value.move,
+  //   [336.19921875, 646.19921875]
+  // )
+}
 
 const createLineCharts = () => {
   if (props.width <= 0) return
@@ -30,11 +56,6 @@ const createLineCharts = () => {
   //   chartDiv.id = props.metric.name
   chartDiv.style.height = `${chartHeight}px`
   chartDiv.style.marginBottom = '50px'
-
-  const resetButton = document.createElement('button')
-  resetButton.textContent = 'Reset'
-  resetButton.style.marginBottom = '10px'
-  chartDiv.appendChild(resetButton)
 
   const svg = d3
     .select(chartDiv)
@@ -47,8 +68,12 @@ const createLineCharts = () => {
   const x = d3.scaleTime().range([0, props.width])
   const y = d3.scaleLinear().range([props.height, 0])
 
+  // use d3 scaleTime to go from date to extent
+
   const xAxis = d3.axisBottom(x)
   const yAxis = d3.axisLeft(y)
+
+  const circleRadius = 2
 
   svg
     .append('g')
@@ -67,6 +92,12 @@ const createLineCharts = () => {
     .x((d) => x(d.date))
     .y((d) => y(d.value))
 
+  const tooltip = d3
+    .select('body')
+    .append('div')
+    .attr('class', 'tooltip')
+    .style('opacity', 1)
+
   svg
     .append('path')
     .data([props.data])
@@ -76,18 +107,12 @@ const createLineCharts = () => {
     .attr('stroke-width', 1.5)
     .attr('d', line)
 
-  const tooltip = d3
-    .select('body')
-    .append('div')
-    .attr('class', 'tooltip')
-    .style('opacity', 0)
-
   svg
     .selectAll('dot')
     .data(props.data)
     .enter()
     .append('circle')
-    .attr('r', 1)
+    .attr('r', circleRadius)
     .attr('fill', 'steelblue')
     .attr('stroke', 'none')
     .attr('cx', (d) => x(d.date))
@@ -112,13 +137,25 @@ const createLineCharts = () => {
     .on('end', updateChart)
 
   const brushSelection = svg.append('g').attr('class', 'brush').call(brush)
+  brushGlobal.value = brush
+  brushGlobalDOM.value = brushSelection
 
-  function updateChart(event) {
-    const extent = event.selection
-    if (!extent) return
+  function updateChart(event, dates) {
+    if (event !== undefined) {
+      const extent = event.selection
+      if (!extent) return
 
-    // Update x domain based on selection
-    x.domain([x.invert(extent[0]), x.invert(extent[1])])
+      updateDataDashboardValues('dateRange', [
+        x.invert(extent[0]),
+        x.invert(extent[1]),
+      ])
+      updateDataDashboardValues('dataRangeValues', extent)
+
+      // Update x domain based on selection
+      x.domain([x.invert(extent[0]), x.invert(extent[1])])
+    } else {
+      x.domain(dates)
+    }
 
     // Remove existing line and circles
     svg.selectAll('.line').remove()
@@ -140,7 +177,7 @@ const createLineCharts = () => {
       .data(props.data)
       .enter()
       .append('circle')
-      .attr('r', 3) // Smaller radius for circles
+      .attr('r', circleRadius) // Smaller radius for circles
       .attr('fill', 'steelblue')
       .attr('stroke', 'none')
       .attr('cx', (d) => x(d.date))
@@ -160,6 +197,7 @@ const createLineCharts = () => {
     svg.select('.x-axis').call(xAxis)
     svg.select('.y-axis').call(yAxis)
   }
+  updateChartGlobal.value = updateChart
 
   function resetChart() {
     // Reset x domain to the original extent
@@ -209,7 +247,7 @@ const createLineCharts = () => {
     brushSelection.call(brush.move, null)
   }
 
-  resetButton.addEventListener('click', resetChart)
+  d3.select('#reset-button').node().addEventListener('click', resetChart)
 
   svg
     .append('text')

@@ -30,9 +30,13 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     relative_humidity: [],
     pm25: [],
     pm10: [],
+    dateRange: [],
+    dateRangeValues: [],
   })
 
   const sensorData = ref({})
+
+  const dateRangeUpdate = ref(null)
 
   // Setters
   // Set the list of existing Eco-Hubs
@@ -58,6 +62,16 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   // Load the data for the sensor
   function loadSensorData(data) {
     sensorData.value = data
+  }
+
+  // Update datadashboard values
+  function updateDataDashboardValues(dataType, data) {
+    dataDashboardValues.value[dataType] = data
+  }
+
+  // Update the dateRangeUpdate
+  function updateDateRangeUpdate(data) {
+    dateRangeUpdate.value = data
   }
 
   // Getters
@@ -91,10 +105,13 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedHubs,
     selectedDatasets,
     hubsList,
+    dateRangeUpdate,
     toggleDataset,
     toggleHub,
     updateExistingHubs,
     updateExistingDatasets,
     loadSensorData,
+    updateDataDashboardValues,
+    updateDateRangeUpdate,
   }
 })
