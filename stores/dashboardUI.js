@@ -46,7 +46,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   // Set the list of existing Datasets
   function updateExistingDatasets(dataset, val) {
     existingDatasets.value[dataset] = val
-    console.log(dataset, val, existingDatasets.value[dataset])
   }
 
   // Toggle visibility of datasets

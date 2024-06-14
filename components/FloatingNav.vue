@@ -22,14 +22,20 @@ const {
   dataDashboardValues,
   toggleHub,
 } = storeToRefs(store)
-const { updateExistingDatasets, updateDateRangeUpdate } = store
+const { updateDataDashboardValues, updateDateRangeUpdate } = store
 
 existingHubs.value = Object.keys(existingHubs.value).reduce((acc, key) => {
   acc[key] = false
   return acc
 }, {})
 
-function applyDateFilter(period) {}
+function applyDateFilter(period) {
+  const endDate = new Date()
+  const startDate = new Date(endDate)
+  startDate.setDate(endDate.getDate() - period)
+  updateDataDashboardValues('dateRange', [startDate, endDate])
+  updateDateRangeUpdate(new Date())
+}
 
 const formatTimeTooltip = (val) => {
   const hours = Math.floor(val)
@@ -101,37 +107,17 @@ const sampleMetrics = {
         </el-slider>
       </el-menu-item>
       <el-menu-item class="preset-date-filters">
-        <button class="date-filter-button" @click="applyDateFilter('today')">
-          Today
-        </button>
-        <button class="date-filter-button" @click="applyDateFilter('24hours')">
+        <button class="date-filter-button" @click.stop="applyDateFilter(1)">
           Last 24 Hours
         </button>
-        <button class="date-filter-button" @click="applyDateFilter('week')">
-          This Week
-        </button>
-        <button
-          class="date-filter-button"
-          @click="applyDateFilter('Last7days')"
-        >
+        <button class="date-filter-button" @click.stop="applyDateFilter(7)">
           Last 7 Days
         </button>
-        <button class="date-filter-button" @click="applyDateFilter('month')">
-          This Month
-        </button>
-        <button
-          class="date-filter-button"
-          @click="applyDateFilter('Last30days')"
-        >
+        <button class="date-filter-button" @click.stop="applyDateFilter(30)">
           Last 30 Days
         </button>
-        <button class="date-filter-button" @click="applyDateFilter('Year')">
-          This Year
-        </button>
-        <button
-          class="date-filter-button"
-          @click="applyDateFilter('Last365days')"
-        >
+
+        <button class="date-filter-button" @click.stop="applyDateFilter(365)">
           Last 365 Days
         </button>
       </el-menu-item>

@@ -2,6 +2,7 @@
   <!-- <div ref="currentContainer" class="current-container"></div> -->
   <div id="chart">
     <el-button id="reset-button" round>Reset Chart</el-button>
+    <div id="tooltip" class="tooltip" />
   </div>
 </template>
 
@@ -31,15 +32,11 @@ const updateChartGlobal = ref(null)
 const brushGlobalDOM = ref(null)
 const brushGlobal = ref(null)
 
-watch(
-  () => dateRangeUpdate.value,
-  (n) => {
-    console.log(n, ' value changed')
-    programmaticUpdate()
-  }
-)
-
 const chartHeight = 300 // Fixed height for each chart
+
+watch(dateRangeUpdate, (n) => {
+  programmaticUpdate()
+})
 
 const programmaticUpdate = () => {
   updateChartGlobal.value(undefined, dataDashboardValues.value.dateRange)
@@ -74,6 +71,8 @@ const createLineCharts = () => {
   const yAxis = d3.axisLeft(y)
 
   const circleRadius = 2
+  const xOffSet = 20
+  const yOffSet = 70
 
   svg
     .append('g')
@@ -92,11 +91,13 @@ const createLineCharts = () => {
     .x((d) => x(d.date))
     .y((d) => y(d.value))
 
-  const tooltip = d3
-    .select('body')
-    .append('div')
-    .attr('class', 'tooltip')
-    .style('opacity', 1)
+  // const tooltip = d3
+  //   .select(chartDiv)
+  //   .append('div')
+  //   .attr('class', 'tooltip')
+  //   .style('opacity', 1)
+  // console.log('tooltip', tooltip)
+  const tooltip = d3.select('#tooltip').style('opacity', 0)
 
   svg
     .append('path')
@@ -106,27 +107,6 @@ const createLineCharts = () => {
     .attr('stroke', 'steelblue')
     .attr('stroke-width', 1.5)
     .attr('d', line)
-
-  svg
-    .selectAll('dot')
-    .data(props.data)
-    .enter()
-    .append('circle')
-    .attr('r', circleRadius)
-    .attr('fill', 'steelblue')
-    .attr('stroke', 'none')
-    .attr('cx', (d) => x(d.date))
-    .attr('cy', (d) => y(d.value))
-    .on('mouseover', function (event, d) {
-      tooltip.transition().duration(200).style('opacity', 0.9)
-      tooltip
-        .html(`Date: ${d.date}<br>Value: ${d.value}`)
-        .style('left', `${event.pageX + 5}px`)
-        .style('top', `${event.pageY - 28}px`)
-    })
-    .on('mouseout', function () {
-      tooltip.transition().duration(500).style('opacity', 0)
-    })
 
   const brush = d3
     .brushX()
@@ -139,6 +119,37 @@ const createLineCharts = () => {
   const brushSelection = svg.append('g').attr('class', 'brush').call(brush)
   brushGlobal.value = brush
   brushGlobalDOM.value = brushSelection
+
+  svg
+    .selectAll('dot')
+    .data(props.data)
+    .enter()
+    .append('circle')
+    .attr('r', circleRadius)
+    .attr('fill', 'steelblue')
+    .attr('stroke', 'none')
+    .attr('cx', (d) => x(d.date))
+    .attr('cy', (d) => y(d.value))
+    .on('mouseover', function (event, d) {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+      })
+      tooltip.transition().duration(200).style('opacity', 0.9)
+      tooltip
+        .html(
+          `Date: ${formatter.format(d.date)}<br>Value: ${(
+            Math.round(d.value * 100) / 100
+          ).toFixed(2)}`
+        )
+        .style('left', `${event.pageX - xOffSet}px`)
+        .style('top', `${event.pageY - yOffSet}px`)
+    })
+    .on('mouseout', function () {
+      tooltip.transition().duration(500).style('opacity', 0)
+    })
 
   function updateChart(event, dates) {
     if (event !== undefined) {
@@ -185,9 +196,13 @@ const createLineCharts = () => {
       .on('mouseover', function (event, d) {
         tooltip.transition().duration(200).style('opacity', 0.9)
         tooltip
-          .html(`Date: ${d.date}<br>Value: ${d.value}`)
-          .style('left', `${event.pageX + 5}px`)
-          .style('top', `${event.pageY - 28}px`)
+          .html(
+            `Date: ${formatter.format(d.date)}<br>Value: ${(
+              Math.round(d.value * 100) / 100
+            ).toFixed(2)}`
+          )
+          .style('left', `${event.pageX - xOffSet}px`)
+          .style('top', `${event.pageY - yOffSet}px`)
       })
       .on('mouseout', function () {
         tooltip.transition().duration(500).style('opacity', 0)
@@ -231,9 +246,13 @@ const createLineCharts = () => {
       .on('mouseover', function (event, d) {
         tooltip.transition().duration(200).style('opacity', 0.9)
         tooltip
-          .html(`Date: ${d.date}<br>Value: ${d.value}`)
-          .style('left', `${event.pageX + 5}px`)
-          .style('top', `${event.pageY - 28}px`)
+          .html(
+            `Date: ${formatter.format(d.date)}<br>Value: ${(
+              Math.round(d.value * 100) / 100
+            ).toFixed(2)}`
+          )
+          .style('left', `${event.pageX - xOffSet}px`)
+          .style('top', `${event.pageY - yOffSet}px`)
       })
       .on('mouseout', function () {
         tooltip.transition().duration(500).style('opacity', 0)
@@ -290,10 +309,10 @@ onMounted(() => {
 <style scoped>
 .tooltip {
   position: absolute;
-  text-align: center;
-  width: 60px;
-  height: 28px;
-  padding: 2px;
+  text-align: left;
+  max-width: 150px;
+  height: auto;
+  padding: 5px;
   font: 12px sans-serif;
   background: lightsteelblue;
   border: 0px;
