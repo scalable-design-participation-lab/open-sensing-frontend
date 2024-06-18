@@ -62,23 +62,48 @@ definePageMeta({
   ],
 })
 import * as d3 from 'd3'
-
 const store = useDashboardUIStore()
-const { dataDashboard, selectedSiteProps } = storeToRefs(store)
+const { masterSolutions, maxMinVals, updatedMaxMinVals, dataDashboard } =
+  storeToRefs(store)
+const { loadMasterSolutions } = store
+
+// loadMasterSolutions()
+
+// const { data, pending, error } = await useFetch(() => 'sensorData.csv')
+// console.log(data, pending, error)
+// await useAsyncData('masterSolutions', () => store.loadMasterSolutions())
+// await loadMasterSolutions()
+
+const getRuntimeConfig = async () => {
+  // const response = await fetch('/master_solutions.csv')
+  // const text = await response.text()
+  // const data = d3.csvParse(text, (d) => {
+  //   console.log(d)
+  // })
+  // const { data, pending, error } = await useFetch(() => '/master_solutions.csv')
+  // console.log(data, pending, error)
+  // console.log(text, 124124234234)
+  // return await runtimeConfig.json()
+  await loadMasterSolutions()
+}
+getRuntimeConfig()
+// const response = await fetch('/sensorData.csv')
+// console.log(response)
 </script>
 
 <template>
   <section>
-    <NUHeader />
+    <MITHeader />
 
-    <DataPopUp
+    <!-- <DataPopUp
       v-if="Object.keys(selectedSiteProps).length > 0"
       @close-pop-up="selectedSiteProps = {}"
-    />
-    <MapDashboard v-show="!dataDashboard" />
+    /> -->
+    <FloatingNavSite v-if="masterSolutions.length > 0" class="top-24 left-5" />
+    <SiteMap v-show="!dataDashboard" />
     <!-- <SensorDashboard v-show="dataDashboard" /> -->
 
-    <NUFooter />
+    <MITFooter />
   </section>
 </template>
 

@@ -27,7 +27,7 @@ const closeModals = () => {
     class="fixed top-0 left-0 white px-5 py-5 w-full h-20 text-black"
     style="background-color: rgba(255, 255, 255, 0.5)"
   >
-    <p class="float-left text-4xl font-bold">ARBORETUM SENSORS</p>
+    <p class="float-left text-4xl font-bold">ECO-HUB SITE ALLOCATION</p>
     <ul class="navigation">
       <li>
         <a
@@ -46,7 +46,7 @@ const closeModals = () => {
     </ul>
   </div>
 
-  <Dashboard v-if="isDashboardVisible" @close="closeModals" />
+  <SiteDashboard v-if="isDashboardVisible" @close="closeModals" />
   <AboutModal v-if="isAboutVisible" @close="closeModals" />
 </template>
 
