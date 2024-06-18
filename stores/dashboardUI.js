@@ -1,3 +1,6 @@
+import { max, min } from 'lodash'
+import * as d3 from 'd3'
+
 export const useDashboardUIStore = defineStore('dashboardUI', () => {
   // State Properties
   const existingHubs = ref({
@@ -38,6 +41,10 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   const dateRangeUpdate = ref(null)
 
+  const masterSolutions = ref([])
+
+  const selectedSolution = ref({})
+
   // Setters
   // Set the list of existing Eco-Hubs
   function updateExistingHubs(hub, val) {
@@ -73,6 +80,25 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     dateRangeUpdate.value = data
   }
 
+  // Load Master Solutions
+  const loadMasterSolutions = async () => {
+    const response = await fetch('/master_solutions.csv')
+    const text = await response.text()
+    const data = d3.csvParse(text, (d) => {
+      // turn every value into a number
+      const newD = {}
+      Object.keys(d).forEach((key) => {
+        newD[key] = +d[key]
+      })
+      return newD
+    })
+    masterSolutions.value = data
+  }
+
+  const setSelectedSolution = (solution) => {
+    selectedSolution.value = solution
+  }
+
   // Getters
   // Get the list of Selected Eco-Hubs
   const selectedHubs = computed(() =>
@@ -92,7 +118,23 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   // Get the list of Eco-Hubs
   const hubsList = computed(() => Object.keys(existingHubs.value))
 
+  // Get the max and min values for the master solutions
+  const updatedMaxMinVals = computed(() => {
+    const vals = {}
+    // iterate through keys in masterSolutions
+    if (masterSolutions.value.length === 0) return vals
+    Object.keys(masterSolutions.value[0]).forEach(
+      (key) =>
+        (vals[key] = {
+          max: Math.max(...masterSolutions.value.map((o) => o[key])),
+          min: Math.min(...masterSolutions.value.map((o) => o[key])),
+        })
+    )
+    return vals
+  })
+
   return {
+    masterSolutions,
     existingHubs,
     existingDatasets,
     dataDashboard,
@@ -101,10 +143,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedSite,
     selectedSiteProps,
     development,
-    selectedHubs,
-    selectedDatasets,
-    hubsList,
     dateRangeUpdate,
+    selectedSolution,
     toggleDataset,
     toggleHub,
     updateExistingHubs,
@@ -112,5 +152,11 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     loadSensorData,
     updateDataDashboardValues,
     updateDateRangeUpdate,
+    loadMasterSolutions,
+    setSelectedSolution,
+    hubsList,
+    selectedHubs,
+    selectedDatasets,
+    updatedMaxMinVals,
   }
 })
