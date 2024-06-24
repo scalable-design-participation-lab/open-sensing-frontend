@@ -49,17 +49,13 @@ watch(selectedSolution, async (newSolution) => {
     solutionObject[parseInt(d['TDS'])] = d
   })
 
-  // console.log(getOriginDestination(parsedSolutions))
-
   if (ecoHubLayer !== undefined)
     ecoHubLayer.setProps({ data: getEcoHubs(solutionObject) })
-  // if (odLayer === undefined) {
-  //   console.log('loading od layer', getOriginDestination(parsedSolutions))
-  //   odLayer = loadODLayer(getOriginDestination(parsedSolutions))
-  //   console.log('loaded od layer', odLayer)
-  //   map.addLayer(odLayer)
-  // }
-  //else odLayer.setProps({ data: getOriginDestination(parsedSolutions) })
+  if (odLayer === undefined && map.loaded()) {
+    odLayer = loadODLayer(getOriginDestination(parsedSolutions))
+    map.addLayer(odLayer)
+  } else if (odLayer !== undefined && map.loaded())
+    odLayer.setProps({ data: getOriginDestination(parsedSolutions) })
 })
 
 const devNamesIndex = {}
@@ -147,16 +143,14 @@ const getOriginDestination = (selectedSolutionSites) => {
 }
 
 const loadODLayer = (data) =>
-  new LineLayer({
-    id: 'LineLayer',
+  new MapboxLayer({
+    id: 'ODLayer',
+    type: LineLayer,
     data: data,
     getColor: (d) => [184, 184, 184, 100],
-    getSourcePosition: (d) => {
-      console.log(center(d.from))
-      center(d.from).geometry.coordinates
-    },
+    getSourcePosition: (d) => center(d.from).geometry.coordinates,
     getTargetPosition: (d) => center(d.to).geometry.coordinates,
-    getWidth: 12,
+    getWidth: 2,
     pickable: false,
   })
 
