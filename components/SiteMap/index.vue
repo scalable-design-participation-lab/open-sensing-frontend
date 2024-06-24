@@ -51,10 +51,7 @@ watch(selectedSolution, async (newSolution) => {
 
   if (ecoHubLayer !== undefined)
     ecoHubLayer.setProps({ data: getEcoHubs(solutionObject) })
-  if (odLayer === undefined && map.loaded()) {
-    odLayer = loadODLayer(getOriginDestination(parsedSolutions))
-    map.addLayer(odLayer)
-  } else if (odLayer !== undefined && map.loaded())
+  if (odLayer !== undefined && map.loaded())
     odLayer.setProps({ data: getOriginDestination(parsedSolutions) })
 })
 
@@ -142,8 +139,11 @@ const getOriginDestination = (selectedSolutionSites) => {
   return od
 }
 
-const loadODLayer = (data) =>
-  new MapboxLayer({
+const loadODLayer = (data = []) => {
+  // if (data.length === 0) {
+
+  // }
+  return new MapboxLayer({
     id: 'ODLayer',
     type: LineLayer,
     data: data,
@@ -153,6 +153,7 @@ const loadODLayer = (data) =>
     getWidth: 2,
     pickable: false,
   })
+}
 
 const loadIconLayer = (data) =>
   new MapboxLayer({
@@ -227,6 +228,8 @@ const loadMapDraw = () => {
         },
       })
     )
+    odLayer = loadODLayer()
+    map.addLayer(odLayer)
 
     ecoHubLayer = loadIconLayer(getEcoHubs())
     map.addLayer(ecoHubLayer)
