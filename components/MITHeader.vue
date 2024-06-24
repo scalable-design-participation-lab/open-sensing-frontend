@@ -46,7 +46,7 @@ const closeModals = () => {
     </ul>
   </div>
 
-  <SiteDashboard v-if="isDashboardVisible" @close="closeModals" />
+  <SiteAllocationDashboard v-if="isDashboardVisible" @close="closeModals" />
   <AboutModal v-if="isAboutVisible" @close="closeModals" />
 </template>
 

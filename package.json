@@ -29,7 +29,7 @@
     "@turf/center": "^7.0.0",
     "@vueuse/core": "^10.10.0",
     "ant-design-vue": "4.x",
-    "chart.js": "^4.3.2",
+    "chart.js": "^4.4.3",
     "d3": "^7.8.5",
     "d3-array": "^3.2.4",
     "d3-scale": "^4.0.2",
@@ -39,6 +39,7 @@
     "mapbox-gl": "^2.15.0",
     "parcoord-es": "^2.2.10",
     "pinia": "^2.1.7",
-    "vue-chart-3": "^3.1.8"
+    "vue-chart-3": "^3.1.8",
+    "vue-chartjs": "^5.3.1"
   }
 }

@@ -21,6 +21,7 @@ const developmentsProps = ref([])
 const store = useDashboardUIStore()
 const { selectedSite, selectedSiteProps, development, selectedSolution } =
   storeToRefs(store)
+const { updateParsedSolutions, updateSolutionsObject } = store
 
 let map
 const sampleDevelopments = {
@@ -48,6 +49,9 @@ watch(selectedSolution, async (newSolution) => {
   parsedSolutions.forEach((d) => {
     solutionObject[parseInt(d['TDS'])] = d
   })
+
+  updateParsedSolutions(parsedSolutions)
+  updateSolutionsObject(solutionObject)
 
   if (ecoHubLayer !== undefined)
     ecoHubLayer.setProps({ data: getEcoHubs(solutionObject) })
