@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-80">
-    <!-- <Scatter :data="sortedChartVals" :options="options" /> -->
+    <Scatter :data="sortedChartVals" :options="options" />
   </div>
 </template>
 
@@ -16,75 +16,19 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
-import { da } from 'element-plus/es/locales.mjs'
 import { Scatter } from 'vue-chartjs'
-import * as d3 from 'd3'
 
 ChartJS.register(LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const store = useDashboardUIStore()
-const { feasibleSites, builtSites } = storeToRefs(store)
+const { feasibleSites } = storeToRefs(store)
 
 const props = defineProps({
   type: { type: String, default: 'TOTAL_POP' },
 })
 
-// """
-// Bar plot of a given variable over the built sites (colored by borough).
-// Example: outreached population.
-// """
-// function plot_built_sites_bar(df_soln, value; kwargs...)
-//     df_built = df_soln[df_soln.BUILT .== 1,:]
-//     df_built = sort(df_built, :DEVELOPMENT)
-//     p = bar(df_built.DEVELOPMENT, df_soln[df_soln.BUILT .== 1,value]; group=df_built.BOROUGH, kwargs...)
-//     return p
-// end;
-
-const test = () => {
-  const groupedSites = Object.groupBy(
-    builtSites.value,
-    ({ BOROUGH }) => BOROUGH
-  )
-
-  // Generate a color scale using D3's scaleOrdinal and a color scheme
-  const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
-
-  const labels = []
-  const datasets = []
-  const colors = []
-  Object.values(groupedSites).forEach((borough) => {
-    borough.forEach((site) => {
-      labels.push(site.DEVELOPMENT)
-      datasets.push(parseFloat(site[props.type]))
-      colors.push(colorScale(site.BOROUGH))
-    })
-  })
-
-  console.log(labels, datasets)
-
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'My First Dataset',
-        data: datasets,
-        backgroundColor: colors,
-        borderColor: colors,
-        borderWidth: 1,
-      },
-    ],
-  }
-  console.log(data, groupedSites)
-}
-
-onMounted(() => {
-  test()
-})
-const groupedChartVals = computed(() => {
+const sortedChartVals = computed(() => {
   const allData = { datasets: [] }
-
-  const groupedSites = Object.groupBy(builtSites, ({ BOROUGH }) => BOROUGH)
-
   const sortedVals = feasibleSites.value.sort(
     (a, b) => parseFloat(a[props.type]) - parseFloat(b[props.type])
   )

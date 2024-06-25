@@ -3,10 +3,11 @@
   <div ref="chartContainer" class="chart-container">
     <button class="close-btn" @click="closeModal">&times;</button>
     <div class="columns-2 w-full">
+      <ScatterChart />
+      <ScatterChart :type="'POP18_24'" />
+      <ScatterChart :type="'AREA_FLOOD'" />
+      <ScatterChart :type="'AREA_BUILD'" />
       <BarChart />
-      <BarChart :type="'POP18_24'" />
-      <BarChart :type="'AREA_FLOOD'" />
-      <BarChart :type="'AREA_BUILD'" />
     </div>
 
     <!-- <FloatingNavSite /> -->

@@ -153,6 +153,10 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     )
   })
 
+  const builtSites = computed(() =>
+    parsedSolutions.value.filter((site) => site.BUILT !== '0')
+  )
+
   return {
     masterSolutions,
     existingHubs,
@@ -183,5 +187,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedDatasets,
     updatedMaxMinVals,
     feasibleSites,
+    builtSites,
   }
 })
