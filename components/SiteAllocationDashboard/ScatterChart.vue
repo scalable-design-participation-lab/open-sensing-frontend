@@ -25,6 +25,7 @@ const { feasibleSites } = storeToRefs(store)
 
 const props = defineProps({
   type: { type: String, default: 'TOTAL_POP' },
+  chartTitle: { type: String, default: '' },
 })
 
 const sortedChartVals = computed(() => {
@@ -67,13 +68,6 @@ const sortedChartVals = computed(() => {
   return allData
 })
 
-const chartTitles = {
-  TOTAL_POP: 'Total Population',
-  POP18_24: '18 to 24 Population',
-  AREA_FLOOD: 'Flooded Area (Acres)',
-  AREA_BUILD: 'Buildable Area (Acres)',
-}
-
 const options = {
   responsive: true,
   maintainAspectRatio: false,
@@ -81,7 +75,7 @@ const options = {
   plugins: {
     title: {
       display: true,
-      text: chartTitles[props.type],
+      text: props.chartTitle,
     },
   },
 }

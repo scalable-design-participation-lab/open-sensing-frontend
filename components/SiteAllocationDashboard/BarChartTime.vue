@@ -22,22 +22,30 @@ import * as d3 from 'd3'
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const store = useDashboardUIStore()
-const { feasibleSites, builtSites } = storeToRefs(store)
+const { parsedSolutions } = storeToRefs(store)
 
 const props = defineProps({
   type: { type: String, default: 'TOTAL_POP' },
   chartTitle: { type: String, default: '' },
 })
 
-// """
-// Bar plot of a given variable over the built sites (colored by borough).
-// Example: outreached population.
+const checkNaN = (value) => {
+  const valType = parseFloat(value)
+  // Check for NaN and use 0 as a fallback
+  return isNaN(valType) ? 0 : valType
+}
+
+//     """
+// Bar plot of an aggregate and normalized variable over all sites.
+// Example: expected travel time to the assigned sites, for each borough.
 // """
 const groupedChartVals = computed(() => {
   const groupedSites = Object.groupBy(
-    builtSites.value,
+    parsedSolutions.value,
     ({ BOROUGH }) => BOROUGH
   )
+
+  const time = props.type === 'TOTAL_POP' ? 'ETT_OUTREACH' : 'ETT_RECRUITMENT'
 
   // Generate a color scale using D3's scaleOrdinal and a color scheme
   const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
@@ -46,13 +54,21 @@ const groupedChartVals = computed(() => {
   const datasets = []
   const colors = []
   Object.values(groupedSites).forEach((borough) => {
-    borough.forEach((site) => {
-      labels.push(site.DEVELOPMENT)
-      datasets.push(parseFloat(site[props.type]))
-      colors.push(colorScale(site.BOROUGH))
-    })
+    const boroughName = borough[0].BOROUGH
+    labels.push(boroughName)
+    colors.push(colorScale(boroughName))
+    const weightedAverage = checkNaN(
+      borough
+        .map((value) => {
+          return checkNaN(value[props.type]) * checkNaN(value[time])
+        })
+        .reduce((acc, curr) => acc + curr, 0) /
+        borough
+          .map((value) => checkNaN(value[props.type]))
+          .reduce((acc, curr) => acc + curr, 0)
+    )
+    datasets.push(weightedAverage)
   })
-
   return {
     labels,
     datasets: [
