@@ -1,12 +1,5 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
-// IMPORTS
-import { csv } from 'd3'
-
-// import ParallelCoords from '~~/components/ParallelCoords'
-
-// Store
-
 definePageMeta({
   middleware: [
     async function (to, from) {
@@ -61,7 +54,13 @@ definePageMeta({
     },
   ],
 })
+// IMPORTS
+import ParallelCoords from '~~/components/ParallelCoords'
 import * as d3 from 'd3'
+
+// import ParallelCoords from '~~/components/ParallelCoords'
+
+// Store
 const store = useDashboardUIStore()
 const { masterSolutions, maxMinVals, updatedMaxMinVals, dataDashboard } =
   storeToRefs(store)
@@ -100,7 +99,8 @@ getRuntimeConfig()
       @close-pop-up="selectedSiteProps = {}"
     /> -->
     <FloatingNavSite v-if="masterSolutions.length > 0" class="top-24 left-5" />
-    <SiteMap v-show="!dataDashboard" />
+    <SiteMap />
+    <ParallelCoords />
     <!-- <SensorDashboard v-show="dataDashboard" /> -->
 
     <MITFooter />

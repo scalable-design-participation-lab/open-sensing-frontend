@@ -6,21 +6,22 @@
 </template>
 
 <script setup>
+const store = useDashboardUIStore()
+const { masterSolutions } = storeToRefs(store)
+
 import 'parcoord-es/dist/parcoords.css'
 import ParCoords from 'parcoord-es'
+
 import { scaleLinear } from 'd3-scale'
 import { extent } from 'd3-array'
 
-var blue_to_brown = scaleLinear()
-  .domain(extent(props.developmentsProps, (d) => d['pop20t24P']))
-  .range(['steelblue', 'brown'])
-// .interpolate(interpolateLab)
-
-const props = defineProps({
-  developmentsProps: { type: Array, default: () => [] },
-})
+// var blue_to_brown = scaleLinear()
+//   .domain(extent(props.developmentsProps, (d) => d['pop20t24P']))
+//   .range(['steelblue', 'brown'])
+// // .interpolate(interpolateLab)
 
 onMounted(() => {
+  console.log('mounted', masterSolutions.value)
   var pc = ParCoords()('#pcoords')
     .data(props.developmentsProps)
     .composite('darken')
