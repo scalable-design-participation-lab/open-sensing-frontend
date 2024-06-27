@@ -10,7 +10,7 @@ const store = useDashboardUIStore()
 const { masterSolutions } = storeToRefs(store)
 
 import 'parcoord-es/dist/parcoords.css'
-import ParCoords from 'parcoord-es'
+// import ParCoords from 'parcoord-es'
 
 import { scaleLinear } from 'd3-scale'
 import { extent } from 'd3-array'
@@ -22,20 +22,20 @@ import { extent } from 'd3-array'
 
 onMounted(() => {
   console.log('mounted', masterSolutions.value)
-  var pc = ParCoords()('#pcoords')
-    .data(props.developmentsProps)
-    .composite('darken')
-    .color(function (d) {
-      return blue_to_brown(d['pop20t24P'])
-    }) // quantitative color scale
-    .alpha(0.35)
-    .alphaOnBrushed(1)
-    .brushedColor('#FFFF00')
-    .render()
-    .createAxes()
-    .brushMode('1D-axes') // enable brushing
-    .reorderable()
-    .interactive() // command line mode
+  // var pc = ParCoords()('#pcoords')
+  //   .data(props.developmentsProps)
+  //   .composite('darken')
+  //   .color(function (d) {
+  //     return blue_to_brown(d['pop20t24P'])
+  //   }) // quantitative color scale
+  //   .alpha(0.35)
+  //   .alphaOnBrushed(1)
+  //   .brushedColor('#FFFF00')
+  //   .render()
+  //   .createAxes()
+  //   .brushMode('1D-axes') // enable brushing
+  //   .reorderable()
+  //   .interactive() // command line mode
 })
 </script>
 
