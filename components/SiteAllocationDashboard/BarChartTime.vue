@@ -35,6 +35,49 @@ const checkNaN = (value) => {
   return isNaN(valType) ? 0 : valType
 }
 
+const test = () => {
+  console.log('test')
+  const groupedSites = Object.groupBy(
+    parsedSolutions.value,
+    ({ BOROUGH }) => BOROUGH
+  )
+
+  const time = props.type === 'TOTAL_POP' ? 'ETT_OUTREACH' : 'ETT_RECRUITMENT'
+
+  // Generate a color scale using D3's scaleOrdinal and a color scheme
+  const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+
+  const labels = []
+  const datasets = []
+  Object.values(groupedSites).forEach((borough) => {
+    const boroughName = borough[0].BOROUGH
+    labels.push(boroughName)
+    const weightedAverage = checkNaN(
+      borough
+        .map((value) => {
+          return checkNaN(value[props.type]) * checkNaN(value[time])
+        })
+        .reduce((acc, curr) => acc + curr, 0) /
+        borough
+          .map((value) => checkNaN(value[props.type]))
+          .reduce((acc, curr) => acc + curr, 0)
+    )
+
+    const currDataset = {
+      label: boroughName,
+      data: [weightedAverage],
+      backgroundColor: colorScale(boroughName),
+      borderColor: colorScale(boroughName),
+      borderWidth: 1,
+    }
+    datasets.push(currDataset)
+  })
+  return {
+    labels,
+    datasets,
+  }
+}
+
 //     """
 // Bar plot of an aggregate and normalized variable over all sites.
 // Example: expected travel time to the assigned sites, for each borough.
