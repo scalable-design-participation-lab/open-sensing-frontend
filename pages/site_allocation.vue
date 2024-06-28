@@ -106,7 +106,7 @@ getRuntimeConfig()
     <div
       id="pop-up-pcoords"
       ref="pcoords"
-      class="absolute h-2/4 p-8 bg-[#004E32]"
+      class="absolute h-2/4 p-8 bg-[#609f80]"
     >
       <ParallelCoords
         v-if="masterSolutions.length > 0 && height > 0"
