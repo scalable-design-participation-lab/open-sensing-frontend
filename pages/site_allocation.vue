@@ -57,7 +57,10 @@ definePageMeta({
 // IMPORTS
 import ParallelCoords from '~~/components/ParallelCoords'
 import * as d3 from 'd3'
+import { useElementSize } from '@vueuse/core'
 
+const pcoords = ref(null)
+const { width, height } = useElementSize(pcoords)
 // import ParallelCoords from '~~/components/ParallelCoords'
 
 // Store
@@ -100,7 +103,17 @@ getRuntimeConfig()
     /> -->
     <FloatingNavSite v-if="masterSolutions.length > 0" class="top-24 left-5" />
     <SiteMap />
-    <ParallelCoords v-if="masterSolutions.length > 0" />
+    <div
+      id="pop-up-pcoords"
+      ref="pcoords"
+      class="absolute h-2/4 p-8 bg-[#004E32]"
+    >
+      <ParallelCoords
+        v-if="masterSolutions.length > 0 && height > 0"
+        :width="width"
+        :height="height"
+      />
+    </div>
     <!-- <SensorDashboard v-show="dataDashboard" /> -->
 
     <MITFooter />
@@ -110,5 +123,12 @@ getRuntimeConfig()
 <style>
 body {
   font-family: 'lato', sans-serif;
+}
+
+#pop-up-pcoords {
+  bottom: 1.25rem;
+  right: 1.25rem;
+  border-radius: 1.5rem;
+  width: 83.333333%;
 }
 </style>

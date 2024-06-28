@@ -1,9 +1,6 @@
 <template>
-  <div id="pop-up-pcoords" class="absolute h-2/4 p-8 bg-[#004E32]">
-    <h1>Summary Statistics</h1>
-    <div id="pcoords" ref="pcoords" class="parcoords w-full h-full" />
-    <!-- <div ref="parcoords" /> -->
-  </div>
+  <h1>Summary Statistics</h1>
+  <div id="pcoords" ref="pcoords" class="parcoords w-full h-full" />
 </template>
 
 <script setup>
@@ -12,28 +9,19 @@ const { masterSolutions } = storeToRefs(store)
 
 import * as d3 from 'd3'
 
+const props = defineProps({
+  width: { type: Number, default: 1000 },
+  height: { type: Number, default: 400 },
+})
+
 const pcoords = ref(null)
 
-// import 'parcoord-es/dist/parcoords.css'
-// import ParCoords from 'parcoord-es'
-
-import { scaleLinear } from 'd3-scale'
-import { extent } from 'd3-array'
-import { pa } from 'element-plus/es/locales.mjs'
-
 const keys = ['Budget', 'Flooding', 'Outreach', 'Recruitment']
+// TODO: Make this dynamic
 const keyz = keys[0]
-
-// var blue_to_brown = scaleLinear()
-//   .domain(extent(props.developmentsProps, (d) => d['pop20t24P']))
-//   .range(['steelblue', 'brown'])
-// // .interpolate(interpolateLab)
 
 const buildParCoords = () => {
   // Specify the chart’s dimensions.
-  console.log('building parcoords', pcoords.value.offsetHeight)
-  const width = pcoords.value.clientWidth
-  const height = pcoords.value.offsetHeight
   const marginTop = 20
   const marginRight = 10
   const marginBottom = 20
@@ -45,12 +33,12 @@ const buildParCoords = () => {
       key,
       d3.scaleLinear(
         d3.extent(masterSolutions.value, (d) => d[key]),
-        [marginLeft, width - marginRight]
+        [marginLeft, props.width - marginRight]
       ),
     ])
   )
   // Create the vertical (*y*) scale.
-  const y = d3.scalePoint(keys, [marginTop, height - marginBottom])
+  const y = d3.scalePoint(keys, [marginTop, props.height - marginBottom])
 
   // Create the color scale.
   const color = d3.scaleSequential(x.get(keyz).domain(), (t) =>
@@ -60,9 +48,9 @@ const buildParCoords = () => {
   // Create the SVG container.
   const svg = d3
     .create('svg')
-    .attr('viewBox', [0, 0, width, height])
-    .attr('width', width)
-    .attr('height', height)
+    .attr('viewBox', [0, 0, props.width, props.height])
+    .attr('width', props.width)
+    .attr('height', props.height)
     .attr('style', 'max-width: 100%; height: auto;')
 
   // Append the lines.
@@ -125,7 +113,7 @@ const buildParCoords = () => {
     .brushX()
     .extent([
       [marginLeft, -(brushHeight / 2)],
-      [width - marginRight, brushHeight / 2],
+      [props.width - marginRight, brushHeight / 2],
     ])
     .on('start brush end', brushed)
 
@@ -150,35 +138,17 @@ const buildParCoords = () => {
     svg.property('value', selected).dispatch('input')
   }
 
-  const test = Object.assign(
+  const pcoordsObj = Object.assign(
     svg.property('value', masterSolutions.value).node(),
     {
       scales: { color },
     }
   )
-  console.log(test, typeof test)
-  pcoords.value.append(test)
-  // console.log(test, typeof test)
-  // parcoords.value = test
+  pcoords.value.append(pcoordsObj)
 }
 
 onMounted(() => {
-  console.log('mounted', masterSolutions.value)
   buildParCoords()
-  // var pc = ParCoords()('#pcoords')
-  //   .data(props.developmentsProps)
-  //   .composite('darken')
-  //   .color(function (d) {
-  //     return blue_to_brown(d['pop20t24P'])
-  //   }) // quantitative color scale
-  //   .alpha(0.35)
-  //   .alphaOnBrushed(1)
-  //   .brushedColor('#FFFF00')
-  //   .render()
-  //   .createAxes()
-  //   .brushMode('1D-axes') // enable brushing
-  //   .reorderable()
-  //   .interactive() // command line mode
 })
 </script>
 
