@@ -100,7 +100,7 @@ getRuntimeConfig()
     /> -->
     <FloatingNavSite v-if="masterSolutions.length > 0" class="top-24 left-5" />
     <SiteMap />
-    <ParallelCoords />
+    <ParallelCoords v-if="masterSolutions.length > 0" />
     <!-- <SensorDashboard v-show="dataDashboard" /> -->
 
     <MITFooter />
