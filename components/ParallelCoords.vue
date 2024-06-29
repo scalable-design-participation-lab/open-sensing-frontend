@@ -16,7 +16,7 @@ const props = defineProps({
 
 const pcoords = ref(null)
 
-const keys = ['Budget', 'Flooding', 'Outreach', 'Recruitment']
+const keys = ['Budget', 'Outreach', 'Recruitment', 'Flooding']
 // TODO: Make this dynamic
 const keyz = keys[0]
 
@@ -27,43 +27,54 @@ const buildParCoords = () => {
   const marginBottom = 20
   const marginLeft = 10
 
-  // Create an horizontal (*x*) scale for each key.
-  const x = new Map(
+  const svg = d3
+    .create('svg')
+    .attr('height', props.height)
+    .attr('width', props.width)
+    .attr('font-family', 'sans-serif')
+    .attr('font-size', 12)
+
+  const y = new Map(
     Array.from(keys, (key) => [
       key,
       d3.scaleLinear(
         d3.extent(masterSolutions.value, (d) => d[key]),
-        [marginLeft, props.width - marginRight]
+        [props.height - marginBottom, marginTop]
       ),
     ])
   )
-  // Create the vertical (*y*) scale.
-  const y = d3.scalePoint(keys, [marginTop, props.height - marginBottom])
-
-  // Create the color scale.
-  const color = d3.scaleSequential(x.get(keyz).domain(), (t) =>
-    d3.interpolateBrBG(1 - t)
+  const x = d3.scalePoint(keys, [marginLeft, props.width - marginRight])
+  const c = d3.scaleOrdinal(
+    masterSolutions.value.map((d) => d[keyz]),
+    d3.schemeCategory10,
+    'black'
   )
+  // const c = d3.scaleSequential(y.get(keyz).domain(), (t) =>
+  //   d3.interpolateBrBG(1 - t)
+  // )
 
-  // Create the SVG container.
-  const svg = d3
-    .create('svg')
-    .attr('viewBox', [0, 0, props.width, props.height])
-    .attr('width', props.width)
-    .attr('height', props.height)
-    .attr('style', 'max-width: 100%; height: auto;')
+  const brushHeight = 20
+  const brushWidth = 50
+  const deselectedColor = '#ddd'
 
-  // Append the lines.
+  const brush = d3
+    .brushY()
+    .extent([
+      [-(brushWidth / 2), marginTop],
+      [brushWidth / 2, props.height - marginBottom],
+    ])
+    .on('start brush end', brushed)
+
   const line = d3
     .line()
     .defined(([, value]) => value != null)
-    .x(([key, value]) => x.get(key)(value))
-    .y(([key]) => y(key))
+    .y(([key, value]) => y.get(key)(value))
+    .x(([key]) => x(key))
 
   const path = svg
     .append('g')
     .attr('fill', 'none')
-    .attr('stroke-width', 1.5)
+    .attr('stroke-width', 2)
     .attr('stroke-opacity', 0.4)
     .selectAll('path')
     .data(
@@ -72,25 +83,25 @@ const buildParCoords = () => {
         .sort((a, b) => d3.ascending(a[keyz], b[keyz]))
     )
     .join('path')
-    .attr('stroke', (d) => color(d[keyz]))
+    .attr('stroke', (d) => c(d[keyz]))
     .attr('d', (d) => line(d3.cross(keys, [d], (key, d) => [key, d[key]])))
-    .call((path) => path.append('title').text((d) => d.SolnIndex))
 
-  // Append the axis for each key.
-  const axes = svg
+  path.append('title').text((d) => d.SolnIndex)
+
+  svg
     .append('g')
     .selectAll('g')
     .data(keys)
     .join('g')
-    .attr('transform', (d) => `translate(0,${y(d)})`)
+    .attr('transform', (d) => `translate(${x(d)}, 0)`)
     .each(function (d) {
-      d3.select(this).call(d3.axisBottom(x.get(d)))
+      d3.select(this).call(d3.axisRight(y.get(d)))
     })
     .call((g) =>
       g
         .append('text')
-        .attr('x', marginLeft)
-        .attr('y', -6)
+        .attr('y', props.height)
+        .attr('x', -6)
         .attr('text-anchor', 'start')
         .attr('fill', 'currentColor')
         .text((d) => d)
@@ -105,31 +116,18 @@ const buildParCoords = () => {
         .attr('stroke-linejoin', 'round')
         .attr('stroke', 'white')
     )
-
-  // Create the brush behavior.
-  const deselectedColor = '#ddd'
-  const brushHeight = 50
-  const brush = d3
-    .brushX()
-    .extent([
-      [marginLeft, -(brushHeight / 2)],
-      [props.width - marginRight, brushHeight / 2],
-    ])
-    .on('start brush end', brushed)
-
-  axes.call(brush)
+    .call(brush)
 
   const selections = new Map()
-
   function brushed({ selection }, key) {
     if (selection === null) selections.delete(key)
-    else selections.set(key, selection.map(x.get(key).invert))
+    else selections.set(key, selection.map(y.get(key).invert).sort())
     const selected = []
     path.each(function (d) {
       const active = Array.from(selections).every(
         ([key, [min, max]]) => d[key] >= min && d[key] <= max
       )
-      d3.select(this).style('stroke', active ? color(d[keyz]) : deselectedColor)
+      d3.select(this).style('stroke', active ? c(d[keyz]) : deselectedColor)
       if (active) {
         d3.select(this).raise()
         selected.push(d)
@@ -138,13 +136,7 @@ const buildParCoords = () => {
     svg.property('value', selected).dispatch('input')
   }
 
-  const pcoordsObj = Object.assign(
-    svg.property('value', masterSolutions.value).node(),
-    {
-      scales: { color },
-    }
-  )
-  pcoords.value.append(pcoordsObj)
+  pcoords.value.append(svg.property('value', masterSolutions.value).node())
 }
 
 onMounted(() => {
