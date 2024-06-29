@@ -27,6 +27,36 @@ const buildParCoords = () => {
   const marginBottom = 20
   const marginLeft = 10
 
+  // Highlight the specie that is hovered
+  var highlight = function (event, d) {
+    const selectedSolution = `._${d.Budget}_${d.SolnIndex}`
+
+    // first every group turns grey
+    d3.selectAll('.line')
+      .transition()
+      .duration(200)
+      .style('stroke', 'lightgrey')
+      .style('stroke-opacity', '0.2')
+    // Second the hovered specie takes its color
+    d3.select(selectedSolution)
+      .transition()
+      .duration(200)
+      .style('stroke', c(d[keyz]))
+      .style('stroke-opacity', strokeOpacity)
+  }
+
+  // Unhighlight
+  var doNotHighlight = function (event, d) {
+    d3.selectAll('.line')
+      .transition()
+      .duration(200)
+      .delay(500)
+      .style('stroke', function (d) {
+        return c(d[keyz])
+      })
+      .style('stroke-opacity', strokeOpacity)
+  }
+
   const svg = d3
     .create('svg')
     .attr('height', props.height)
@@ -56,6 +86,7 @@ const buildParCoords = () => {
   const brushHeight = 20
   const brushWidth = 50
   const deselectedColor = '#ddd'
+  const strokeOpacity = 0.6
 
   const brush = d3
     .brushY()
@@ -75,7 +106,7 @@ const buildParCoords = () => {
     .append('g')
     .attr('fill', 'none')
     .attr('stroke-width', 2)
-    .attr('stroke-opacity', 0.4)
+    .attr('stroke-opacity', strokeOpacity)
     .selectAll('path')
     .data(
       masterSolutions.value
@@ -83,8 +114,16 @@ const buildParCoords = () => {
         .sort((a, b) => d3.ascending(a[keyz], b[keyz]))
     )
     .join('path')
+    .attr('class', function (d) {
+      return `line _${d.Budget}_${d.SolnIndex}`
+    }) // 2 class for each line: 'line' and the solution name
     .attr('stroke', (d) => c(d[keyz]))
     .attr('d', (d) => line(d3.cross(keys, [d], (key, d) => [key, d[key]])))
+    .on('click', (event, d) => {
+      console.log(d, event)
+    })
+    .on('mouseover', highlight)
+    .on('mouseleave', doNotHighlight)
 
   path.append('title').text((d) => d.SolnIndex)
 
@@ -139,6 +178,7 @@ const buildParCoords = () => {
       }
     })
     svg.property('value', selected).dispatch('input')
+    console.log(selections, selected)
   }
 
   pcoords.value.append(svg.property('value', masterSolutions.value).node())
