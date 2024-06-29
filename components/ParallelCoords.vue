@@ -121,12 +121,17 @@ const buildParCoords = () => {
   const selections = new Map()
   function brushed({ selection }, key) {
     if (selection === null) selections.delete(key)
-    else selections.set(key, selection.map(y.get(key).invert).sort())
+    else
+      selections.set(
+        key,
+        selection.map(y.get(key).invert).sort((a, b) => a - b)
+      )
     const selected = []
     path.each(function (d) {
       const active = Array.from(selections).every(
         ([key, [min, max]]) => d[key] >= min && d[key] <= max
       )
+
       d3.select(this).style('stroke', active ? c(d[keyz]) : deselectedColor)
       if (active) {
         d3.select(this).raise()
