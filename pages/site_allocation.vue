@@ -106,7 +106,7 @@ getRuntimeConfig()
     <div
       id="pop-up-pcoords"
       ref="pcoords"
-      class="absolute h-2/4 p-8 bg-[#609f80]"
+      class="absolute h-1/3 p-8 bg-[#609f80]"
     >
       <ParallelCoords
         v-if="masterSolutions.length > 0 && height > 0"
@@ -126,9 +126,9 @@ body {
 }
 
 #pop-up-pcoords {
-  bottom: 1.25rem;
-  right: 1.25rem;
+  bottom: 2.5rem;
+  left: 1.25rem;
   border-radius: 1.5rem;
-  width: 83.333333%;
+  width: calc(100% - 2.5rem); /* Adjusted width */
 }
 </style>

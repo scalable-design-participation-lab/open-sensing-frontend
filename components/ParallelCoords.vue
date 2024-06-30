@@ -1,6 +1,9 @@
 <template>
-  <h1>Summary Statistics</h1>
-  <div id="pcoords" ref="pcoords" class="parcoords w-full h-full" />
+  <div
+    id="pcoords"
+    ref="pcoords"
+    class="parcoords w-full h-full bg-white rounded-md"
+  />
 </template>
 
 <script setup>
@@ -23,12 +26,12 @@ const keyz = keys[0]
 const buildParCoords = () => {
   // Specify the chart’s dimensions.
   const marginTop = 20
-  const marginRight = 10
+  const marginRight = 30
   const marginBottom = 20
-  const marginLeft = 10
+  const marginLeft = 30
 
   // Highlight the specie that is hovered
-  var highlight = function (event, d) {
+  const highlight = function (event, d) {
     const selectedSolution = `._${d.Budget}_${d.SolnIndex}`
 
     // first every group turns grey
@@ -46,15 +49,20 @@ const buildParCoords = () => {
   }
 
   // Unhighlight
-  var doNotHighlight = function (event, d) {
+  const doNotHighlight = function (event, d) {
     d3.selectAll('.line')
       .transition()
       .duration(200)
-      .delay(500)
+      .delay(200)
       .style('stroke', function (d) {
         return c(d[keyz])
       })
       .style('stroke-opacity', strokeOpacity)
+  }
+
+  // Select Solution
+  const selectSolution = function (event, d) {
+    console.log(d)
   }
 
   const svg = d3
@@ -83,7 +91,6 @@ const buildParCoords = () => {
   //   d3.interpolateBrBG(1 - t)
   // )
 
-  const brushHeight = 20
   const brushWidth = 50
   const deselectedColor = '#ddd'
   const strokeOpacity = 0.6
@@ -119,9 +126,7 @@ const buildParCoords = () => {
     }) // 2 class for each line: 'line' and the solution name
     .attr('stroke', (d) => c(d[keyz]))
     .attr('d', (d) => line(d3.cross(keys, [d], (key, d) => [key, d[key]])))
-    .on('click', (event, d) => {
-      console.log(d, event)
-    })
+    .on('click', selectSolution)
     .on('mouseover', highlight)
     .on('mouseleave', doNotHighlight)
 
@@ -140,8 +145,8 @@ const buildParCoords = () => {
       g
         .append('text')
         .attr('y', props.height)
-        .attr('x', -6)
-        .attr('text-anchor', 'start')
+        .attr('x', 0) // Adjusted for centering
+        .attr('text-anchor', 'middle') // Changed from 'start' to 'middle' for centering
         .attr('fill', 'currentColor')
         .text((d) => d)
     )
@@ -178,7 +183,6 @@ const buildParCoords = () => {
       }
     })
     svg.property('value', selected).dispatch('input')
-    console.log(selections, selected)
   }
 
   pcoords.value.append(svg.property('value', masterSolutions.value).node())
