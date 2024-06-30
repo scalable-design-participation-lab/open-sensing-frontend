@@ -3,12 +3,13 @@
     id="pcoords"
     ref="pcoords"
     class="parcoords w-full h-full bg-white rounded-md"
-  />
+  ></div>
 </template>
 
 <script setup>
 const store = useDashboardUIStore()
 const { masterSolutions } = storeToRefs(store)
+const { setSelectedSolution } = store
 
 import * as d3 from 'd3'
 
@@ -62,7 +63,8 @@ const buildParCoords = () => {
 
   // Select Solution
   const selectSolution = function (event, d) {
-    console.log(d)
+    d.BudgetIndex = d.Budget
+    setSelectedSolution(d)
   }
 
   const svg = d3
