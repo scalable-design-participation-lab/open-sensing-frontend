@@ -65,8 +65,13 @@ const { width, height } = useElementSize(pcoords)
 
 // Store
 const store = useDashboardUIStore()
-const { masterSolutions, maxMinVals, updatedMaxMinVals, dataDashboard } =
-  storeToRefs(store)
+const {
+  masterSolutions,
+  maxMinVals,
+  updatedMaxMinVals,
+  dataDashboard,
+  showPCoords,
+} = storeToRefs(store)
 const { loadMasterSolutions } = store
 
 // loadMasterSolutions()
@@ -104,9 +109,10 @@ getRuntimeConfig()
     <FloatingNavSite v-if="masterSolutions.length > 0" class="top-24 left-5" />
     <SiteMap />
     <div
+      v-if="showPCoords"
       id="pop-up-pcoords"
       ref="pcoords"
-      class="absolute h-1/3 p-8 bg-[#609f80]"
+      class="absolute h-1/3 p-2 bg-white opacity-60 box-shadow"
     >
       <ParallelCoords
         v-if="masterSolutions.length > 0 && height > 0"
@@ -123,6 +129,10 @@ getRuntimeConfig()
 <style>
 body {
   font-family: 'lato', sans-serif;
+}
+
+.box-shadow {
+  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
 }
 
 #pop-up-pcoords {

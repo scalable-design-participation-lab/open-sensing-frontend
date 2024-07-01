@@ -49,6 +49,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   const solutionsObject = ref({})
 
+  const showPCoords = ref(false)
+
   // Setters
   // Set the list of existing Eco-Hubs
   function updateExistingHubs(hub, val) {
@@ -111,6 +113,10 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     solutionsObject.value = solutions
   }
 
+  const showPCoordsToggle = () => {
+    showPCoords.value = !showPCoords.value
+  }
+
   // Getters
   // Get the list of Selected Eco-Hubs
   const selectedHubs = computed(() =>
@@ -171,6 +177,7 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedSolution,
     parsedSolutions,
     solutionsObject,
+    showPCoords,
     toggleDataset,
     toggleHub,
     updateExistingHubs,
@@ -182,6 +189,7 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     setSelectedSolution,
     updateParsedSolutions,
     updateSolutionsObject,
+    showPCoordsToggle,
     hubsList,
     selectedHubs,
     selectedDatasets,

@@ -2,7 +2,7 @@
   <div
     id="pcoords"
     ref="pcoords"
-    class="parcoords w-full h-full bg-white rounded-md"
+    class="parcoords w-full h-full rounded-md"
   ></div>
 </template>
 

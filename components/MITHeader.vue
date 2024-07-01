@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
-import Dashboard from './Dashboard'
 import AboutModal from './About.vue'
+const store = useDashboardUIStore()
+const { showPCoordsToggle } = store
 
 const isDashboardVisible = ref(false)
 const isAboutVisible = ref(false)
@@ -13,6 +13,10 @@ const navigate = (section) => {
   } else if (section === 'about') {
     isDashboardVisible.value = false
     isAboutVisible.value = true
+  } else if (section === 'pcoords') {
+    showPCoordsToggle()
+    isDashboardVisible.value = false
+    isAboutVisible.value = false
   }
 }
 
@@ -29,6 +33,13 @@ const closeModals = () => {
   >
     <p class="float-left text-4xl font-bold">ECO-HUB SITE ALLOCATION</p>
     <ul class="navigation">
+      <li>
+        <a
+          href="#"
+          :class="{ active: isDashboardVisible }"
+          @click="navigate('pcoords')"
+        >SELECT PROPOSAL</a>
+      </li>
       <li>
         <a
           href="#"
