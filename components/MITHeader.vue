@@ -8,11 +8,13 @@ const isAboutVisible = ref(false)
 
 const navigate = (section) => {
   if (section === 'dashboard') {
-    isDashboardVisible.value = true
+    showPCoordsToggle()
+    isDashboardVisible.value = !isDashboardVisible.value
     isAboutVisible.value = false
   } else if (section === 'about') {
+    showPCoordsToggle()
     isDashboardVisible.value = false
-    isAboutVisible.value = true
+    isAboutVisible.value = !isAboutVisible.value
   } else if (section === 'pcoords') {
     showPCoordsToggle()
     isDashboardVisible.value = false
