@@ -1,12 +1,5 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
-// IMPORTS
-import { csv } from 'd3'
-
-// import ParallelCoords from '~~/components/ParallelCoords'
-
-// Store
-
 definePageMeta({
   middleware: [
     async function (to, from) {
@@ -61,11 +54,19 @@ definePageMeta({
     },
   ],
 })
+// IMPORTS
+import ParallelCoords from '~~/components/ParallelCoords'
 import * as d3 from 'd3'
+import { useElementSize } from '@vueuse/core'
+
+const pcoords = ref(null)
+const { width, height } = useElementSize(pcoords)
+// import ParallelCoords from '~~/components/ParallelCoords'
+
+// Store
 const store = useDashboardUIStore()
-const { masterSolutions, maxMinVals, updatedMaxMinVals, dataDashboard } =
-  storeToRefs(store)
-const { loadMasterSolutions } = store
+const { masterSolutions, popUpVisibility } = storeToRefs(store)
+const { loadMasterSolutions, setPopUpVisibility } = store
 
 // loadMasterSolutions()
 
@@ -100,9 +101,29 @@ getRuntimeConfig()
       @close-pop-up="selectedSiteProps = {}"
     /> -->
     <FloatingNavSite v-if="masterSolutions.length > 0" class="top-24 left-5" />
-    <SiteMap v-show="!dataDashboard" />
-    <!-- <SensorDashboard v-show="dataDashboard" /> -->
+    <SiteMap />
+    <div
+      v-if="popUpVisibility.pcoords"
+      id="pop-up-pcoords"
+      ref="pcoords"
+      class="absolute h-1/3 p-2 bg-white opacity-60 box-shadow"
+    >
+      <ParallelCoords
+        v-if="masterSolutions.length > 0 && height > 0"
+        :width="width"
+        :height="height"
+      />
+    </div>
 
+    <SiteAllocationDashboard
+      v-if="popUpVisibility.dashboard"
+      class="left-[320px] top-24"
+      @close="setPopUpVisibility('dashboard')"
+    />
+    <AboutModal
+      v-if="popUpVisibility.about"
+      @close="setPopUpVisibility('about')"
+    />
     <MITFooter />
   </section>
 </template>
@@ -110,5 +131,16 @@ getRuntimeConfig()
 <style>
 body {
   font-family: 'lato', sans-serif;
+}
+
+.box-shadow {
+  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
+}
+
+#pop-up-pcoords {
+  bottom: 2.5rem;
+  left: 1.25rem;
+  border-radius: 1.5rem;
+  width: calc(100% - 2.5rem); /* Adjusted width */
 }
 </style>

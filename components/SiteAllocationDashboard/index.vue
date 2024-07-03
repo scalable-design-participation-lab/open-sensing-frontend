@@ -1,22 +1,33 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div ref="chartContainer" class="chart-container">
+  <div ref="chartContainer" class="chart-container overflow-auto">
     <button class="close-btn" @click="closeModal">&times;</button>
-    <!-- <FloatingNavSite /> -->
-    <!-- <div ref="scrollContainer" class="scroll-container">
-      <div v-if="mounted">
-        <LineChart
-          v-for="(metric, metricName) in metrics"
-          :key="metricName"
-          :class="{ innactive: !selectedDatasets.includes(metricName) }"
-          :metric="metric"
-          :data="sensorData[metricName]"
-          :margin="margin"
-          :width="width"
-          :height="height"
+    <div ref="scrollContainer" class="scroll-container">
+      <div class="columns-2 w-full">
+        <ScatterChart :chart-title="'Outreach Population'" />
+        <ScatterChart
+          :type="'POP18_24'"
+          :chart-title="'Recruitment Population'"
+        />
+        <ScatterChart
+          :type="'AREA_FLOOD'"
+          :chart-title="'Flooded Area (Acres)'"
+        />
+        <ScatterChart
+          :type="'AREA_BUILD'"
+          :chart-title="'Buildable Area (Acres)'"
+        />
+        <BarChart :chart-title="'Outreach Population'" />
+        <BarChart :type="'POP18_24'" :chart-title="'Recruitment Population'" />
+        <BarChartTime
+          :chart-title="'Estimated Average Travel Time (Min) Outreach Population'"
+        />
+        <BarChartTime
+          :type="'POP18_24'"
+          :chart-title="'Estimated Average Travel Time (Min) Recruitment Population'"
         />
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -59,11 +70,8 @@ const closeModal = () => {
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 53%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95%;
-  height: 85%;
+  width: calc(100% - 340px);
+  height: 82%;
   background-color: white;
   border-radius: 15px;
   box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
@@ -92,12 +100,9 @@ const closeModal = () => {
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  width: calc(100% - 320px);
+  width: 95%;
   height: 95%;
   padding: 5px;
-  margin-left: 300px;
-  margin-top: 50px;
-  margin-bottom: 30px;
 }
 
 .scroll-container::-webkit-scrollbar {

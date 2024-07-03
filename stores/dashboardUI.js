@@ -45,6 +45,16 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   const selectedSolution = ref({})
 
+  const parsedSolutions = ref([])
+
+  const solutionsObject = ref({})
+
+  const popUpVisibility = ref({
+    pcoords: false,
+    dashboard: false,
+    about: false,
+  })
+
   // Setters
   // Set the list of existing Eco-Hubs
   function updateExistingHubs(hub, val) {
@@ -99,6 +109,22 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedSolution.value = solution
   }
 
+  const updateParsedSolutions = (solutions) => {
+    parsedSolutions.value = solutions
+  }
+
+  const updateSolutionsObject = (solutions) => {
+    solutionsObject.value = solutions
+  }
+
+  const setPopUpVisibility = (popUp) => {
+    Object.keys(popUpVisibility.value).forEach((key) => {
+      if (key === popUp)
+        popUpVisibility.value[key] = !popUpVisibility.value[key]
+      else popUpVisibility.value[key] = false
+    })
+  }
+
   // Getters
   // Get the list of Selected Eco-Hubs
   const selectedHubs = computed(() =>
@@ -133,6 +159,18 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     return vals
   })
 
+  const feasibleSites = computed(() => {
+    const MIN_HUB_AREA = 2 // acres
+
+    return parsedSolutions.value.filter(
+      (site) => site.AREA_BUILD >= MIN_HUB_AREA && site.HAS_ECO_HUB === '0.0'
+    )
+  })
+
+  const builtSites = computed(() =>
+    parsedSolutions.value.filter((site) => site.BUILT !== '0')
+  )
+
   return {
     masterSolutions,
     existingHubs,
@@ -145,6 +183,9 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     development,
     dateRangeUpdate,
     selectedSolution,
+    parsedSolutions,
+    solutionsObject,
+    popUpVisibility,
     toggleDataset,
     toggleHub,
     updateExistingHubs,
@@ -154,9 +195,14 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     updateDateRangeUpdate,
     loadMasterSolutions,
     setSelectedSolution,
+    updateParsedSolutions,
+    updateSolutionsObject,
+    setPopUpVisibility,
     hubsList,
     selectedHubs,
     selectedDatasets,
     updatedMaxMinVals,
+    feasibleSites,
+    builtSites,
   }
 })

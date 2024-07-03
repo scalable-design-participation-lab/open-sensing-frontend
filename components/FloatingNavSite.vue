@@ -1,23 +1,14 @@
 <script setup>
 // IMPORTS
-import {
-  ElMenu,
-  ElSubMenu,
-  ElMenuItem,
-  ElSlider,
-  ElRadioButton,
-  ElRadioGroup,
-} from 'element-plus'
+import { ElMenu, ElSubMenu, ElMenuItem, ElSlider } from 'element-plus'
 import 'element-plus/dist/index.css'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
-import { set } from 'lodash'
 
 // import ParallelCoords from '~~/components/ParallelCoords'
 
 // Store
 const store = useDashboardUIStore()
-const { masterSolutions, updatedMaxMinVals, selectedSolution } =
-  storeToRefs(store)
+const { masterSolutions, updatedMaxMinVals } = storeToRefs(store)
 const { setSelectedSolution } = store
 
 const budget = ref(0)

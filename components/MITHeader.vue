@@ -1,25 +1,7 @@
 <script setup>
-import { ref } from 'vue'
-import Dashboard from './Dashboard'
-import AboutModal from './About.vue'
-
-const isDashboardVisible = ref(false)
-const isAboutVisible = ref(false)
-
-const navigate = (section) => {
-  if (section === 'dashboard') {
-    isDashboardVisible.value = true
-    isAboutVisible.value = false
-  } else if (section === 'about') {
-    isDashboardVisible.value = false
-    isAboutVisible.value = true
-  }
-}
-
-const closeModals = () => {
-  isDashboardVisible.value = false
-  isAboutVisible.value = false
-}
+const store = useDashboardUIStore()
+const { setPopUpVisibility } = store
+const { popUpVisibility } = storeToRefs(store)
 </script>
 
 <template>
@@ -32,22 +14,26 @@ const closeModals = () => {
       <li>
         <a
           href="#"
-          :class="{ active: isDashboardVisible }"
-          @click="navigate('dashboard')"
+          :class="{ active: popUpVisibility.pcoords }"
+          @click="setPopUpVisibility('pcoords')"
+        >SELECT PROPOSAL</a>
+      </li>
+      <li>
+        <a
+          href="#"
+          :class="{ active: popUpVisibility.dashboard }"
+          @click="setPopUpVisibility('dashboard')"
         >DASHBOARD</a>
       </li>
       <li>
         <a
           href="#"
-          :class="{ active: isAboutVisible }"
-          @click="navigate('about')"
+          :class="{ active: popUpVisibility.about }"
+          @click="setPopUpVisibility('about')"
         >ABOUT</a>
       </li>
     </ul>
   </div>
-
-  <SiteDashboard v-if="isDashboardVisible" @close="closeModals" />
-  <AboutModal v-if="isAboutVisible" @close="closeModals" />
 </template>
 
 <style scoped>
