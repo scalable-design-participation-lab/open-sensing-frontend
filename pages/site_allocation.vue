@@ -117,6 +117,7 @@ getRuntimeConfig()
 
     <SiteAllocationDashboard
       v-if="popUpVisibility.dashboard"
+      class="left-[320px] top-24"
       @close="setPopUpVisibility('dashboard')"
     />
     <AboutModal

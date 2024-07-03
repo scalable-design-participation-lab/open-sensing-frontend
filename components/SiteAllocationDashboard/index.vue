@@ -70,11 +70,8 @@ const closeModal = () => {
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 53%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95%;
-  height: 85%;
+  width: calc(100% - 340px);
+  height: 82%;
   background-color: white;
   border-radius: 15px;
   box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
@@ -103,12 +100,9 @@ const closeModal = () => {
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  width: calc(100% - 320px);
+  width: 95%;
   height: 95%;
   padding: 5px;
-  margin-left: 300px;
-  margin-top: 50px;
-  margin-bottom: 30px;
 }
 
 .scroll-container::-webkit-scrollbar {
