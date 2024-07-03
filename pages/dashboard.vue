@@ -64,7 +64,8 @@ definePageMeta({
 import * as d3 from 'd3'
 
 const store = useDashboardUIStore()
-const { dataDashboard, selectedSiteProps } = storeToRefs(store)
+const { dataDashboard, selectedSiteProps, popUpVisibility } = storeToRefs(store)
+const { setPopUpVisibility } = store
 </script>
 
 <template>
@@ -76,7 +77,12 @@ const { dataDashboard, selectedSiteProps } = storeToRefs(store)
       @close-pop-up="selectedSiteProps = {}"
     />
     <MapDashboard v-show="!dataDashboard" />
-    <!-- <SensorDashboard v-show="dataDashboard" /> -->
+
+    <Dashboard
+      v-if="popUpVisibility.dashboard"
+      @close="setPopUpVisibility('dashboard')"
+    />
+    <About v-if="popUpVisibility.about" @close="setPopUpVisibility('about')" />
 
     <NUFooter />
   </section>
