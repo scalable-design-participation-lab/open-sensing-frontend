@@ -65,14 +65,8 @@ const { width, height } = useElementSize(pcoords)
 
 // Store
 const store = useDashboardUIStore()
-const {
-  masterSolutions,
-  maxMinVals,
-  updatedMaxMinVals,
-  dataDashboard,
-  showPCoords,
-} = storeToRefs(store)
-const { loadMasterSolutions } = store
+const { masterSolutions, popUpVisibility } = storeToRefs(store)
+const { loadMasterSolutions, setPopUpVisibility } = store
 
 // loadMasterSolutions()
 
@@ -109,7 +103,7 @@ getRuntimeConfig()
     <FloatingNavSite v-if="masterSolutions.length > 0" class="top-24 left-5" />
     <SiteMap />
     <div
-      v-if="showPCoords"
+      v-if="popUpVisibility.pcoords"
       id="pop-up-pcoords"
       ref="pcoords"
       class="absolute h-1/3 p-2 bg-white opacity-60 box-shadow"
@@ -120,8 +114,15 @@ getRuntimeConfig()
         :height="height"
       />
     </div>
-    <!-- <SensorDashboard v-show="dataDashboard" /> -->
 
+    <SiteAllocationDashboard
+      v-if="popUpVisibility.dashboard"
+      @close="setPopUpVisibility('dashboard')"
+    />
+    <AboutModal
+      v-if="popUpVisibility.about"
+      @close="setPopUpVisibility('about')"
+    />
     <MITFooter />
   </section>
 </template>

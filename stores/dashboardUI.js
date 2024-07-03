@@ -49,7 +49,11 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   const solutionsObject = ref({})
 
-  const showPCoords = ref(false)
+  const popUpVisibility = ref({
+    pcoords: false,
+    dashboard: false,
+    about: false,
+  })
 
   // Setters
   // Set the list of existing Eco-Hubs
@@ -113,8 +117,12 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     solutionsObject.value = solutions
   }
 
-  const showPCoordsToggle = () => {
-    showPCoords.value = !showPCoords.value
+  const setPopUpVisibility = (popUp) => {
+    Object.keys(popUpVisibility.value).forEach((key) => {
+      if (key === popUp)
+        popUpVisibility.value[key] = !popUpVisibility.value[key]
+      else popUpVisibility.value[key] = false
+    })
   }
 
   // Getters
@@ -177,7 +185,7 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedSolution,
     parsedSolutions,
     solutionsObject,
-    showPCoords,
+    popUpVisibility,
     toggleDataset,
     toggleHub,
     updateExistingHubs,
@@ -189,7 +197,7 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     setSelectedSolution,
     updateParsedSolutions,
     updateSolutionsObject,
-    showPCoordsToggle,
+    setPopUpVisibility,
     hubsList,
     selectedHubs,
     selectedDatasets,

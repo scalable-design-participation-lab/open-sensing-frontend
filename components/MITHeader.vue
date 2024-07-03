@@ -1,31 +1,7 @@
 <script setup>
-import AboutModal from './About.vue'
 const store = useDashboardUIStore()
-const { showPCoordsToggle } = store
-
-const isDashboardVisible = ref(false)
-const isAboutVisible = ref(false)
-
-const navigate = (section) => {
-  if (section === 'dashboard') {
-    showPCoordsToggle()
-    isDashboardVisible.value = !isDashboardVisible.value
-    isAboutVisible.value = false
-  } else if (section === 'about') {
-    showPCoordsToggle()
-    isDashboardVisible.value = false
-    isAboutVisible.value = !isAboutVisible.value
-  } else if (section === 'pcoords') {
-    showPCoordsToggle()
-    isDashboardVisible.value = false
-    isAboutVisible.value = false
-  }
-}
-
-const closeModals = () => {
-  isDashboardVisible.value = false
-  isAboutVisible.value = false
-}
+const { setPopUpVisibility } = store
+const { popUpVisibility } = storeToRefs(store)
 </script>
 
 <template>
@@ -38,29 +14,26 @@ const closeModals = () => {
       <li>
         <a
           href="#"
-          :class="{ active: isDashboardVisible }"
-          @click="navigate('pcoords')"
+          :class="{ active: popUpVisibility.pcoords }"
+          @click="setPopUpVisibility('pcoords')"
         >SELECT PROPOSAL</a>
       </li>
       <li>
         <a
           href="#"
-          :class="{ active: isDashboardVisible }"
-          @click="navigate('dashboard')"
+          :class="{ active: popUpVisibility.dashboard }"
+          @click="setPopUpVisibility('dashboard')"
         >DASHBOARD</a>
       </li>
       <li>
         <a
           href="#"
-          :class="{ active: isAboutVisible }"
-          @click="navigate('about')"
+          :class="{ active: popUpVisibility.about }"
+          @click="setPopUpVisibility('about')"
         >ABOUT</a>
       </li>
     </ul>
   </div>
-
-  <SiteAllocationDashboard v-if="isDashboardVisible" @close="closeModals" />
-  <AboutModal v-if="isAboutVisible" @close="closeModals" />
 </template>
 
 <style scoped>
