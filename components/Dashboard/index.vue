@@ -4,29 +4,43 @@
     <button class="close-btn" @click="closeModal">&times;</button>
     <FloatingNav />
     <div ref="scrollContainer" class="scroll-container">
-      <div v-if="mounted">
+      <div v-if="dataLoaded">
         <LineChart
           v-for="(metric, metricName) in metrics"
+          v-show="selectedDatasets.includes(metricName)"
           :key="metricName"
-          :class="{ innactive: !selectedDatasets.includes(metricName) }"
           :metric="metric"
           :data="sensorData[metricName]"
           :margin="margin"
-          :width="width"
-          :height="height"
+          :width="chartWidth"
+          :height="chartHeight"
         />
       </div>
+      <div v-else>Loading data...</div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
+import LineChart from './LineChart.vue'
+import FloatingNav from '../FloatingNav.vue'
 
 const store = useDashboardUIStore()
 const { selectedDatasets, sensorData } = storeToRefs(store)
-const mounted = ref(false)
+
+const chartContainer = ref(null)
+const scrollContainer = ref(null)
+const chartWidth = ref(0)
+const chartHeight = 300 // Fixed height for each chart
+
+const margin = { top: 30, right: 30, bottom: 50, left: 60 }
+
+const dataLoaded = computed(
+  () => Object.keys(sensorData.value).length > 0 && chartWidth.value > 0
+)
 
 const metrics = ref({
   Temperature: { name: 'temperature', label: 'Temperature (°C)' },
@@ -42,23 +56,17 @@ const metrics = ref({
   pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
 })
 
-const margin = ref({ top: 30, right: 30, bottom: 50, left: 60 })
-const height = ref(0)
-const width = ref(0)
-const containerWidth = ref(0)
-const scrollContainer = ref(null)
-
-const chartHeight = 300 // Fixed height for each chart
-
-onMounted(() => {
-  containerWidth.value = scrollContainer.value.clientWidth
-  width.value = containerWidth.value - margin.value.left - margin.value.right
-  height.value = chartHeight - margin.value.top - margin.value.bottom
-
-  mounted.value = true
+useResizeObserver(scrollContainer, (entries) => {
+  const entry = entries[0]
+  if (entry) {
+    chartWidth.value = entry.contentRect.width - margin.left - margin.right
+  }
 })
 
-// const props = defineProps(['visible'])
+onMounted(() => {
+  console.log('Dashboard mounted, sensorData:', sensorData.value)
+})
+
 const emit = defineEmits(['close'])
 
 const closeModal = () => {
@@ -67,9 +75,6 @@ const closeModal = () => {
 </script>
 
 <style scoped>
-.innactive {
-  display: none;
-}
 .chart-container {
   display: flex;
   justify-content: center;

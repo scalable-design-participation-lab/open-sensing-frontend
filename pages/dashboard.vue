@@ -1,18 +1,70 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
 // IMPORTS
+import { ref, onMounted, onUnmounted } from 'vue'
 import { csv } from 'd3'
-
-// import ParallelCoords from '~~/components/ParallelCoords'
+import * as d3 from 'd3'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import Dashboard from '../components/Dashboard/index.vue'
 
 // Store
+const store = useDashboardUIStore()
+const { dataDashboard, selectedSiteProps, popUpVisibility } = storeToRefs(store)
+const {
+  setPopUpVisibility,
+  updateSelectedSiteProps,
+  loadSensorData,
+  loadDashboardData,
+} = store
+
+// Ref to track if Dashboard data is loaded
+const dashboardLoaded = ref(false)
+
+// Function to preload Dashboard data
+const preloadDashboard = async () => {
+  if (!dashboardLoaded.value) {
+    await loadDashboardData()
+    dashboardLoaded.value = true
+  }
+}
+
+// Function to save Dashboard visibility state
+const saveState = () => {
+  localStorage.setItem(
+    'dashboardVisibility',
+    JSON.stringify(popUpVisibility.value.dashboard)
+  )
+}
+
+// Function to close DataPopUp
+const closeDataPopUp = () => {
+  updateSelectedSiteProps({})
+}
+
+onMounted(() => {
+  // Restore Dashboard visibility state from localStorage
+  const savedVisibility = localStorage.getItem('dashboardVisibility')
+  if (savedVisibility) {
+    setPopUpVisibility('dashboard')
+  }
+
+  // Start preloading Dashboard data
+  preloadDashboard()
+
+  // Add event listener to save state before unload
+  window.addEventListener('beforeunload', saveState)
+})
+
+onUnmounted(() => {
+  // Remove event listener
+  window.removeEventListener('beforeunload', saveState)
+})
 
 definePageMeta({
   middleware: [
     async function (to, from) {
       // Custom inline middleware
-      const store = useDashboardUIStore()
-      const { loadSensorData } = store
+      const store = useDashboardUIStore() // Get a fresh instance of the store
 
       const response = await fetch(
         'https://gist.githubusercontent.com/cesandoval/9e02adbb9527c367a7ae893f735e3ff3/raw/a547d333c742977926d5e877ea076528cf9b142a/sensorData.csv'
@@ -21,7 +73,7 @@ definePageMeta({
       const text = await response.text()
       const data = d3.csvParse(text, (d) => {
         return {
-          date: new Date(d.timestamp), //d3.timeParse('%Y-%m-%d %H:%M:%S')(d.timestamp),
+          date: new Date(d.timestamp),
           temperature: +d.temperature,
           relative_humidity: +d.relative_humidity,
           voc: +d.voc,
@@ -57,15 +109,10 @@ definePageMeta({
         }))
       })
 
-      loadSensorData(metricData)
+      store.loadSensorData(metricData) // Use store.loadSensorData
     },
   ],
 })
-import * as d3 from 'd3'
-
-const store = useDashboardUIStore()
-const { dataDashboard, selectedSiteProps, popUpVisibility } = storeToRefs(store)
-const { setPopUpVisibility } = store
 </script>
 
 <template>
@@ -74,12 +121,12 @@ const { setPopUpVisibility } = store
 
     <DataPopUp
       v-if="Object.keys(selectedSiteProps).length > 0"
-      @close-pop-up="selectedSiteProps = {}"
+      @close-pop-up="closeDataPopUp"
     />
     <MapDashboard v-show="!dataDashboard" />
 
     <Dashboard
-      v-if="popUpVisibility.dashboard"
+      v-if="dashboardLoaded && popUpVisibility.dashboard"
       @close="setPopUpVisibility('dashboard')"
     />
     <About v-if="popUpVisibility.about" @close="setPopUpVisibility('about')" />

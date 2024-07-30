@@ -55,6 +55,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     about: false,
   })
 
+  const dashboardData = ref(null)
+
   // Setters
   // Set the list of existing Eco-Hubs
   function updateExistingHubs(hub, val) {
@@ -85,11 +87,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     dataDashboardValues.value[dataType] = data
   }
 
-  // Update the dateRangeUpdate
-  function updateDateRangeUpdate(data) {
-    dateRangeUpdate.value = data
-  }
-
   // Load Master Solutions
   const loadMasterSolutions = async () => {
     const response = await fetch('/master_solutions.csv')
@@ -117,12 +114,35 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     solutionsObject.value = solutions
   }
 
+  const updateSelectedSite = (site) => {
+    selectedSite.value = site
+  }
+
+  const updateSelectedSiteProps = (props) => {
+    selectedSiteProps.value = props
+  }
+
+  const updateDateRangeUpdate = (date) => {
+    dateRangeUpdate.value = date
+  }
+
   const setPopUpVisibility = (popUp) => {
     Object.keys(popUpVisibility.value).forEach((key) => {
       if (key === popUp)
         popUpVisibility.value[key] = !popUpVisibility.value[key]
       else popUpVisibility.value[key] = false
     })
+  }
+
+  const loadDashboardData = async () => {
+    if (!dashboardData.value) {
+      // Simulate data loading
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      dashboardData.value = {
+        /* loaded data */
+      }
+    }
+    return dashboardData.value
   }
 
   // Getters
@@ -151,10 +171,10 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     if (masterSolutions.value.length === 0) return vals
     Object.keys(masterSolutions.value[0]).forEach(
       (key) =>
-        (vals[key] = {
-          max: Math.max(...masterSolutions.value.map((o) => o[key])),
-          min: Math.min(...masterSolutions.value.map((o) => o[key])),
-        })
+      (vals[key] = {
+        max: Math.max(...masterSolutions.value.map((o) => o[key])),
+        min: Math.min(...masterSolutions.value.map((o) => o[key])),
+      })
     )
     return vals
   })
@@ -204,5 +224,9 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     updatedMaxMinVals,
     feasibleSites,
     builtSites,
+    updateSelectedSite,
+    updateSelectedSiteProps,
+    updateDateRangeUpdate,
+    loadDashboardData,
   }
 })

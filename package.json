@@ -36,6 +36,7 @@
     "deck.gl": "8.8",
     "element-plus": "^2.6.0",
     "lodash": "^4.17.21",
+    "lucide-vue-next": "^0.417.0",
     "mapbox-gl": "^2.15.0",
     "parcoord-es": "^2.2.10",
     "pinia": "^2.1.7",

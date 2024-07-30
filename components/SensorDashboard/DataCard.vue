@@ -6,10 +6,8 @@ Chart.register(...registerables)
 // set up props for the component
 const props = defineProps({
   // make chartData an object and give it a default value
-  chartData: { type: Object, default: () => { } },
+  chartData: { type: Object, default: () => {} },
 })
-
-
 </script>
 
 <template>
