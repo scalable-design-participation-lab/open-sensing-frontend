@@ -35,10 +35,12 @@
     "d3-scale": "^4.0.2",
     "deck.gl": "8.8",
     "element-plus": "^2.6.0",
+    "express": "^4.19.2",
     "lodash": "^4.17.21",
     "lucide-vue-next": "^0.417.0",
     "mapbox-gl": "^2.15.0",
     "parcoord-es": "^2.2.10",
+    "pg": "^8.12.0",
     "pinia": "^2.1.7",
     "vue-chart-3": "^3.1.8",
     "vue-chartjs": "^5.3.1"

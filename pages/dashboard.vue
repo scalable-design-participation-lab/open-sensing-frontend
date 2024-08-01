@@ -1,9 +1,26 @@
 <!-- eslint-disable vue/multi-word-component-names -->
+<template>
+  <section>
+    <NUHeader />
+
+    <DataPopUp
+      v-if="Object.keys(selectedSiteProps).length > 0"
+      @close-pop-up="closeDataPopUp"
+    />
+    <MapDashboard v-show="!dataDashboard" />
+
+    <Dashboard
+      v-if="dashboardLoaded && popUpVisibility.dashboard"
+      @close="setPopUpVisibility('dashboard')"
+    />
+    <About v-if="popUpVisibility.about" @close="setPopUpVisibility('about')" />
+
+    <NUFooter />
+  </section>
+</template>
+
 <script setup>
-// IMPORTS
 import { ref, onMounted, onUnmounted } from 'vue'
-import { csv } from 'd3'
-import * as d3 from 'd3'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import Dashboard from '../components/Dashboard/index.vue'
 
@@ -63,77 +80,42 @@ onUnmounted(() => {
 definePageMeta({
   middleware: [
     async function (to, from) {
-      // Custom inline middleware
-      const store = useDashboardUIStore() // Get a fresh instance of the store
+      const store = useDashboardUIStore()
 
-      const response = await fetch(
-        'https://gist.githubusercontent.com/cesandoval/9e02adbb9527c367a7ae893f735e3ff3/raw/a547d333c742977926d5e877ea076528cf9b142a/sensorData.csv'
-      )
+      try {
+        // $fetch already returns parsed JSON, so we don't need to call .json()
+        const data = await $fetch('/api/sensor-data')
 
-      const text = await response.text()
-      const data = d3.csvParse(text, (d) => {
-        return {
-          date: new Date(d.timestamp),
-          temperature: +d.temperature,
-          relative_humidity: +d.relative_humidity,
-          voc: +d.voc,
-          nox: +d.nox,
-          pm1: +d.pm1,
-          pm25: +d.pm25,
-          pm4: +d.pm4,
-          pm10: +d.pm10,
+        const metrics = {
+          Temperature: { name: 'temperature', label: 'Temperature (°C)' },
+          'Relative Humidity': {
+            name: 'relative_humidity',
+            label: 'Relative Humidity (%)',
+          },
+          'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
+          'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
+          pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
+          'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
+          pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
+          pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
         }
-      })
 
-      data.sort((a, b) => a.date - b.date)
+        const metricData = {}
+        Object.keys(metrics).forEach((key) => {
+          metricData[key] = data.map((d) => ({
+            date: new Date(d.timestamp),
+            value: d[metrics[key].name],
+          }))
+        })
 
-      const metrics = ref({
-        Temperature: { name: 'temperature', label: 'Temperature (°C)' },
-        'Relative Humidity': {
-          name: 'relative_humidity',
-          label: 'Relative Humidity (%)',
-        },
-        'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
-        'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
-        pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
-        'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
-        pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
-        pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
-      })
-
-      const metricData = {}
-      Object.keys(metrics.value).forEach((key) => {
-        metricData[key] = data.map((d) => ({
-          date: d.date,
-          value: d[metrics.value[key].name],
-        }))
-      })
-
-      store.loadSensorData(metricData) // Use store.loadSensorData
+        store.loadSensorData(metricData)
+      } catch (err) {
+        console.error('Error fetching sensor data', err)
+      }
     },
   ],
 })
 </script>
-
-<template>
-  <section>
-    <NUHeader />
-
-    <DataPopUp
-      v-if="Object.keys(selectedSiteProps).length > 0"
-      @close-pop-up="closeDataPopUp"
-    />
-    <MapDashboard v-show="!dataDashboard" />
-
-    <Dashboard
-      v-if="dashboardLoaded && popUpVisibility.dashboard"
-      @close="setPopUpVisibility('dashboard')"
-    />
-    <About v-if="popUpVisibility.about" @close="setPopUpVisibility('about')" />
-
-    <NUFooter />
-  </section>
-</template>
 
 <style>
 body {
