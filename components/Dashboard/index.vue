@@ -63,8 +63,9 @@ useResizeObserver(scrollContainer, (entries) => {
   }
 })
 
-onMounted(() => {
-  console.log('Dashboard mounted, sensorData:', sensorData.value)
+onMounted(async () => {
+  console.log('Dashboard mounted, loading sensor data if not already loaded')
+  await store.loadSensorData()
 })
 
 const emit = defineEmits(['close'])

@@ -10,7 +10,7 @@
     <MapDashboard v-show="!dataDashboard" />
 
     <Dashboard
-      v-if="dashboardLoaded && popUpVisibility.dashboard"
+      v-show="dashboardLoaded && popUpVisibility.dashboard"
       @close="setPopUpVisibility('dashboard')"
     />
     <About v-if="popUpVisibility.about" @close="setPopUpVisibility('about')" />
@@ -41,8 +41,16 @@ const dashboardLoaded = ref(false)
 const preloadDashboard = async () => {
   if (!dashboardLoaded.value) {
     await loadDashboardData()
+    await loadSensorData(true)
     dashboardLoaded.value = true
   }
+}
+
+let refreshInterval
+const startDataRefresh = () => {
+  refreshInterval = setInterval(() => {
+    loadSensorData(true)
+  }, 60000)
 }
 
 // Function to save Dashboard visibility state
@@ -68,6 +76,9 @@ onMounted(() => {
   // Start preloading Dashboard data
   preloadDashboard()
 
+  // Start data refresh
+  startDataRefresh()
+
   // Add event listener to save state before unload
   window.addEventListener('beforeunload', saveState)
 })
@@ -75,45 +86,10 @@ onMounted(() => {
 onUnmounted(() => {
   // Remove event listener
   window.removeEventListener('beforeunload', saveState)
-})
-
-definePageMeta({
-  middleware: [
-    async function (to, from) {
-      const store = useDashboardUIStore()
-
-      try {
-        // $fetch already returns parsed JSON, so we don't need to call .json()
-        const data = await $fetch('/api/sensor-data')
-
-        const metrics = {
-          Temperature: { name: 'temperature', label: 'Temperature (°C)' },
-          'Relative Humidity': {
-            name: 'relative_humidity',
-            label: 'Relative Humidity (%)',
-          },
-          'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
-          'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
-          pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
-          'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
-          pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
-          pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
-        }
-
-        const metricData = {}
-        Object.keys(metrics).forEach((key) => {
-          metricData[key] = data.map((d) => ({
-            date: new Date(d.timestamp),
-            value: d[metrics[key].name],
-          }))
-        })
-
-        store.loadSensorData(metricData)
-      } catch (err) {
-        console.error('Error fetching sensor data', err)
-      }
-    },
-  ],
+  // Clear refresh interval
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+  }
 })
 </script>
 

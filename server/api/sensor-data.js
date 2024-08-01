@@ -14,9 +14,12 @@ export default defineEventHandler(async (event) => {
     })
 
     try {
+        console.log('Attempting to connect to database...')
         const client = await pool.connect()
+        console.log('Connected to database. Executing query...')
         const result = await client.query('SELECT * FROM sen55 ORDER BY timestamp')
         client.release()
+        console.log(`Query executed. Returned ${result.rows.length} rows.`)
 
         return result.rows
     } catch (err) {
