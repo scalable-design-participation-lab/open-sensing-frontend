@@ -81,7 +81,7 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   // Load the data for the sensor
   async function loadSensorData(force = false) {
-    const cacheTime = 60000
+    const cacheTime = 5400000 // 1h30m
     if (
       force ||
       !sensorData.value ||
@@ -213,10 +213,10 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     if (masterSolutions.value.length === 0) return vals
     Object.keys(masterSolutions.value[0]).forEach(
       (key) =>
-      (vals[key] = {
-        max: Math.max(...masterSolutions.value.map((o) => o[key])),
-        min: Math.min(...masterSolutions.value.map((o) => o[key])),
-      })
+        (vals[key] = {
+          max: Math.max(...masterSolutions.value.map((o) => o[key])),
+          min: Math.min(...masterSolutions.value.map((o) => o[key])),
+        })
     )
     return vals
   })

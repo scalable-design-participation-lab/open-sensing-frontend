@@ -50,7 +50,7 @@ let refreshInterval
 const startDataRefresh = () => {
   refreshInterval = setInterval(() => {
     loadSensorData(true)
-  }, 60000)
+  }, 5400000)
 }
 
 // Function to save Dashboard visibility state
