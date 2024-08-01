@@ -6,7 +6,7 @@ import 'ant-design-vue/dist/reset.css'
 //   Vue.use(Antd)
 // }
 
-export default defineNuxtPlugin(nuxtApp => {
+export default defineNuxtPlugin((nuxtApp) => {
   // Doing something with nuxtApp
   nuxtApp.vueApp.use(Antd)
 })

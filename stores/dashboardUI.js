@@ -2,6 +2,10 @@ import { max, min } from 'lodash'
 import * as d3 from 'd3'
 
 export const useDashboardUIStore = defineStore('dashboardUI', () => {
+  const sensorData = ref({})
+  const lastFetchTime = ref(null)
+  const isFetching = ref(false)
+
   // State Properties
   const existingHubs = ref({
     HOWARD: true,
@@ -37,8 +41,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     dateRangeValues: [],
   })
 
-  const sensorData = ref({})
-
   const dateRangeUpdate = ref(null)
 
   const masterSolutions = ref([])
@@ -54,6 +56,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     dashboard: false,
     about: false,
   })
+
+  const dashboardData = ref(null)
 
   // Setters
   // Set the list of existing Eco-Hubs
@@ -76,18 +80,53 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   }
 
   // Load the data for the sensor
-  function loadSensorData(data) {
-    sensorData.value = data
+  async function loadSensorData(force = false) {
+    const cacheTime = 5400000 // 1h30m
+    if (
+      force ||
+      !sensorData.value ||
+      !lastFetchTime.value ||
+      Date.now() - lastFetchTime.value > cacheTime
+    ) {
+      if (isFetching.value) return sensorData.value
+      isFetching.value = true
+      try {
+        const data = await $fetch('/api/sensor-data')
+        const metrics = {
+          Temperature: { name: 'temperature', label: 'Temperature (°C)' },
+          'Relative Humidity': {
+            name: 'relative_humidity',
+            label: 'Relative Humidity (%)',
+          },
+          'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
+          'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
+          pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
+          'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
+          pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
+          pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
+        }
+
+        const metricData = {}
+        Object.keys(metrics).forEach((key) => {
+          metricData[key] = data.map((d) => ({
+            date: new Date(d.timestamp),
+            value: d[metrics[key].name],
+          }))
+        })
+        sensorData.value = metricData
+        lastFetchTime.value = Date.now()
+      } catch (err) {
+        console.error('Error fetching sensor data', err)
+      } finally {
+        isFetching.value = false
+      }
+    }
+    return sensorData.value
   }
 
   // Update datadashboard values
   function updateDataDashboardValues(dataType, data) {
     dataDashboardValues.value[dataType] = data
-  }
-
-  // Update the dateRangeUpdate
-  function updateDateRangeUpdate(data) {
-    dateRangeUpdate.value = data
   }
 
   // Load Master Solutions
@@ -117,12 +156,35 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     solutionsObject.value = solutions
   }
 
+  const updateSelectedSite = (site) => {
+    selectedSite.value = site
+  }
+
+  const updateSelectedSiteProps = (props) => {
+    selectedSiteProps.value = props
+  }
+
+  const updateDateRangeUpdate = (date) => {
+    dateRangeUpdate.value = date
+  }
+
   const setPopUpVisibility = (popUp) => {
     Object.keys(popUpVisibility.value).forEach((key) => {
       if (key === popUp)
         popUpVisibility.value[key] = !popUpVisibility.value[key]
       else popUpVisibility.value[key] = false
     })
+  }
+
+  const loadDashboardData = async () => {
+    if (!dashboardData.value) {
+      // Simulate data loading
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      dashboardData.value = {
+        /* loaded data */
+      }
+    }
+    return dashboardData.value
   }
 
   // Getters
@@ -204,5 +266,9 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     updatedMaxMinVals,
     feasibleSites,
     builtSites,
+    updateSelectedSite,
+    updateSelectedSiteProps,
+    updateDateRangeUpdate,
+    loadDashboardData,
   }
 })
