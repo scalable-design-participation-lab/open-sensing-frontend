@@ -59,7 +59,6 @@ export default {
 
     const handleToolClick = (index) => {
       activeToolIndex.value = activeToolIndex.value === index ? null : index
-      // 在这里添加每个工具的具体功能
       console.log(`Clicked tool: ${sensorTools[index].tooltip}`)
     }
 
@@ -78,29 +77,56 @@ export default {
 </script>
 
 <style scoped>
+.map-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 .sensor-tools {
   display: flex;
   flex-direction: column;
   width: auto;
   height: auto;
   max-height: 90vh;
-  padding: 1rem;
+  padding: 1.5rem 1rem;
   justify-content: space-between;
   align-items: center;
   border-radius: 2rem;
-  background: rgba(250, 250, 250, 0.9);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(240, 240, 240, 0.9)
+  );
   position: absolute;
   left: 1.5rem;
   top: 50%;
   transform: translateY(-50%);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
   transition: all 0.3s ease;
   z-index: 1000;
+  pointer-events: auto;
 }
 
 .sensor-tools:hover {
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 1),
+    rgba(245, 245, 245, 1)
+  );
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+  transform: translateY(-51%);
 }
 
 .sensor-tool-button {
@@ -115,19 +141,53 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sensor-tool-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle,
+    rgba(64, 158, 255, 0.1) 0%,
+    rgba(64, 158, 255, 0) 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sensor-tool-button:hover::before {
+  opacity: 1;
 }
 
 .sensor-tool-button:hover {
-  background-color: rgba(64, 158, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sensor-tool-button.active {
   background-color: #409eff;
   color: white;
+  box-shadow: 0 0 15px rgba(64, 158, 255, 0.5);
+}
+
+.sensor-tool-button.active:hover {
+  transform: translateY(0);
+  box-shadow: 0 0 20px rgba(64, 158, 255, 0.7);
 }
 
 .sensor-tool-button .el-icon {
   font-size: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.sensor-tool-button:hover .el-icon {
+  transform: scale(1.1);
 }
 
 .sensor-markers {
@@ -136,6 +196,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
+  pointer-events: auto;
 }
 
 .sensor-marker {
@@ -177,21 +238,19 @@ export default {
   transition: all 0.3s ease;
 }
 
-/* 其他样式保持不变 */
-
 @media (max-width: 768px) {
   .sensor-tools {
     left: 1rem;
+    padding: 1rem 0.75rem;
+  }
+
+  .sensor-tool-button {
     width: 3rem;
+    height: 3rem;
   }
 
-  .sensor-tool-icon {
-    font-size: 2rem;
-  }
-
-  .sensor-info {
-    width: 200px;
-    padding: 0.8rem;
+  .sensor-tool-button .el-icon {
+    font-size: 1.3rem;
   }
 }
 </style>

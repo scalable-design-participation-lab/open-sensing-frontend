@@ -19,17 +19,20 @@
         <span class="dot"></span>
         <span class="dot"></span>
       </button>
-      <button
-        class="user-profile-button block"
-        aria-label="User profile"
-      ></button>
+      <button class="user-profile-button block" aria-label="User profile">
+        <el-icon><Download /></el-icon>
+      </button>
     </nav>
   </header>
 </template>
 
 <script>
+import { Download } from '@element-plus/icons-vue'
 export default {
   name: 'AppHeader',
+  components: {
+    Download,
+  },
 }
 </script>
 
