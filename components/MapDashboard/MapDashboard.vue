@@ -1,7 +1,13 @@
-<!-- eslint-disable vue/multi-word-component-names -->
+<!-- MapDashboard.vue -->
+<template>
+  <div>
+    <main id="main-container" />
+  </div>
+</template>
+
 <script setup>
 // IMPORTS
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { IconLayer } from '@deck.gl/layers'
 
@@ -111,12 +117,6 @@ const loadMapDraw = () => {
   })
 }
 </script>
-
-<template>
-  <div>
-    <main id="main-container" />
-  </div>
-</template>
 
 <style lang="postcss" scoped>
 #main-container {

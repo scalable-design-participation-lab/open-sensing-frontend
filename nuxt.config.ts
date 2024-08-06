@@ -7,18 +7,13 @@ export default defineNuxtConfig({
     // css files
     // '@/assets/less/antd.less',
   ],
+
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [
-    // '@/plugins/_',
-    { src: '@/plugins/antd-ui', mode: 'client' },
-  ],
+  plugins: [{ src: '@/plugins/antd-ui', mode: 'client' }],
 
-  modules: [
-    // ...
-    '@pinia/nuxt',
-  ],
+  modules: ['@pinia/nuxt', '@element-plus/nuxt'],
 
   components: [
     {
@@ -27,6 +22,8 @@ export default defineNuxtConfig({
     },
   ],
 
+  // Element
+  // modules: ['@element-plus/nuxt'],
   runtimeConfig: {
     dbUser: process.env.DB_USER,
     dbHost: process.env.DB_HOST,
@@ -34,7 +31,4 @@ export default defineNuxtConfig({
     dbPassword: process.env.DB_PASSWORD,
     dbPort: process.env.DB_PORT,
   },
-
-  // Element
-  // modules: ['@element-plus/nuxt'],
 })

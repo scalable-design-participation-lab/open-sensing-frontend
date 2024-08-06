@@ -10,7 +10,10 @@
 
   <!-- Mapbox/DeckGl Canvas -->
   <section>
-    <main id="main-container" class="font-sans font-normal flex flex-col h-screen"></main>
+    <main
+      id="main-container"
+      class="font-sans font-normal flex flex-col h-screen"
+    ></main>
   </section>
 </template>
 
