@@ -6,6 +6,18 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   const lastFetchTime = ref(null)
   const isFetching = ref(false)
 
+  const showFilter = ref(false)
+
+  const toggleFilter = () => {
+    showFilter.value = !showFilter.value
+    console.log('Filter toggled:', showFilter.value)
+  }
+
+  const closeFilter = () => {
+    showFilter.value = false
+    console.log('Filter closed')
+  }
+
   // State Properties
   const existingHubs = ref({
     HOWARD: true,
@@ -270,5 +282,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     updateSelectedSiteProps,
     updateDateRangeUpdate,
     loadDashboardData,
+    showFilter,
+    toggleFilter,
+    closeFilter,
   }
 })

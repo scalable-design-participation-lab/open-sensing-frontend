@@ -1,3 +1,4 @@
+">
 <template>
   <footer class="footer">
     <div class="footer-left">
@@ -16,11 +17,7 @@
   </footer>
 </template>
 
-<script>
-export default {
-  name: 'AppFooter',
-}
-</script>
+<script setup></script>
 
 <style scoped>
 .footer {

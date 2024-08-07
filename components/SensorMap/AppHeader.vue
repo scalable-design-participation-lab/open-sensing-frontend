@@ -10,7 +10,9 @@
         />
       </div>
       <div class="sdpl-icon block">🤲</div>
-      <div class="application-name block">Open Sensing</div>
+      <div class="application-name block" @click="openDashboard">
+        Open Sensing
+      </div>
     </div>
     <nav class="nav-right">
       <button class="satellite-button block">Satellite</button>
@@ -24,19 +26,41 @@
       </button>
     </nav>
   </header>
+
+  <Dashboard v-if="showDashboard" @close="closeDashboard" />
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
 import { Download } from '@element-plus/icons-vue'
-export default {
-  name: 'AppHeader',
-  components: {
-    Download,
-  },
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+
+const store = useDashboardUIStore()
+const { setPopUpVisibility } = store
+
+const showDashboard = ref(false)
+
+const openDashboard = () => {
+  showDashboard.value = true
+  setPopUpVisibility('dashboard')
+}
+
+const closeDashboard = () => {
+  showDashboard.value = false
+  setPopUpVisibility('dashboard')
 }
 </script>
 
 <style scoped>
+.application-name {
+  background-color: #000;
+  color: #fff;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  font-size: 1.2rem;
+  cursor: pointer; /* Add this to indicate it's clickable */
+}
+
 .header {
   position: absolute;
   top: 1.5rem;

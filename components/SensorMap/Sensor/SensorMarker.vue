@@ -1,24 +1,27 @@
+">
 <template>
   <div class="sensor-marker" :style="{ top: top, left: left }">
     <div class="marker-icon"></div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'SensorMarker',
+<script setup>
+import { defineProps, defineOptions } from 'vue'
 
-  props: {
-    top: {
-      type: String,
-      required: true,
-    },
-    left: {
-      type: String,
-      required: true,
-    },
+defineOptions({
+  name: 'SensorMarker',
+})
+
+defineProps({
+  top: {
+    type: String,
+    required: true,
   },
-}
+  left: {
+    type: String,
+    required: true,
+  },
+})
 </script>
 
 <style scoped>

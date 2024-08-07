@@ -1,3 +1,4 @@
+">
 <template>
   <div class="sensor-info">
     <div class="info-header">
@@ -18,35 +19,32 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { defineProps, defineOptions } from 'vue'
 import {
   ArrowLeftBold,
   ArrowRightBold,
   TopRight,
 } from '@element-plus/icons-vue'
 
-export default {
+defineOptions({
   name: 'SensorInfo',
-  components: {
-    ArrowLeftBold,
-    ArrowRightBold,
-    TopRight,
+})
+
+defineProps({
+  title: {
+    type: String,
+    required: true,
   },
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    time: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
+  time: {
+    type: String,
+    required: true,
   },
-}
+  description: {
+    type: String,
+    required: true,
+  },
+})
 </script>
 
 <style scoped>

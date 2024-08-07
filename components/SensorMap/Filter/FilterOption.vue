@@ -1,30 +1,35 @@
+">
 <template>
   <label class="filter-option">
     <input
       type="checkbox"
       :checked="isChecked"
-      @change="$emit('change', $event.target.checked)"
+      @change="emit('change', $event.target.checked)"
     />
     <span class="checkmark"></span>
     <span class="option-text">{{ label }}</span>
   </label>
 </template>
 
-<script>
-export default {
+<script setup>
+import { defineProps, defineEmits, defineOptions } from 'vue'
+
+defineOptions({
   name: 'FilterOption',
-  props: {
-    label: {
-      type: String,
-      required: true,
-    },
-    isChecked: {
-      type: Boolean,
-      default: false,
-    },
+})
+
+const props = defineProps({
+  label: {
+    type: String,
+    required: true,
   },
-  emits: ['change'],
-}
+  isChecked: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const emit = defineEmits(['change'])
 </script>
 
 <style scoped>
