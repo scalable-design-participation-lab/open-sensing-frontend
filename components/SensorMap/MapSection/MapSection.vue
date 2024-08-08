@@ -49,17 +49,13 @@ const sensorTools = [
 ]
 
 const handleToolClick = (index) => {
-  console.log(`Sensor tool ${index} clicked`)
   if (sensorTools[index].component === Filter) {
     toggleFilter()
-    console.log('Toggle filter called')
   } else if (sensorTools[index].component === FullScreen) {
     openDashboard()
   } else {
     activeToolIndex.value = activeToolIndex.value === index ? null : index
   }
-  console.log(`Active tool index: ${activeToolIndex.value}`)
-  console.log(`Show filter: ${showFilter.value}`)
 }
 
 const openDashboard = () => {
@@ -75,7 +71,6 @@ const closeDashboard = () => {
 const selectedSensor = ref(null)
 
 watch(showFilter, (newValue) => {
-  console.log(`showFilter changed to: ${newValue}`)
   activeToolIndex.value = newValue
     ? sensorTools.findIndex((tool) => tool.component === Filter)
     : null

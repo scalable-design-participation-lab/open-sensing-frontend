@@ -20,12 +20,26 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   // State Properties
   const existingHubs = ref({
-    HOWARD: true,
-    'BAY VIEW': true,
-    ASTORIA: true,
-    WAGNER: true,
-    FOREST: true,
-    "MARINER'S HARBOR": true,
+    // HOWARD: true,
+    // 'BAY VIEW': true,
+    // ASTORIA: true,
+    // WAGNER: true,
+    // FOREST: true,
+    // "MARINER'S HARBOR": true,
+    'Architecture Studios': true,
+    'Cabot Center': true,
+    'Cargill Hall': true,
+    'Carter Playground': true,
+    'Centennial Common': true,
+    'Columbus Garage': true,
+    'Curry Student Center': true,
+    'Forsyth Building': true,
+    'Gainsborough Garage': true,
+    'Gainsborough Garage Roof': true,
+    'ISEC Terrace': true,
+    'Matthews Arena': true,
+    'Robinson Hall': true,
+    'Snell Library Quad': true,
   })
   const existingDatasets = ref({
     Temperature: true,

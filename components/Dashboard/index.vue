@@ -1,10 +1,12 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div ref="chartContainer" class="chart-container">
-    <button class="close-btn" @click="closeModal">&times;</button>
-    <FloatingNav />
+    <div class="dashboard-header">
+      <h2 class="dashboard-title">Sensor Data</h2>
+      <button class="close-btn" @click="closeModal">&times;</button>
+    </div>
     <div ref="scrollContainer" class="scroll-container">
-      <div v-if="dataLoaded">
+      <div v-if="dataLoaded" class="charts-wrapper">
         <LineChart
           v-for="(metric, metricName) in metrics"
           v-show="selectedDatasets.includes(metricName)"
@@ -14,9 +16,19 @@
           :margin="margin"
           :width="chartWidth"
           :height="chartHeight"
+          @date-range-update="updateGlobalDateRange"
         />
       </div>
-      <div v-else>Loading data...</div>
+      <div v-else class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading data...</p>
+      </div>
+    </div>
+    <div class="dashboard-footer">
+      <button class="reset-button" @click="resetAllCharts">Reset All</button>
+      <div v-if="globalDateRange.length === 2" class="date-range-display">
+        {{ formatDateRange(globalDateRange) }}
+      </div>
     </div>
   </div>
 </template>
@@ -26,17 +38,17 @@ import { ref, onMounted, computed } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import LineChart from './LineChart.vue'
-import FloatingNav from '../FloatingNav.vue'
 
 const store = useDashboardUIStore()
-const { selectedDatasets, sensorData } = storeToRefs(store)
+const { selectedDatasets, sensorData, dataDashboardValues } = storeToRefs(store)
 
 const chartContainer = ref(null)
 const scrollContainer = ref(null)
 const chartWidth = ref(0)
-const chartHeight = 300 // Fixed height for each chart
+const chartHeight = 180 // Slightly reduced height for compact layout
+const globalDateRange = ref([])
 
-const margin = { top: 30, right: 30, bottom: 50, left: 60 }
+const margin = { top: 20, right: 20, bottom: 30, left: 40 }
 
 const dataLoaded = computed(
   () => Object.keys(sensorData.value).length > 0 && chartWidth.value > 0
@@ -73,68 +85,156 @@ const emit = defineEmits(['close'])
 const closeModal = () => {
   emit('close')
 }
+
+const updateGlobalDateRange = (range) => {
+  globalDateRange.value = range
+  store.updateDataDashboardValues('dateRange', range)
+}
+
+const resetAllCharts = () => {
+  globalDateRange.value = []
+  store.updateDataDashboardValues('dateRange', [])
+  // You may need to emit an event to reset all LineChart components
+}
+
+const formatDateRange = (range) => {
+  if (range.length !== 2) return ''
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: '2-digit',
+    })
+  }
+  return `${formatDate(range[0])} - ${formatDate(range[1])}`
+}
 </script>
 
 <style scoped>
 .chart-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 53%;
+  position: fixed;
+  bottom: 20px;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95%;
-  height: 85%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 40%;
   background-color: white;
-  border-radius: 15px;
-  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
+  border-radius: 15px 15px 0 0;
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
   z-index: 10;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-title {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
 }
 
 .close-btn {
-  position: absolute;
-  top: 5px;
-  right: 10px;
   background: transparent;
   border: none;
   font-size: 20px;
-  font-weight: bold;
-  color: lightgray;
+  color: #666;
   cursor: pointer;
+  transition: color 0.2s;
 }
 
 .close-btn:hover {
-  color: #609f80;
+  color: #333;
 }
 
 .scroll-container {
-  display: flex;
-  flex-direction: column;
+  flex-grow: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  width: calc(100% - 320px);
-  height: 95%;
-  padding: 5px;
-  margin-left: 300px;
-  margin-top: 50px;
-  margin-bottom: 30px;
+  padding: 10px;
+}
+
+.charts-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.dashboard-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 15px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+}
+
+.reset-button {
+  padding: 5px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.reset-button:hover {
+  background-color: #45a049;
+}
+
+.date-range-display {
+  font-size: 0.8rem;
+  color: #666;
 }
 
 .scroll-container::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
   background-color: transparent;
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
   background-color: #609f80;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background-clip: padding-box;
+  border-radius: 4px;
 }
 
-.scroll-container::-webkit-scrollbar-button {
-  display: none;
+.scroll-container::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 4px;
 }
 </style>
