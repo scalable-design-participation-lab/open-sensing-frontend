@@ -14,11 +14,7 @@
           <span class="tooltip">{{ icon.tooltip }}</span>
         </button>
       </div>
-      <div v-if="selectedSensor" class="sensor-info">
-        <h3>{{ selectedSensor.title }}</h3>
-        <p>{{ selectedSensor.description }}</p>
-        <p>Last updated: {{ selectedSensor.time }}</p>
-      </div>
+      <SensorInfo />
     </div>
     <Dashboard v-if="showDashboard" @close="closeDashboard" />
   </section>
@@ -29,13 +25,12 @@ import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { House, Filter, FullScreen, Location } from '@element-plus/icons-vue'
-
 defineOptions({
   name: 'MapSection',
 })
 
 const store = useDashboardUIStore()
-const { showFilter } = storeToRefs(store)
+const { showFilter, selectedSite } = storeToRefs(store)
 const { toggleFilter, setPopUpVisibility } = store
 
 const activeToolIndex = ref(null)
@@ -68,22 +63,9 @@ const closeDashboard = () => {
   setPopUpVisibility('dashboard')
 }
 
-const selectedSensor = ref(null)
-
-watch(showFilter, (newValue) => {
-  activeToolIndex.value = newValue
-    ? sensorTools.findIndex((tool) => tool.component === Filter)
-    : null
+watch(selectedSite, (newValue) => {
+  console.log('MapSection: Selected site changed:', newValue)
 })
-
-// Simulated sensor selection (you can replace this with actual logic later)
-const selectSensor = () => {
-  selectedSensor.value = {
-    title: 'Sensor 1',
-    description: 'Temperature and humidity sensor',
-    time: 'Just now',
-  }
-}
 </script>
 
 <style scoped>
@@ -162,16 +144,5 @@ const selectSensor = () => {
   display: none;
   white-space: nowrap;
   pointer-events: none;
-}
-
-.sensor-info {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  pointer-events: auto;
 }
 </style>

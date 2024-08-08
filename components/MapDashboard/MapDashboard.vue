@@ -10,6 +10,8 @@
 import { onMounted, ref, watch } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { IconLayer } from '@deck.gl/layers'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 // Mapbox imports
 import mapboxgl from 'mapbox-gl'
@@ -24,6 +26,8 @@ const developmentsProps = ref([])
 // Store
 const store = useDashboardUIStore()
 const { selectedSite, selectedSiteProps, development } = storeToRefs(store)
+const { updateSelectedSite, updateSelectedSiteProps, updateClickPosition } =
+  store
 
 let map
 
@@ -65,7 +69,7 @@ sensorLocations.features.forEach((feature, index) => {
   )
 })
 
-/***
+/**
  * Loads mapbox map and Deck.gl
  */
 const loadMapDraw = () => {
@@ -82,11 +86,7 @@ const loadMapDraw = () => {
     attributionControl: false,
   })
 
-  // /* -------------------------------------------------------------------------- */
-  // /*                                MAP CALLBACKS                               */
-  // /* -------------------------------------------------------------------------- */
-
-  // /* ---------------------------------- LOAD ---------------------------------- */
+  // Map callbacks
   map.on('load', () => {
     const firstLabelLayerId = map
       .getStyle()
@@ -103,19 +103,59 @@ const loadMapDraw = () => {
         type: IconLayer,
         data: sensorLocations.features,
         pickable: true,
-        // iconAtlas and iconMapping are required
-        // getIcon: return a string
         iconAtlas:
           'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
         iconMapping: ICON_MAPPING,
         getIcon: (d) => 'marker',
         getPosition: (d) => d.geometry.coordinates,
         getSize: (d) => 60,
-        getColor: [255, 0, 0], //(d) => [Math.sqrt(d.exits), 140, 0],
+        getColor: [255, 0, 0],
+        onClick: (info) => {
+          const { object, x, y } = info
+          if (object && object.properties) {
+            console.log('Clicked object properties:', object.properties)
+            const sensorId =
+              object.properties.DEVELOPMENT ||
+              object.properties.TDS_NUM ||
+              'Unknown Sensor'
+            console.log('Sensor ID:', sensorId)
+
+            const clickX = x
+            const clickY = y
+
+            const mapBounds = map.getContainer().getBoundingClientRect()
+
+            const relativeX = clickX - mapBounds.left
+            const relativeY = clickY - mapBounds.top
+
+            updateSelectedSite(sensorId)
+            updateSelectedSiteProps(object.properties)
+            updateClickPosition({ x: relativeX, y: relativeY })
+            console.log('Icon position updated:', {
+              x: relativeX,
+              y: relativeY,
+            })
+          } else {
+            console.log('Clicked on an undefined area')
+          }
+        },
       })
     )
   })
 }
+
+// Add watchers for debugging
+watch(selectedSite, (newValue) => {
+  console.log('MapDashboard: selectedSite changed', newValue)
+})
+
+watch(
+  selectedSiteProps,
+  (newValue) => {
+    console.log('MapDashboard: selectedSiteProps changed', newValue)
+  },
+  { deep: true }
+)
 </script>
 
 <style lang="postcss" scoped>

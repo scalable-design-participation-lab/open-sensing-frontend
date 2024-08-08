@@ -1,6 +1,5 @@
-">
 <template>
-  <div class="sensor-info">
+  <div v-show="!!selectedSite" class="sensor-info" :style="positionStyle">
     <div class="info-header">
       <span>
         <el-icon><ArrowLeftBold /></el-icon>
@@ -12,15 +11,22 @@
     </div>
     <div class="info-divider"></div>
     <div class="info-content">
-      <h3 class="sensor-title">{{ title }}</h3>
-      <span class="sensor-time">{{ time }}</span>
+      <h3 class="sensor-title">{{ selectedSite }}</h3>
+      <span class="sensor-time">Last updated: {{ currentTime }}</span>
     </div>
-    <p class="sensor-description">{{ description }}</p>
+    <p class="sensor-description">
+      TDS Number: {{ selectedSiteProps.TDS_NUM || 'N/A' }}<br />
+      Population (20-24): {{ selectedSiteProps.pop20t24P || 'N/A' }}<br />
+      Suitable Area: {{ selectedSiteProps.suit_area || 'N/A' }}<br />
+      NYCHA Area: {{ selectedSiteProps.NYCHA_Area || 'N/A' }}
+    </p>
   </div>
 </template>
 
 <script setup>
-import { defineProps, defineOptions } from 'vue'
+import { computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
 import {
   ArrowLeftBold,
   ArrowRightBold,
@@ -31,19 +37,28 @@ defineOptions({
   name: 'SensorInfo',
 })
 
-defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  time: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
+const store = useDashboardUIStore()
+const { selectedSite, selectedSiteProps, clickPosition } = storeToRefs(store)
+
+const currentTime = computed(() => {
+  return new Date().toLocaleString()
+})
+
+const positionStyle = computed(() => {
+  const { x, y } = clickPosition.value
+  const offset = 10
+  return {
+    left: `${x + offset}px`,
+    top: `${y - offset}px`,
+  }
+})
+
+watch(selectedSite, (newValue) => {
+  console.log('SensorInfo: Selected site changed:', newValue)
+})
+
+watch(clickPosition, (newValue) => {
+  console.log('SensorInfo: Click position changed:', newValue)
 })
 </script>
 
@@ -54,9 +69,9 @@ defineProps({
   border-radius: 5px;
   padding: 13px;
   width: 227px;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
 }
 
 .info-header {

@@ -18,6 +18,12 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     console.log('Filter closed')
   }
 
+  const clickPosition = ref({ x: 0, y: 0 })
+
+  const updateClickPosition = (position) => {
+    clickPosition.value = position
+  }
+
   // State Properties
   const existingHubs = ref({
     // HOWARD: true,
@@ -260,6 +266,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   )
 
   return {
+    clickPosition,
+    updateClickPosition,
     masterSolutions,
     existingHubs,
     existingDatasets,
