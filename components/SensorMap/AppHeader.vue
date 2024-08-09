@@ -4,7 +4,7 @@
       <div class="neu-logo block">
         <img
           loading="lazy"
-          src="@/assets/images/group.png"
+          src="@/assets/images/vector.svg"
           alt="NEU Logo"
           class="neu-logo-image"
         />
@@ -93,7 +93,7 @@ const closeDashboard = () => {
 }
 
 .neu-logo-image {
-  width: 120px;
+  width: 45px;
   height: auto;
 }
 
