@@ -5,7 +5,7 @@
       <div class="footer-content">
         <img
           loading="lazy"
-          src="@/assets/images/group.png"
+          src="@/assets/images/logo.png"
           alt="Footer content"
           class="footer-image"
         />
@@ -55,7 +55,7 @@
 }
 
 .footer-image {
-  height: 30px;
+  height: 50px;
   width: auto;
 }
 

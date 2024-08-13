@@ -10,7 +10,7 @@
         />
       </div>
       <div class="sdpl-icon block">🤲</div>
-      <div class="application-name block" @click="openDashboard">
+      <div class="application-name block" @click="handleToggleDashboard">
         Open Sensing
       </div>
     </div>
@@ -26,41 +26,25 @@
       </button>
     </nav>
   </header>
-
-  <Dashboard v-if="showDashboard" @close="closeDashboard" />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { Download } from '@element-plus/icons-vue'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 const store = useDashboardUIStore()
-const { setPopUpVisibility } = store
+const { showDashboard } = storeToRefs(store)
+const { toggleDashboard } = store
 
-const showDashboard = ref(false)
-
-const openDashboard = () => {
-  showDashboard.value = true
-  setPopUpVisibility('dashboard')
-}
-
-const closeDashboard = () => {
-  showDashboard.value = false
-  setPopUpVisibility('dashboard')
+const handleToggleDashboard = () => {
+  console.log('AppHeader: Toggle Dashboard clicked')
+  toggleDashboard()
+  console.log('AppHeader: showDashboard after toggle:', showDashboard.value)
 }
 </script>
 
 <style scoped>
-.application-name {
-  background-color: #000;
-  color: #fff;
-  font-weight: 600;
-  padding: 1rem 1.5rem;
-  font-size: 1.2rem;
-  cursor: pointer; /* Add this to indicate it's clickable */
-}
-
 .header {
   position: absolute;
   top: 1.5rem;
@@ -109,6 +93,7 @@ const closeDashboard = () => {
   font-weight: 600;
   padding: 1rem 1.5rem;
   font-size: 1.2rem;
+  cursor: pointer;
 }
 
 .satellite-button {

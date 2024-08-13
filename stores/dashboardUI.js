@@ -13,6 +13,27 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     console.log('Filter toggled:', showFilter.value)
   }
 
+  const showDashboard = ref(false)
+
+  const toggleDashboard = () => {
+    console.log('Store: toggleDashboard called')
+    showDashboard.value = !showDashboard.value
+    console.log('Store: showDashboard after toggle:', showDashboard.value)
+  }
+
+  const setPopUpVisibility = (popUp) => {
+    console.log('Store: setPopUpVisibility called with:', popUp)
+    if (popUp === 'dashboard') {
+      showDashboard.value = true
+    } else {
+      showDashboard.value = false
+    }
+    console.log(
+      'Store: showDashboard after setPopUpVisibility:',
+      showDashboard.value
+    )
+  }
+
   const closeFilter = () => {
     showFilter.value = false
     console.log('Filter closed')
@@ -200,14 +221,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     dateRangeUpdate.value = date
   }
 
-  const setPopUpVisibility = (popUp) => {
-    Object.keys(popUpVisibility.value).forEach((key) => {
-      if (key === popUp)
-        popUpVisibility.value[key] = !popUpVisibility.value[key]
-      else popUpVisibility.value[key] = false
-    })
-  }
-
   const loadDashboardData = async () => {
     if (!dashboardData.value) {
       // Simulate data loading
@@ -266,6 +279,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   )
 
   return {
+    showDashboard,
+    toggleDashboard,
     clickPosition,
     updateClickPosition,
     masterSolutions,
