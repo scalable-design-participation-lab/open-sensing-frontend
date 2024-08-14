@@ -227,7 +227,7 @@ watch(selectedOptions, handleFilterChange, { deep: true })
           <el-icon><Close /></el-icon>
         </el-button>
       </div>
-      <el-scrollbar>
+      <el-scrollbar class="filter-content">
         <el-collapse v-model="activeNames" accordion>
           <el-collapse-item name="1">
             <template #title>
@@ -321,7 +321,7 @@ const {
   updateDateRangeUpdate,
 } = store
 
-const activeNames = ref(['1'])
+const activeNames = ref([])
 const selectedLocations = ref([])
 const selectedDatasets = ref([])
 
@@ -404,7 +404,7 @@ selectedDatasets.value = Object.keys(existingDatasets.value).filter(
   top: 20px;
   right: 20px;
   width: 320px;
-  max-height: calc(100vh - 40px);
+  height: 500px;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -434,8 +434,13 @@ selectedDatasets.value = Object.keys(existingDatasets.value).filter(
   font-size: 18px;
 }
 
+.filter-content {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
 :deep(.el-scrollbar__wrap) {
-  max-height: calc(100vh - 120px);
+  overflow-x: hidden;
 }
 
 :deep(.el-collapse) {

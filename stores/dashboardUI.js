@@ -4,9 +4,23 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useDashboardUIStore = defineStore('dashboardUI', () => {
+  // Map related state and functions
+  const mapType = ref('satellite')
+  const mapCenter = ref(null)
+
+  const setMapType = (type) => {
+    mapType.value = type
+  }
+
+  const updateMapCenter = (center) => {
+    mapCenter.value = center
+  }
+
+  // Sensor related state and functions
   const showSensorInfo = ref(false)
   const showSensorDetail = ref(false)
   const selectedSensorId = ref(null)
+  const clickPosition = ref({ x: 0, y: 0 })
 
   const selectedSensor = computed(() =>
     sensors.value.find((sensor) => sensor.id === selectedSensorId.value)
@@ -14,12 +28,17 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   const toggleSensorDetail = () => {
     showSensorDetail.value = !showSensorDetail.value
+    if (showSensorDetail.value) {
+      showSensorInfo.value = false
+      showDashboard.value = false
+    }
   }
 
   const updateSelectedSensor = (id) => {
     selectedSensorId.value = id
     showSensorInfo.value = true
     showSensorDetail.value = false
+    showDashboard.value = false
   }
 
   const closeSensorInfo = () => {
@@ -29,6 +48,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   const updateClickPosition = (position) => {
     clickPosition.value = position
   }
+
+  // Sensor data
   const locations = [
     'Architecture Studios',
     'Cabot Center',
@@ -56,10 +77,9 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
       humidity: feature.properties.relative_humidity,
       voc: feature.properties.voc,
       nox: feature.properties.nox,
-      pm25: feature.properties.pm25,
+      pm25: Number(feature.properties.pm25.toFixed(2)),
       coordinates: feature.geometry.coordinates,
       timestamp: new Date(feature.properties.timestamp).toLocaleString(),
-      // Additional mock data
       batteryLevel: Math.floor(getRandomValue(20, 100)),
       signalStrength: Math.floor(getRandomValue(1, 5)),
       lastMaintenance: new Date(
@@ -75,46 +95,37 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     }))
   )
 
-  const sensorData = ref({})
-  const lastFetchTime = ref(null)
-  const isFetching = ref(false)
-
+  // Filter related state and functions
   const showFilter = ref(false)
 
   const toggleFilter = () => {
     showFilter.value = !showFilter.value
-    console.log('Filter toggled:', showFilter.value)
   }
 
+  const closeFilter = () => {
+    showFilter.value = false
+  }
+
+  // Dashboard related state and functions
   const showDashboard = ref(false)
 
   const toggleDashboard = () => {
-    console.log('Store: toggleDashboard called')
     showDashboard.value = !showDashboard.value
-    console.log('Store: showDashboard after toggle:', showDashboard.value)
+    if (showDashboard.value) {
+      showSensorInfo.value = false
+      showSensorDetail.value = false
+    }
   }
 
   const setPopUpVisibility = (popUp) => {
-    console.log('Store: setPopUpVisibility called with:', popUp)
     if (popUp === 'dashboard') {
       showDashboard.value = true
     } else {
       showDashboard.value = false
     }
-    console.log(
-      'Store: showDashboard after setPopUpVisibility:',
-      showDashboard.value
-    )
   }
 
-  const closeFilter = () => {
-    showFilter.value = false
-    console.log('Filter closed')
-  }
-
-  const clickPosition = ref({ x: 0, y: 0 })
-
-  // State Properties
+  // Eco-Hubs and Datasets
   const existingHubs = ref(
     Object.fromEntries(locations.map((loc) => [loc, true]))
   )
@@ -128,62 +139,29 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     pm4: true,
     pm10: true,
   })
-  const dataDashboard = ref(false)
-  const selectedSite = ref('')
-  const selectedSiteProps = ref({})
-  const development = ref('')
 
-  const dataDashboardValues = ref({
-    time: [0, 24],
-    temperature: [],
-    heat_index: [],
-    relative_humidity: [],
-    pm25: [],
-    pm10: [],
-    dateRange: [],
-    dateRangeValues: [],
-  })
-
-  const dateRangeUpdate = ref(null)
-
-  const masterSolutions = ref([])
-
-  const selectedSolution = ref({})
-
-  const parsedSolutions = ref([])
-
-  const solutionsObject = ref({})
-
-  const popUpVisibility = ref({
-    pcoords: false,
-    dashboard: false,
-    about: false,
-  })
-
-  const dashboardData = ref(null)
-
-  // Setters
-  // Set the list of existing Eco-Hubs
-  function updateExistingHubs(hub, val) {
-    return (existingHubs.value[hub] = val)
+  const updateExistingHubs = (hub, val) => {
+    existingHubs.value[hub] = val
   }
-  // Set the list of existing Datasets
-  function updateExistingDatasets(dataset, val) {
+
+  const updateExistingDatasets = (dataset, val) => {
     existingDatasets.value[dataset] = val
   }
 
-  // Toggle visibility of datasets
-  function toggleDataset(datasetKey) {
+  const toggleDataset = (datasetKey) => {
     existingDatasets.value[datasetKey] = !existingDatasets.value[datasetKey]
   }
 
-  // Toggle visibility of hubs
-  function toggleHub(hubKey) {
+  const toggleHub = (hubKey) => {
     existingHubs.value[hubKey] = !existingHubs.value[hubKey]
   }
 
-  // Load the data for the sensor
-  async function loadSensorData(force = false) {
+  // Sensor data loading
+  const sensorData = ref({})
+  const lastFetchTime = ref(null)
+  const isFetching = ref(false)
+
+  const loadSensorData = async (force = false) => {
     const cacheTime = 5400000 // 1h30m
     if (
       force ||
@@ -227,17 +205,39 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     return sensorData.value
   }
 
-  // Update datadashboard values
-  function updateDataDashboardValues(dataType, data) {
+  // Dashboard data
+  const dataDashboard = ref(false)
+  const dataDashboardValues = ref({
+    time: [0, 24],
+    temperature: [],
+    heat_index: [],
+    relative_humidity: [],
+    pm25: [],
+    pm10: [],
+    dateRange: [],
+    dateRangeValues: [],
+  })
+
+  const updateDataDashboardValues = (dataType, data) => {
     dataDashboardValues.value[dataType] = data
   }
 
-  // Load Master Solutions
+  const dateRangeUpdate = ref(null)
+
+  const updateDateRangeUpdate = (date) => {
+    dateRangeUpdate.value = date
+  }
+
+  // Solutions related state and functions
+  const masterSolutions = ref([])
+  const selectedSolution = ref({})
+  const parsedSolutions = ref([])
+  const solutionsObject = ref({})
+
   const loadMasterSolutions = async () => {
     const response = await fetch('/master_solutions.csv')
     const text = await response.text()
     const data = d3.csvParse(text, (d) => {
-      // turn every value into a number
       const newD = {}
       Object.keys(d).forEach((key) => {
         newD[key] = +d[key]
@@ -259,6 +259,11 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     solutionsObject.value = solutions
   }
 
+  // Site related state
+  const selectedSite = ref('')
+  const selectedSiteProps = ref({})
+  const development = ref('')
+
   const updateSelectedSite = (site) => {
     selectedSite.value = site
   }
@@ -267,44 +272,31 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedSiteProps.value = props
   }
 
-  const updateDateRangeUpdate = (date) => {
-    dateRangeUpdate.value = date
-  }
+  // Popup visibility
+  const popUpVisibility = ref({
+    pcoords: false,
+    dashboard: false,
+    about: false,
+  })
 
-  const loadDashboardData = async () => {
-    if (!dashboardData.value) {
-      // Simulate data loading
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      dashboardData.value = {
-        /* loaded data */
-      }
-    }
-    return dashboardData.value
-  }
-
-  // Getters
-  // Get the list of Selected Eco-Hubs
+  // Computed properties
   const selectedHubs = computed(() =>
     Object.keys(existingHubs.value).filter(
       (hub) => existingHubs.value[hub] == true
     )
   )
-  // Get the list of Selected Datasets
+
   const selectedDatasets = computed(() => {
     if (Object.keys(existingDatasets.value).length === 0) return []
-    else
-      return Object.keys(existingDatasets.value).filter(
-        (dataset) => existingDatasets.value[dataset] === true
-      )
+    return Object.keys(existingDatasets.value).filter(
+      (dataset) => existingDatasets.value[dataset] === true
+    )
   })
 
-  // Get the list of Eco-Hubs
   const hubsList = computed(() => Object.keys(existingHubs.value))
 
-  // Get the max and min values for the master solutions
   const updatedMaxMinVals = computed(() => {
     const vals = {}
-    // iterate through keys in masterSolutions
     if (masterSolutions.value.length === 0) return vals
     Object.keys(masterSolutions.value[0]).forEach(
       (key) =>
@@ -318,7 +310,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   const feasibleSites = computed(() => {
     const MIN_HUB_AREA = 2 // acres
-
     return parsedSolutions.value.filter(
       (site) => site.AREA_BUILD >= MIN_HUB_AREA && site.HAS_ECO_HUB === '0.0'
     )
@@ -328,7 +319,26 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     parsedSolutions.value.filter((site) => site.BUILT !== '0')
   )
 
+  // Dashboard data loading (mock function)
+  const dashboardData = ref(null)
+  const loadDashboardData = async () => {
+    if (!dashboardData.value) {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      dashboardData.value = {
+        /* loaded data */
+      }
+    }
+    return dashboardData.value
+  }
+
   return {
+    // Map related
+    mapType,
+    mapCenter,
+    setMapType,
+    updateMapCenter,
+
+    // Sensor related
     showSensorInfo,
     showSensorDetail,
     selectedSensor,
@@ -337,52 +347,67 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     closeSensorInfo,
     sensors,
     selectedSensorId,
-    selectedSensor,
-    showSensorDetail,
-    toggleSensorDetail,
-    updateSelectedSensor,
-    showDashboard,
-    toggleDashboard,
     clickPosition,
     updateClickPosition,
-    masterSolutions,
+
+    // Filter related
+    showFilter,
+    toggleFilter,
+    closeFilter,
+
+    // Dashboard related
+    showDashboard,
+    toggleDashboard,
+    setPopUpVisibility,
+
+    // Eco-Hubs and Datasets
     existingHubs,
     existingDatasets,
+    updateExistingHubs,
+    updateExistingDatasets,
+    toggleDataset,
+    toggleHub,
+
+    // Sensor data
+    sensorData,
+    loadSensorData,
+
+    // Dashboard data
     dataDashboard,
     dataDashboardValues,
-    sensorData,
-    selectedSite,
-    selectedSiteProps,
-    development,
+    updateDataDashboardValues,
     dateRangeUpdate,
+    updateDateRangeUpdate,
+
+    // Solutions related
+    masterSolutions,
     selectedSolution,
     parsedSolutions,
     solutionsObject,
-    popUpVisibility,
-    toggleDataset,
-    toggleHub,
-    updateExistingHubs,
-    updateExistingDatasets,
-    loadSensorData,
-    updateDataDashboardValues,
-    updateDateRangeUpdate,
     loadMasterSolutions,
     setSelectedSolution,
     updateParsedSolutions,
     updateSolutionsObject,
-    setPopUpVisibility,
-    hubsList,
+
+    // Site related
+    selectedSite,
+    selectedSiteProps,
+    development,
+    updateSelectedSite,
+    updateSelectedSiteProps,
+
+    // Popup visibility
+    popUpVisibility,
+
+    // Computed properties
     selectedHubs,
     selectedDatasets,
+    hubsList,
     updatedMaxMinVals,
     feasibleSites,
     builtSites,
-    updateSelectedSite,
-    updateSelectedSiteProps,
-    updateDateRangeUpdate,
+
+    // Dashboard data loading
     loadDashboardData,
-    showFilter,
-    toggleFilter,
-    closeFilter,
   }
 })

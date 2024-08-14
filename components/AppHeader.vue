@@ -15,7 +15,20 @@
       </div>
     </div>
     <nav class="nav-right">
-      <button class="satellite-button block">Satellite</button>
+      <el-dropdown @command="handleMapTypeChange">
+        <button class="Map-button block">
+          Map Selection
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="satellite">Satellite</el-dropdown-item>
+            <el-dropdown-item command="light">Light</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
       <button class="more-options-button block" aria-label="More options">
         <span class="dot"></span>
         <span class="dot"></span>
@@ -30,12 +43,16 @@
 
 <script setup>
 import { storeToRefs } from 'pinia'
-import { Download } from '@element-plus/icons-vue'
+import { Download, ArrowDown } from '@element-plus/icons-vue'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 const store = useDashboardUIStore()
-const { showDashboard } = storeToRefs(store)
-const { toggleDashboard } = store
+const { showDashboard, mapType } = storeToRefs(store)
+const { toggleDashboard, setMapType } = store
+
+const handleMapTypeChange = (command) => {
+  setMapType(command)
+}
 
 const handleToggleDashboard = () => {
   console.log('AppHeader: Toggle Dashboard clicked')
@@ -96,7 +113,7 @@ const handleToggleDashboard = () => {
   cursor: pointer;
 }
 
-.satellite-button {
+.map-button {
   color: #333;
   font-weight: 600;
   padding: 1rem 1.5rem;

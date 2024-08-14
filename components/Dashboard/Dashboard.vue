@@ -284,7 +284,11 @@ const formatDateRange = (range) => {
         <el-col
           v-for="sensor in sensors"
           :key="sensor.id"
-          :span="12"
+          :xs="24"
+          :sm="12"
+          :md="8"
+          :lg="6"
+          :xl="4"
           class="sensor-column"
         >
           <SensorTile :sensor="sensor" class="sensor-card" />
@@ -338,15 +342,16 @@ const overviewStats = computed(() => [
   flex-direction: column;
   gap: 20px;
   padding: 20px;
-  width: 95vw;
+  width: 80%;
   max-width: 1800px;
-  height: 90vh;
+  height: 80%;
+  max-height: 90vh;
   margin: 0 auto;
-  background-color: transparent;
-  box-shadow: none;
+  background-color: white;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  border-radius: 8px;
 }
-
 .overview-card {
   flex-shrink: 0;
 }
@@ -359,12 +364,12 @@ const overviewStats = computed(() => [
 }
 
 .card-header h2 {
-  font-size: 1.5em;
+  font-size: 1.2em;
   margin: 0;
 }
 
 .overview-description {
-  font-size: 1em;
+  font-size: 0.9em;
   color: #666;
   margin-bottom: 15px;
 }
@@ -381,18 +386,18 @@ const overviewStats = computed(() => [
 
 .stat-card {
   text-align: center;
-  padding: 15px;
+  padding: 10px;
 }
 
 .stat-card h3 {
-  font-size: 1.8em;
+  font-size: 1.4em;
   margin: 0;
   color: #409eff;
 }
 
 .stat-card p {
   margin: 5px 0 0;
-  font-size: 1em;
+  font-size: 0.8em;
   color: #666;
 }
 
@@ -430,8 +435,58 @@ const overviewStats = computed(() => [
 
 @media (max-width: 1200px) {
   .dashboard-grid {
-    width: 90vw;
-    height: 95vh;
+    width: 95%;
+    height: auto;
+    max-height: 85vh;
+    margin: 20px auto;
+  }
+  .card-header h2 {
+    font-size: 1em;
+  }
+
+  .overview-description {
+    font-size: 0.8em;
+  }
+
+  .stat-card h3 {
+    font-size: 1.2em;
+  }
+
+  .stat-card p {
+    font-size: 0.7em;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    width: 90%;
+    padding: 10px;
+    max-height: 80vh;
+    margin: 10px auto;
+  }
+
+  .overview-card {
+    margin-bottom: 10px;
+  }
+
+  .card-header h2 {
+    font-size: 0.9em;
+  }
+
+  .overview-description {
+    font-size: 0.75em;
+  }
+
+  .stat-card h3 {
+    font-size: 1em;
+  }
+
+  .stat-card p {
+    font-size: 0.65em;
+  }
+
+  .sensor-column {
+    margin-bottom: 5px;
   }
 }
 </style>

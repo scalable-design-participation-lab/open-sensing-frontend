@@ -208,12 +208,15 @@ const initMiniMap = () => {
     container: 'mini-map',
     style: 'mapbox://styles/mapbox/satellite-v9',
     center: selectedSensor.value.coordinates,
-    zoom: 17,
-    interactive: false,
+    zoom: 15,
     attributionControl: false,
   })
 
-  new mapboxgl.Marker({
+  miniMap.value.addControl(new mapboxgl.NavigationControl(), 'top-right')
+
+  miniMap.value.addControl(new mapboxgl.ScaleControl(), 'bottom-right')
+
+  const marker = new mapboxgl.Marker({
     color: '#FF0000',
   })
     .setLngLat(selectedSensor.value.coordinates)
@@ -223,6 +226,31 @@ const initMiniMap = () => {
     miniMap.value.setPitch(45)
     miniMap.value.setBearing(20)
   })
+
+  miniMap.value.on('dblclick', () => {
+    miniMap.value.flyTo({
+      center: selectedSensor.value.coordinates,
+      zoom: 15,
+      pitch: 45,
+      bearing: 20,
+    })
+  })
+
+  watch(
+    selectedSensor,
+    (newSensor) => {
+      if (newSensor && miniMap.value) {
+        marker.setLngLat(newSensor.coordinates)
+        miniMap.value.flyTo({
+          center: newSensor.coordinates,
+          zoom: 15,
+          pitch: 45,
+          bearing: 20,
+        })
+      }
+    },
+    { deep: true }
+  )
 }
 
 const closeSensorDetail = () => {
@@ -390,10 +418,20 @@ watch(
 
 #mini-map {
   width: 100%;
-  height: 250px;
+  height: 300px;
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.mapboxgl-ctrl-top-right) {
+  top: 10px;
+  right: 10px;
+}
+
+:deep(.mapboxgl-ctrl-scale) {
+  margin-bottom: 10px;
+  margin-right: 10px;
 }
 
 .chart-container {

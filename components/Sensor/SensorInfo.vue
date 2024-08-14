@@ -40,21 +40,39 @@ import {
 } from '@element-plus/icons-vue'
 
 const store = useDashboardUIStore()
-const { selectedSensor, clickPosition, showSensorInfo } = storeToRefs(store)
+const { selectedSensor, mapCenter, showSensorInfo } = storeToRefs(store)
 const { toggleSensorDetail, closeSensorInfo } = store
 
 const positionStyle = computed(() => {
-  const { x, y } = clickPosition.value
+  if (!mapCenter.value) return {}
+
+  const { innerWidth, innerHeight } = window
   const offset = 10
+  const infoWidth = 227 // Width of the info box
+  const infoHeight = 200 // Approximate height of the info box
+
+  // Calculate position based on map center
+  let left = innerWidth / 2 + offset
+  let top = innerHeight / 2 + infoHeight / 6
+
+  // Ensure the info box doesn't go off-screen
+  if (left + infoWidth > innerWidth) {
+    left = innerWidth - infoWidth - offset
+  }
+  if (top < 0) {
+    top = offset
+  } else if (top + infoHeight > innerHeight) {
+    top = innerHeight - infoHeight - offset
+  }
+
   return {
-    left: `${x + offset}px`,
-    top: `${y - offset}px`,
+    left: `${left}px`,
+    top: `${top}px`,
   }
 })
 
 const openSensorDetail = () => {
   toggleSensorDetail()
-  closeSensorInfo()
 }
 </script>
 
