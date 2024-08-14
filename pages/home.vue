@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia't show
+import { storeToRefs } from 'pinia'
 
 const store = useDashboardUIStore()
 const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
