@@ -1,48 +1,47 @@
 <template>
-  <div v-show="!!selectedSite" class="sensor-info" :style="positionStyle">
+  <div v-if="showSensorInfo" class="sensor-info" :style="positionStyle">
     <div class="info-header">
       <span>
         <el-icon><ArrowLeftBold /></el-icon>
         <el-icon><ArrowRightBold /></el-icon>
       </span>
-      <span class="arrow-icon">
+      <span class="arrow-icon" @click="openSensorDetail">
         <el-icon><TopRight /></el-icon>
+      </span>
+      <span class="close-icon" @click="closeSensorInfo">
+        <el-icon><Close /></el-icon>
       </span>
     </div>
     <div class="info-divider"></div>
     <div class="info-content">
-      <h3 class="sensor-title">{{ selectedSite }}</h3>
-      <span class="sensor-time">Last updated: {{ currentTime }}</span>
+      <h3 class="sensor-title">{{ selectedSensor.location }}</h3>
+      <span class="sensor-time"
+        >Last updated: {{ selectedSensor.timestamp }}</span
+      >
     </div>
     <p class="sensor-description">
-      TDS Number: {{ selectedSiteProps.TDS_NUM || 'N/A' }}<br />
-      Population (20-24): {{ selectedSiteProps.pop20t24P || 'N/A' }}<br />
-      Suitable Area: {{ selectedSiteProps.suit_area || 'N/A' }}<br />
-      NYCHA Area: {{ selectedSiteProps.NYCHA_Area || 'N/A' }}
+      Temperature: {{ selectedSensor.temperature.toFixed(1) }}°C<br />
+      Humidity: {{ selectedSensor.humidity.toFixed(1) }}%<br />
+      Air Quality: {{ selectedSensor.airQuality }}<br />
+      Battery Level: {{ selectedSensor.batteryLevel }}%
     </p>
   </div>
 </template>
 
 <script setup>
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import {
   ArrowLeftBold,
   ArrowRightBold,
   TopRight,
+  Close,
 } from '@element-plus/icons-vue'
 
-defineOptions({
-  name: 'SensorInfo',
-})
-
 const store = useDashboardUIStore()
-const { selectedSite, selectedSiteProps, clickPosition } = storeToRefs(store)
-
-const currentTime = computed(() => {
-  return new Date().toLocaleString()
-})
+const { selectedSensor, clickPosition, showSensorInfo } = storeToRefs(store)
+const { toggleSensorDetail, closeSensorInfo } = store
 
 const positionStyle = computed(() => {
   const { x, y } = clickPosition.value
@@ -53,13 +52,10 @@ const positionStyle = computed(() => {
   }
 })
 
-watch(selectedSite, (newValue) => {
-  console.log('SensorInfo: Selected site changed:', newValue)
-})
-
-watch(clickPosition, (newValue) => {
-  console.log('SensorInfo: Click position changed:', newValue)
-})
+const openSensorDetail = () => {
+  toggleSensorDetail()
+  closeSensorInfo()
+}
 </script>
 
 <style scoped>
@@ -77,6 +73,10 @@ watch(clickPosition, (newValue) => {
 .info-header {
   display: flex;
   justify-content: space-between;
+}
+
+.arrow-icon {
+  cursor: pointer;
 }
 
 .info-divider {
@@ -98,5 +98,10 @@ watch(clickPosition, (newValue) => {
 .sensor-description {
   font-size: 11px;
   margin-top: 12px;
+}
+
+.close-icon {
+  cursor: pointer;
+  margin-left: 10px;
 }
 </style>

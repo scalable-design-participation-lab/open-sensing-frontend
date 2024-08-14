@@ -1,15 +1,19 @@
-<!-- home.vue -->
 <template>
   <div class="home">
     <AppHeader class="app-header" />
     <main class="main-content">
-      <MapSection />
+      <MapDashboard />
       <FilterSidebar v-if="showFilter" class="filter-sidebar" />
-      <DashboardOverlay :visible="showDashboard" class="dashboard-overlay" />
+      <DashboardOverlay
+        :visible="showDashboard || showSensorDetail"
+        class="dashboard-overlay"
+      />
       <Dashboard v-if="showDashboard" class="dashboard" />
       <div class="sensor-tools-container">
         <SensorTools />
       </div>
+      <SensorInfo />
+      <SensorDetail v-if="showSensorDetail" class="sensor-detail" />
     </main>
     <AppFooter class="app-footer" />
   </div>
@@ -17,10 +21,9 @@
 
 <script setup>
 import { storeToRefs } from 'pinia'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 const store = useDashboardUIStore()
-const { showFilter, showDashboard } = storeToRefs(store)
+const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
 </script>
 
 <style scoped>
@@ -46,7 +49,16 @@ const { showFilter, showDashboard } = storeToRefs(store)
   right: 20px;
   z-index: 20;
 }
-
+.sensor-detail {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  max-height: 95vh;
+  overflow: hidden;
+  background-color: transparent;
+}
 .dashboard {
   position: fixed;
   top: 50%;

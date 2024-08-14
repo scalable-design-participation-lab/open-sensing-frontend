@@ -1,4 +1,3 @@
-<!-- MapDashboard.vue -->
 <template>
   <div>
     <main id="main-container" />
@@ -6,137 +5,62 @@
 </template>
 
 <script setup>
-// IMPORTS
 import { onMounted, ref, watch } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { IconLayer } from '@deck.gl/layers'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
-
-// Mapbox imports
 import mapboxgl from 'mapbox-gl'
-import sensorLocations from '~/static/Sensor_Locations_NEU.json'
 
 const accessToken =
   'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
 
-// Card for interaction;
-const developmentsProps = ref([])
-
-// Store
 const store = useDashboardUIStore()
-const { selectedSite, selectedSiteProps, development } = storeToRefs(store)
-const { updateSelectedSite, updateSelectedSiteProps, updateClickPosition } =
-  store
+const { sensors, selectedSensorId } = storeToRefs(store)
+const { updateSelectedSensor, updateClickPosition } = store
 
 let map
 
 onMounted(() => loadMapDraw())
 
-watch(development, (newDevelopment) => {
-  const selectedDevelopmet =
-    sensorLocations.features[
-      devNamesIndex[newDevelopment].id
-    ].geometry.coordinates.flat(2)
-
-  // Create a 'LngLatBounds' with both corners at the first coordinate.
-  const bounds = new mapboxgl.LngLatBounds(
-    selectedDevelopmet[0],
-    selectedDevelopmet[0]
-  )
-  // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
-  for (const coord of selectedDevelopmet) {
-    bounds.extend(coord)
-  }
-
-  map.fitBounds(bounds, {
-    padding: 120,
-  })
-})
-
-const devNamesIndex = {}
-sensorLocations.features.forEach((feature, index) => {
-  devNamesIndex[feature.properties['DEVELOPMENT']] = {
-    id: index,
-    tdsNum: feature.properties['TDS_NUM'],
-  }
-  developmentsProps.value.push(
-    (({ pop20t24P, suit_area, NYCHA_Area }) => ({
-      pop20t24P,
-      suit_area,
-      NYCHA_Area,
-    }))(feature.properties)
-  )
-})
-
-/**
- * Loads mapbox map and Deck.gl
- */
 const loadMapDraw = () => {
-  // 2) mapbox token
   mapboxgl.accessToken = accessToken
 
-  // 3) Initialize the map
-  console.log('creating map')
   map = new mapboxgl.Map({
     container: 'main-container',
-    style: 'mapbox://styles/mapbox/light-v9',
-    center: [-71.090953, 42.338512],
-    zoom: 16.3,
+    style: 'mapbox://styles/mapbox/satellite-v9',
+    center: [-71.0892, 42.3398], // Center of NEU campus
+    zoom: 15,
     attributionControl: false,
   })
 
-  // Map callbacks
   map.on('load', () => {
-    const firstLabelLayerId = map
-      .getStyle()
-      .layers.find((layer) => layer.type === 'symbol').id
-    console.log('loaded.....')
-
     const ICON_MAPPING = {
       marker: { x: 0, y: 0, width: 128, height: 128, mask: true },
     }
 
     map.addLayer(
       new MapboxLayer({
-        id: 'ny-marker',
+        id: 'sensor-markers',
         type: IconLayer,
-        data: sensorLocations.features,
+        data: sensors.value,
         pickable: true,
         iconAtlas:
           'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
         iconMapping: ICON_MAPPING,
-        getIcon: (d) => 'marker',
-        getPosition: (d) => d.geometry.coordinates,
-        getSize: (d) => 60,
-        getColor: [255, 0, 0],
+        getIcon: () => 'marker',
+        getPosition: (d) => d.coordinates,
+        getSize: () => 40,
+        getColor: (d) =>
+          d.status === 'Active'
+            ? [0, 255, 0]
+            : d.status === 'Inactive'
+            ? [255, 0, 0]
+            : [255, 255, 0],
         onClick: (info) => {
-          const { object, x, y } = info
-          if (object && object.properties) {
-            console.log('Clicked object properties:', object.properties)
-            const sensorId =
-              object.properties.DEVELOPMENT ||
-              object.properties.TDS_NUM ||
-              'Unknown Sensor'
-            console.log('Sensor ID:', sensorId)
-
-            const clickX = x
-            const clickY = y
-
-            const mapBounds = map.getContainer().getBoundingClientRect()
-
-            const relativeX = clickX - mapBounds.left
-            const relativeY = clickY - mapBounds.top
-
-            updateSelectedSite(sensorId)
-            updateSelectedSiteProps(object.properties)
-            updateClickPosition({ x: relativeX, y: relativeY })
-            console.log('Icon position updated:', {
-              x: relativeX,
-              y: relativeY,
-            })
-          } else {
-            console.log('Clicked on an undefined area')
+          if (info.object) {
+            updateSelectedSensor(info.object.id)
+            updateClickPosition({ x: info.x, y: info.y })
           }
         },
       })
@@ -144,18 +68,18 @@ const loadMapDraw = () => {
   })
 }
 
-// Add watchers for debugging
-watch(selectedSite, (newValue) => {
-  console.log('MapDashboard: selectedSite changed', newValue)
+watch(selectedSensorId, (newId) => {
+  if (newId && map) {
+    const sensor = sensors.value.find((s) => s.id === newId)
+    if (sensor) {
+      map.flyTo({
+        center: sensor.coordinates,
+        zoom: 17,
+        duration: 1000,
+      })
+    }
+  }
 })
-
-watch(
-  selectedSiteProps,
-  (newValue) => {
-    console.log('MapDashboard: selectedSiteProps changed', newValue)
-  },
-  { deep: true }
-)
 </script>
 
 <style lang="postcss" scoped>

@@ -252,7 +252,9 @@ const formatDateRange = (range) => {
       <template #header>
         <div class="card-header">
           <h2>Sensor Overview</h2>
-          <el-tag size="small" type="info">30 minutes ago</el-tag>
+          <el-tag size="small" type="info">
+            Last updated: {{ lastUpdated }}
+          </el-tag>
         </div>
       </template>
       <p class="overview-description">{{ overviewDescription }}</p>
@@ -293,91 +295,39 @@ const formatDateRange = (range) => {
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
 import SensorTile from './SensorTile.vue'
 
+const store = useDashboardUIStore()
+const { sensors } = storeToRefs(store)
+
 const overviewDescription = ref(
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+  'This dashboard provides an overview of all sensor data across the Northeastern University campus.'
 )
 
-const overviewStats = ref([
-  { value: '18', label: 'Active Sensors' },
-  { value: '7', label: 'Values Measured' },
-  { value: '1', label: 'Pending Issue' },
-])
+const lastUpdated = computed(() => {
+  const dates = sensors.value.map((sensor) => new Date(sensor.timestamp))
+  const latestDate = new Date(Math.max.apply(null, dates))
+  return latestDate.toLocaleString()
+})
 
-const sensors = ref([
+const overviewStats = computed(() => [
   {
-    id: 1,
-    location: 'Cabot Center',
-    airQuality: 'Good',
-    soilMoisture: '37%',
-    temperature: '73°F',
-    battery: '47%',
-    value: 77,
+    value: sensors.value.filter((sensor) => sensor.status === 'Active').length,
+    label: 'Active Sensors',
   },
   {
-    id: 2,
-    location: 'Cabot Center',
-    airQuality: 'Good',
-    soilMoisture: '37%',
-    temperature: '73°F',
-    battery: '47%',
-    value: 35,
+    value: Object.keys(sensors.value[0]).filter((key) =>
+      ['temperature', 'humidity', 'voc', 'nox', 'pm25'].includes(key)
+    ).length,
+    label: 'Values Measured',
   },
   {
-    id: 3,
-    location: 'Cabot Center',
-    airQuality: 'Good',
-    soilMoisture: '37%',
-    temperature: '73°F',
-    battery: '47%',
-    value: 12,
-  },
-  {
-    id: 4,
-    location: 'Cabot Center',
-    airQuality: 'Good',
-    soilMoisture: '37%',
-    temperature: '73°F',
-    battery: '47%',
-    value: 12,
-  },
-  {
-    id: 5,
-    location: 'Cabot Center',
-    airQuality: 'Good',
-    soilMoisture: '37%',
-    temperature: '73°F',
-    battery: '47%',
-    value: 35,
-  },
-  {
-    id: 6,
-    location: 'Cabot Center',
-    airQuality: 'Good',
-    soilMoisture: '37%',
-    temperature: '73°F',
-    battery: '47%',
-    value: 42,
-  },
-  {
-    id: 7,
-    location: 'Cabot Center',
-    airQuality: 'Good',
-    soilMoisture: '37%',
-    temperature: '73°F',
-    battery: '47%',
-    value: 53,
-  },
-  {
-    id: 8,
-    location: 'Cabot Center',
-    airQuality: 'Good',
-    soilMoisture: '37%',
-    temperature: '73°F',
-    battery: '47%',
-    value: 1,
+    value: sensors.value.filter((sensor) => sensor.status === 'Maintenance')
+      .length,
+    label: 'Pending Issues',
   },
 ])
 </script>

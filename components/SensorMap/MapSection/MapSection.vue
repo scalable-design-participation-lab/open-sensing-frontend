@@ -26,7 +26,7 @@ watch(selectedSite, (newValue) => {
   position: relative;
   width: 100%;
   height: 100vh;
-  z-index: 1;
+  z-index: 0;
 }
 
 .map-overlay {
@@ -36,6 +36,6 @@ watch(selectedSite, (newValue) => {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
 }
 </style>

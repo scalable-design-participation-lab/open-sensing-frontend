@@ -1,38 +1,45 @@
-<!-- SensorTile.vue -->
 <template>
   <el-card class="sensor-tile" shadow="hover">
     <template #header>
       <div class="sensor-header">
-        <h3>Sensor {{ sensor.id }}</h3>
-        <span>{{ sensor.location }}</span>
-        <el-button type="text" icon="el-icon-full-screen"></el-button>
+        <h3>{{ sensor.location }}</h3>
+        <el-tag :type="getStatusType(sensor.status)">
+          {{ sensor.status }}
+        </el-tag>
+        <div class="header-actions">
+          <el-button type="text" icon="el-icon-full-screen"></el-button>
+          <el-button type="text" @click="openSensorDetail">
+            <el-icon><ArrowRight /></el-icon>
+          </el-button>
+        </div>
       </div>
     </template>
     <el-row :gutter="20">
       <el-col :span="12">
         <el-progress
           type="dashboard"
-          :percentage="sensor.value"
-          :color="getColor(sensor.value)"
+          :percentage="sensor.batteryLevel"
+          :color="getColor(sensor.batteryLevel)"
         >
           <template #default="{ percentage }">
-            <span class="percentage-value">{{ percentage }}</span>
+            <span class="percentage-value">{{ percentage }}%</span>
           </template>
         </el-progress>
+        <p class="progress-label">Battery Level</p>
       </el-col>
       <el-col :span="12">
         <el-descriptions :column="1" border size="small">
-          <el-descriptions-item label="Air quality">
+          <el-descriptions-item label="Temperature">
+            {{ sensor.temperature.toFixed(1) }}°C
+          </el-descriptions-item>
+          <el-descriptions-item label="Humidity">
+            {{ sensor.humidity.toFixed(1) }}%
+          </el-descriptions-item>
+          <el-descriptions-item label="Air Quality">
             {{ sensor.airQuality }}
           </el-descriptions-item>
           <el-descriptions-item label="Soil Moisture">
             {{ sensor.soilMoisture }}
-          </el-descriptions-item>
-          <el-descriptions-item label="Temperature">
-            {{ sensor.temperature }}
-          </el-descriptions-item>
-          <el-descriptions-item label="Battery">
-            {{ sensor.battery }}
           </el-descriptions-item>
         </el-descriptions>
       </el-col>
@@ -42,6 +49,8 @@
 
 <script setup>
 import { defineProps } from 'vue'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { ArrowRight } from '@element-plus/icons-vue'
 
 const props = defineProps({
   sensor: {
@@ -50,10 +59,30 @@ const props = defineProps({
   },
 })
 
+const store = useDashboardUIStore()
+
 const getColor = (value) => {
   if (value < 30) return '#F56C6C'
   if (value < 70) return '#E6A23C'
   return '#67C23A'
+}
+
+const getStatusType = (status) => {
+  switch (status) {
+    case 'Active':
+      return 'success'
+    case 'Inactive':
+      return 'danger'
+    case 'Maintenance':
+      return 'warning'
+    default:
+      return 'info'
+  }
+}
+
+const openSensorDetail = () => {
+  store.updateSelectedSensor(props.sensor.id)
+  store.toggleSensorDetail()
 }
 </script>
 
@@ -75,10 +104,21 @@ const getColor = (value) => {
   color: #303133;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
 .percentage-value {
   font-size: 24px;
   font-weight: bold;
   color: #303133;
+}
+
+.progress-label {
+  text-align: center;
+  margin-top: 10px;
+  color: #606266;
 }
 
 .el-progress {

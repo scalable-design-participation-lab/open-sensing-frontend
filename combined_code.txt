@@ -1,0 +1,4742 @@
+--- components/About.vue ---
+<template>
+  <div class="modal">
+    <button class="close-btn" @click="closeModal">&times;</button>
+    <div class="modal-content">
+      <h1>About</h1>
+      <p>Project and Team Description as needed.</p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+const props = defineProps(['visible'])
+const emit = defineEmits(['close'])
+
+const closeModal = () => {
+  emit('close')
+}
+</script>
+
+<style scoped>
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 90%;
+  max-height: 90%;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  overflow: auto;
+  padding: 50px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: lightgray;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #609f80;
+}
+
+.modal-content {
+  text-align: center;
+}
+
+.modal-content h1 {
+  margin-bottom: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #609f80;
+}
+
+.modal-content p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+}
+</style>
+
+--- components/Dashboard/Dashboard.vue ---
+<!-- eslint-disable vue/multi-word-component-names
+<template>
+  <div ref="chartContainer" class="chart-container">
+    <div class="dashboard-header">
+      <h2 class="dashboard-title">Sensor Data</h2>
+      <button class="close-btn" @click="closeModal">&times;</button>
+    </div>
+    <div ref="scrollContainer" class="scroll-container">
+      <div v-if="dataLoaded" class="charts-wrapper">
+        <LineChart
+          v-for="(metric, metricName) in metrics"
+          v-show="selectedDatasets.includes(metricName)"
+          :key="metricName"
+          :metric="metric"
+          :data="sensorData[metricName]"
+          :margin="margin"
+          :width="chartWidth"
+          :height="chartHeight"
+          @date-range-update="updateGlobalDateRange"
+        />
+      </div>
+      <div v-else class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading data...</p>
+      </div>
+    </div>
+    <div class="dashboard-footer">
+      <button class="reset-button" @click="resetAllCharts">Reset All</button>
+      <div v-if="globalDateRange.length === 2" class="date-range-display">
+        {{ formatDateRange(globalDateRange) }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import LineChart from './LineChart.vue'
+
+const store = useDashboardUIStore()
+const { selectedDatasets, sensorData, dataDashboardValues } = storeToRefs(store)
+
+const chartContainer = ref(null)
+const scrollContainer = ref(null)
+const chartWidth = ref(0)
+const chartHeight = 180 // Slightly reduced height for compact layout
+const globalDateRange = ref([])
+
+const margin = { top: 20, right: 20, bottom: 30, left: 40 }
+
+const dataLoaded = computed(
+  () => Object.keys(sensorData.value).length > 0 && chartWidth.value > 0
+)
+
+const metrics = ref({
+  Temperature: { name: 'temperature', label: 'Temperature (°C)' },
+  'Relative Humidity': {
+    name: 'relative_humidity',
+    label: 'Relative Humidity (%)',
+  },
+  'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
+  'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
+  pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
+  'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
+  pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
+  pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
+})
+
+useResizeObserver(scrollContainer, (entries) => {
+  const entry = entries[0]
+  if (entry) {
+    chartWidth.value = entry.contentRect.width - margin.left - margin.right
+  }
+})
+
+onMounted(async () => {
+  console.log('Dashboard mounted, loading sensor data if not already loaded')
+  await store.loadSensorData()
+})
+
+const emit = defineEmits(['close'])
+
+const closeModal = () => {
+  emit('close')
+}
+
+const updateGlobalDateRange = (range) => {
+  globalDateRange.value = range
+  store.updateDataDashboardValues('dateRange', range)
+}
+
+const resetAllCharts = () => {
+  globalDateRange.value = []
+  store.updateDataDashboardValues('dateRange', [])
+  // You may need to emit an event to reset all LineChart components
+}
+
+const formatDateRange = (range) => {
+  if (range.length !== 2) return ''
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: '2-digit',
+    })
+  }
+  return `${formatDate(range[0])} - ${formatDate(range[1])}`
+}
+</script>
+
+<style scoped>
+.chart-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 40%;
+  background-color: white;
+  border-radius: 15px 15px 0 0;
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-title {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.scroll-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+}
+
+.charts-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.dashboard-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 15px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+}
+
+.reset-button {
+  padding: 5px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.reset-button:hover {
+  background-color: #45a049;
+}
+
+.date-range-display {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+  background-color: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #609f80;
+  border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}
+</style> -->
+<!-- This code was generated by Builder.io -->
+<!-- Dashboard.vue -->
+<!-- Dashboard.vue -->
+<!-- Dashboard.vue -->
+<!-- Dashboard.vue -->
+<!-- Dashboard.vue -->
+<!-- Dashboard.vue -->
+<!-- Dashboard.vue -->
+<template>
+  <div class="dashboard-grid">
+    <el-card class="overview-card">
+      <template #header>
+        <div class="card-header">
+          <h2>Sensor Overview</h2>
+          <el-tag size="small" type="info">30 minutes ago</el-tag>
+        </div>
+      </template>
+      <p class="overview-description">{{ overviewDescription }}</p>
+      <div class="overview-actions">
+        <el-button type="primary" icon="el-icon-download" size="small">
+          Export
+        </el-button>
+        <el-button type="info" icon="el-icon-share" size="small">
+          Share
+        </el-button>
+        <el-button type="warning" icon="el-icon-edit" size="small">
+          Edit
+        </el-button>
+      </div>
+      <el-row :gutter="20" class="overview-stats">
+        <el-col v-for="(stat, index) in overviewStats" :key="index" :span="8">
+          <el-card class="stat-card" shadow="hover">
+            <h3>{{ stat.value }}</h3>
+            <p>{{ stat.label }}</p>
+          </el-card>
+        </el-col>
+      </el-row>
+    </el-card>
+
+    <div class="sensors-container">
+      <el-row :gutter="20">
+        <el-col
+          v-for="sensor in sensors"
+          :key="sensor.id"
+          :span="12"
+          class="sensor-column"
+        >
+          <SensorTile :sensor="sensor" class="sensor-card" />
+        </el-col>
+      </el-row>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import SensorTile from './SensorTile.vue'
+
+const overviewDescription = ref(
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+)
+
+const overviewStats = ref([
+  { value: '18', label: 'Active Sensors' },
+  { value: '7', label: 'Values Measured' },
+  { value: '1', label: 'Pending Issue' },
+])
+
+const sensors = ref([
+  {
+    id: 1,
+    location: 'Cabot Center',
+    airQuality: 'Good',
+    soilMoisture: '37%',
+    temperature: '73°F',
+    battery: '47%',
+    value: 77,
+  },
+  {
+    id: 2,
+    location: 'Cabot Center',
+    airQuality: 'Good',
+    soilMoisture: '37%',
+    temperature: '73°F',
+    battery: '47%',
+    value: 35,
+  },
+  {
+    id: 3,
+    location: 'Cabot Center',
+    airQuality: 'Good',
+    soilMoisture: '37%',
+    temperature: '73°F',
+    battery: '47%',
+    value: 12,
+  },
+  {
+    id: 4,
+    location: 'Cabot Center',
+    airQuality: 'Good',
+    soilMoisture: '37%',
+    temperature: '73°F',
+    battery: '47%',
+    value: 12,
+  },
+  {
+    id: 5,
+    location: 'Cabot Center',
+    airQuality: 'Good',
+    soilMoisture: '37%',
+    temperature: '73°F',
+    battery: '47%',
+    value: 35,
+  },
+  {
+    id: 6,
+    location: 'Cabot Center',
+    airQuality: 'Good',
+    soilMoisture: '37%',
+    temperature: '73°F',
+    battery: '47%',
+    value: 42,
+  },
+  {
+    id: 7,
+    location: 'Cabot Center',
+    airQuality: 'Good',
+    soilMoisture: '37%',
+    temperature: '73°F',
+    battery: '47%',
+    value: 53,
+  },
+  {
+    id: 8,
+    location: 'Cabot Center',
+    airQuality: 'Good',
+    soilMoisture: '37%',
+    temperature: '73°F',
+    battery: '47%',
+    value: 1,
+  },
+])
+</script>
+
+<style scoped>
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  width: 95vw;
+  max-width: 1800px;
+  height: 90vh;
+  margin: 0 auto;
+  background-color: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.overview-card {
+  flex-shrink: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.card-header h2 {
+  font-size: 1.5em;
+  margin: 0;
+}
+
+.overview-description {
+  font-size: 1em;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.overview-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.overview-stats {
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 15px;
+}
+
+.stat-card h3 {
+  font-size: 1.8em;
+  margin: 0;
+  color: #409eff;
+}
+
+.stat-card p {
+  margin: 5px 0 0;
+  font-size: 1em;
+  color: #666;
+}
+
+.sensors-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.sensor-column {
+  margin-bottom: 20px;
+}
+
+:deep(.el-card) {
+  border: none;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.sensors-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sensors-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.sensors-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.sensors-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    width: 90vw;
+    height: 95vh;
+  }
+}
+</style>
+
+--- components/Dashboard/DashboardOverlay.vue ---
+<!-- DashboardOverlay.vue -->
+<template>
+  <Transition name="fade">
+    <div v-if="visible" class="dashboard-overlay"></div>
+  </Transition>
+</template>
+
+<script setup>
+defineProps({
+  visible: {
+    type: Boolean,
+    default: false,
+  },
+})
+</script>
+
+<style scoped>
+.dashboard-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 15;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
+
+--- components/Dashboard/LineChart.vue ---
+<template>
+  <div :id="chartId">
+    <el-button class="reset-button" round @click="resetChart">
+      Reset Chart
+    </el-button>
+    <div class="tooltip" />
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, watch, onUnmounted } from 'vue'
+import * as d3 from 'd3'
+import { ElButton } from 'element-plus'
+import 'element-plus/dist/index.css'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+
+const props = defineProps({
+  metric: { type: Object, required: true },
+  data: { type: Array, required: true },
+  width: { type: Number, required: true },
+  height: { type: Number, required: true },
+  margin: { type: Object, required: true },
+})
+
+const store = useDashboardUIStore()
+const { dataDashboardValues, dateRangeUpdate } = storeToRefs(store)
+const { updateDataDashboardValues } = store
+
+const chartId = ref(`chart-${Date.now()}`)
+let svg, x, y, xAxis, yAxis, line, brush
+
+const createLineChart = () => {
+  if (props.width <= 0 || !props.data.length) return
+
+  const chartDiv = d3.select(`#${chartId.value}`)
+  chartDiv.selectAll('*').remove() // Clear previous chart
+
+  const margin = { top: 20, right: 30, bottom: 50, left: 50 }
+  const width = props.width - margin.left - margin.right
+  const height = props.height - margin.top - margin.bottom
+
+  svg = chartDiv
+    .append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`)
+
+  x = d3.scaleTime().range([0, width])
+  y = d3.scaleLinear().range([height, 0])
+
+  xAxis = d3.axisBottom(x).ticks(5).tickSizeOuter(0)
+  yAxis = d3.axisLeft(y)
+
+  svg
+    .append('g')
+    .attr('class', 'x-axis')
+    .attr('transform', `translate(0,${height})`)
+    .call(xAxis)
+    .selectAll('text')
+    .style('text-anchor', 'end')
+    .attr('dx', '-.8em')
+    .attr('dy', '.15em')
+    .attr('transform', 'rotate(-45)')
+
+  svg.append('g').attr('class', 'y-axis').call(yAxis)
+
+  x.domain(d3.extent(props.data, (d) => d.date))
+  y.domain([0, d3.max(props.data, (d) => d.value)])
+
+  line = d3
+    .line()
+    .x((d) => x(d.date))
+    .y((d) => y(d.value))
+
+  svg
+    .append('path')
+    .data([props.data])
+    .attr('class', 'line')
+    .attr('fill', 'none')
+    .attr('stroke', 'steelblue')
+    .attr('stroke-width', 1.5)
+    .attr('d', line)
+
+  brush = d3
+    .brushX()
+    .extent([
+      [0, 0],
+      [width, height],
+    ])
+    .on('end', updateChart)
+
+  svg.append('g').attr('class', 'brush').call(brush)
+
+  // Add x-axis label
+  svg
+    .append('text')
+    .attr('class', 'x-axis-label')
+    .attr('x', width / 2)
+    .attr('y', height + margin.bottom - 5)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '12px')
+    .text('Time')
+
+  // Add y-axis label
+  svg
+    .append('text')
+    .attr('class', 'y-axis-label')
+    .attr('transform', 'rotate(-90)')
+    .attr('y', 0 - margin.left)
+    .attr('x', 0 - height / 2)
+    .attr('dy', '1em')
+    .style('text-anchor', 'middle')
+    .style('font-size', '12px')
+    .text(props.metric.label)
+}
+
+const updateChart = (event) => {
+  if (!event || !event.selection) return
+  const [x0, x1] = event.selection.map(x.invert)
+  updateDataDashboardValues('dateRange', [x0, x1])
+  x.domain([x0, x1])
+  svg.select('.x-axis').call(xAxis)
+  svg.select('.line').attr('d', line)
+}
+
+const resetChart = () => {
+  x.domain(d3.extent(props.data, (d) => d.date))
+  svg.select('.x-axis').call(xAxis)
+  svg.select('.line').attr('d', line)
+  svg.select('.brush').call(brush.move, null)
+}
+
+watch(() => props.data, createLineChart, { deep: true })
+watch(() => props.width, createLineChart)
+watch(dateRangeUpdate, () => {
+  if (dataDashboardValues.value.dateRange.length === 2) {
+    x.domain(dataDashboardValues.value.dateRange)
+    svg.select('.x-axis').call(xAxis)
+    svg.select('.line').attr('d', line)
+  }
+})
+
+onMounted(createLineChart)
+onUnmounted(() => {
+  d3.select(`#${chartId.value}`).selectAll('*').remove()
+})
+</script>
+
+<style scoped>
+.tooltip {
+  position: absolute;
+  text-align: left;
+  padding: 5px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.brush .selection {
+  fill: steelblue;
+  fill-opacity: 0.3;
+}
+
+.reset-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.x-axis text,
+.y-axis text {
+  font-size: 10px;
+}
+
+.x-axis-label,
+.y-axis-label {
+  fill: #666;
+}
+</style>
+
+--- components/Dashboard/SensorTile.vue ---
+<!-- SensorTile.vue -->
+<template>
+  <el-card class="sensor-tile" shadow="hover">
+    <template #header>
+      <div class="sensor-header">
+        <h3>Sensor {{ sensor.id }}</h3>
+        <span>{{ sensor.location }}</span>
+        <el-button type="text" icon="el-icon-full-screen"></el-button>
+      </div>
+    </template>
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <el-progress
+          type="dashboard"
+          :percentage="sensor.value"
+          :color="getColor(sensor.value)"
+        >
+          <template #default="{ percentage }">
+            <span class="percentage-value">{{ percentage }}</span>
+          </template>
+        </el-progress>
+      </el-col>
+      <el-col :span="12">
+        <el-descriptions :column="1" border size="small">
+          <el-descriptions-item label="Air quality">
+            {{ sensor.airQuality }}
+          </el-descriptions-item>
+          <el-descriptions-item label="Soil Moisture">
+            {{ sensor.soilMoisture }}
+          </el-descriptions-item>
+          <el-descriptions-item label="Temperature">
+            {{ sensor.temperature }}
+          </el-descriptions-item>
+          <el-descriptions-item label="Battery">
+            {{ sensor.battery }}
+          </el-descriptions-item>
+        </el-descriptions>
+      </el-col>
+    </el-row>
+  </el-card>
+</template>
+
+<script setup>
+import { defineProps } from 'vue'
+
+const props = defineProps({
+  sensor: {
+    type: Object,
+    required: true,
+  },
+})
+
+const getColor = (value) => {
+  if (value < 30) return '#F56C6C'
+  if (value < 70) return '#E6A23C'
+  return '#67C23A'
+}
+</script>
+
+<style scoped>
+.sensor-tile {
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.sensor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sensor-header h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #303133;
+}
+
+.percentage-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #303133;
+}
+
+.el-progress {
+  margin: 0 auto;
+}
+
+.el-descriptions {
+  font-size: 0.9em;
+}
+
+:deep(.el-descriptions__label) {
+  color: #606266;
+}
+
+:deep(.el-descriptions__content) {
+  color: #303133;
+}
+</style>
+
+--- components/DataPopUp.vue ---
+<script setup>
+import { DoughnutChart } from 'vue-chart-3'
+import { Chart, registerables } from 'chart.js'
+Chart.register(...registerables)
+
+// Store
+const store = useDashboardUIStore()
+const { selectedSiteProps } = storeToRefs(store)
+
+const testData = {
+  datasets: [
+    {
+      data: [30, 40, 60, 70, 5],
+      backgroundColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
+      borderColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
+    },
+  ],
+}
+</script>
+
+<template>
+  <div id="pop-up" class="absolute w-3/12 h-2/4 p-8 bg-[#004E32]">
+    <div class="cursor-pointer" @click="$emit('closePopUp', {})">X</div>
+    <h1>{{ selectedSiteProps.DEVELOPMEN }}</h1>
+    <DoughnutChart :chart-data="testData" :width="150" :height="150" />
+    <table class="table-fixed table">
+      <tbody class="text-white">
+        <tr>
+          <td>Number 18-24 years old</td>
+          <td id="text-right">
+            {{
+              parseFloat(
+                ((selectedSiteProps.pop20t24P +
+                  selectedSiteProps.pop20t24P / 2) /
+                  100) *
+                  parseFloat(
+                    selectedSiteProps['TOTAL POPULATION'].replace(/,/g, '')
+                  )
+              ).toFixed(2)
+            }}
+          </td>
+        </tr>
+        <tr>
+          <td>City district</td>
+          <td id="text-right">
+            {{ selectedSiteProps['NY CITY COUNCIL DISTRICT'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>Congressional District</td>
+          <td id="text-right">
+            {{ 'NY-' + selectedSiteProps['US CONGRESSIONAL DISTRICT'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>Available Area</td>
+          <td id="text-right">
+            {{ selectedSiteProps['suit_area'].toFixed(2) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<style>
+#pop-up {
+  bottom: 1.25rem;
+  right: 1.25rem;
+  border-radius: 1.5rem;
+}
+
+.table {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.75rem; /* 28px */
+}
+
+#text-right {
+  text-align: right;
+}
+</style>
+
+--- components/DesignCollapse.vue ---
+<script setup>
+import { ref } from 'vue'
+// import { useCostStore } from '~/store/cost'
+// import { storeToRefs } from 'pinia'
+</script>
+
+<template>
+  <el-collapse>Test</el-collapse>
+</template>
+
+<style>
+/* Edit el-collapse */
+.el-collapse-item__header {
+  background-color: rgba(255, 255, 255, 0);
+  --el-collapse-content-bg-color: rgba(255, 255, 255, 0);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+}
+
+.el-collapse-item__wrap {
+  background-color: rgba(255, 255, 255, 0);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+}
+</style>
+
+--- components/FloatingNav.vue ---
+<script setup>
+// IMPORTS
+import {
+  ElMenu,
+  ElSubMenu,
+  ElMenuItem,
+  ElCheckbox,
+  ElDatePicker,
+  ElSlider,
+} from 'element-plus'
+import 'element-plus/dist/index.css'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+
+// import ParallelCoords from '~~/components/ParallelCoords'
+
+// Store
+const store = useDashboardUIStore()
+const {
+  existingHubs,
+  existingDatasets,
+  dataDashboard,
+  dataDashboardValues,
+  toggleHub,
+} = storeToRefs(store)
+const { updateDataDashboardValues, updateDateRangeUpdate } = store
+
+existingHubs.value = Object.keys(existingHubs.value).reduce((acc, key) => {
+  acc[key] = false
+  return acc
+}, {})
+
+function applyDateFilter(period) {
+  const endDate = new Date()
+  const startDate = new Date(endDate)
+  startDate.setDate(endDate.getDate() - period)
+  updateDataDashboardValues('dateRange', [startDate, endDate])
+  updateDateRangeUpdate(new Date())
+}
+
+const formatTimeTooltip = (val) => {
+  const hours = Math.floor(val)
+  const minutes = Math.floor((val % 1) * 60)
+    .toString()
+    .padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+const sampleMetrics = {
+  Temperature: { name: 'Temperature', units: '°F' },
+  Particles: { name: 'Particulate Matter', units: 'μg/m3' },
+  Humidity: { name: 'Relative Humidity', units: '%RH' },
+  Moisture: { name: 'Soil Moisture', units: '% Moisture' },
+  Solar: { name: 'Solar Input', units: 'Amps' },
+}
+</script>
+
+<template>
+  <el-menu default-active="2" class="el-menu-vertical-demo" unique-opened>
+    <el-sub-menu index="locations">
+      <template #title> LOCATION SELECTION </template>
+      <el-menu-item v-for="(isActive, name) in existingHubs" :key="name">
+        <el-checkbox
+          v-model="existingHubs[name]"
+          :label="name"
+          @change="toggleHub(name)"
+        />
+      </el-menu-item>
+    </el-sub-menu>
+    <el-sub-menu index="data">
+      <template #title> DATA SELECTIONS </template>
+      <el-menu-item
+        v-for="(isActive, dataset) in existingDatasets"
+        :key="dataset"
+      >
+        <el-checkbox v-model="existingDatasets[dataset]" :label="dataset" />
+        <!-- <el-checkbox
+          :label="dataset"
+          @change="(value) => updateExistingDatasets(dataset, value)"
+        /> -->
+      </el-menu-item>
+    </el-sub-menu>
+    <el-sub-menu index="filter">
+      <template #title> DATE & TIME </template>
+      <el-menu-item>
+        <el-date-picker
+          v-model="dataDashboardValues.dateRange"
+          type="daterange"
+          range-separator="to"
+          start-placeholder="Start Date"
+          end-placeholder="End Date"
+          align="right"
+          unlink-panels
+          @change="updateDateRangeUpdate(new Date())"
+        />
+      </el-menu-item>
+      <el-menu-item>
+        <div style="margin-right: 20px">Time</div>
+        <el-slider
+          v-model="dataDashboardValues.time"
+          range
+          :min="0"
+          :max="24"
+          :step="0.5"
+          show-stops
+          :format-tooltip="formatTimeTooltip"
+        >
+        </el-slider>
+      </el-menu-item>
+      <el-menu-item class="preset-date-filters">
+        <button class="date-filter-button" @click.stop="applyDateFilter(1)">
+          Last 24 Hours
+        </button>
+        <button class="date-filter-button" @click.stop="applyDateFilter(7)">
+          Last 7 Days
+        </button>
+        <button class="date-filter-button" @click.stop="applyDateFilter(30)">
+          Last 30 Days
+        </button>
+
+        <button class="date-filter-button" @click.stop="applyDateFilter(365)">
+          Last 365 Days
+        </button>
+      </el-menu-item>
+    </el-sub-menu>
+  </el-menu>
+</template>
+
+<style scoped>
+.el-menu-vertical-demo {
+  width: 300px;
+  border-radius: 15px;
+  position: absolute;
+  z-index: 1000;
+  left: 0px;
+  top: 0px;
+  background-color: #609f80;
+  font-weight: bold;
+  height: 100%;
+}
+
+.el-menu-vertical-demo :deep(.el-sub-menu:hover .el-sub-menu__title) {
+  color: white;
+  background-color: transparent;
+}
+
+.el-menu-item:hover {
+  background-color: #4f8a6c;
+}
+
+.el-menu-item {
+  font-size: 0.8rem;
+  background-color: #609f80;
+  color: black;
+  margin: 0;
+}
+
+:deep(.el-checkbox) {
+  color: black;
+}
+
+:deep(.el-checkbox:hover) {
+  color: white;
+  font-weight: bold;
+}
+
+:deep(.el-checkbox__inner) {
+  border: 1px solid black !important;
+  background-color: #609f80 !important;
+}
+
+:deep(.el-checkbox input:checked ~ .el-checkbox__inner) {
+  background-color: white !important;
+  border-color: white !important;
+}
+
+:deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
+  color: white !important;
+  font-weight: bold !important;
+}
+
+:deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
+  color: #609f80 !important;
+  border-color: #609f80 !important;
+}
+
+.el-menu-vertical-demo :deep(.el-date-editor) {
+  background-color: #609f80;
+}
+
+.el-menu-vertical-demo :deep(.el-date-editor .el-input__inner),
+.el-menu-vertical-demo :deep(.el-date-editor .el-input__icon) {
+  color: white;
+}
+
+.time-slider-container {
+  padding-top: 10px;
+}
+
+.preset-date-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px;
+  min-height: 200px;
+  justify-content: center;
+  align-items: center;
+}
+
+.date-filter-button {
+  background-color: #609f80;
+  color: white;
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s, color 0.3s;
+  font-size: 0.8rem;
+  line-height: 1;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.date-filter-button:hover,
+.date-filter-button:focus {
+  background-color: white;
+  color: #609f80;
+  outline: none;
+}
+</style>
+
+--- components/FloatingNavSite.vue ---
+<script setup>
+// IMPORTS
+import { ElMenu, ElSubMenu, ElMenuItem, ElSlider } from 'element-plus'
+import 'element-plus/dist/index.css'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+
+// import ParallelCoords from '~~/components/ParallelCoords'
+
+// Store
+const store = useDashboardUIStore()
+const { masterSolutions, updatedMaxMinVals } = storeToRefs(store)
+const { setSelectedSolution } = store
+
+const budget = ref(0)
+const outreach = ref(0)
+const recruitment = ref(0)
+const flooding = ref(0)
+
+const marks = ref({
+  0: '0°C',
+  2: '8°C',
+  3: '37°C',
+  5: {
+    style: {
+      color: '#1989FA',
+    },
+    label: '50%',
+  },
+})
+
+const formatTooltip = (val) => {
+  return
+}
+
+// const distToSelection = computed(() => {
+//   return masterSolutions.value.map((solution) => {
+//     return {
+//       Budget: Math.abs(solution.Budget - budget.value),
+//       Outreach: Math.abs(solution.Outreach - outreach.value),
+//       Recruitment: Math.abs(solution.Recruitment - recruitment.value),
+//       Flooding: Math.abs(solution.Flooding - flooding.value),
+//       SolnIndex: solution.SolnIndex,
+//       BudgetIndex: solution.Budget,
+//     }
+//   })
+// })
+
+// watch(distToSelection, (n) => {
+//   const sorted = n.sort(
+//     getSortMethod('+Budget', '+Outreach', '+Recruitment', '+Flooding')
+//   )
+//   setSelectedSolution(sorted[0])
+//   // console.log(sorted, selectedSolution.value)
+// })
+
+onMounted(() => {
+  computeSelectedSolution()
+})
+
+const computeSelectedSolution = () => {
+  const distToSelection = masterSolutions.value.map((solution) => {
+    return {
+      Budget: Math.abs(solution.Budget - budget.value),
+      Outreach: Math.abs(solution.Outreach - outreach.value),
+      Recruitment: Math.abs(solution.Recruitment - recruitment.value),
+      Flooding: Math.abs(solution.Flooding - flooding.value),
+      SolnIndex: solution.SolnIndex,
+      BudgetIndex: solution.Budget,
+    }
+  })
+
+  const sorted = distToSelection.sort(
+    getSortMethod('+Budget', '+Outreach', '+Recruitment', '+Flooding')
+  )
+  setSelectedSolution(sorted[0])
+}
+// const marks = ref({
+//   [updatedMaxMinVals.Budget.min]: updatedMaxMinVals.Budget.min.toString(),
+//   [updatedMaxMinVals.Budget.max]: updatedMaxMinVals.Budget.max.toString(),
+// })
+
+function getSortMethod() {
+  var _args = Array.prototype.slice.call(arguments)
+  return function (a, b) {
+    for (var x in _args) {
+      var ax = a[_args[x].substring(1)]
+      var bx = b[_args[x].substring(1)]
+      var cx
+
+      ax = typeof ax == 'string' ? ax.toLowerCase() : ax / 1
+      bx = typeof bx == 'string' ? bx.toLowerCase() : bx / 1
+
+      if (_args[x].substring(0, 1) == '-') {
+        cx = ax
+        ax = bx
+        bx = cx
+      }
+      if (ax != bx) {
+        return ax < bx ? -1 : 1
+      }
+    }
+  }
+}
+</script>
+
+<template>
+  <el-menu default-active="2" class="el-menu-vertical-demo" unique-opened>
+    <el-sub-menu index="locations">
+      <template #title> BUDGET </template>
+      <el-menu-item key="budget">
+        <el-slider
+          v-model="budget"
+          :step="1"
+          show-stops
+          :min="1"
+          :max="
+            updatedMaxMinVals.Budget !== undefined
+              ? updatedMaxMinVals.Budget.max
+              : 1
+          "
+          @change="computeSelectedSolution()"
+        />
+      </el-menu-item>
+
+      <!-- <el-menu-item key="budget">
+        <el-radio-group v-model="budget">
+          <el-radio-button label="New York" value="New York" />
+          <el-radio-button label="Washington" value="Washington" />
+          <el-radio-button label="Los Angeles" value="Los Angeles" />
+          <el-radio-button label="Chicago" value="Chicago" />
+        </el-radio-group>
+      </el-menu-item> -->
+    </el-sub-menu>
+    <el-sub-menu index="data">
+      <template #title> OUTREACH </template>
+      <el-menu-item key="outreach">
+        <el-slider
+          v-model="outreach"
+          :step="0.01"
+          :min="
+            updatedMaxMinVals.Outreach !== undefined
+              ? updatedMaxMinVals.Outreach.min
+              : 1
+          "
+          :max="
+            updatedMaxMinVals.Outreach !== undefined
+              ? updatedMaxMinVals.Outreach.max
+              : 1
+          "
+          @change="computeSelectedSolution()"
+        />
+      </el-menu-item>
+    </el-sub-menu>
+    <el-sub-menu index="filter">
+      <template #title> RECRUITMENT </template>
+      <el-menu-item key="recruitment">
+        <el-slider
+          v-model="recruitment"
+          :step="0.01"
+          :min="
+            updatedMaxMinVals.Recruitment !== undefined
+              ? updatedMaxMinVals.Recruitment.min
+              : 1
+          "
+          :max="
+            updatedMaxMinVals.Recruitment !== undefined
+              ? updatedMaxMinVals.Recruitment.max
+              : 1
+          "
+          @change="computeSelectedSolution()"
+        />
+      </el-menu-item>
+    </el-sub-menu>
+    <el-sub-menu index="flooding">
+      <template #title> FLOODING </template>
+      <el-menu-item key="flooding">
+        <el-slider
+          v-model="flooding"
+          :step="0.01"
+          :min="
+            updatedMaxMinVals.Flooding !== undefined
+              ? updatedMaxMinVals.Flooding.min
+              : 1
+          "
+          :max="
+            updatedMaxMinVals.Flooding !== undefined
+              ? updatedMaxMinVals.Flooding.max
+              : 1
+          "
+          @change="computeSelectedSolution()"
+        />
+      </el-menu-item>
+    </el-sub-menu>
+  </el-menu>
+</template>
+
+<style scoped>
+.el-menu-vertical-demo {
+  width: 300px;
+  border-radius: 15px;
+  position: absolute;
+  z-index: 1000;
+  background-color: #609f80;
+  font-weight: bold;
+  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  /* overflow: hidden; */
+}
+
+.el-menu-vertical-demo :deep(.el-sub-menu:hover .el-sub-menu__title) {
+  color: white;
+  background-color: transparent;
+}
+
+.el-menu-item:hover {
+  background-color: #4f8a6c;
+}
+
+.el-menu-item {
+  font-size: 0.8rem;
+  background-color: #609f80;
+  color: black;
+  margin: 0;
+}
+
+.slider-demo-block {
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+}
+.slider-demo-block .el-slider {
+  margin-top: 0;
+  margin-left: 12px;
+}
+</style>
+
+--- components/Home/ButtonHelp.vue ---
+<template>
+  <button class="button-help" @click="$emit('click')">
+    <span class="icon">?</span>
+  </button>
+</template>
+
+<script setup>
+defineEmits(['click'])
+</script>
+
+<style scoped>
+.button-help {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button-help:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.icon {
+  font-size: 24px;
+  color: #4a4a4a;
+  font-weight: bold;
+}
+</style>
+
+--- components/Home/Header.vue ---
+<!-- eslint-disable vue/multi-word-component-names -->
+<template>
+  <header class="header">
+    <nav class="nav-left">
+      <div class="neu-logo">
+        <img
+          loading="lazy"
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/e7e29babea30db976030704cfbd4779ea5f2dbb729f52574063bbcb61a05ac37?apiKey=ae53b33f21034bb89bae5f89d96cde5e&&apiKey=ae53b33f21034bb89bae5f89d96cde5e"
+          class="logo-image"
+          alt="Neu Logo"
+        />
+      </div>
+      <div class="sdpl-icon">🤲</div>
+      <div class="application-name">Open Sensing</div>
+    </nav>
+    <nav class="nav-right">
+      <div class="satellite-button">Satellite</div>
+      <button class="more-options" aria-label="More options">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </button>
+      <button
+        class="additional-options"
+        aria-label="Additional options"
+      ></button>
+    </nav>
+  </header>
+</template>
+
+<style scoped>
+.header {
+  align-items: start;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-left {
+  justify-content: start;
+}
+
+.nav-right {
+  justify-content: end;
+  color: var(--NEU-Black, #000);
+  white-space: nowrap;
+  font: 500 15px Helvetica Neue, sans-serif;
+}
+
+.neu-logo,
+.sdpl-icon,
+.application-name,
+.satellite-button,
+.more-options,
+.additional-options {
+  border-radius: 15px;
+  align-self: stretch;
+  margin: auto 0;
+}
+
+.neu-logo {
+  background-color: #fafafa;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  width: 138px;
+  padding: 8px 13px;
+}
+
+.logo-image {
+  aspect-ratio: 3.34;
+  object-fit: contain;
+  object-position: center;
+  width: 107px;
+  max-width: 100%;
+}
+
+.sdpl-icon {
+  background-color: #fafafa;
+  overflow: hidden;
+  color: #000;
+  text-align: center;
+  width: 48px;
+  height: 48px;
+  padding: 0 12px;
+  font: 400 25px Inter, sans-serif;
+}
+
+.application-name {
+  background-color: #000;
+  min-height: 48px;
+  color: var(--NEU-White, #fff);
+  text-align: center;
+  width: 137px;
+  padding: 15px 20px;
+  font: 500 15px Helvetica Neue, sans-serif;
+}
+
+.satellite-button {
+  background-color: var(--bg-area, #f9f9f9);
+  min-height: 48px;
+  text-align: center;
+  width: 87px;
+  padding: 15px 16px;
+}
+
+.more-options,
+.additional-options {
+  background-color: #fff;
+  width: 48px;
+  height: 48px;
+  border: none;
+  cursor: pointer;
+}
+
+.more-options {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  justify-content: space-between;
+  padding: 15px 10px;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  background-color: #000;
+  border-radius: 50%;
+}
+
+@media (max-width: 991px) {
+  .nav-right,
+  .satellite-button,
+  .more-options {
+    white-space: initial;
+  }
+
+  .sdpl-icon {
+    white-space: initial;
+  }
+}
+</style>
+
+--- components/Home/index.vue ---
+<!-- eslint-disable vue/multi-word-component-names -->
+<template>
+  <div class="home-container">
+    <Header class="header-instance" />
+
+    <MapDashboard class="map-dashboard-instance" />
+
+    <ToolsSensors
+      class="tools-sensors-instance"
+      @tool-click="handleToolClick"
+    />
+
+    <ButtonHelp class="button-help-instance" @click="handleHelpClick" />
+
+    <div class="right-toggle">
+      <!-- Add content for right toggle here if needed -->
+    </div>
+
+    <LocationTag
+      v-for="(location, index) in locations"
+      :key="index"
+      :class="`location-tag-${index + 1}`"
+      :name="location.name"
+      :info="location.info"
+      @click="handleLocationClick(location)"
+    />
+
+    <div class="neu-logo-text-wrapper">
+      <NeuLogoText class="neu-logo-text-instance" />
+    </div>
+
+    <NUFooter class="footer-instance" />
+
+    <DataPopUp v-if="showDataPopup" @close-pop-up="closeDataPopUp" />
+
+    <About v-if="showAbout" @close="closeAbout" />
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import NUHeader from '@/components/NUHeader.vue'
+import MapDashboard from '@/components/MapDashboard/index.vue'
+import ToolsSensors from './ToolsSensors.vue'
+import ButtonHelp from './ButtonHelp.vue'
+import LocationTag from './LocationTag.vue'
+import NeuLogoText from './NeuLogoText.vue'
+import NUFooter from '@/components/NUFooter.vue'
+import DataPopUp from '@/components/DataPopUp.vue'
+import About from '@/components/About.vue'
+
+const store = useDashboardUIStore()
+const { sensorData } = storeToRefs(store)
+
+const showDataPopup = ref(false)
+const showAbout = ref(false)
+
+const locations = computed(() => {
+  // Transform sensorData into location data for LocationTag components
+  return Object.entries(sensorData.value).map(([key, value], index) => ({
+    id: key,
+    name: value.name || `Location ${index + 1}`,
+    info: `Sensor ID: ${key}`,
+    class: `location-tag-${index + 1}`,
+  }))
+})
+
+const handleToolClick = (toolName) => {
+  console.log(`Tool ${toolName} clicked`)
+  // Add logic for each tool
+}
+
+const handleHelpClick = () => {
+  console.log('Help button clicked')
+  showAbout.value = true
+}
+
+const handleLocationClick = (location) => {
+  console.log('Location clicked:', location)
+  showDataPopup.value = true
+  // You might want to update some state here to show relevant data in the popup
+}
+
+const closeDataPopUp = () => {
+  showDataPopup.value = false
+}
+
+const closeAbout = () => {
+  showAbout.value = false
+}
+</script>
+
+<style scoped>
+.home-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.header-instance {
+  position: absolute;
+  left: 172px;
+  top: 59px;
+  z-index: 10;
+}
+
+.map-dashboard-instance {
+  width: 100%;
+  height: 100%;
+}
+
+.tools-sensors-instance {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+}
+
+.button-help-instance {
+  position: absolute;
+  left: 172px;
+  bottom: 30px;
+  z-index: 10;
+}
+
+.right-toggle {
+  height: 812px;
+  right: 0;
+  position: absolute;
+  top: 131px;
+  width: 308px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  z-index: 10;
+}
+
+.location-tag-1,
+.location-tag-2,
+.location-tag-3,
+.location-tag-4,
+.location-tag-5,
+.location-tag-6 {
+  position: absolute;
+  z-index: 10;
+}
+
+.neu-logo-text-wrapper {
+  position: absolute;
+  left: 788px;
+  bottom: 25px;
+  z-index: 10;
+}
+
+.footer-instance {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+/* You might need to adjust these positions based on your exact requirements */
+.location-tag-1 {
+  left: 450px;
+  top: 607px;
+}
+.location-tag-2 {
+  left: 615px;
+  top: 641px;
+}
+.location-tag-3 {
+  left: 1048px;
+  top: 401px;
+}
+.location-tag-4 {
+  left: 818px;
+  top: 325px;
+}
+.location-tag-5 {
+  left: 1031px;
+  top: 824px;
+}
+.location-tag-6 {
+  left: 236px;
+  top: 756px;
+}
+</style>
+
+--- components/Home/LocationTag.vue ---
+<template>
+  <div class="location-tag" @click="$emit('click')">
+    <h3 class="location-name">{{ name }}</h3>
+    <p class="location-info">{{ info }}</p>
+  </div>
+</template>
+
+<script setup>
+defineProps({
+  name: { type: String, default: 'Unknown Location' },
+  info: { type: String, default: 'No additional information' },
+})
+
+defineEmits(['click'])
+</script>
+
+<style scoped>
+.location-tag {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  max-width: 200px;
+}
+
+.location-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.location-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.location-info {
+  font-size: 14px;
+  margin: 0;
+  color: #666;
+}
+</style>
+
+--- components/Home/NeuLogoText.vue ---
+<template>
+  <div class="neu-logo-text">
+    <span class="neu">NEU</span>
+    <span class="sensor-project">Sensor Project</span>
+  </div>
+</template>
+
+<script setup>
+// No props or emits needed for this component
+</script>
+
+<style scoped>
+.neu-logo-text {
+  display: flex;
+  align-items: center;
+  font-family: 'Arial', sans-serif;
+  background-color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.neu {
+  font-weight: bold;
+  font-size: 24px;
+  color: #c41230; /* NEU red color */
+  margin-right: 8px;
+}
+
+.sensor-project {
+  font-size: 18px;
+  color: #333;
+}
+</style>
+
+--- components/Home/ToolsSensors.vue ---
+<template>
+  <div class="tools-sensors">
+    <button
+      v-for="tool in tools"
+      :key="tool.name"
+      class="tool-button"
+      @click="$emit('tool-click', tool.name)"
+    >
+      <img :src="tool.icon" :alt="tool.name" class="tool-icon" />
+    </button>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import homeIcon from '@/assets/images/Home_Page.png'
+import filterIcon from '@/assets/images/Funnel.png'
+import appIcon from '@/assets/images/Ios_Application_Placeholder.png'
+import locationIcon from '@/assets/images/Location.png'
+
+const tools = ref([
+  { name: 'home', icon: homeIcon },
+  { name: 'filter', icon: filterIcon },
+  { name: 'app', icon: appIcon },
+  { name: 'location', icon: locationIcon },
+])
+
+defineEmits(['tool-click'])
+</script>
+
+<style scoped>
+.tools-sensors {
+  align-items: center;
+  background-color: #fafafa;
+  border-radius: 50px;
+  box-shadow: var(-- drop-shadow);
+  display: flex;
+  height: 48px;
+  justify-content: space-between;
+  padding: 5px 45px;
+  position: relative;
+  transform: rotate (90deg);
+  width: 298px;
+}
+
+.tool-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tool-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tool-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+</style>
+
+--- components/MapDashboard/MapDashboard.vue ---
+<!-- MapDashboard.vue -->
+<template>
+  <div>
+    <main id="main-container" />
+  </div>
+</template>
+
+<script setup>
+// IMPORTS
+import { onMounted, ref, watch } from 'vue'
+import { MapboxLayer } from '@deck.gl/mapbox'
+import { IconLayer } from '@deck.gl/layers'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+
+// Mapbox imports
+import mapboxgl from 'mapbox-gl'
+import sensorLocations from '~/static/Sensor_Locations_NEU.json'
+
+const accessToken =
+  'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
+
+// Card for interaction;
+const developmentsProps = ref([])
+
+// Store
+const store = useDashboardUIStore()
+const { selectedSite, selectedSiteProps, development } = storeToRefs(store)
+const { updateSelectedSite, updateSelectedSiteProps, updateClickPosition } =
+  store
+
+let map
+
+onMounted(() => loadMapDraw())
+
+watch(development, (newDevelopment) => {
+  const selectedDevelopmet =
+    sensorLocations.features[
+      devNamesIndex[newDevelopment].id
+    ].geometry.coordinates.flat(2)
+
+  // Create a 'LngLatBounds' with both corners at the first coordinate.
+  const bounds = new mapboxgl.LngLatBounds(
+    selectedDevelopmet[0],
+    selectedDevelopmet[0]
+  )
+  // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
+  for (const coord of selectedDevelopmet) {
+    bounds.extend(coord)
+  }
+
+  map.fitBounds(bounds, {
+    padding: 120,
+  })
+})
+
+const devNamesIndex = {}
+sensorLocations.features.forEach((feature, index) => {
+  devNamesIndex[feature.properties['DEVELOPMENT']] = {
+    id: index,
+    tdsNum: feature.properties['TDS_NUM'],
+  }
+  developmentsProps.value.push(
+    (({ pop20t24P, suit_area, NYCHA_Area }) => ({
+      pop20t24P,
+      suit_area,
+      NYCHA_Area,
+    }))(feature.properties)
+  )
+})
+
+/**
+ * Loads mapbox map and Deck.gl
+ */
+const loadMapDraw = () => {
+  // 2) mapbox token
+  mapboxgl.accessToken = accessToken
+
+  // 3) Initialize the map
+  console.log('creating map')
+  map = new mapboxgl.Map({
+    container: 'main-container',
+    style: 'mapbox://styles/mapbox/light-v9',
+    center: [-71.090953, 42.338512],
+    zoom: 16.3,
+    attributionControl: false,
+  })
+
+  // Map callbacks
+  map.on('load', () => {
+    const firstLabelLayerId = map
+      .getStyle()
+      .layers.find((layer) => layer.type === 'symbol').id
+    console.log('loaded.....')
+
+    const ICON_MAPPING = {
+      marker: { x: 0, y: 0, width: 128, height: 128, mask: true },
+    }
+
+    map.addLayer(
+      new MapboxLayer({
+        id: 'ny-marker',
+        type: IconLayer,
+        data: sensorLocations.features,
+        pickable: true,
+        iconAtlas:
+          'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+        iconMapping: ICON_MAPPING,
+        getIcon: (d) => 'marker',
+        getPosition: (d) => d.geometry.coordinates,
+        getSize: (d) => 60,
+        getColor: [255, 0, 0],
+        onClick: (info) => {
+          const { object, x, y } = info
+          if (object && object.properties) {
+            console.log('Clicked object properties:', object.properties)
+            const sensorId =
+              object.properties.DEVELOPMENT ||
+              object.properties.TDS_NUM ||
+              'Unknown Sensor'
+            console.log('Sensor ID:', sensorId)
+
+            const clickX = x
+            const clickY = y
+
+            const mapBounds = map.getContainer().getBoundingClientRect()
+
+            const relativeX = clickX - mapBounds.left
+            const relativeY = clickY - mapBounds.top
+
+            updateSelectedSite(sensorId)
+            updateSelectedSiteProps(object.properties)
+            updateClickPosition({ x: relativeX, y: relativeY })
+            console.log('Icon position updated:', {
+              x: relativeX,
+              y: relativeY,
+            })
+          } else {
+            console.log('Clicked on an undefined area')
+          }
+        },
+      })
+    )
+  })
+}
+
+// Add watchers for debugging
+watch(selectedSite, (newValue) => {
+  console.log('MapDashboard: selectedSite changed', newValue)
+})
+
+watch(
+  selectedSiteProps,
+  (newValue) => {
+    console.log('MapDashboard: selectedSiteProps changed', newValue)
+  },
+  { deep: true }
+)
+</script>
+
+<style lang="postcss" scoped>
+#main-container {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  flex-direction: column;
+}
+</style>
+
+--- components/NUFooter.vue ---
+<!-- <script setup></script>
+
+<template>
+    <div class="fixed bottom-0 left-0 white px-5 py-3 w-full h-10 text-black">
+        <p class="float-left text-1xl font-bold">Northeastern University</p>
+    </div>
+</template>
+
+<style scoped></style> -->
+<script setup>
+import { ref } from 'vue'
+import { Twitter, Linkedin, Github } from 'lucide-vue-next'
+
+const currentYear = new Date().getFullYear()
+</script>
+
+<template>
+  <footer class="footer">
+    <div class="footer-left">
+      <div class="university-info">
+        <img
+          src="@/assets/images/neu-icon.jpg"
+          alt="Northeastern University Logo"
+          class="university-logo"
+        />
+        <p class="university-name">Northeastern University</p>
+      </div>
+      <p class="copyright">
+        © {{ currentYear }} Northeastern University. All rights reserved.
+      </p>
+    </div>
+    <div class="footer-right">
+      <nav class="footer-links">
+        <a href="#" class="footer-link">Privacy Policy</a>
+        <a href="#" class="footer-link">Terms of Service</a>
+        <a href="#" class="footer-link">Contact Us</a>
+      </nav>
+      <div class="social-links">
+        <a href="#" class="social-icon" title="Twitter"
+          ><Twitter size="18"
+        /></a>
+        <a href="#" class="social-icon" title="LinkedIn"
+          ><Linkedin size="18"
+        /></a>
+        <a href="#" class="social-icon" title="GitHub"><Github size="18" /></a>
+      </div>
+    </div>
+  </footer>
+</template>
+
+<style scoped>
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f8f8f8;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.footer-left,
+.footer-right {
+  display: flex;
+  align-items: center;
+}
+
+.university-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 2rem;
+}
+
+.university-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.university-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-top: 1rem;
+}
+
+.copyright {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 1rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+  margin-right: 2rem;
+}
+
+.footer-link {
+  font-size: 0.9rem;
+  color: #444;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #c00;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-icon {
+  color: #444;
+  transition: color 0.3s ease;
+}
+
+.social-icon:hover {
+  color: #c00;
+}
+</style>
+
+--- components/NUHeader.vue ---
+<!-- <script setup>
+const store = useDashboardUIStore()
+const { setPopUpVisibility } = store
+const { popUpVisibility } = storeToRefs(store)
+</script>
+
+<template>
+  <div
+    class="fixed top-0 left-0 white px-5 py-5 w-full h-20 text-black"
+    style="background-color: rgba(255, 255, 255, 0.5)"
+  >
+    <p class="float-left text-4xl font-bold">ARBORETUM SENSORS</p>
+    <ul class="navigation">
+      <li>
+        <a
+          href="#"
+          :class="{ active: popUpVisibility.dashboard }"
+          @click="setPopUpVisibility('dashboard')"
+          >DASHBOARD</a
+        >
+      </li>
+      <li>
+        <a
+          href="#"
+          :class="{ active: popUpVisibility.about }"
+          @click="setPopUpVisibility('about')"
+          >ABOUT</a
+        >
+      </li>
+    </ul>
+  </div>
+</template>
+
+<style scoped>
+.navigation {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.navigation li {
+  margin-left: 20px;
+  font-size: 1.2rem;
+  font-family: 'Segoe UI Symbol', sans-serif;
+}
+
+.navigation li a {
+  color: black;
+  text-decoration: none;
+}
+
+.navigation li a:active,
+.navigation li a:hover,
+.navigation li a.active {
+  color: #609f80;
+  font-weight: 900;
+}
+</style> -->
+
+<script setup>
+import { ref, computed } from 'vue'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import {
+  Sun,
+  Moon,
+  LayoutDashboard,
+  Info,
+  Database,
+  Settings,
+  LogOut,
+} from 'lucide-vue-next'
+
+const store = useDashboardUIStore()
+const { setPopUpVisibility } = store
+const { popUpVisibility } = storeToRefs(store)
+
+const isDarkMode = ref(false)
+const toggleTheme = () => {
+  isDarkMode.value = !isDarkMode.value
+  document.body.classList.toggle('dark-mode')
+}
+
+const navItems = [
+  { name: 'Dashboard', key: 'dashboard', icon: LayoutDashboard },
+  { name: 'Data', key: 'data', icon: Database },
+  { name: 'Settings', key: 'settings', icon: Settings },
+  { name: 'About', key: 'about', icon: Info }, // Changed from InfoCircle to Info
+]
+
+const logoColor = computed(() => (isDarkMode.value ? '#FFFFFF' : '#333333'))
+const accentColor = computed(() => (isDarkMode.value ? '#4CAF50' : '#2E7D32'))
+</script>
+
+<template>
+  <header :class="['header', { 'dark-mode': isDarkMode }]">
+    <div class="logo-container">
+      <svg width="40" height="40" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" :fill="logoColor" />
+        <text
+          x="50"
+          y="50"
+          font-size="40"
+          :fill="accentColor"
+          text-anchor="middle"
+          dominant-baseline="central"
+        >
+          A
+        </text>
+      </svg>
+      <h1 class="logo-text">Arboretum Sensors</h1>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li v-for="item in navItems" :key="item.key">
+          <a
+            href="#"
+            :class="{ active: popUpVisibility[item.key] }"
+            @click="setPopUpVisibility(item.key)"
+          >
+            <component :is="item.icon" class="nav-icon" :size="18" />
+            {{ item.name }}
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="header-controls">
+      <button
+        class="theme-toggle"
+        :title="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+        @click="toggleTheme"
+      >
+        <Moon v-if="!isDarkMode" :size="22" />
+        <Sun v-else :size="22" />
+      </button>
+      <button class="logout-button" title="Log out">
+        <LogOut :size="22" />
+      </button>
+    </div>
+  </header>
+</template>
+
+<style scoped>
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  font-family: 'Arial', sans-serif;
+}
+
+.header.dark-mode {
+  background-color: rgba(30, 30, 30, 0.95);
+  color: #ffffff;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-left: 1rem;
+  color: #333333;
+  transition: color 0.3s ease;
+  letter-spacing: 0.5px;
+  margin-top: 1rem;
+}
+
+.dark-mode .logo-text {
+  color: #ffffff;
+}
+
+.navigation ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation li {
+  margin: 0 0.5rem;
+}
+
+.navigation a {
+  color: #333333;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.dark-mode .navigation a {
+  color: #ffffff;
+}
+
+.navigation a:hover,
+.navigation a.active {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+.nav-icon {
+  margin-right: 0.5rem;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+}
+
+.theme-toggle,
+.logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  color: #333333;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+}
+
+.dark-mode .theme-toggle,
+.dark-mode .logout-button {
+  color: #ffffff;
+}
+
+.theme-toggle:hover,
+.logout-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .theme-toggle:hover,
+.dark-mode .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  animation: fadeIn 0.5s ease-out;
+}
+</style>
+
+--- components/OpenSensingHeader/OpenSensingHeader.vue ---
+<!-- This code was generated by Builder.io -->
+<template>
+  <header class="header">
+    <nav class="nav-left">
+      <div class="neu-logo">
+        <img
+          loading="lazy"
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/e7e29babea30db976030704cfbd4779ea5f2dbb729f52574063bbcb61a05ac37?apiKey=ae53b33f21034bb89bae5f89d96cde5e&&apiKey=ae53b33f21034bb89bae5f89d96cde5e"
+          class="logo-image"
+          alt="Neu Logo"
+        />
+      </div>
+      <div class="sdpl-icon">🤲</div>
+      <div class="application-name">Open Sensing</div>
+    </nav>
+    <nav class="nav-right">
+      <div class="satellite-button">Satellite</div>
+      <button class="more-options" aria-label="More options">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </button>
+      <button
+        class="additional-options"
+        aria-label="Additional options"
+      ></button>
+    </nav>
+  </header>
+</template>
+
+<style scoped>
+.header {
+  align-items: start;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-left {
+  justify-content: start;
+}
+
+.nav-right {
+  justify-content: end;
+  color: var(--NEU-Black, #000);
+  white-space: nowrap;
+  font: 500 15px Helvetica Neue, sans-serif;
+}
+
+.neu-logo,
+.sdpl-icon,
+.application-name,
+.satellite-button,
+.more-options,
+.additional-options {
+  border-radius: 15px;
+  align-self: stretch;
+  margin: auto 0;
+}
+
+.neu-logo {
+  background-color: #fafafa;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  width: 138px;
+  padding: 8px 13px;
+}
+
+.logo-image {
+  aspect-ratio: 3.34;
+  object-fit: contain;
+  object-position: center;
+  width: 107px;
+  max-width: 100%;
+}
+
+.sdpl-icon {
+  background-color: #fafafa;
+  overflow: hidden;
+  color: #000;
+  text-align: center;
+  width: 48px;
+  height: 48px;
+  padding: 0 12px;
+  font: 400 25px Inter, sans-serif;
+}
+
+.application-name {
+  background-color: #000;
+  min-height: 48px;
+  color: var(--NEU-White, #fff);
+  text-align: center;
+  width: 137px;
+  padding: 15px 20px;
+  font: 500 15px Helvetica Neue, sans-serif;
+}
+
+.satellite-button {
+  background-color: var(--bg-area, #f9f9f9);
+  min-height: 48px;
+  text-align: center;
+  width: 87px;
+  padding: 15px 16px;
+}
+
+.more-options,
+.additional-options {
+  background-color: #fff;
+  width: 48px;
+  height: 48px;
+  border: none;
+  cursor: pointer;
+}
+
+.more-options {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  justify-content: space-between;
+  padding: 15px 10px;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  background-color: #000;
+  border-radius: 50%;
+}
+
+@media (max-width: 991px) {
+  .nav-right,
+  .satellite-button,
+  .more-options {
+    white-space: initial;
+  }
+
+  .sdpl-icon {
+    white-space: initial;
+  }
+}
+</style>
+
+--- components/ParallelCoords.vue ---
+<template>
+  <div
+    id="pcoords"
+    ref="pcoords"
+    class="parcoords w-full h-full rounded-md"
+  ></div>
+</template>
+
+<script setup>
+const store = useDashboardUIStore()
+const { masterSolutions } = storeToRefs(store)
+const { setSelectedSolution } = store
+
+import * as d3 from 'd3'
+
+const props = defineProps({
+  width: { type: Number, default: 1000 },
+  height: { type: Number, default: 400 },
+})
+
+const pcoords = ref(null)
+
+const keys = ['Budget', 'Outreach', 'Recruitment', 'Flooding']
+// TODO: Make this dynamic
+const keyz = keys[0]
+
+const buildParCoords = () => {
+  // Specify the chart’s dimensions.
+  const marginTop = 20
+  const marginRight = 30
+  const marginBottom = 20
+  const marginLeft = 30
+
+  // Highlight the specie that is hovered
+  const highlight = function (event, d) {
+    const selectedSolution = `._${d.Budget}_${d.SolnIndex}`
+
+    // first every group turns grey
+    d3.selectAll('.line')
+      .transition()
+      .duration(200)
+      .style('stroke', 'lightgrey')
+      .style('stroke-opacity', '0.2')
+    // Second the hovered specie takes its color
+    d3.select(selectedSolution)
+      .transition()
+      .duration(200)
+      .style('stroke', c(d[keyz]))
+      .style('stroke-opacity', strokeOpacity)
+  }
+
+  // Unhighlight
+  const doNotHighlight = function (event, d) {
+    d3.selectAll('.line')
+      .transition()
+      .duration(200)
+      .delay(200)
+      .style('stroke', function (d) {
+        return c(d[keyz])
+      })
+      .style('stroke-opacity', strokeOpacity)
+  }
+
+  // Select Solution
+  const selectSolution = function (event, d) {
+    d.BudgetIndex = d.Budget
+    setSelectedSolution(d)
+  }
+
+  const svg = d3
+    .create('svg')
+    .attr('height', props.height)
+    .attr('width', props.width)
+    .attr('font-family', 'sans-serif')
+    .attr('font-size', 12)
+
+  const y = new Map(
+    Array.from(keys, (key) => [
+      key,
+      d3.scaleLinear(
+        d3.extent(masterSolutions.value, (d) => d[key]),
+        [props.height - marginBottom, marginTop]
+      ),
+    ])
+  )
+  const x = d3.scalePoint(keys, [marginLeft, props.width - marginRight])
+  const c = d3.scaleOrdinal(
+    masterSolutions.value.map((d) => d[keyz]),
+    d3.schemeCategory10,
+    'black'
+  )
+  // const c = d3.scaleSequential(y.get(keyz).domain(), (t) =>
+  //   d3.interpolateBrBG(1 - t)
+  // )
+
+  const brushWidth = 50
+  const deselectedColor = '#ddd'
+  const strokeOpacity = 0.6
+
+  const brush = d3
+    .brushY()
+    .extent([
+      [-(brushWidth / 2), marginTop],
+      [brushWidth / 2, props.height - marginBottom],
+    ])
+    .on('start brush end', brushed)
+
+  const line = d3
+    .line()
+    .defined(([, value]) => value != null)
+    .y(([key, value]) => y.get(key)(value))
+    .x(([key]) => x(key))
+
+  const path = svg
+    .append('g')
+    .attr('fill', 'none')
+    .attr('stroke-width', 2)
+    .attr('stroke-opacity', strokeOpacity)
+    .selectAll('path')
+    .data(
+      masterSolutions.value
+        .slice()
+        .sort((a, b) => d3.ascending(a[keyz], b[keyz]))
+    )
+    .join('path')
+    .attr('class', function (d) {
+      return `line _${d.Budget}_${d.SolnIndex}`
+    }) // 2 class for each line: 'line' and the solution name
+    .attr('stroke', (d) => c(d[keyz]))
+    .attr('d', (d) => line(d3.cross(keys, [d], (key, d) => [key, d[key]])))
+    .on('click', selectSolution)
+    .on('mouseover', highlight)
+    .on('mouseleave', doNotHighlight)
+
+  path.append('title').text((d) => d.SolnIndex)
+
+  svg
+    .append('g')
+    .selectAll('g')
+    .data(keys)
+    .join('g')
+    .attr('transform', (d) => `translate(${x(d)}, 0)`)
+    .each(function (d) {
+      d3.select(this).call(d3.axisRight(y.get(d)))
+    })
+    .call((g) =>
+      g
+        .append('text')
+        .attr('y', props.height)
+        .attr('x', 0) // Adjusted for centering
+        .attr('text-anchor', 'middle') // Changed from 'start' to 'middle' for centering
+        .attr('fill', 'currentColor')
+        .text((d) => d)
+    )
+    .call((g) =>
+      g
+        .selectAll('text')
+        .clone(true)
+        .lower()
+        .attr('fill', 'none')
+        .attr('stroke-width', 5)
+        .attr('stroke-linejoin', 'round')
+        .attr('stroke', 'white')
+    )
+    .call(brush)
+
+  const selections = new Map()
+  function brushed({ selection }, key) {
+    if (selection === null) selections.delete(key)
+    else
+      selections.set(
+        key,
+        selection.map(y.get(key).invert).sort((a, b) => a - b)
+      )
+    const selected = []
+    path.each(function (d) {
+      const active = Array.from(selections).every(
+        ([key, [min, max]]) => d[key] >= min && d[key] <= max
+      )
+
+      d3.select(this).style('stroke', active ? c(d[keyz]) : deselectedColor)
+      if (active) {
+        d3.select(this).raise()
+        selected.push(d)
+      }
+    })
+    svg.property('value', selected).dispatch('input')
+  }
+
+  pcoords.value.append(svg.property('value', masterSolutions.value).node())
+}
+
+onMounted(() => {
+  buildParCoords()
+})
+</script>
+
+<style>
+#pop-up-pcoords {
+  bottom: 1.25rem;
+  right: 1.25rem;
+  border-radius: 1.5rem;
+  width: 83.333333%;
+}
+</style>
+
+--- components/SensorDashboard/DataCard.vue ---
+<script setup>
+import { LineChart } from 'vue-chart-3'
+import { Chart, registerables } from 'chart.js'
+Chart.register(...registerables)
+
+// set up props for the component
+const props = defineProps({
+  // make chartData an object and give it a default value
+  chartData: { type: Object, default: () => {} },
+})
+</script>
+
+<template>
+  <div class="px-4">
+    <div class="relative pb-4">
+      <select class="absolute right-0 bg-[#FFFFFF]/[.6]">
+        <option value="all">All Data</option>
+        <option value="dailyMean">Daily Averages</option>
+      </select>
+    </div>
+    <LineChart :chart-data="chartData" />
+  </div>
+</template>
+
+<style>
+#overview-card {
+  bottom: 1.25rem;
+  right: 1.25rem;
+  border-radius: 1.5rem;
+}
+
+.table {
+  font-size: 1.125rem;
+  /* 18px */
+  line-height: 1.75rem;
+  /* 28px */
+}
+
+#text-right {
+  text-align: right;
+}
+</style>
+
+--- components/SensorDashboard/index.vue ---
+<script setup>
+import { ref } from 'vue'
+import { csv } from 'd3'
+
+const chartData = ref({})
+
+// Store
+const store = useDashboardUIStore()
+const { selectedDatasets, hubsList, existingHubs } = storeToRefs(store)
+
+onMounted(async () => {
+  const allData = await csv('/sensorData.csv')
+  const labels = allData.map((d) => d['timestamp'])
+  // loop through all the elements in metrics
+  selectedDatasets.value.forEach((metric) => {
+    chartData.value[metric] = {
+      labels,
+      datasets: [
+        {
+          layout: { padding: 50 },
+          data:
+            metric != 'heat_index'
+              ? allData.map((d) => parseFloat(d[metric]))
+              : allData.map(
+                  (d) =>
+                    0.5 *
+                    (parseFloat(d['temperature']) +
+                      61 +
+                      (parseFloat(d['temperature']) - 68) * 1.2 +
+                      parseFloat(d['relative_humidity']) * 0.094)
+                ),
+          fill: false,
+          pointStyle: false,
+          borderColor: 'rgb(255, 255, 255)',
+          tension: 0.1,
+          // options: { plugins: { legend: { position: 'right' } } },
+        },
+      ],
+    }
+  })
+})
+
+const getClass = (metric) => {
+  {
+    const tailwindClass = 'mt-8 overflow-x-scroll'
+    // if (metric != 'temperature') return tailwindClass + ' w-1/2'
+    // else return tailwindClass
+    return tailwindClass
+  }
+}
+</script>
+
+<template>
+  <div
+    class="px-4 bg-[#004E32] overflow-auto"
+    :style="{ height: 'calc(100vh - 50px)' }"
+  >
+    <div class="bg-[#41715C] pb-4 px-4">
+      <h1 class="p-4">Overview</h1>
+      <div class="flex overflow-auto gap-4">
+        <div v-for="name in hubsList" :key="name">
+          <OverviewCard
+            class="border-4 cursor-pointer"
+            :class="
+              existingHubs[name] ? 'border-[#DBFF00]' : 'border-[#41715C]'
+            "
+            :name="name"
+            @click="existingHubs[name] = !existingHubs[name]"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <div
+        v-for="metric in selectedDatasets"
+        :key="metric"
+        class="bg-[#41715C] overflow-y-auto w-full mb-8"
+      >
+        <h1 class="p-4">{{ metric }}</h1>
+        <DataCard
+          :chart-data="chartData[metric] !== undefined ? chartData[metric] : {}"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+#pop-up {
+  bottom: 1.25rem;
+  right: 1.25rem;
+  border-radius: 1.5rem;
+}
+</style>
+
+--- components/SensorDashboard/OverviewCard.vue ---
+<script setup>
+import { DoughnutChart } from 'vue-chart-3'
+import { Chart, registerables } from 'chart.js'
+Chart.register(...registerables)
+
+const props = defineProps({
+  // give name a default value
+
+  name: { type: String, default: '' },
+  devProps: { type: Object, default: () => { } },
+})
+
+const testData = {
+  datasets: [
+    {
+      data: [77, 23],
+      backgroundColor: ['#004E32', '#abaeb3'],
+      borderColor: ['#004E32', '#abaeb3'],
+    },
+  ],
+}
+</script>
+
+<template>
+  <div id="overview-card" class="w-96 h-52 p-4 bg-white">
+    <div class="flex flex-col">
+      <div class="flex justify-between mb-3 border-b-[3px] border-b-[#004E32]">
+        <div class="">
+          <h1>{{ props.name }}</h1>
+        </div>
+        <div class="flex justify-between items-center gap-2">
+          <div class="">{{ 'OPERATIONAL' }}</div>
+          <div class="h-[12px] w-[12px] bg-lime-300 rounded-full border border-[#004E32]"></div>
+        </div>
+      </div>
+      <div class="flex flex-row items-center gap-4 w-full">
+        <div class="items-center basis-1/4">
+          <DoughnutChart class="mb-2" :chart-data="testData" :width="100" :height="100" />
+          <div class="text-center">GOOD</div>
+        </div>
+
+        <table class="table-fixed table basis-3/4">
+          <tbody class="text-black">
+            <tr class="border-b border-b-[#004E32]">
+              <td>Air Quality</td>
+              <td id="text-right">
+                {{ 'Good' }}
+              </td>
+            </tr>
+            <tr class="border-b border-b-[#004E32]">
+              <td>Battery</td>
+              <td id="text-right">
+                {{ '80%' }}
+              </td>
+            </tr>
+            <tr class="border-b border-b-[#004E32]">
+              <td>Soil Moisture</td>
+              <td id="text-right">
+                {{ '42%' }}
+              </td>
+            </tr>
+            <tr class="border-b border-b-[#004E32]">
+              <td>Temperature</td>
+              <td id="text-right">
+                {{ '67F' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+#overview-card {
+  bottom: 1.25rem;
+  right: 1.25rem;
+  border-radius: 1.5rem;
+}
+
+.table {
+  font-size: 1.125rem;
+  /* 18px */
+  line-height: 1.75rem;
+  /* 28px */
+}
+
+#text-right {
+  text-align: right;
+}
+</style>
+
+--- components/SensorDetail/SensorDetail.vue ---
+<template>
+  <transition name="fade">
+    <div v-if="showSensorDetail" class="sensor-detail-overlay">
+      <div class="sensor-detail">
+        <header class="sensor-header">
+          <h1>{{ sensorTitle }}</h1>
+          <el-button class="close-button" @click="closeSensorDetail">
+            ×
+          </el-button>
+        </header>
+        <div class="sensor-content">
+          <div class="sensor-info">
+            <div class="sensor-stats">
+              <div class="stat-item">
+                <h3>{{ pendingIssues }}</h3>
+                <p>Pending Issues</p>
+              </div>
+              <div class="stat-item">
+                <h3>{{ batteryCharge }}</h3>
+                <p>Battery Charge</p>
+              </div>
+              <div class="stat-item">
+                <h3>{{ activityPeriod }}</h3>
+                <p>Activity Period</p>
+              </div>
+              <div class="stat-item">
+                <h3>{{ valuesMeasured }}</h3>
+                <p>Values Measured</p>
+              </div>
+            </div>
+            <div class="sensor-location">
+              <h2>Location</h2>
+              <p>{{ location }}</p>
+            </div>
+          </div>
+          <div class="sensor-data">
+            <h2>Sensor Data</h2>
+            <FilterSidebar />
+            <div ref="chartContainer" class="chart-container">
+              <div ref="scrollContainer" class="scroll-container">
+                <div v-if="dataLoaded" class="charts-wrapper">
+                  <LineChart
+                    v-for="(metric, metricName) in metrics"
+                    v-show="selectedDatasets.includes(metricName)"
+                    :key="metricName"
+                    :metric="metric"
+                    :data="sensorData[metricName]"
+                    :margin="margin"
+                    :width="chartWidth"
+                    :height="chartHeight"
+                    @date-range-update="updateGlobalDateRange"
+                  />
+                </div>
+                <div v-else class="loading">
+                  <div class="loading-spinner"></div>
+                  <p>Loading data...</p>
+                </div>
+              </div>
+            </div>
+            <div class="dashboard-footer">
+              <button class="reset-button" @click="resetAllCharts">
+                Reset All
+              </button>
+              <div
+                v-if="globalDateRange.length === 2"
+                class="date-range-display"
+              >
+                {{ formatDateRange(globalDateRange) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</template>
+
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { useResizeObserver } from '@vueuse/core'
+
+const store = useDashboardUIStore()
+const {
+  selectedSite,
+  selectedSiteProps,
+  showSensorDetail,
+  selectedSensorId,
+  selectedDatasets,
+  sensorData,
+  dataDashboardValues,
+} = storeToRefs(store)
+
+const sensorTitle = computed(() => `Sensor: ${selectedSite.value}`)
+const pendingIssues = ref('0')
+const batteryCharge = ref('45%')
+const activityPeriod = ref('11 months')
+const valuesMeasured = ref('7')
+const location = computed(() => selectedSiteProps.value.location || 'N/A')
+
+const chartContainer = ref(null)
+const scrollContainer = ref(null)
+const chartWidth = ref(0)
+const chartHeight = 180
+const globalDateRange = ref([])
+
+const margin = { top: 20, right: 20, bottom: 30, left: 40 }
+
+const dataLoaded = computed(
+  () => Object.keys(sensorData.value).length > 0 && chartWidth.value > 0
+)
+
+const metrics = ref({
+  Temperature: { name: 'temperature', label: 'Temperature (°C)' },
+  'Relative Humidity': {
+    name: 'relative_humidity',
+    label: 'Relative Humidity (%)',
+  },
+  'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
+  'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
+  pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
+  'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
+  pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
+  pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
+})
+
+useResizeObserver(scrollContainer, (entries) => {
+  const entry = entries[0]
+  if (entry) {
+    chartWidth.value = entry.contentRect.width - margin.left - margin.right
+  }
+})
+
+onMounted(async () => {
+  console.log('SensorDetail mounted, loading sensor data if not already loaded')
+  await store.loadSensorData()
+})
+
+const closeSensorDetail = () => {
+  store.toggleSensorDetail()
+}
+
+const updateGlobalDateRange = (range) => {
+  globalDateRange.value = range
+  store.updateDataDashboardValues('dateRange', range)
+}
+
+const resetAllCharts = () => {
+  globalDateRange.value = []
+  store.updateDataDashboardValues('dateRange', [])
+}
+
+const formatDateRange = (range) => {
+  if (range.length !== 2) return ''
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: '2-digit',
+    })
+  }
+  return `${formatDate(range[0])} - ${formatDate(range[1])}`
+}
+</script>
+
+<style scoped>
+.sensor-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.sensor-detail {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.sensor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f7fa;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.sensor-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #303133;
+}
+
+.close-button {
+  font-size: 24px;
+  color: #909399;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.sensor-content {
+  display: flex;
+  padding: 20px;
+}
+
+.sensor-info {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.sensor-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  padding: 15px;
+  text-align: center;
+}
+
+.stat-item h3 {
+  margin: 0;
+  font-size: 24px;
+  color: #409eff;
+}
+
+.stat-item p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #606266;
+}
+
+.sensor-location {
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.sensor-location h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #303133;
+}
+
+.sensor-location p {
+  margin: 0;
+  font-size: 16px;
+  color: #606266;
+}
+
+.sensor-data {
+  flex: 2;
+}
+
+.sensor-data h2 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  color: #303133;
+}
+
+.chart-container {
+  margin-top: 20px;
+  height: 400px;
+  overflow: hidden;
+}
+
+.scroll-container {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.charts-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.dashboard-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  margin-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.reset-button {
+  padding: 5px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.reset-button:hover {
+  background-color: #45a049;
+}
+
+.date-range-display {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .sensor-content {
+    flex-direction: column;
+  }
+
+  .sensor-info {
+    padding-right: 0;
+    margin-bottom: 20px;
+  }
+}
+</style>
+
+--- components/SensorMap/AppFooter.vue ---
+">
+<template>
+  <footer class="footer">
+    <div class="footer-left">
+      <div class="footer-content">
+        <img
+          loading="lazy"
+          src="@/assets/images/logo.png"
+          alt="Footer content"
+          class="footer-image"
+        />
+      </div>
+    </div>
+    <div class="footer-right">
+      <button class="help-button" aria-label="Help">?</button>
+    </div>
+  </footer>
+</template>
+
+<script setup></script>
+
+<style scoped>
+.footer {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.footer-left,
+.footer-right {
+  display: flex;
+  align-items: center;
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.footer-content:hover {
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+.footer-image {
+  height: 50px;
+  width: auto;
+}
+
+.help-button {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.help-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .footer-right {
+    margin-top: 0.5rem;
+  }
+
+  .footer-content,
+  .help-button {
+    padding: 0.5rem;
+  }
+
+  .footer-image {
+    height: 24px;
+  }
+
+  .help-button {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+}
+</style>
+
+--- components/SensorMap/AppHeader.vue ---
+<template>
+  <header class="header">
+    <div class="nav-left">
+      <div class="neu-logo block">
+        <img
+          loading="lazy"
+          src="@/assets/images/vector.svg"
+          alt="NEU Logo"
+          class="neu-logo-image"
+        />
+      </div>
+      <div class="sdpl-icon block">🤲</div>
+      <div class="application-name block" @click="handleToggleDashboard">
+        Open Sensing
+      </div>
+    </div>
+    <nav class="nav-right">
+      <button class="satellite-button block">Satellite</button>
+      <button class="more-options-button block" aria-label="More options">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </button>
+      <button class="user-profile-button block" aria-label="User profile">
+        <el-icon><Download /></el-icon>
+      </button>
+    </nav>
+  </header>
+</template>
+
+<script setup>
+import { storeToRefs } from 'pinia'
+import { Download } from '@element-plus/icons-vue'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+
+const store = useDashboardUIStore()
+const { showDashboard } = storeToRefs(store)
+const { toggleDashboard } = store
+
+const handleToggleDashboard = () => {
+  console.log('AppHeader: Toggle Dashboard clicked')
+  toggleDashboard()
+  console.log('AppHeader: showDashboard after toggle:', showDashboard.value)
+}
+</script>
+
+<style scoped>
+.header {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.block {
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.neu-logo-image {
+  width: 45px;
+  height: auto;
+}
+
+.sdpl-icon {
+  font-size: 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.application-name {
+  background-color: #000;
+  color: #fff;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.satellite-button {
+  color: #333;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.more-options-button,
+.user-profile-button {
+  width: 3.5rem;
+  height: 3.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  background-color: #333;
+  border-radius: 50%;
+  margin: 0 2px;
+}
+
+.block:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    top: 1rem;
+    left: 1rem;
+  }
+
+  .nav-right {
+    margin-top: 1rem;
+  }
+
+  .neu-logo-image {
+    width: 100px;
+  }
+
+  .sdpl-icon,
+  .more-options-button,
+  .user-profile-button {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .application-name,
+  .satellite-button {
+    font-size: 1rem;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    top: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .nav-left,
+  .nav-right {
+    gap: 0.75rem;
+  }
+
+  .neu-logo-image {
+    width: 90px;
+  }
+
+  .sdpl-icon,
+  .more-options-button,
+  .user-profile-button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .application-name,
+  .satellite-button {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
+}
+</style>
+
+--- components/SensorMap/FilterSidebar/FilterSidebar.vue ---
+<!-- <template>
+  <aside class="filter-sidebar">
+    <div class="filter-header">
+      <h2 class="filter-title">Filters</h2>
+      <el-button class="close-button" circle @click="handleClose">
+        <el-icon><Close /></el-icon>
+      </el-button>
+    </div>
+    <div class="filter-content">
+      <el-collapse v-model="activeNames">
+        <el-collapse-item
+          v-for="(section, index) in filterSections"
+          :key="index"
+          :name="section.title"
+        >
+          <template #title>
+            <span class="section-title">{{ section.title }}</span>
+          </template>
+          <el-checkbox-group
+            v-model="selectedOptions[section.title]"
+            @change="handleFilterChange"
+          >
+            <el-checkbox
+              v-for="option in section.options"
+              :key="option"
+              :label="option"
+            >
+              {{ option }}
+            </el-checkbox>
+          </el-checkbox-group>
+        </el-collapse-item>
+        <el-collapse-item name="Time">
+          <template #title>
+            <span class="section-title">Time Range</span>
+          </template>
+          <el-date-picker
+            v-model="dateRange"
+            type="daterange"
+            range-separator="To"
+            start-placeholder="Start date"
+            end-placeholder="End date"
+            style="width: 100%"
+            @change="handleDateChange"
+          />
+          <div class="time-options">
+            <el-button
+              v-for="option in timeOptions"
+              :key="option"
+              :class="{ 'is-active': selectedTimeOption === option }"
+              @click="selectTimeOption(option)"
+            >
+              {{ option }}
+            </el-button>
+          </div>
+        </el-collapse-item>
+      </el-collapse>
+    </div>
+  </aside>
+</template>
+
+<script setup>
+import { ref, reactive, watch } from 'vue'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { Close } from '@element-plus/icons-vue'
+
+const store = useDashboardUIStore()
+const { closeFilter } = store
+
+const activeNames = ref(['Location'])
+const dateRange = ref([])
+const selectedTimeOption = ref(null)
+
+const filterSections = [
+  {
+    title: 'Location',
+    options: [
+      'Architecture Studios',
+      'Cabot Center',
+      'Cargill Hall',
+      'Carter Playground',
+      'Centennial Common',
+      'Columbus Garage',
+      'Curry Student Center',
+      'Forsyth Building',
+      'Gainsborough Garage',
+      'Gainsborough Garage Roof',
+      'ISEC Terrace',
+      'Matthews Arena',
+      'Robinson Hall',
+      'Snell Library Quad',
+    ],
+  },
+  {
+    title: 'Data',
+    options: ['Temperature', 'Humidity', 'Air Pollution'],
+  },
+  {
+    title: 'Status',
+    options: ['Active', 'Inactive', 'Conflict'],
+  },
+]
+
+const selectedOptions = reactive({
+  Location: [],
+  Data: [],
+  Status: [],
+})
+
+const timeOptions = [
+  'today',
+  'last 24h',
+  'last 7 days',
+  'last 14 days',
+  'last 30 days',
+  'last 365 days',
+]
+
+const selectTimeOption = (option) => {
+  selectedTimeOption.value = option
+  handleFilterChange()
+}
+
+const handleFilterChange = () => {
+  console.log(
+    'Filters changed',
+    selectedOptions,
+    dateRange.value,
+    selectedTimeOption.value
+  )
+}
+
+const handleDateChange = () => {
+  handleFilterChange()
+}
+
+const handleClose = () => {
+  closeFilter()
+}
+
+watch(selectedOptions, handleFilterChange, { deep: true })
+</script>
+
+<style scoped>
+.filter-sidebar {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 350px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.filter-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-button {
+  padding: 8px;
+  font-size: 18px;
+}
+
+.filter-content {
+  padding: 16px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.time-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.time-options .el-button {
+  flex: 1 0 calc(33.333% - 8px);
+}
+
+.time-options .el-button.is-active {
+  background-color: #409eff;
+  color: white;
+}
+
+:deep(.el-collapse) {
+  border: none;
+}
+
+:deep(.el-collapse-item__header) {
+  font-size: 16px;
+  font-weight: 500;
+  border-bottom: none;
+}
+
+:deep(.el-collapse-item__content) {
+  padding-bottom: 16px;
+}
+
+:deep(.el-checkbox__label) {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .filter-sidebar {
+    max-width: none;
+    width: 100%;
+  }
+}
+</style> -->
+<template>
+  <transition name="fade">
+    <aside v-if="showFilter" class="filter-sidebar-card">
+      <div class="filter-header">
+        <h2>Filters</h2>
+        <el-button class="close-button" circle @click="closeFilter">
+          <el-icon><Close /></el-icon>
+        </el-button>
+      </div>
+      <el-scrollbar>
+        <el-collapse v-model="activeNames" accordion>
+          <el-collapse-item name="1">
+            <template #title>
+              <span class="collapse-title">LOCATION SELECTION</span>
+            </template>
+            <el-checkbox-group
+              v-model="selectedLocations"
+              class="checkbox-group"
+            >
+              <el-checkbox
+                v-for="(isActive, name) in existingHubs"
+                :key="name"
+                :label="name"
+                @change="() => toggleHub(name)"
+              >
+                {{ name }}
+              </el-checkbox>
+            </el-checkbox-group>
+          </el-collapse-item>
+          <el-collapse-item name="2">
+            <template #title>
+              <span class="collapse-title">DATA SELECTIONS</span>
+            </template>
+            <el-checkbox-group
+              v-model="selectedDatasets"
+              class="checkbox-group"
+            >
+              <el-checkbox
+                v-for="(isActive, dataset) in existingDatasets"
+                :key="dataset"
+                :label="dataset"
+              >
+                {{ dataset }}
+              </el-checkbox>
+            </el-checkbox-group>
+          </el-collapse-item>
+          <el-collapse-item name="3">
+            <template #title>
+              <span class="collapse-title">DATE & TIME</span>
+            </template>
+            <el-date-picker
+              v-model="dateRange"
+              type="daterange"
+              range-separator="to"
+              start-placeholder="Start Date"
+              end-placeholder="End Date"
+              style="width: 100%; margin-bottom: 15px"
+              @change="handleDateChange"
+            />
+            <div class="time-range">
+              <span>Time Range:</span>
+              <el-slider
+                v-model="timeRange"
+                range
+                :min="0"
+                :max="24"
+                :step="0.5"
+                :format-tooltip="formatTimeTooltip"
+              />
+            </div>
+            <div class="preset-date-filters">
+              <el-button
+                v-for="option in timeOptions"
+                :key="option"
+                class="date-filter-button"
+                @click="applyDateFilter(option)"
+              >
+                {{ option }}
+              </el-button>
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+      </el-scrollbar>
+    </aside>
+  </transition>
+</template>
+
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { Close } from '@element-plus/icons-vue'
+
+const store = useDashboardUIStore()
+const { existingHubs, existingDatasets, dataDashboardValues, showFilter } =
+  storeToRefs(store)
+const {
+  toggleHub,
+  closeFilter,
+  updateDataDashboardValues,
+  updateDateRangeUpdate,
+} = store
+
+const activeNames = ref(['1'])
+const selectedLocations = ref([])
+const selectedDatasets = ref([])
+
+const dateRange = computed({
+  get: () => dataDashboardValues.value.dateRange,
+  set: (value) => updateDataDashboardValues('dateRange', value),
+})
+
+const timeRange = computed({
+  get: () => dataDashboardValues.value.time,
+  set: (value) => updateDataDashboardValues('time', value),
+})
+
+const timeOptions = [
+  'Last 24 Hours',
+  'Last 7 Days',
+  'Last 30 Days ',
+  'Last 365 Days',
+]
+
+const formatTimeTooltip = (val) => {
+  const hours = Math.floor(val)
+  const minutes = Math.floor((val % 1) * 60)
+    .toString()
+    .padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+const applyDateFilter = (period) => {
+  const endDate = new Date()
+  let startDate = new Date(endDate)
+
+  switch (period) {
+    case 'Last 24 Hours':
+      startDate.setDate(endDate.getDate() - 1)
+      break
+    case 'Last 7 Days':
+      startDate.setDate(endDate.getDate() - 7)
+      break
+    case 'Last 30 Days':
+      startDate.setDate(endDate.getDate() - 30)
+      break
+    case 'Last 365 Days':
+      startDate.setDate(endDate.getDate() - 365)
+      break
+  }
+
+  updateDataDashboardValues('dateRange', [startDate, endDate])
+  updateDateRangeUpdate(new Date())
+}
+
+const handleDateChange = () => {
+  updateDateRangeUpdate(new Date())
+}
+
+watch(selectedLocations, (newValue) => {
+  Object.keys(existingHubs.value).forEach((hub) => {
+    existingHubs.value[hub] = newValue.includes(hub)
+  })
+})
+
+watch(selectedDatasets, (newValue) => {
+  Object.keys(existingDatasets.value).forEach((dataset) => {
+    existingDatasets.value[dataset] = newValue.includes(dataset)
+  })
+})
+
+// Initialize selectedLocations and selectedDatasets
+selectedLocations.value = Object.keys(existingHubs.value).filter(
+  (hub) => existingHubs.value[hub]
+)
+selectedDatasets.value = Object.keys(existingDatasets.value).filter(
+  (dataset) => existingDatasets.value[dataset]
+)
+</script>
+
+<style scoped>
+.filter-sidebar-card {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 320px;
+  max-height: calc(100vh - 40px);
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.filter-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-button {
+  padding: 8px;
+  font-size: 18px;
+}
+
+:deep(.el-scrollbar__wrap) {
+  max-height: calc(100vh - 120px);
+}
+
+:deep(.el-collapse) {
+  border: none;
+}
+
+:deep(.el-collapse-item__header) {
+  font-size: 15px;
+  font-weight: 600;
+  color: #409eff;
+  padding: 12px 20px;
+}
+
+:deep(.el-collapse-item__content) {
+  padding: 0 20px 15px;
+}
+
+.collapse-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+:deep(.el-checkbox__label) {
+  font-size: 14px;
+}
+
+.time-range {
+  margin-bottom: 15px;
+}
+
+.preset-date-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.date-filter-button {
+  font-size: 12px;
+  padding: 8px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
+
+--- components/SensorMap/MapSection/MapSection.vue ---
+<!-- MapSection.vue -->
+<template>
+  <section class="map-section">
+    <MapDashboard />
+    <div class="map-overlay">
+      <SensorInfo />
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+
+const store = useDashboardUIStore()
+const { selectedSite } = storeToRefs(store)
+
+watch(selectedSite, (newValue) => {
+  console.log('MapSection:', newValue)
+})
+</script>
+
+<style scoped>
+.map-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+</style>
+
+--- components/SensorMap/Sensor/SensorInfo.vue ---
+<template>
+  <div v-show="!!selectedSite" class="sensor-info" :style="positionStyle">
+    <div class="info-header">
+      <span>
+        <el-icon><ArrowLeftBold /></el-icon>
+        <el-icon><ArrowRightBold /></el-icon>
+      </span>
+      <span class="arrow-icon">
+        <el-icon><TopRight /></el-icon>
+      </span>
+    </div>
+    <div class="info-divider"></div>
+    <div class="info-content">
+      <h3 class="sensor-title">{{ selectedSite }}</h3>
+      <span class="sensor-time">Last updated: {{ currentTime }}</span>
+    </div>
+    <p class="sensor-description">
+      TDS Number: {{ selectedSiteProps.TDS_NUM || 'N/A' }}<br />
+      Population (20-24): {{ selectedSiteProps.pop20t24P || 'N/A' }}<br />
+      Suitable Area: {{ selectedSiteProps.suit_area || 'N/A' }}<br />
+      NYCHA Area: {{ selectedSiteProps.NYCHA_Area || 'N/A' }}
+    </p>
+  </div>
+</template>
+
+<script setup>
+import { computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import {
+  ArrowLeftBold,
+  ArrowRightBold,
+  TopRight,
+} from '@element-plus/icons-vue'
+
+defineOptions({
+  name: 'SensorInfo',
+})
+
+const store = useDashboardUIStore()
+const { selectedSite, selectedSiteProps, clickPosition } = storeToRefs(store)
+
+const currentTime = computed(() => {
+  return new Date().toLocaleString()
+})
+
+const positionStyle = computed(() => {
+  const { x, y } = clickPosition.value
+  const offset = 10
+  return {
+    left: `${x + offset}px`,
+    top: `${y - offset}px`,
+  }
+})
+
+watch(selectedSite, (newValue) => {
+  console.log('SensorInfo: Selected site changed:', newValue)
+})
+
+watch(clickPosition, (newValue) => {
+  console.log('SensorInfo: Click position changed:', newValue)
+})
+</script>
+
+<style scoped>
+.sensor-info {
+  position: absolute;
+  background-color: #fafafa;
+  border-radius: 5px;
+  padding: 13px;
+  width: 227px;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
+}
+
+.info-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-divider {
+  height: 1px;
+  background-color: #000;
+  margin: 9px 0;
+}
+
+.sensor-title {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sensor-time {
+  font-size: 11px;
+  color: #a8a8a8;
+}
+
+.sensor-description {
+  font-size: 11px;
+  margin-top: 12px;
+}
+</style>
+
+--- components/SensorMap/Sensor/SensorMarker.vue ---
+">
+<template>
+  <div class="sensor-marker" :style="{ top: top, left: left }">
+    <div class="marker-icon"></div>
+  </div>
+</template>
+
+<script setup>
+import { defineProps, defineOptions } from 'vue'
+
+defineOptions({
+  name: 'SensorMarker',
+})
+
+defineProps({
+  top: {
+    type: String,
+    required: true,
+  },
+  left: {
+    type: String,
+    required: true,
+  },
+})
+</script>
+
+<style scoped>
+.sensor-marker {
+  position: absolute;
+  width: 68px;
+  height: 68px;
+  background-color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-icon {
+  width: 35px;
+  height: 35px;
+  background-color: #000;
+  border-radius: 1px;
+}
+</style>
+
+--- components/SensorMap/SensorTools.vue ---
+<!-- SensorTools.vue -->
+<template>
+  <div class="sensor-tools">
+    <button
+      v-for="(icon, index) in sensorTools"
+      :key="index"
+      class="sensor-tool-button"
+      :class="{ active: activeToolIndex === index }"
+      @click="handleToolClick(index)"
+    >
+      <el-icon><component :is="icon.component" /></el-icon>
+      <span class="tooltip">{{ icon.tooltip }}</span>
+    </button>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { House, Filter, FullScreen, Location } from '@element-plus/icons-vue'
+
+const store = useDashboardUIStore()
+const { showFilter, showDashboard } = storeToRefs(store)
+const { toggleFilter, toggleDashboard } = store
+
+const activeToolIndex = ref(null)
+
+const sensorTools = [
+  { component: House, tooltip: 'Home' },
+  { component: Filter, tooltip: 'Filter' },
+  { component: FullScreen, tooltip: 'Dashboard' },
+  { component: Location, tooltip: 'Location Info' },
+]
+
+const handleToolClick = (index) => {
+  console.log('SensorTools: Tool clicked:', sensorTools[index].tooltip)
+  if (sensorTools[index].component === Filter) {
+    toggleFilter()
+  } else if (sensorTools[index].component === FullScreen) {
+    toggleDashboard()
+  } else {
+    activeToolIndex.value = activeToolIndex.value === index ? null : index
+  }
+}
+</script>
+
+<style scoped>
+.sensor-tools {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.sensor-tool-button {
+  width: 50px;
+  height: 50px;
+  margin: 8px 0;
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.sensor-tool-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sensor-tool-button:hover .tooltip {
+  display: block;
+}
+
+.sensor-tool-button.active {
+  background-color: #409eff;
+  color: white;
+}
+
+.sensor-tool-button .el-icon {
+  font-size: 24px;
+}
+
+.tooltip {
+  position: absolute;
+  left: 120%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  display: none;
+  white-space: nowrap;
+  pointer-events: none;
+}
+</style>
+
+--- components/SidebarNav.vue ---
+<script setup>
+import { ElDropdown, ElCollapse, ElCollapseItem } from 'element-plus'
+import 'element-plus/dist/index.css'
+import { ArrowDown } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+
+const activeName = ref('1')
+
+const props = defineProps({
+  location: { type: String, default: () => '' },
+})
+</script>
+
+<template>
+  <div
+    class="absolute bg-black/90 px-3 py-3 w-1/6"
+    style="background-color: #609f80"
+  >
+    <div class="border-b-8 border-white py-4" style="background-color: #609f80">
+      <p class="text-xl font-bold text-black">
+        {{ location }}
+      </p>
+
+      <el-collapse v-model="activeName" accordion>
+        <el-collapse-item title="Consistency" name="1">
+          <div>
+            Consistent with real life: in line with the process and logic of
+            real life, and comply with languages and habits that the users are
+            used to;
+          </div>
+          <div>
+            Consistent within interface: all elements should be consistent, such
+            as: design style, icons and texts, position of elements, etc.
+          </div>
+        </el-collapse-item>
+        <el-collapse-item title="Feedback" name="2">
+          <div>
+            Operation feedback: enable the users to clearly perceive their
+            operations by style updates and interactive effects;
+          </div>
+          <div>
+            Visual feedback: reflect current state by updating or rearranging
+            elements of the page.
+          </div>
+        </el-collapse-item>
+        <el-collapse-item title="Efficiency" name="3">
+          <div>
+            Simplify the process: keep operating process simple and intuitive;
+          </div>
+          <div>
+            Definite and clear: enunciate your intentions clearly so that the
+            users can quickly understand and make decisions;
+          </div>
+          <div>
+            Easy to identify: the interface should be straightforward, which
+            helps the users to identify and frees them from memorizing and
+            recalling.
+          </div>
+        </el-collapse-item>
+        <el-collapse-item title="Controllability" name="4">
+          <div>
+            Decision making: giving advices about operations is acceptable, but
+            do not make decisions for the users;
+          </div>
+          <div>
+            Controlled consequences: users should be granted the freedom to
+            operate, including canceling, aborting or terminating current
+            operation.
+          </div>
+        </el-collapse-item>
+      </el-collapse>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.example-showcase .el-dropdown-link {
+  cursor: pointer;
+  color: var(--el-color-primary);
+  display: flex;
+  align-items: center;
+}
+</style>
+

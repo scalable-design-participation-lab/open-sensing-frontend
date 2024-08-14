@@ -1,7 +1,80 @@
-import { max, min } from 'lodash'
 import * as d3 from 'd3'
+import sensorLocations from '~/static/Sensor_Locations_NEU.json'
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 
 export const useDashboardUIStore = defineStore('dashboardUI', () => {
+  const showSensorInfo = ref(false)
+  const showSensorDetail = ref(false)
+  const selectedSensorId = ref(null)
+
+  const selectedSensor = computed(() =>
+    sensors.value.find((sensor) => sensor.id === selectedSensorId.value)
+  )
+
+  const toggleSensorDetail = () => {
+    showSensorDetail.value = !showSensorDetail.value
+  }
+
+  const updateSelectedSensor = (id) => {
+    selectedSensorId.value = id
+    showSensorInfo.value = true
+    showSensorDetail.value = false
+  }
+
+  const closeSensorInfo = () => {
+    showSensorInfo.value = false
+  }
+
+  const updateClickPosition = (position) => {
+    clickPosition.value = position
+  }
+  const locations = [
+    'Architecture Studios',
+    'Cabot Center',
+    'Cargill Hall',
+    'Carter Playground',
+    'Centennial Common',
+    'Columbus Garage',
+    'Curry Student Center',
+    'Forsyth Building',
+    'Gainsborough Garage',
+    'Gainsborough Garage Roof',
+    'ISEC Terrace',
+    'Matthews Arena',
+    'Robinson Hall',
+    'Snell Library Quad',
+  ]
+
+  const getRandomValue = (min, max) => Math.random() * (max - min) + min
+
+  const sensors = ref(
+    sensorLocations.features.map((feature, index) => ({
+      id: feature.properties.OBJECTID,
+      location: locations[index % locations.length],
+      temperature: feature.properties.temperature,
+      humidity: feature.properties.relative_humidity,
+      voc: feature.properties.voc,
+      nox: feature.properties.nox,
+      pm25: feature.properties.pm25,
+      coordinates: feature.geometry.coordinates,
+      timestamp: new Date(feature.properties.timestamp).toLocaleString(),
+      // Additional mock data
+      batteryLevel: Math.floor(getRandomValue(20, 100)),
+      signalStrength: Math.floor(getRandomValue(1, 5)),
+      lastMaintenance: new Date(
+        Date.now() - getRandomValue(0, 30 * 24 * 60 * 60 * 1000)
+      ).toLocaleDateString(),
+      status: ['Active', 'Inactive', 'Maintenance'][
+        Math.floor(Math.random() * 3)
+      ],
+      airQuality: ['Good', 'Moderate', 'Poor', 'Very Poor'][
+        Math.floor(Math.random() * 4)
+      ],
+      soilMoisture: getRandomValue(20, 80).toFixed(1) + '%',
+    }))
+  )
+
   const sensorData = ref({})
   const lastFetchTime = ref(null)
   const isFetching = ref(false)
@@ -41,33 +114,10 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
   const clickPosition = ref({ x: 0, y: 0 })
 
-  const updateClickPosition = (position) => {
-    clickPosition.value = position
-  }
-
   // State Properties
-  const existingHubs = ref({
-    // HOWARD: true,
-    // 'BAY VIEW': true,
-    // ASTORIA: true,
-    // WAGNER: true,
-    // FOREST: true,
-    // "MARINER'S HARBOR": true,
-    'Architecture Studios': true,
-    'Cabot Center': true,
-    'Cargill Hall': true,
-    'Carter Playground': true,
-    'Centennial Common': true,
-    'Columbus Garage': true,
-    'Curry Student Center': true,
-    'Forsyth Building': true,
-    'Gainsborough Garage': true,
-    'Gainsborough Garage Roof': true,
-    'ISEC Terrace': true,
-    'Matthews Arena': true,
-    'Robinson Hall': true,
-    'Snell Library Quad': true,
-  })
+  const existingHubs = ref(
+    Object.fromEntries(locations.map((loc) => [loc, true]))
+  )
   const existingDatasets = ref({
     Temperature: true,
     'Relative Humidity': true,
@@ -279,6 +329,18 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
   )
 
   return {
+    showSensorInfo,
+    showSensorDetail,
+    selectedSensor,
+    toggleSensorDetail,
+    updateSelectedSensor,
+    closeSensorInfo,
+    sensors,
+    selectedSensorId,
+    selectedSensor,
+    showSensorDetail,
+    toggleSensorDetail,
+    updateSelectedSensor,
     showDashboard,
     toggleDashboard,
     clickPosition,
