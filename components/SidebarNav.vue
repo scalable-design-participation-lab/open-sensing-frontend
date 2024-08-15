@@ -12,8 +12,11 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="absolute bg-black/90 px-3 py-3 w-1/6" style="background-color: #609F80">
-    <div class="border-b-8 border-white py-4" style="background-color: #609F80">
+  <div
+    class="absolute bg-black/90 px-3 py-3 w-1/6"
+    style="background-color: #609f80"
+  >
+    <div class="border-b-8 border-white py-4" style="background-color: #609f80">
       <p class="text-xl font-bold text-black">
         {{ location }}
       </p>

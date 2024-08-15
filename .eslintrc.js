@@ -25,5 +25,11 @@ module.exports = {
     'vue/singleline-html-element-content-newline': 'off',
 
     'vue/html-self-closing': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
 }

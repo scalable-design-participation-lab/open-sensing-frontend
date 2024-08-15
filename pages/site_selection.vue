@@ -230,18 +230,24 @@ const loadMapDraw = () => {
 
 <template>
   <div>
-    <div :style="{
-      overflow: 'auto',
-      height: '100vh',
-      width: '200px',
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      bottom: 0,
-      background: 'rgb(0, 78, 50)',
-    }">
+    <div
+      :style="{
+        overflow: 'auto',
+        height: '100vh',
+        width: '200px',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        background: 'rgb(0, 78, 50)',
+      }"
+    >
       <div class="text-left text-white">Green City Force</div>
-      <el-menu default-active="2" class="el-menu-vertical-demo" background-color="rgb(0, 78, 50)">
+      <el-menu
+        default-active="2"
+        class="el-menu-vertical-demo"
+        background-color="rgb(0, 78, 50)"
+      >
         <el-sub-menu index="1">
           <template #title>
             <span>Filters</span>
@@ -277,7 +283,12 @@ const loadMapDraw = () => {
             <template #title>Transportation Accessibility</template>
             <el-menu-item index="range-access">
               <div>
-                <el-slider v-model="rangeAccess" range :max="75000" :marks="marksAccess" />
+                <el-slider
+                  v-model="rangeAccess"
+                  range
+                  :max="75000"
+                  :marks="marksAccess"
+                />
               </div>
             </el-menu-item>
           </el-sub-menu>
@@ -311,21 +322,36 @@ const loadMapDraw = () => {
         </el-sub-menu>
         <el-sub-menu index="quick-selection">
           <template #title> Quick Selection </template>
-          <el-menu-item v-for="(developmentObj, name) in sampleDevelopments" :key="developmentObj.name"
-            @click="selectDevelopment(name)">
+          <el-menu-item
+            v-for="(developmentObj, name) in sampleDevelopments"
+            :key="developmentObj.name"
+            @click="selectDevelopment(name)"
+          >
             {{ developmentObj.name }}
           </el-menu-item>
         </el-sub-menu>
-        <el-input v-model="value" placeholder="Search by address" :suffix-icon="Search" />
-        <el-checkbox v-model="analysisChecked" label="Advanced Site Analysis Mode" />
+        <el-input
+          v-model="value"
+          placeholder="Search by address"
+          :suffix-icon="Search"
+        />
+        <el-checkbox
+          v-model="analysisChecked"
+          label="Advanced Site Analysis Mode"
+        />
       </el-menu>
     </div>
     <div :style="{ marginLeft: '200px' }">
-      <div :style="{ height: '50px', background: 'rgb(0, 78, 50)', padding: 0 }" />
+      <div
+        :style="{ height: '50px', background: 'rgb(0, 78, 50)', padding: 0 }"
+      />
       <div>
         <div>
-          <DataPopUp v-if="Object.keys(selectedSiteProps).length > 0" :dev-props="selectedSiteProps"
-            @closePopUp="selectedSiteProps = {}" />
+          <DataPopUp
+            v-if="Object.keys(selectedSiteProps).length > 0"
+            :dev-props="selectedSiteProps"
+            @close-pop-up="selectedSiteProps = {}"
+          />
 
           <main id="main-container">
             <!-- <ParallelCoords
@@ -395,5 +421,6 @@ body {
   margin: 16px;
 }
 
-.menu-title {}
+.menu-title {
+}
 </style>

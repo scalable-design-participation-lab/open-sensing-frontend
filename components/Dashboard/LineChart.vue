@@ -11,11 +11,13 @@
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import * as d3 from 'd3'
 import { ElButton } from 'element-plus'
+import 'element-plus/dist/index.css'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps({
   metric: { type: Object, required: true },
-  data: { type: Array, required: true },
+  data: { type: Object, required: true },
   width: { type: Number, required: true },
   height: { type: Number, required: true },
   margin: { type: Object, required: true },
@@ -29,44 +31,67 @@ const chartId = ref(`chart-${Date.now()}`)
 let svg, x, y, xAxis, yAxis, line, brush
 
 const createLineChart = () => {
-  if (props.width <= 0 || !props.data.length) return
+  if (props.width <= 0 || !props.data.data || props.data.data.length === 0)
+    return
 
   const chartDiv = d3.select(`#${chartId.value}`)
   chartDiv.selectAll('*').remove() // Clear previous chart
 
+  const margin = { top: 20, right: 30, bottom: 50, left: 50 }
+  const width = props.width - margin.left - margin.right
+  const height = props.height - margin.top - margin.bottom
+
   svg = chartDiv
     .append('svg')
-    .attr('width', props.width + props.margin.left + props.margin.right)
-    .attr('height', props.height + props.margin.top + props.margin.bottom)
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
     .append('g')
-    .attr('transform', `translate(${props.margin.left},${props.margin.top})`)
+    .attr('transform', `translate(${margin.left},${margin.top})`)
 
-  x = d3.scaleTime().range([0, props.width])
-  y = d3.scaleLinear().range([props.height, 0])
+  // Ensure dates are parsed correctly
+  const parseDate = d3.isoParse
+  const data = props.data.data.map((d) => ({ ...d, date: parseDate(d.date) }))
 
-  xAxis = d3.axisBottom(x)
-  yAxis = d3.axisLeft(y)
+  // Determine x and y domains from the data
+  const xDomain = d3.extent(data, (d) => d.date)
+  const yDomain = [props.data.min, props.data.max]
+
+  x = d3.scaleTime().range([0, width]).domain(xDomain)
+  y = d3.scaleLinear().range([height, 0]).domain(yDomain).nice()
+
+  xAxis = d3
+    .axisBottom(x)
+    .ticks(5)
+    .tickFormat(d3.timeFormat('%Y-%m-%d'))
+    .tickSizeOuter(0)
+
+  yAxis = d3
+    .axisLeft(y)
+    .ticks(5)
+    .tickFormat((d) => d3.format('.2f')(d))
 
   svg
     .append('g')
     .attr('class', 'x-axis')
-    .attr('transform', `translate(0,${props.height})`)
-  svg.append('g').attr('class', 'y-axis')
+    .attr('transform', `translate(0,${height})`)
+    .call(xAxis)
+    .selectAll('text')
+    .style('text-anchor', 'end')
+    .attr('dx', '-.8em')
+    .attr('dy', '.15em')
+    .attr('transform', 'rotate(-45)')
 
-  x.domain(d3.extent(props.data, (d) => d.date))
-  y.domain([0, d3.max(props.data, (d) => d.value)])
-
-  svg.select('.x-axis').call(xAxis)
-  svg.select('.y-axis').call(yAxis)
+  svg.append('g').attr('class', 'y-axis').call(yAxis)
 
   line = d3
     .line()
     .x((d) => x(d.date))
     .y((d) => y(d.value))
+    .defined((d) => !isNaN(d.value))
 
   svg
     .append('path')
-    .data([props.data])
+    .datum(data)
     .attr('class', 'line')
     .attr('fill', 'none')
     .attr('stroke', 'steelblue')
@@ -77,27 +102,32 @@ const createLineChart = () => {
     .brushX()
     .extent([
       [0, 0],
-      [props.width, props.height],
+      [width, height],
     ])
     .on('end', updateChart)
 
   svg.append('g').attr('class', 'brush').call(brush)
 
-  // Add labels
+  // Add x-axis label
   svg
     .append('text')
-    .attr('x', props.width / 2)
-    .attr('y', props.height + props.margin.bottom - 10)
+    .attr('class', 'x-axis-label')
+    .attr('x', width / 2)
+    .attr('y', height + margin.bottom - 5)
     .attr('text-anchor', 'middle')
+    .style('font-size', '12px')
     .text('Time')
 
+  // Add y-axis label
   svg
     .append('text')
+    .attr('class', 'y-axis-label')
     .attr('transform', 'rotate(-90)')
-    .attr('y', 0 - props.margin.left)
-    .attr('x', 0 - props.height / 2)
+    .attr('y', 0 - margin.left)
+    .attr('x', 0 - height / 2)
     .attr('dy', '1em')
     .style('text-anchor', 'middle')
+    .style('font-size', '12px')
     .text(props.metric.label)
 }
 
@@ -111,8 +141,12 @@ const updateChart = (event) => {
 }
 
 const resetChart = () => {
-  x.domain(d3.extent(props.data, (d) => d.date))
+  const data = props.data.data.map((d) => ({ ...d, date: d3.isoParse(d.date) }))
+  const xDomain = d3.extent(data, (d) => d.date)
+  x.domain(xDomain)
+  y.domain([props.data.min, props.data.max]).nice()
   svg.select('.x-axis').call(xAxis)
+  svg.select('.y-axis').call(yAxis)
   svg.select('.line').attr('d', line)
   svg.select('.brush').call(brush.move, null)
 }
@@ -160,5 +194,16 @@ onUnmounted(() => {
   position: absolute;
   top: 10px;
   right: 10px;
+  z-index: 10;
+}
+
+.x-axis text,
+.y-axis text {
+  font-size: 10px;
+}
+
+.x-axis-label,
+.y-axis-label {
+  fill: #666;
 }
 </style>
