@@ -2,8 +2,8 @@
   <div v-if="showSensorInfo" class="sensor-info" :style="positionStyle">
     <div class="info-header">
       <span>
-        <el-icon><ArrowLeftBold /></el-icon>
-        <el-icon><ArrowRightBold /></el-icon>
+        <el-icon @click="selectPreviousSensor"><Back /></el-icon>
+        <el-icon @click="selectNextSensor"><Right /></el-icon>
       </span>
       <span class="arrow-icon" @click="openSensorDetail">
         <el-icon><TopRight /></el-icon>
@@ -32,16 +32,16 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
-import {
-  ArrowLeftBold,
-  ArrowRightBold,
-  TopRight,
-  Close,
-} from '@element-plus/icons-vue'
+import { Back, Right, TopRight, Close } from '@element-plus/icons-vue'
 
 const store = useDashboardUIStore()
 const { selectedSensor, mapCenter, showSensorInfo } = storeToRefs(store)
-const { toggleSensorDetail, closeSensorInfo } = store
+const {
+  toggleSensorDetail,
+  closeSensorInfo,
+  selectNextSensor,
+  selectPreviousSensor,
+} = store
 
 const positionStyle = computed(() => {
   if (!mapCenter.value) return {}
@@ -121,5 +121,9 @@ const openSensorDetail = () => {
 .close-icon {
   cursor: pointer;
   margin-left: 10px;
+}
+
+.el-icon {
+  cursor: pointer;
 }
 </style>

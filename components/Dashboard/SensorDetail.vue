@@ -13,31 +13,27 @@
           <el-tag :type="getStatusType(selectedSensor.status)">
             {{ selectedSensor.status }}
           </el-tag>
+          <div class="navigation-buttons">
+            <el-button class="nav-button" @click="selectPreviousSensor">
+              <el-icon><ArrowUp /></el-icon>
+            </el-button>
+            <el-button class="nav-button" @click="selectNextSensor">
+              <el-icon><ArrowDown /></el-icon>
+            </el-button>
+          </div>
           <el-button class="close-button" @click="closeSensorDetail">
-            ×
+            <el-icon><Close /></el-icon>
           </el-button>
         </header>
         <div class="sensor-content">
           <div class="sensor-stats">
-            <div class="stat-item">
-              <h3>{{ selectedSensor.temperature.toFixed(1) }}°C</h3>
-              <p>Temperature</p>
-            </div>
-            <div class="stat-item">
-              <h3>{{ selectedSensor.humidity.toFixed(1) }}%</h3>
-              <p>Humidity</p>
-            </div>
-            <div class="stat-item">
-              <h3>{{ selectedSensor.voc }}</h3>
-              <p>VOC (ppb)</p>
-            </div>
-            <div class="stat-item">
-              <h3>{{ selectedSensor.nox }}</h3>
-              <p>NOx (ppb)</p>
-            </div>
-            <div class="stat-item">
-              <h3>{{ selectedSensor.pm25 }}</h3>
-              <p>PM2.5 (µg/m³)</p>
+            <div
+              v-for="(value, key) in sensorStats"
+              :key="key"
+              class="stat-item"
+            >
+              <h3>{{ value }}</h3>
+              <p>{{ key }}</p>
             </div>
           </div>
           <div class="sensor-details">
@@ -126,7 +122,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { useResizeObserver } from '@vueuse/core'
-import { Back } from '@element-plus/icons-vue'
+import { Back, ArrowUp, ArrowDown, Close } from '@element-plus/icons-vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import LineChart from './LineChart.vue'
@@ -164,6 +160,17 @@ const metrics = ref({
   'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
   pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
   pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
+})
+
+const sensorStats = computed(() => {
+  if (!selectedSensor.value) return {}
+  return {
+    Temperature: `${selectedSensor.value.temperature.toFixed(1)}°C`,
+    Humidity: `${selectedSensor.value.humidity.toFixed(1)}%`,
+    'VOC (ppb)': selectedSensor.value.voc,
+    'NOx (ppb)': selectedSensor.value.nox,
+    'PM2.5 (µg/m³)': selectedSensor.value.pm25,
+  }
 })
 
 const getStatusType = (status) => {
@@ -222,7 +229,6 @@ const initMiniMap = () => {
   })
 
   miniMap.value.addControl(new mapboxgl.NavigationControl(), 'top-right')
-
   miniMap.value.addControl(new mapboxgl.ScaleControl(), 'bottom-right')
 
   const marker = new mapboxgl.Marker({
@@ -244,22 +250,6 @@ const initMiniMap = () => {
       bearing: 20,
     })
   })
-
-  watch(
-    selectedSensor,
-    (newSensor) => {
-      if (newSensor && miniMap.value) {
-        marker.setLngLat(newSensor.coordinates)
-        miniMap.value.flyTo({
-          center: newSensor.coordinates,
-          zoom: 15,
-          pitch: 45,
-          bearing: 20,
-        })
-      }
-    },
-    { deep: true }
-  )
 }
 
 const closeSensorDetail = () => {
@@ -301,15 +291,43 @@ const formatDateRange = (range) => {
   return `${formatDate(range[0])} - ${formatDate(range[1])}`
 }
 
+const selectNextSensor = async () => {
+  await store.selectNextSensor()
+  refreshSensorData()
+}
+
+const selectPreviousSensor = async () => {
+  await store.selectPreviousSensor()
+  refreshSensorData()
+}
+
+const refreshSensorData = async () => {
+  if (miniMap.value) {
+    miniMap.value.flyTo({
+      center: selectedSensor.value.coordinates,
+      zoom: 15,
+      pitch: 45,
+      bearing: 20,
+    })
+  }
+  await store.loadSensorData()
+  resetAllCharts()
+}
+
 watch(
   selectedSensor,
-  (newSensor) => {
-    if (newSensor && miniMap.value) {
-      miniMap.value.setCenter(newSensor.coordinates)
-      miniMap.value.getSource('marker').setData({
-        type: 'Point',
-        coordinates: newSensor.coordinates,
-      })
+  async (newSensor, oldSensor) => {
+    if (newSensor && newSensor !== oldSensor) {
+      if (miniMap.value) {
+        miniMap.value.flyTo({
+          center: newSensor.coordinates,
+          zoom: 15,
+          pitch: 45,
+          bearing: 20,
+        })
+      }
+      await store.loadSensorData()
+      resetAllCharts()
     }
   },
   { deep: true }
@@ -523,6 +541,25 @@ watch(
   align-items: center;
   padding: 10px 0;
   border-top: 1px solid #e0e0e0;
+}
+
+.navigation-buttons {
+  display: flex;
+  gap: 5px;
+  margin-right: 10px;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #409eff;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.nav-button:hover {
+  color: #66b1ff;
 }
 
 .reset-button {

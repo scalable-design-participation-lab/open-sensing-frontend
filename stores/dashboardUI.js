@@ -41,6 +41,30 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     showDashboard.value = false
   }
 
+  const getNextSensorId = () => {
+    const currentIndex = sensors.value.findIndex(
+      (sensor) => sensor.id === selectedSensorId.value
+    )
+    return sensors.value[(currentIndex + 1) % sensors.value.length].id
+  }
+
+  const getPreviousSensorId = () => {
+    const currentIndex = sensors.value.findIndex(
+      (sensor) => sensor.id === selectedSensorId.value
+    )
+    return sensors.value[
+      (currentIndex - 1 + sensors.value.length) % sensors.value.length
+    ].id
+  }
+
+  const selectNextSensor = () => {
+    selectedSensorId.value = getNextSensorId()
+  }
+
+  const selectPreviousSensor = () => {
+    selectedSensorId.value = getPreviousSensorId()
+  }
+
   const closeSensorInfo = () => {
     showSensorInfo.value = false
   }
@@ -349,6 +373,8 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     selectedSensorId,
     clickPosition,
     updateClickPosition,
+    selectNextSensor,
+    selectPreviousSensor,
 
     // Filter related
     showFilter,
