@@ -12,7 +12,6 @@
       <div class="sensor-tools-container">
         <SensorTools />
       </div>
-      <SensorInfo />
       <SensorDetail v-if="showSensorDetail" class="sensor-detail" />
     </main>
     <AppFooter class="app-footer" />
@@ -21,6 +20,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia'
+import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 const store = useDashboardUIStore()
 const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
@@ -49,6 +49,7 @@ const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
   right: 20px;
   z-index: 20;
 }
+
 .sensor-detail {
   position: fixed;
   top: 50%;
@@ -59,6 +60,7 @@ const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
   overflow: hidden;
   background-color: transparent;
 }
+
 .dashboard {
   position: fixed;
   top: 50%;

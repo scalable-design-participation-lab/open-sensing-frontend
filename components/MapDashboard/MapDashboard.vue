@@ -1,11 +1,12 @@
 <template>
   <div>
     <main id="main-container" />
+    <SensorInfo v-if="showSensorInfo" :marker-position="markerPosition" />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { IconLayer } from '@deck.gl/layers'
 import { storeToRefs } from 'pinia'
@@ -16,10 +17,16 @@ const accessToken =
   'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
 
 const store = useDashboardUIStore()
-const { sensors, selectedSensorId, mapType } = storeToRefs(store)
+const { sensors, selectedSensorId, mapType, showSensorInfo } =
+  storeToRefs(store)
 const { updateSelectedSensor, updateClickPosition, updateMapCenter } = store
 
 let map
+const markerPosition = ref({ x: 0, y: 0 })
+
+const selectedSensor = computed(() =>
+  sensors.value.find((s) => s.id === selectedSensorId.value)
+)
 
 onMounted(() => loadMapDraw())
 
@@ -50,6 +57,7 @@ const addIconLayer = () => {
         if (info.object) {
           updateSelectedSensor(info.object.id)
           updateClickPosition({ x: info.x, y: info.y })
+          updateMarkerPosition()
         }
       },
     })
@@ -69,7 +77,18 @@ const loadMapDraw = () => {
 
   map.on('load', () => {
     addIconLayer()
+    map.on('move', updateMarkerPosition)
   })
+}
+
+const updateMarkerPosition = () => {
+  if (selectedSensor.value && map) {
+    const pixelPosition = map.project(selectedSensor.value.coordinates)
+    markerPosition.value = {
+      x: pixelPosition.x,
+      y: pixelPosition.y,
+    }
+  }
 }
 
 watch(mapType, (newMapType) => {
@@ -91,10 +110,10 @@ watch(selectedSensorId, (newId) => {
         duration: 1000,
       })
 
-      // Wait for the animation to complete before updating the center
       map.once('moveend', () => {
         const center = map.getCenter()
         updateMapCenter({ lng: center.lng, lat: center.lat })
+        updateMarkerPosition()
       })
     }
   }
