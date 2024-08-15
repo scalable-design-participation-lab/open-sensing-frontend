@@ -339,8 +339,8 @@ watch(
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 50%;
+  height: 50%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -352,11 +352,12 @@ watch(
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  width: 90vw;
+  width: 90%;
   max-width: 1200px;
-  height: 90vh;
+  height: 90%;
   overflow-y: auto;
   display: flex;
+
   flex-direction: column;
 }
 

@@ -287,7 +287,7 @@ const formatDateRange = (range) => {
           :xs="24"
           :sm="12"
           :md="8"
-          :lg="6"
+          :lg="8"
           :xl="6"
           class="sensor-column"
         >
@@ -342,9 +342,9 @@ const overviewStats = computed(() => [
   flex-direction: column;
   gap: 20px;
   padding: 20px;
-  width: 90vw;
+  width: 85%;
   max-width: 1800px;
-  height: 90vh;
+  height: 85%;
   margin: 20px auto;
   background-color: white;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);

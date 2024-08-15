@@ -75,10 +75,10 @@ const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
   left: 20px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 20;
+  z-index: 15;
 }
 
 .app-footer {
-  z-index: 20;
+  z-index: 15;
 }
 </style>
