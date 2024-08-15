@@ -6,6 +6,9 @@
     >
       <div class="sensor-detail">
         <header class="sensor-header">
+          <el-button class="back-button" text @click="goBackToDashboard">
+            <el-icon><Back /></el-icon>
+          </el-button>
           <h1>{{ selectedSensor.location }}</h1>
           <el-tag :type="getStatusType(selectedSensor.status)">
             {{ selectedSensor.status }}
@@ -101,9 +104,9 @@
               </div>
             </div>
             <div class="dashboard-footer">
-              <button class="reset-button" @click="resetAllCharts">
+              <el-button class="reset-button" @click="resetAllCharts">
                 Reset All
-              </button>
+              </el-button>
               <div
                 v-if="globalDateRange.length === 2"
                 class="date-range-display"
@@ -123,13 +126,19 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { useResizeObserver } from '@vueuse/core'
+import { Back } from '@element-plus/icons-vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import LineChart from './LineChart.vue'
 
 const store = useDashboardUIStore()
-const { selectedSensor, showSensorDetail, selectedDatasets, sensorData } =
-  storeToRefs(store)
+const {
+  selectedSensor,
+  showSensorDetail,
+  selectedDatasets,
+  sensorData,
+  showDashboard,
+} = storeToRefs(store)
 
 const miniMap = ref(null)
 const scrollContainer = ref(null)
@@ -257,6 +266,11 @@ const closeSensorDetail = () => {
   store.toggleSensorDetail()
 }
 
+const goBackToDashboard = () => {
+  store.toggleSensorDetail()
+  store.toggleDashboard()
+}
+
 const updateGlobalDateRange = (range) => {
   globalDateRange.value = range
   store.updateDataDashboardValues('dateRange', range)
@@ -265,6 +279,14 @@ const updateGlobalDateRange = (range) => {
 const resetAllCharts = () => {
   globalDateRange.value = []
   store.updateDataDashboardValues('dateRange', [])
+
+  Object.keys(metrics.value).forEach((metricName) => {
+    if (sensorData.value[metricName]) {
+      store.updateDataDashboardValues(metricName, sensorData.value[metricName])
+    }
+  })
+
+  chartWidth.value = chartWidth.value + 1
 }
 
 const formatDateRange = (range) => {
@@ -299,8 +321,8 @@ watch(
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -312,17 +334,31 @@ watch(
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  width: 90%;
+  width: 90vw;
   max-width: 1200px;
-  max-height: 90vh;
+  height: 90vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 
+.back-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #409eff;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 15px;
+}
+
+.back-button:hover {
+  color: #66b1ff;
+}
+
 .sensor-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding: 20px;
   background-color: #f5f7fa;
@@ -333,6 +369,7 @@ watch(
   margin: 0;
   font-size: 24px;
   color: #303133;
+  flex-grow: 1;
 }
 
 .close-button {
@@ -524,6 +561,10 @@ watch(
 }
 
 @media (max-width: 1024px) {
+  .sensor-detail {
+    width: 95vw;
+    height: 95vh;
+  }
   .sensor-stats,
   .info-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -534,6 +575,11 @@ watch(
 }
 
 @media (max-width: 768px) {
+  .sensor-detail {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
   .sensor-stats,
   .info-grid {
     grid-template-columns: repeat(2, 1fr);

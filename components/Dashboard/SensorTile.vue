@@ -6,16 +6,10 @@
         <el-tag :type="getStatusType(sensor.status)">
           {{ sensor.status }}
         </el-tag>
-        <div class="header-actions">
-          <el-button type="text" icon="el-icon-full-screen"></el-button>
-          <el-button type="text" @click="openSensorDetail">
-            <el-icon><ArrowRight /></el-icon>
-          </el-button>
-        </div>
       </div>
     </template>
     <el-row :gutter="20">
-      <el-col :span="12">
+      <el-col :span="10">
         <el-progress
           type="dashboard"
           :percentage="sensor.batteryLevel"
@@ -23,27 +17,36 @@
         >
           <template #default="{ percentage }">
             <span class="percentage-value">{{ percentage }}%</span>
+            <span class="percentage-label">Battery</span>
           </template>
         </el-progress>
-        <p class="progress-label">Battery Level</p>
       </el-col>
-      <el-col :span="12">
-        <el-descriptions :column="1" border size="small">
-          <el-descriptions-item label="Temperature">
-            {{ sensor.temperature.toFixed(1) }}°C
-          </el-descriptions-item>
-          <el-descriptions-item label="Humidity">
-            {{ sensor.humidity.toFixed(1) }}%
-          </el-descriptions-item>
-          <el-descriptions-item label="Air Quality">
-            {{ sensor.airQuality }}
-          </el-descriptions-item>
-          <el-descriptions-item label="Soil Moisture">
-            {{ sensor.soilMoisture }}
-          </el-descriptions-item>
-        </el-descriptions>
+      <el-col :span="14">
+        <div class="sensor-data">
+          <div class="data-item">
+            <span class="label">Temperature:</span>
+            <span class="value">{{ sensor.temperature.toFixed(1) }}°C</span>
+          </div>
+          <div class="data-item">
+            <span class="label">Humidity:</span>
+            <span class="value">{{ sensor.humidity.toFixed(1) }}%</span>
+          </div>
+          <div class="data-item">
+            <span class="label">Air Quality:</span>
+            <span class="value">{{ sensor.airQuality }}</span>
+          </div>
+          <div class="data-item">
+            <span class="label">Soil Moisture:</span>
+            <span class="value">{{ sensor.soilMoisture }}</span>
+          </div>
+        </div>
       </el-col>
     </el-row>
+    <div class="sensor-actions">
+      <el-button type="text" @click="openSensorDetail">
+        Details <el-icon class="el-icon--right"><ArrowRight /></el-icon>
+      </el-button>
+    </div>
   </el-card>
 </template>
 
@@ -96,6 +99,7 @@ const openSensorDetail = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
 }
 
 .sensor-header h3 {
@@ -104,36 +108,94 @@ const openSensorDetail = () => {
   color: #303133;
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-}
-
 .percentage-value {
   font-size: 24px;
   font-weight: bold;
   color: #303133;
+  display: block;
 }
 
-.progress-label {
-  text-align: center;
-  margin-top: 10px;
+.percentage-label {
+  font-size: 14px;
   color: #606266;
 }
 
-.el-progress {
+.sensor-data {
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  padding: 15px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.data-item {
+  margin-bottom: 10px;
+}
+
+.data-item:last-child {
+  margin-bottom: 0;
+}
+
+.data-item .label {
+  color: #606266;
+  font-size: 0.9em;
+  margin-right: 5px;
+}
+
+.data-item .value {
+  color: #303133;
+  font-weight: bold;
+}
+
+.sensor-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+:deep(.el-progress) {
   margin: 0 auto;
 }
 
-.el-descriptions {
-  font-size: 0.9em;
+@media (max-width: 1200px) {
+  .sensor-header h3 {
+    font-size: 1.1em;
+  }
+
+  .percentage-value {
+    font-size: 22px;
+  }
+
+  .data-item {
+    font-size: 0.9em;
+  }
 }
 
-:deep(.el-descriptions__label) {
-  color: #606266;
-}
+@media (max-width: 768px) {
+  .sensor-header h3 {
+    font-size: 1em;
+  }
 
-:deep(.el-descriptions__content) {
-  color: #303133;
+  .percentage-value {
+    font-size: 20px;
+  }
+
+  .data-item {
+    font-size: 0.85em;
+  }
+
+  .el-row {
+    flex-direction: column;
+  }
+
+  .el-col {
+    width: 100% !important;
+  }
+
+  .sensor-data {
+    margin-top: 15px;
+  }
 }
 </style>

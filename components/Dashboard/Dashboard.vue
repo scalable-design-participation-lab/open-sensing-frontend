@@ -288,7 +288,7 @@ const formatDateRange = (range) => {
           :sm="12"
           :md="8"
           :lg="6"
-          :xl="4"
+          :xl="6"
           class="sensor-column"
         >
           <SensorTile :sensor="sensor" class="sensor-card" />
@@ -342,16 +342,16 @@ const overviewStats = computed(() => [
   flex-direction: column;
   gap: 20px;
   padding: 20px;
-  width: 80%;
+  width: 90vw;
   max-width: 1800px;
-  height: 80%;
-  max-height: 90vh;
-  margin: 0 auto;
+  height: 90vh;
+  margin: 20px auto;
   background-color: white;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   overflow: hidden;
   border-radius: 8px;
 }
+
 .overview-card {
   flex-shrink: 0;
 }
@@ -435,10 +435,9 @@ const overviewStats = computed(() => [
 
 @media (max-width: 1200px) {
   .dashboard-grid {
-    width: 95%;
-    height: auto;
-    max-height: 85vh;
-    margin: 20px auto;
+    width: 95vw;
+    height: 95vh;
+    margin: 10px auto;
   }
   .card-header h2 {
     font-size: 1em;
@@ -459,10 +458,11 @@ const overviewStats = computed(() => [
 
 @media (max-width: 768px) {
   .dashboard-grid {
-    width: 90%;
+    width: 100vw;
+    height: 100vh;
     padding: 10px;
-    max-height: 80vh;
-    margin: 10px auto;
+    margin: 0;
+    border-radius: 0;
   }
 
   .overview-card {

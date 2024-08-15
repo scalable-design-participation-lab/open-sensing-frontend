@@ -29,6 +29,27 @@ const { updateDataDashboardValues } = store
 const chartId = ref(`chart-${Date.now()}`)
 let svg, x, y, xAxis, yAxis, line, brush
 
+const metricRanges = {
+  temperature: {
+    min: -2,
+    max: 50,
+    format: (d) => `${d.toFixed(0)}°C`,
+    ticks: 6,
+  },
+  relative_humidity: {
+    min: 0,
+    max: 100,
+    format: (d) => `${d.toFixed(0)}%`,
+    ticks: 5,
+  },
+  voc: { min: 0, max: 600, format: (d) => `${d.toFixed(0)}`, ticks: 5 },
+  nox: { min: 0, max: 4, format: (d) => `${d.toFixed(0)}`, ticks: 5 },
+  pm1: { min: 0, max: 3000, format: (d) => `${d.toFixed(1)}`, ticks: 5 },
+  pm25: { min: 0, max: 3000, format: (d) => `${d.toFixed(1)}`, ticks: 5 },
+  pm4: { min: 0, max: 3000, format: (d) => `${d.toFixed(1)}`, ticks: 5 },
+  pm10: { min: 0, max: 3000, format: (d) => `${d.toFixed(1)}`, ticks: 5 },
+}
+
 const createLineChart = () => {
   if (props.width <= 0 || !props.data.length) return
 
@@ -66,12 +87,34 @@ const createLineChart = () => {
   svg.append('g').attr('class', 'y-axis').call(yAxis)
 
   x.domain(d3.extent(props.data, (d) => d.date))
-  y.domain([0, d3.max(props.data, (d) => d.value)])
+
+  const metricRange = metricRanges[props.metric.name]
+  if (metricRange) {
+    y.domain([metricRange.min, metricRange.max])
+    yAxis.tickFormat(metricRange.format).ticks(metricRange.ticks)
+
+    const outOfRangeData = props.data.filter(
+      (d) => d.value < metricRange.min || d.value > metricRange.max
+    )
+    if (outOfRangeData.length > 0) {
+      console.warn(
+        `Warning: Some ${props.metric.name} data points are out of the fixed range:`,
+        outOfRangeData
+      )
+    }
+  } else {
+    y.domain([0, d3.max(props.data, (d) => d.value)])
+  }
+
+  svg.select('.y-axis').call(yAxis)
+
+  console.log('Y axis range for', props.metric.name, ':', y.domain())
 
   line = d3
     .line()
     .x((d) => x(d.date))
     .y((d) => y(d.value))
+    .defined((d) => !isNaN(d.value))
 
   svg
     .append('path')
