@@ -213,10 +213,15 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
 
         const metricData = {}
         Object.keys(metrics).forEach((key) => {
-          metricData[key] = data.map((d) => ({
-            date: new Date(d.timestamp),
-            value: d[metrics[key].name],
-          }))
+          const values = data.map((d) => d[metrics[key].name])
+          metricData[key] = {
+            data: data.map((d) => ({
+              date: new Date(d.timestamp),
+              value: d[metrics[key].name],
+            })),
+            min: Math.min(...values),
+            max: Math.max(...values),
+          }
         })
         sensorData.value = metricData
         lastFetchTime.value = Date.now()

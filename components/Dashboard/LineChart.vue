@@ -13,10 +13,11 @@ import * as d3 from 'd3'
 import { ElButton } from 'element-plus'
 import 'element-plus/dist/index.css'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps({
   metric: { type: Object, required: true },
-  data: { type: Array, required: true },
+  data: { type: Object, required: true },
   width: { type: Number, required: true },
   height: { type: Number, required: true },
   margin: { type: Object, required: true },
@@ -29,29 +30,9 @@ const { updateDataDashboardValues } = store
 const chartId = ref(`chart-${Date.now()}`)
 let svg, x, y, xAxis, yAxis, line, brush
 
-const metricRanges = {
-  temperature: {
-    min: -2,
-    max: 50,
-    format: (d) => `${d.toFixed(0)}°C`,
-    ticks: 6,
-  },
-  relative_humidity: {
-    min: 0,
-    max: 100,
-    format: (d) => `${d.toFixed(0)}%`,
-    ticks: 5,
-  },
-  voc: { min: 0, max: 600, format: (d) => `${d.toFixed(0)}`, ticks: 5 },
-  nox: { min: 0, max: 4, format: (d) => `${d.toFixed(0)}`, ticks: 5 },
-  pm1: { min: 0, max: 3000, format: (d) => `${d.toFixed(1)}`, ticks: 5 },
-  pm25: { min: 0, max: 3000, format: (d) => `${d.toFixed(1)}`, ticks: 5 },
-  pm4: { min: 0, max: 3000, format: (d) => `${d.toFixed(1)}`, ticks: 5 },
-  pm10: { min: 0, max: 3000, format: (d) => `${d.toFixed(1)}`, ticks: 5 },
-}
-
 const createLineChart = () => {
-  if (props.width <= 0 || !props.data.length) return
+  if (props.width <= 0 || !props.data.data || props.data.data.length === 0)
+    return
 
   const chartDiv = d3.select(`#${chartId.value}`)
   chartDiv.selectAll('*').remove() // Clear previous chart
@@ -67,11 +48,27 @@ const createLineChart = () => {
     .append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`)
 
-  x = d3.scaleTime().range([0, width])
-  y = d3.scaleLinear().range([height, 0])
+  // Ensure dates are parsed correctly
+  const parseDate = d3.isoParse
+  const data = props.data.data.map((d) => ({ ...d, date: parseDate(d.date) }))
 
-  xAxis = d3.axisBottom(x).ticks(5).tickSizeOuter(0)
-  yAxis = d3.axisLeft(y)
+  // Determine x and y domains from the data
+  const xDomain = d3.extent(data, (d) => d.date)
+  const yDomain = [props.data.min, props.data.max]
+
+  x = d3.scaleTime().range([0, width]).domain(xDomain)
+  y = d3.scaleLinear().range([height, 0]).domain(yDomain).nice()
+
+  xAxis = d3
+    .axisBottom(x)
+    .ticks(5)
+    .tickFormat(d3.timeFormat('%Y-%m-%d'))
+    .tickSizeOuter(0)
+
+  yAxis = d3
+    .axisLeft(y)
+    .ticks(5)
+    .tickFormat((d) => d3.format('.2f')(d))
 
   svg
     .append('g')
@@ -86,30 +83,6 @@ const createLineChart = () => {
 
   svg.append('g').attr('class', 'y-axis').call(yAxis)
 
-  x.domain(d3.extent(props.data, (d) => d.date))
-
-  const metricRange = metricRanges[props.metric.name]
-  if (metricRange) {
-    y.domain([metricRange.min, metricRange.max])
-    yAxis.tickFormat(metricRange.format).ticks(metricRange.ticks)
-
-    const outOfRangeData = props.data.filter(
-      (d) => d.value < metricRange.min || d.value > metricRange.max
-    )
-    if (outOfRangeData.length > 0) {
-      console.warn(
-        `Warning: Some ${props.metric.name} data points are out of the fixed range:`,
-        outOfRangeData
-      )
-    }
-  } else {
-    y.domain([0, d3.max(props.data, (d) => d.value)])
-  }
-
-  svg.select('.y-axis').call(yAxis)
-
-  console.log('Y axis range for', props.metric.name, ':', y.domain())
-
   line = d3
     .line()
     .x((d) => x(d.date))
@@ -118,7 +91,7 @@ const createLineChart = () => {
 
   svg
     .append('path')
-    .data([props.data])
+    .datum(data)
     .attr('class', 'line')
     .attr('fill', 'none')
     .attr('stroke', 'steelblue')
@@ -168,8 +141,12 @@ const updateChart = (event) => {
 }
 
 const resetChart = () => {
-  x.domain(d3.extent(props.data, (d) => d.date))
+  const data = props.data.data.map((d) => ({ ...d, date: d3.isoParse(d.date) }))
+  const xDomain = d3.extent(data, (d) => d.date)
+  x.domain(xDomain)
+  y.domain([props.data.min, props.data.max]).nice()
   svg.select('.x-axis').call(xAxis)
+  svg.select('.y-axis').call(yAxis)
   svg.select('.line').attr('d', line)
   svg.select('.brush').call(brush.move, null)
 }
