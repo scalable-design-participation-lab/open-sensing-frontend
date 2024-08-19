@@ -1,11 +1,13 @@
 <script setup lang="ts">
-const { data: page } = await useAsyncData('index', () => queryContent('/').findOne())
+const { data: page } = await useAsyncData('index', () =>
+  queryContent('/').findOne()
+)
 
 useSeoMeta({
   title: page.value.title,
   ogTitle: page.value.title,
   description: page.value.description,
-  ogDescription: page.value.description
+  ogDescription: page.value.description,
 })
 </script>
 
@@ -29,10 +31,7 @@ useSeoMeta({
             class="focus:outline-none"
             tabindex="-1"
           >
-            <span
-              class="absolute inset-0"
-              aria-hidden="true"
-            />
+            <span class="absolute inset-0" aria-hidden="true" />
           </NuxtLink>
 
           {{ page.hero.headline.label }}
@@ -47,10 +46,7 @@ useSeoMeta({
 
       <ImagePlaceholder />
 
-      <ULandingLogos
-        :title="page.logos.title"
-        align="center"
-      >
+      <ULandingLogos :title="page.logos.title" align="center">
         <UIcon
           v-for="icon in page.logos.icons"
           :key="icon"
@@ -114,11 +110,10 @@ useSeoMeta({
       </UPageColumns>
     </ULandingSection>
 
-    <ULandingSection class="bg-primary-50 dark:bg-primary-400 dark:bg-opacity-10">
-      <ULandingCTA
-        v-bind="page.cta"
-        :card="false"
-      />
+    <ULandingSection
+      class="bg-primary-50 dark:bg-primary-400 dark:bg-opacity-10"
+    >
+      <ULandingCTA v-bind="page.cta" :card="false" />
     </ULandingSection>
 
     <ULandingSection
@@ -134,9 +129,9 @@ useSeoMeta({
           button: {
             label: 'font-semibold',
             trailingIcon: {
-              base: 'w-6 h-6'
-            }
-          }
+              base: 'w-6 h-6',
+            },
+          },
         }"
         class="max-w-4xl mx-auto"
       />

@@ -1,100 +1,87 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <section>
-    <NUHeader />
-
-    <DataPopUp
-      v-if="Object.keys(selectedSiteProps).length > 0"
-      @close-pop-up="closeDataPopUp"
-    />
-    <MapDashboard v-show="!dataDashboard" />
-
-    <Dashboard
-      v-show="dashboardLoaded && popUpVisibility.dashboard"
-      @close="setPopUpVisibility('dashboard')"
-    />
-    <About v-if="popUpVisibility.about" @close="setPopUpVisibility('about')" />
-
-    <NUFooter />
-  </section>
+  <div class="home">
+    <DashboardHeader class="app-header" />
+    <main class="main-content">
+      <MapDashboard />
+      <FilterSidebar v-if="showFilter" class="filter-sidebar" />
+      <DashboardOverlay
+        :visible="showDashboard || showSensorDetail"
+        class="dashboard-overlay"
+      />
+      <Dashboard v-if="showDashboard" class="dashboard" />
+      <div class="sensor-tools-container">
+        <SensorTools />
+      </div>
+      <SensorDetail v-if="showSensorDetail" class="sensor-detail" />
+    </main>
+    <DashboardFooter class="app-footer" />
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
-import Dashboard from '../components/Dashboard/index.vue'
 
-// Store
 const store = useDashboardUIStore()
-const { dataDashboard, selectedSiteProps, popUpVisibility } = storeToRefs(store)
-const {
-  setPopUpVisibility,
-  updateSelectedSiteProps,
-  loadSensorData,
-  loadDashboardData,
-} = store
-
-// Ref to track if Dashboard data is loaded
-const dashboardLoaded = ref(false)
-
-// Function to preload Dashboard data
-const preloadDashboard = async () => {
-  if (!dashboardLoaded.value) {
-    await loadDashboardData()
-    await loadSensorData(true)
-    dashboardLoaded.value = true
-  }
-}
-
-let refreshInterval
-const startDataRefresh = () => {
-  refreshInterval = setInterval(() => {
-    loadSensorData(true)
-  }, 5400000)
-}
-
-// Function to save Dashboard visibility state
-const saveState = () => {
-  localStorage.setItem(
-    'dashboardVisibility',
-    JSON.stringify(popUpVisibility.value.dashboard)
-  )
-}
-
-// Function to close DataPopUp
-const closeDataPopUp = () => {
-  updateSelectedSiteProps({})
-}
-
-onMounted(() => {
-  // Restore Dashboard visibility state from localStorage
-  const savedVisibility = localStorage.getItem('dashboardVisibility')
-  if (savedVisibility) {
-    setPopUpVisibility('dashboard')
-  }
-
-  // Start preloading Dashboard data
-  preloadDashboard()
-
-  // Start data refresh
-  startDataRefresh()
-
-  // Add event listener to save state before unload
-  window.addEventListener('beforeunload', saveState)
-})
-
-onUnmounted(() => {
-  // Remove event listener
-  window.removeEventListener('beforeunload', saveState)
-  // Clear refresh interval
-  if (refreshInterval) {
-    clearInterval(refreshInterval)
-  }
-})
+const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
 </script>
 
-<style>
-body {
-  font-family: 'lato', sans-serif;
+<style scoped>
+.home {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-header {
+  z-index: 20;
+}
+
+.main-content {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-sidebar {
+  position: absolute;
+  top: 100px;
+  right: 20px;
+  z-index: 20;
+}
+
+.sensor-detail {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  max-height: 95vh;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+.dashboard {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  max-height: 95vh;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+.sensor-tools-container {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;
+}
+
+.app-footer {
+  z-index: 15;
 }
 </style>

@@ -1,23 +1,51 @@
 <template>
   <div class="flex overflow-hidden flex-col bg-white dark:bg-gray-900">
-    <UHeader :links="headerLinks">
-      <template #logo>
-        <ULandingLogos align="left">
-          <UIcon name="i-simple-icons-github" class="w-8 h-8 flex-shrink-0" />
-          <span class="text-xl font-bold ml-2">Drawing Together</span>
-        </ULandingLogos>
-      </template>
-      <template #right>
-        <UColorModeButton />
-        <UButton
-          to="https://github.com/scalable-design-participation-lab/autonomous-sensor-module-frontend.git"
-          target="_blank"
-          icon="i-simple-icons-github"
-          color="gray"
-          variant="ghost"
-        />
-      </template>
-    </UHeader>
+    <header class="bg-white dark:bg-gray-900 py-8 shadow-md">
+      <UContainer class="flex justify-between items-center">
+        <div class="flex space-x-4">
+          <UButton
+            to="/"
+            class="header-btn bg-black text-white hover:bg-gray-800"
+          >
+            Drawing Together
+          </UButton>
+          <UButton
+            to="/project"
+            class="header-btn bg-gray-100 text-black hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+          >
+            Project Name
+          </UButton>
+          <UButton
+            to="/learn"
+            class="header-btn bg-gray-100 text-black hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+          >
+            Learn
+          </UButton>
+        </div>
+        <div class="flex items-center space-x-4">
+          <UButton
+            to="/draw"
+            class="header-btn bg-gray-100 text-black hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+          >
+            → Draw
+          </UButton>
+          <UColorModeButton
+            class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+            :ui="{
+              icon: {
+                base: 'w-7 h-7',
+              },
+            }"
+          />
+          <UAvatar
+            src="https://avatars.githubusercontent.com/u/739984?v=4"
+            alt="Avatar"
+            size="lg"
+            class="rounded-full"
+          />
+        </div>
+      </UContainer>
+    </header>
 
     <UContainer>
       <ULandingHero
@@ -127,6 +155,7 @@
             :title="item.title"
             :description="item.description"
             :icon="item.icon"
+            class="col-span-6 row-span-2"
           />
         </ULandingGrid>
       </section>
@@ -242,15 +271,9 @@ const moreSeriesItems = [
 </script>
 
 <style scoped>
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+/* @layer components {
+  .header-btn {
+    @apply rounded-full px-8 py-4 text-xl font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md;
+  }
+} */
 </style>
