@@ -3,10 +3,50 @@
     Loading...
   </div>
   <div v-else class="flex overflow-hidden flex-col bg-white dark:bg-gray-900">
-    <Header :links="headerLinks" class="w-full" />
+    <header class="bg-white dark:bg-gray-900 py-8 shadow-md">
+      <UContainer class="flex justify-between items-center">
+        <div class="flex space-x-4">
+          <UButton
+            v-for="link in headerLinks"
+            :key="link.label"
+            :to="link.to"
+            :class="[
+              'rounded-full px-8 py-4 text-xl font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md',
+              link.primary
+                ? 'bg-black text-white hover:bg-gray-800'
+                : 'bg-gray-100 text-black hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
+            ]"
+          >
+            {{ link.label }}
+          </UButton>
+        </div>
+        <div class="flex items-center space-x-4">
+          <UButton
+            to="/draw"
+            class="[ 'rounded-full px-8 py-4 text-xl font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md', link.primary ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-100 text-black hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600', ]"
+          >
+            → Draw
+          </UButton>
+          <UColorModeButton
+            class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+            :ui="{
+              icon: {
+                base: 'w-7 h-7',
+              },
+            }"
+          />
+          <UAvatar
+            src="https://avatars.githubusercontent.com/u/739984?v=4"
+            alt="Avatar"
+            size="lg"
+            class="rounded-full"
+          />
+        </div>
+      </UContainer>
+    </header>
 
-    <UContainer class="flex-grow">
-      <HeroSection
+    <UContainer>
+      <ULandingHero
         title="Drawing Together"
         description="Collaborate in real-time with your team on creative projects. Experience a new way of visual communication and idea sharing."
         :links="[
@@ -17,56 +57,88 @@
             color: 'primary',
           },
         ]"
-        :headline-button="{
-          label: 'See what\'s new in our latest release',
-          to: '/releases',
-          icon: 'i-heroicons-arrow-right',
-        }"
-        image-src="~/assets/images/northeastern.jpg"
-        image-alt="Illustration of Drawing Together"
-      />
+      >
+        <template #headline>
+          <UButton
+            color="gray"
+            to="/releases"
+            label="See what's new in our latest release"
+            trailing-icon="i-heroicons-arrow-right"
+            size="xs"
+            class="rounded-full"
+          />
+        </template>
+        <template #default>
+          <img
+            src="~/assets/images/northeastern.jpg"
+            alt="Illustration of Drawing Together"
+            class="w-full rounded-md shadow-xl ring-1 ring-gray-300 dark:ring-gray-700"
+          />
+        </template>
+      </ULandingHero>
 
       <UPage>
         <UPageBody prose>
-          <Headline
-            title="Why are we doing this?"
-            type="paragraph"
-            :content="whyContent"
-          />
+          <h2>Why are we doing this?</h2>
+          <p>{{ whyContent }}</p>
 
-          <Headline
-            title="This is a Secondary Headline"
-            type="diagram"
-            :content="tabItems"
-          />
+          <h2>This is a Secondary Headline</h2>
+          <UCard>
+            <UTabs :items="tabItems" />
+          </UCard>
           <p>{{ secondaryContent }}</p>
 
-          <Headline
-            title="This is Another Secondary Headline"
-            type="chart"
-            content="Chart placeholder"
-          />
+          <h2>This is Another Secondary Headline</h2>
+          <UCard class="p-4 text-center">
+            <div class="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg">
+              Chart placeholder
+            </div>
+          </UCard>
           <p>{{ tertiaryContent }}</p>
 
-          <Reference :items="accordionItems" />
+          <h2>References</h2>
+          <UAccordion :items="accordionItems" />
         </UPageBody>
       </UPage>
 
       <UDivider class="my-10" />
 
-      <MoreInThisSeries :items="moreSeriesItems" :cols="3" />
+      <section>
+        <h2 class="text-2xl font-medium text-black dark:text-white mb-5">
+          More in this series
+        </h2>
+        <ULandingGrid :cols="3" :gap="5">
+          <ULandingCard
+            v-for="(item, index) in moreSeriesItems"
+            :key="index"
+            :title="item.title"
+            :description="item.description"
+            :icon="item.icon"
+            class="col-span-6 row-span-2"
+          />
+        </ULandingGrid>
+      </section>
     </UContainer>
 
-    <Footer
-      title="Drawing Participation"
-      :links="[
-        { to: '#about', label: 'About' },
-        { to: '#support', label: 'Support' },
-        { to: '#more', label: 'More' },
-        { to: '#evenmore', label: 'Even More' },
-      ]"
-      :buttons="[{ label: 'Logo 1' }, { label: 'Logo 2' }]"
-    />
+    <UFooter class="mt-10">
+      <template #left>
+        <h2 class="text-2xl">Drawing Participation</h2>
+        <nav class="mt-4">
+          <ul class="space-y-2">
+            <li><ULink to="#about">About</ULink></li>
+            <li><ULink to="#support">Support</ULink></li>
+            <li><ULink to="#more">More</ULink></li>
+            <li><ULink to="#evenmore">Even More</ULink></li>
+          </ul>
+        </nav>
+      </template>
+      <template #right>
+        <div class="flex gap-4">
+          <UButton color="gray" label="Logo 1" />
+          <UButton color="gray" label="Logo 2" />
+        </div>
+      </template>
+    </UFooter>
   </div>
 </template>
 
@@ -206,3 +278,5 @@ async function loadMoreSeriesItems() {
   ]
 }
 </script>
+
+<style scoped></style>
