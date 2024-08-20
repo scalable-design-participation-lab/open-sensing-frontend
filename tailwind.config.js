@@ -1,7 +1,5 @@
-import type { Config } from 'tailwindcss'
-import defaultTheme from 'tailwindcss/defaultTheme'
-
-export default <Partial<Config>>{
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     './components/**/*.{js,vue,ts}',
     './layouts/**/*.vue',
@@ -13,7 +11,10 @@ export default <Partial<Config>>{
   theme: {
     extend: {
       fontFamily: {
-        sans: ['DM Sans', ...defaultTheme.fontFamily.sans],
+        sans: [
+          'DM Sans',
+          ...require('tailwindcss/defaultTheme').fontFamily.sans,
+        ],
       },
       colors: {
         green: {
@@ -30,10 +31,9 @@ export default <Partial<Config>>{
           950: '#052e16',
         },
       },
-
       spacing: {
-        '128': '32rem',
-        '144': '36rem',
+        128: '32rem',
+        144: '36rem',
       },
       borderRadius: {
         '4xl': '2rem',
@@ -42,16 +42,4 @@ export default <Partial<Config>>{
   },
   plugins: [],
   darkMode: 'class',
-
-  mode: 'jit',
-  purge: {
-    content: [
-      './components/**/*.{js,vue,ts}',
-      './layouts/**/*.vue',
-      './pages/**/*.vue',
-      './plugins/**/*.{js,ts}',
-      './nuxt.config.{js,ts}',
-      './app.vue',
-    ],
-  },
 }

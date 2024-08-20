@@ -15,11 +15,9 @@
             :is="item.component || 'UButton'"
             v-bind="item.props"
             :class="[
-              'flex items-center justify-center transition-all duration-200 ease-in-out hover:-translate-y-1',
+              'rounded-full px-8 py-4 text-xl font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md',
               item.class,
               {
-                'rounded-full px-8 py-4 text-xl font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md':
-                  item.component === 'UButton',
                 'bg-black text-white hover:bg-gray-800': item.primary,
                 'bg-gray-100 text-black hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600':
                   !item.primary,
@@ -27,9 +25,6 @@
             ]"
             @click="item.onClick"
           >
-            <template v-if="item.icon">
-              <component :is="item.icon" />
-            </template>
             {{ item.label }}
           </component>
         </template>
@@ -40,18 +35,12 @@
             :is="item.component || 'UButton'"
             v-bind="item.props"
             :class="[
-              'flex items-center justify-center transition-all duration-200 ease-in-out hover:-translate-y-1',
+              'rounded-full px-8 py-4 text-xl font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md',
               item.class,
-              {
-                'rounded-full px-8 py-4 text-xl font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md':
-                  item.component === 'UButton',
-              },
+              'bg-gray-100 text-black hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
             ]"
             @click="item.onClick"
           >
-            <template v-if="item.icon">
-              <component :is="item.icon" />
-            </template>
             {{ item.label }}
           </component>
         </template>
@@ -76,74 +65,85 @@
   </header>
 </template>
 
-<script setup lang="ts">
-import { PropType } from 'vue'
-
-interface HeaderItem {
-  component?: string
-  label?: string
-  icon?: any
-  class?: string
-  props?: any
-  primary?: boolean
-  onClick?: () => void
+<script>
+export default {
+  name: 'GeneralizedHeader',
+  props: {
+    isAbsolute: {
+      type: Boolean,
+      default: false,
+    },
+    containerClass: {
+      type: String,
+      default: '',
+    },
+    leftItems: {
+      type: Array,
+      default: () => [
+        {
+          label: 'Drawing Together',
+          component: 'UButton',
+          primary: true,
+          props: { to: '/' },
+        },
+        {
+          label: 'Project Name',
+          component: 'UButton',
+          props: { to: '/project' },
+        },
+        { label: 'Learn', component: 'UButton', props: { to: '/learn' } },
+      ],
+    },
+    rightItems: {
+      type: Array,
+      default: () => [
+        { label: '→ Draw', component: 'UButton', props: { to: '/draw' } },
+      ],
+    },
+    showColorModeButton: {
+      type: Boolean,
+      default: true,
+    },
+    showAvatar: {
+      type: Boolean,
+      default: true,
+    },
+    avatarSrc: {
+      type: String,
+      default: 'https://avatars.githubusercontent.com/u/739984?v=4',
+    },
+    avatarAlt: {
+      type: String,
+      default: 'User Avatar',
+    },
+  },
 }
-
-const props = defineProps({
-  isAbsolute: {
-    type: Boolean,
-    default: false,
-  },
-  containerClass: {
-    type: String,
-    default: '',
-  },
-  leftItems: {
-    type: Array as PropType<HeaderItem[]>,
-    default: () => [],
-  },
-  rightItems: {
-    type: Array as PropType<HeaderItem[]>,
-    default: () => [],
-  },
-  showColorModeButton: {
-    type: Boolean,
-    default: true,
-  },
-  showAvatar: {
-    type: Boolean,
-    default: false,
-  },
-  avatarSrc: {
-    type: String,
-    default: '',
-  },
-  avatarAlt: {
-    type: String,
-    default: 'User Avatar',
-  },
-})
 </script>
 
 <style scoped>
 @media (max-width: 1024px) {
   .header.is-absolute {
-    @apply flex-col items-start top-4 left-4;
+    flex-direction: column;
+    align-items: flex-start;
+    top: 1rem;
+    left: 1rem;
   }
 
   .nav-right {
-    @apply mt-4;
+    margin-top: 1rem;
   }
 }
 
 @media (max-width: 768px) {
   .header.is-absolute {
-    @apply top-3 left-3 right-3;
+    top: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
   }
 
   .nav-left,
   .nav-right {
-    @apply gap-3;
+    gap: 0.75rem;
   }
 }
 </style>
