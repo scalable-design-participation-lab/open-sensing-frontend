@@ -1,25 +1,35 @@
 <template>
-  <UCard class="sensor-info" :style="positionStyle">
+  <UCard class="sensor-info" :ui="cardStyle" :style="positionStyle">
     <template #header>
       <div class="info-header">
-        <span>
+        <div class="navigation-buttons">
+          <UButton
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-arrow-left"
+            @click="selectPreviousSensor"
+          />
+          <UButton
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-arrow-right"
+            @click="selectNextSensor"
+          />
+        </div>
+        <div class="action-buttons">
           <UButton
             color="primary"
             variant="ghost"
-            @click="selectPreviousSensor"
-          >
-            <UIcon name="i-heroicons-arrow-left" />
-          </UButton>
-          <UButton color="primary" variant="ghost" @click="selectNextSensor">
-            <UIcon name="i-heroicons-arrow-right" />
-          </UButton>
-        </span>
-        <UButton color="primary" variant="ghost" @click="openSensorDetail">
-          <UIcon name="i-heroicons-arrow-top-right-on-square" />
-        </UButton>
-        <UButton color="gray" variant="ghost" @click="closeSensorInfo">
-          <UIcon name="i-heroicons-x-mark" />
-        </UButton>
+            icon="i-heroicons-arrow-top-right-on-square"
+            @click="openSensorDetail"
+          />
+          <UButton
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-x-mark"
+            @click="closeSensorInfo"
+          />
+        </div>
       </div>
     </template>
     <div class="info-content">
@@ -27,24 +37,36 @@
       <span class="sensor-time"
         >Last updated: {{ selectedSensor.timestamp }}</span
       >
+      <div class="sensor-data">
+        <div class="data-item">
+          <UIcon name="i-heroicons-temperature" class="data-icon" />
+          <span>{{ selectedSensor.temperature.toFixed(1) }}°C</span>
+        </div>
+        <div class="data-item">
+          <UIcon name="i-heroicons-cloud" class="data-icon" />
+          <span>{{ selectedSensor.humidity.toFixed(1) }}%</span>
+        </div>
+        <div class="data-item">
+          <UIcon name="i-heroicons-sparkles" class="data-icon" />
+          <span>{{ selectedSensor.airQuality }}</span>
+        </div>
+        <div class="data-item">
+          <UIcon name="i-heroicons-battery-50" class="data-icon" />
+          <span>{{ selectedSensor.batteryLevel }}%</span>
+        </div>
+      </div>
     </div>
-    <p class="sensor-description">
-      Temperature: {{ selectedSensor.temperature.toFixed(1) }}°C<br />
-      Humidity: {{ selectedSensor.humidity.toFixed(1) }}%<br />
-      Air Quality: {{ selectedSensor.airQuality }}<br />
-      Battery Level: {{ selectedSensor.batteryLevel }}%
-    </p>
   </UCard>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 const props = defineProps({
   markerPosition: {
-    type: Object,
+    type: Object as () => { x: number; y: number },
     required: true,
   },
 })
@@ -61,14 +83,12 @@ const {
 const positionStyle = computed(() => {
   const { x, y } = props.markerPosition
   const offset = 10
-  const infoWidth = 227 // Width of the info box
-  const infoHeight = 200 // Approximate height of the info box
+  const infoWidth = 280 // 增加宽度
+  const infoHeight = 250 // 增加高度
 
-  // Calculate position based on marker position
   let left = x + offset
   let top = y - infoHeight - offset
 
-  // Ensure the info box doesn't go off-screen
   const { innerWidth, innerHeight } = window
   if (left + infoWidth > innerWidth) {
     left = x - infoWidth - offset
@@ -84,6 +104,12 @@ const positionStyle = computed(() => {
   }
 })
 
+const cardStyle = {
+  base: 'bg-white dark:bg-gray-800 shadow-lg',
+  body: 'p-0',
+  header: 'p-3 border-b border-gray-200 dark:border-gray-700',
+}
+
 const openSensorDetail = () => {
   toggleSensorDetail()
 }
@@ -91,51 +117,54 @@ const openSensorDetail = () => {
 
 <style scoped>
 .sensor-info {
-  background-color: #fafafa;
-  border-radius: 5px;
-  padding: 13px;
-  width: 227px;
+  width: 280px;
   z-index: 1000;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   pointer-events: auto;
 }
 
 .info-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
-.arrow-icon {
-  cursor: pointer;
+.navigation-buttons,
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
-.info-divider {
-  height: 1px;
-  background-color: #000;
-  margin: 9px 0;
+.info-content {
+  padding: 1rem;
 }
 
 .sensor-title {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
 }
 
 .sensor-time {
-  font-size: 11px;
-  color: #a8a8a8;
+  font-size: 0.8rem;
+  color: #6b7280;
+  display: block;
+  margin-bottom: 1rem;
 }
 
-.sensor-description {
-  font-size: 11px;
-  margin-top: 12px;
+.sensor-data {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
-.close-icon {
-  cursor: pointer;
-  margin-left: 10px;
+.data-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
 }
 
-.el-icon {
-  cursor: pointer;
+.data-icon {
+  margin-right: 0.5rem;
+  color: #4b5563;
 }
 </style>

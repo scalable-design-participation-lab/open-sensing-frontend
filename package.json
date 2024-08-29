@@ -51,7 +51,8 @@
     "pg": "^8.12.0",
     "pinia": "^2.1.7",
     "vue-chart-3": "^3.1.8",
-    "vue-chartjs": "^5.3.1"
+    "vue-chartjs": "^5.3.1",
+    "vue-virtual-scroll-list": "^2.3.5"
   },
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }

@@ -18,13 +18,14 @@
       </div>
       <SensorDetail v-if="showSensorDetail" class="sensor-detail" />
     </main>
-    <DashboardFooter class="app-footer" />
+    <Footer class="app-footer" title="Dashboard Footer" />
   </div>
 </template>
 
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
+import Footer from '@/components/FrontPage/Footer.vue'
 
 const store = useDashboardUIStore()
 const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
@@ -75,6 +76,6 @@ const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
 
 .app-header,
 .app-footer {
-  z-index: 15;
+  z-index: 20;
 }
 </style>
