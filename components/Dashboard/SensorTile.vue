@@ -22,29 +22,15 @@
 
       <UCard class="bg-gray-50 p-3 flex-grow">
         <div class="grid grid-cols-2 gap-4 text-sm h-full">
-          <div class="text-center flex flex-col justify-center">
-            <span class="text-xl font-bold text-blue-500"
-              >{{ sensor.temperature.toFixed(1) }}°C</span
-            >
-            <p class="text-xs text-gray-600">Temperature</p>
-          </div>
-          <div class="text-center flex flex-col justify-center">
-            <span class="text-xl font-bold text-blue-500"
-              >{{ sensor.humidity.toFixed(1) }}%</span
-            >
-            <p class="text-xs text-gray-600">Humidity</p>
-          </div>
-          <div class="text-center flex flex-col justify-center">
-            <span class="text-xl font-bold text-blue-500">{{
-              sensor.airQuality
-            }}</span>
-            <p class="text-xs text-gray-600">Air Quality</p>
-          </div>
-          <div class="text-center flex flex-col justify-center">
-            <span class="text-xl font-bold text-blue-500">{{
-              sensor.soilMoisture
-            }}</span>
-            <p class="text-xs text-gray-600">Soil Moisture</p>
+          <div
+            v-for="(value, key) in sensorData"
+            :key="key"
+            class="text-center flex flex-col justify-center"
+          >
+            <span class="text-xl font-bold" :class="getValueColor(key, value)">
+              {{ formatValue(key, value) }}
+            </span>
+            <p class="text-xs text-gray-600">{{ formatLabel(key) }}</p>
           </div>
         </div>
       </UCard>
@@ -52,7 +38,7 @@
       <UButton
         color="primary"
         variant="ghost"
-        class="mt-4 self-center"
+        class="mt-4 self-center transition-colors duration-300 hover:bg-blue-100"
         @click="openSensorDetail"
       >
         Details
@@ -77,12 +63,6 @@ const props = defineProps({
 
 const store = useDashboardUIStore()
 
-const getBatteryColor = (value) => {
-  if (value < 30) return 'red'
-  if (value < 70) return 'yellow'
-  return 'green'
-}
-
 const getBatteryIconColor = (value) => {
   if (value < 30) return 'text-red-500'
   if (value < 70) return 'text-yellow-500'
@@ -106,6 +86,39 @@ const openSensorDetail = () => {
   store.updateSelectedSensor(props.sensor.id)
   store.toggleSensorDetail()
 }
+
+const sensorData = computed(() => ({
+  temperature: props.sensor.temperature,
+  humidity: props.sensor.humidity,
+  airQuality: props.sensor.airQuality,
+  soilMoisture: props.sensor.soilMoisture,
+}))
+
+const formatValue = (key, value) => {
+  if (key === 'temperature') return `${value.toFixed(1)}°C`
+  if (key === 'humidity') return `${value.toFixed(1)}%`
+  return value
+}
+
+const formatLabel = (key) => {
+  return key
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, (str) => str.toUpperCase())
+}
+
+const getValueColor = (key, value) => {
+  if (key === 'temperature') {
+    if (value < 10) return 'text-blue-500'
+    if (value > 30) return 'text-red-500'
+    return 'text-green-500'
+  }
+  if (key === 'humidity') {
+    if (value < 30) return 'text-yellow-500'
+    if (value > 70) return 'text-blue-500'
+    return 'text-green-500'
+  }
+  return 'text-blue-500'
+}
 </script>
 
 <style scoped>
@@ -113,6 +126,13 @@ const openSensorDetail = () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 250px; /* Adjust this value as needed */
+  min-height: 250px;
+  transition: all 0.3s ease-in-out;
+}
+
+.sensor-tile:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 </style>

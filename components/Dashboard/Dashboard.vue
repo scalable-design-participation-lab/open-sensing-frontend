@@ -27,7 +27,7 @@
             <UCard
               v-for="(stat, index) in overviewStats"
               :key="index"
-              class="text-center p-4 bg-white"
+              class="text-center p-4 bg-white hover:shadow-lg transition-shadow duration-300"
             >
               <h3 class="text-2xl font-bold text-blue-500">{{ stat.value }}</h3>
               <p class="text-sm text-gray-600">{{ stat.label }}</p>
@@ -43,6 +43,7 @@
             :key="sensor.id"
             :sensor="sensor"
             class="sensor-card"
+            @click="openSensorDetail(sensor.id)"
           />
         </div>
       </div>
@@ -87,6 +88,11 @@ const overviewStats = computed(() => [
   },
 ])
 
+const openSensorDetail = (sensorId) => {
+  store.updateSelectedSensor(sensorId)
+  store.toggleSensorDetail()
+}
+
 // Rename the component to address the linter error
 defineOptions({
   name: 'DashboardView',
@@ -117,7 +123,14 @@ defineOptions({
   flex-shrink: 0;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.overview-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .overview-content,
@@ -139,6 +152,11 @@ defineOptions({
 .sensor-card {
   width: 100%;
   height: 100%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.sensor-card:hover {
+  transform: translateY(-5px);
 }
 
 @media (max-width: 1400px) {
