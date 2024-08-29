@@ -1860,7 +1860,7 @@
     node-gyp-build "^4.2.2"
     resolve-from "^5.0.0"
 
-"@vitejs/plugin-vue-jsx@^4.0.0":
+"@vitejs/plugin-vue-jsx@^4.0.0", "@vitejs/plugin-vue-jsx@^4.0.1":
   version "4.0.1"
   resolved "https://registry.npmjs.org/@vitejs/plugin-vue-jsx/-/plugin-vue-jsx-4.0.1.tgz"
   integrity sha512-7mg9HFGnFHMEwCdB6AY83cVK4A6sCqnrjFYF4WIlebYAQVVJ/sC/CiTruVdrRlhrFoeZ8rlMxY9wYpPTIRhhAg==
