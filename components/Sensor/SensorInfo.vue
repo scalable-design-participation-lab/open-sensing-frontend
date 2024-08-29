@@ -1,18 +1,27 @@
 <template>
-  <div class="sensor-info" :style="positionStyle">
-    <div class="info-header">
-      <span>
-        <el-icon @click="selectPreviousSensor"><Back /></el-icon>
-        <el-icon @click="selectNextSensor"><Right /></el-icon>
-      </span>
-      <span class="arrow-icon" @click="openSensorDetail">
-        <el-icon><TopRight /></el-icon>
-      </span>
-      <span class="close-icon" @click="closeSensorInfo">
-        <el-icon><Close /></el-icon>
-      </span>
-    </div>
-    <div class="info-divider"></div>
+  <UCard class="sensor-info" :style="positionStyle">
+    <template #header>
+      <div class="info-header">
+        <span>
+          <UButton
+            color="primary"
+            variant="ghost"
+            @click="selectPreviousSensor"
+          >
+            <UIcon name="i-heroicons-arrow-left" />
+          </UButton>
+          <UButton color="primary" variant="ghost" @click="selectNextSensor">
+            <UIcon name="i-heroicons-arrow-right" />
+          </UButton>
+        </span>
+        <UButton color="primary" variant="ghost" @click="openSensorDetail">
+          <UIcon name="i-heroicons-arrow-top-right-on-square" />
+        </UButton>
+        <UButton color="gray" variant="ghost" @click="closeSensorInfo">
+          <UIcon name="i-heroicons-x-mark" />
+        </UButton>
+      </div>
+    </template>
     <div class="info-content">
       <h3 class="sensor-title">{{ selectedSensor.location }}</h3>
       <span class="sensor-time"
@@ -25,14 +34,13 @@
       Air Quality: {{ selectedSensor.airQuality }}<br />
       Battery Level: {{ selectedSensor.batteryLevel }}%
     </p>
-  </div>
+  </UCard>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
-import { Back, Right, TopRight, Close } from '@element-plus/icons-vue'
 
 const props = defineProps({
   markerPosition: {

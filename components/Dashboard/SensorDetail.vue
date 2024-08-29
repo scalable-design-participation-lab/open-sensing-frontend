@@ -1,120 +1,113 @@
 <template>
-  <transition name="fade">
-    <div
-      v-if="showSensorDetail && selectedSensor"
-      class="sensor-detail-overlay"
-    >
-      <div class="sensor-detail">
-        <header class="sensor-header">
-          <el-button class="back-button" text @click="goBackToDashboard">
-            <el-icon><Back /></el-icon>
-          </el-button>
+  <UModal v-model="showSensorDetail" :ui="{ width: 'max-w-5xl' }">
+    <UCard v-if="selectedSensor" class="sensor-detail">
+      <template #header>
+        <div class="sensor-header">
+          <UButton color="primary" variant="ghost" @click="goBackToDashboard">
+            <UIcon name="i-heroicons-arrow-left" />
+          </UButton>
           <h1>{{ selectedSensor.location }}</h1>
-          <el-tag :type="getStatusType(selectedSensor.status)">
+          <UBadge :color="getStatusColor(selectedSensor.status)">
             {{ selectedSensor.status }}
-          </el-tag>
+          </UBadge>
           <div class="navigation-buttons">
-            <el-button class="nav-button" @click="selectPreviousSensor">
-              <el-icon><ArrowUp /></el-icon>
-            </el-button>
-            <el-button class="nav-button" @click="selectNextSensor">
-              <el-icon><ArrowDown /></el-icon>
-            </el-button>
-          </div>
-          <el-button class="close-button" @click="closeSensorDetail">
-            <el-icon><Close /></el-icon>
-          </el-button>
-        </header>
-        <div class="sensor-content">
-          <div class="sensor-stats">
-            <div
-              v-for="(value, key) in sensorStats"
-              :key="key"
-              class="stat-item"
+            <UButton
+              color="primary"
+              variant="ghost"
+              @click="selectPreviousSensor"
             >
-              <h3>{{ value }}</h3>
-              <p>{{ key }}</p>
-            </div>
+              <UIcon name="i-heroicons-arrow-up" />
+            </UButton>
+            <UButton color="primary" variant="ghost" @click="selectNextSensor">
+              <UIcon name="i-heroicons-arrow-down" />
+            </UButton>
           </div>
-          <div class="sensor-details">
-            <div class="sensor-info">
-              <h2>Sensor Information</h2>
-              <div class="info-grid">
-                <div class="info-item battery-level">
-                  <el-progress
-                    type="circle"
-                    :percentage="selectedSensor.batteryLevel"
-                    :color="getBatteryColor"
-                  >
-                    <template #default="{ percentage }">
-                      <span class="percentage-value">{{ percentage }}%</span>
-                    </template>
-                  </el-progress>
-                  <p>Battery Level</p>
-                </div>
-                <div class="info-item">
-                  <h3>{{ selectedSensor.signalStrength }}/5</h3>
-                  <p>Signal Strength</p>
-                </div>
-                <div class="info-item">
-                  <h3>{{ selectedSensor.airQuality }}</h3>
-                  <p>Air Quality</p>
-                </div>
-                <div class="info-item">
-                  <h3>{{ selectedSensor.soilMoisture }}</h3>
-                  <p>Soil Moisture</p>
-                </div>
-              </div>
-              <p class="last-updated">
-                Last Updated: {{ formatDate(selectedSensor.timestamp) }}
-              </p>
-              <p class="last-maintenance">
-                Last Maintenance:
-                {{ formatDate(selectedSensor.lastMaintenance) }}
-              </p>
-            </div>
-            <div class="sensor-location">
-              <h2>Location</h2>
-              <div id="mini-map" ref="miniMap"></div>
-            </div>
-          </div>
-          <div class="chart-container">
-            <h2>Sensor Data</h2>
-            <div ref="scrollContainer" class="scroll-container">
-              <div v-if="dataLoaded" class="charts-wrapper">
-                <LineChart
-                  v-for="(metric, metricName) in metrics"
-                  v-show="selectedDatasets.includes(metricName)"
-                  :key="metricName"
-                  :metric="metric"
-                  :data="sensorData[metricName]"
-                  :margin="margin"
-                  :width="chartWidth"
-                  :height="chartHeight"
-                  @date-range-update="updateGlobalDateRange"
-                />
-              </div>
-              <div v-else class="loading">
-                <div class="loading-spinner"></div>
-                <p>Loading data...</p>
-              </div>
-            </div>
-            <div class="dashboard-footer">
-              <el-button class="reset-button" @click="resetAllCharts">
-                Reset All
-              </el-button>
-              <div
-                v-if="globalDateRange.length === 2"
-                class="date-range-display"
+          <UButton color="gray" variant="ghost" @click="closeSensorDetail">
+            <UIcon name="i-heroicons-x-mark" />
+          </UButton>
+        </div>
+      </template>
+      <div class="sensor-content">
+        <UGrid :cols="5" class="sensor-stats">
+          <UCard
+            v-for="(value, key) in sensorStats"
+            :key="key"
+            class="stat-item"
+          >
+            <h3>{{ value }}</h3>
+            <p>{{ key }}</p>
+          </UCard>
+        </UGrid>
+        <UGrid :cols="2" class="sensor-details">
+          <div class="sensor-info">
+            <h2>Sensor Information</h2>
+            <UGrid :cols="2" class="info-grid">
+              <UCard class="info-item battery-level">
+                <UProgress
+                  type="circle"
+                  :value="selectedSensor.batteryLevel"
+                  :color="getBatteryColor(selectedSensor.batteryLevel)"
+                >
+                  <template #default="{ value }">
+                    <span class="percentage-value">{{ value }}%</span>
+                  </template>
+                </UProgress>
+                <p>Battery Level</p>
+              </UCard>
+              <UCard
+                v-for="(item, key) in sensorInfo"
+                :key="key"
+                class="info-item"
               >
-                {{ formatDateRange(globalDateRange) }}
-              </div>
+                <h3>{{ item.value }}</h3>
+                <p>{{ item.label }}</p>
+              </UCard>
+            </UGrid>
+            <p class="last-updated">
+              Last Updated: {{ formatDate(selectedSensor.timestamp) }}
+            </p>
+            <p class="last-maintenance">
+              Last Maintenance: {{ formatDate(selectedSensor.lastMaintenance) }}
+            </p>
+          </div>
+          <div class="sensor-location">
+            <h2>Location</h2>
+            <div id="mini-map" ref="miniMap"></div>
+          </div>
+        </UGrid>
+        <div class="chart-container">
+          <h2>Sensor Data</h2>
+          <div ref="scrollContainer" class="scroll-container">
+            <div v-if="dataLoaded" class="charts-wrapper">
+              <LineChart
+                v-for="(metric, metricName) in metrics"
+                v-show="selectedDatasets.includes(metricName)"
+                :key="metricName"
+                :metric="metric"
+                :data="sensorData[metricName]"
+                :margin="margin"
+                :width="chartWidth"
+                :height="chartHeight"
+                @date-range-update="updateGlobalDateRange"
+              />
+            </div>
+            <div v-else class="loading">
+              <UIcon name="i-heroicons-arrow-path" class="loading-spinner" />
+              <p>Loading data...</p>
+            </div>
+          </div>
+          <div class="dashboard-footer">
+            <UButton color="primary" @click="resetAllCharts">
+              Reset All
+            </UButton>
+            <div v-if="globalDateRange.length === 2" class="date-range-display">
+              {{ formatDateRange(globalDateRange) }}
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </transition>
+    </UCard>
+  </UModal>
 </template>
 
 <script setup>
@@ -122,7 +115,6 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { useResizeObserver } from '@vueuse/core'
-import { Back, ArrowUp, ArrowDown, Close } from '@element-plus/icons-vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import LineChart from './LineChart.vue'
@@ -173,24 +165,36 @@ const sensorStats = computed(() => {
   }
 })
 
-const getStatusType = (status) => {
+const getStatusColor = (status) => {
   switch (status) {
     case 'Active':
-      return 'success'
+      return 'green'
     case 'Inactive':
-      return 'danger'
+      return 'red'
     case 'Maintenance':
-      return 'warning'
+      return 'yellow'
     default:
-      return 'info'
+      return 'gray'
   }
 }
 
 const getBatteryColor = (percentage) => {
-  if (percentage < 20) return '#F56C6C'
-  if (percentage < 50) return '#E6A23C'
-  return '#67C23A'
+  if (percentage < 20) return 'red'
+  if (percentage < 50) return 'yellow'
+  return 'green'
 }
+
+const sensorInfo = computed(() => ({
+  signalStrength: {
+    value: `${selectedSensor.value.signalStrength}/5`,
+    label: 'Signal Strength',
+  },
+  airQuality: { value: selectedSensor.value.airQuality, label: 'Air Quality' },
+  soilMoisture: {
+    value: selectedSensor.value.soilMoisture,
+    label: 'Soil Moisture',
+  },
+}))
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString('en-US', {
@@ -335,44 +339,14 @@ watch(
 </script>
 
 <style scoped>
-.sensor-detail-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
 .sensor-detail {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   width: 90%;
   max-width: 1200px;
   height: 90%;
   overflow-y: auto;
   display: flex;
-
   flex-direction: column;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #409eff;
-  cursor: pointer;
-  padding: 0;
-  margin-right: 15px;
-}
-
-.back-button:hover {
-  color: #66b1ff;
+  padding: 20px;
 }
 
 .sensor-header {
@@ -389,14 +363,6 @@ watch(
   font-size: 24px;
   color: #303133;
   flex-grow: 1;
-}
-
-.close-button {
-  font-size: 24px;
-  color: #909399;
-  background: none;
-  border: none;
-  cursor: pointer;
 }
 
 .sensor-content {
@@ -550,33 +516,6 @@ watch(
   margin-right: 10px;
 }
 
-.nav-button {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #409eff;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.nav-button:hover {
-  color: #66b1ff;
-}
-
-.reset-button {
-  padding: 5px 10px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.reset-button:hover {
-  background-color: #45a049;
-}
-
 .date-range-display {
   font-size: 0.8rem;
   color: #666;
@@ -586,16 +525,6 @@ watch(
   font-size: 24px;
   font-weight: bold;
   color: #303133;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 
 @media (max-width: 1024px) {

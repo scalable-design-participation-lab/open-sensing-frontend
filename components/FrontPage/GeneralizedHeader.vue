@@ -2,20 +2,29 @@
   <header
     class="fixed top-8 left-8 right-8 flex justify-between items-center z-50"
   >
-    <div class="flex items-center space-x-6">
+    <div class="flex items-center space-x-2 sm:space-x-3">
       <UButton
         v-if="logoSrc"
         variant="outline"
         color="gray"
-        class="h-16 w-16 p-0 rounded-full backdrop-blur-md bg-white/90 flex items-center justify-center"
+        :class="[
+          `h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 p-0 backdrop-blur-md bg-white/90 flex items-center justify-center transition-all duration-300 hover:bg-gray-100`,
+          shapeClass,
+        ]"
       >
-        <img :src="logoSrc" :alt="logoAlt" class="w-10 h-auto" />
+        <img
+          :src="logoSrc"
+          :alt="logoAlt"
+          class="w-6 sm:w-7 md:w-8 lg:w-10 h-auto"
+        />
       </UButton>
       <UButton
         v-if="showIcon"
-        variant="outline"
         color="gray"
-        class="h-16 w-16 text-3xl rounded-full backdrop-blur-md bg-white/90 flex items-center justify-center"
+        :class="[
+          `h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 text-xl sm:text-2xl md:text-3xl backdrop-blur-md bg-white flex items-center justify-center border-2 border-gray-300 shadow-md transition-all duration-300 hover:text-white hover:border-black`,
+          shapeClass,
+        ]"
       >
         🤲
       </UButton>
@@ -25,7 +34,13 @@
             :variant="item.variant || (item.primary ? 'solid' : 'outline')"
             :color="item.color || (item.primary ? 'black' : 'gray')"
             :icon="item.icon"
-            class="h-16 px-7 rounded-full text-lg"
+            :class="[
+              `h-8 sm:h-10 md:h-12 lg:h-14 px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full transition-all duration-300`,
+              item.primary
+                ? 'bg-white text-black hover:bg-black hover:text-white hover:border hover:border-white'
+                : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black',
+              shapeClass,
+            ]"
             @click="navigate"
           >
             {{ item.label }}
@@ -36,21 +51,30 @@
           :variant="item.variant || (item.primary ? 'solid' : 'outline')"
           :color="item.color || (item.primary ? 'black' : 'gray')"
           :icon="item.icon"
-          class="h-16 px-7 rounded-full text-lg"
+          :class="[
+            `h-8 sm:h-10 md:h-12 lg:h-14 px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full transition-all duration-300`,
+            item.primary
+              ? 'bg-white text-black hover:bg-black hover:text-white hover:border hover:border-white'
+              : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black',
+            shapeClass,
+          ]"
           @click="item.onClick"
         >
           {{ item.label }}
         </UButton>
       </template>
     </div>
-    <div class="flex items-center space-x-6">
+    <div class="flex items-center space-x-2 sm:space-x-3">
       <template v-for="(item, index) in rightItems" :key="index">
         <UDropdown v-if="item.dropdown" v-bind="item.dropdown">
           <UButton
             :variant="item.variant || 'outline'"
             :color="item.color || 'gray'"
             :icon="item.icon"
-            class="h-16 px-7 rounded-full backdrop-blur-md bg-white/90 text-lg"
+            :class="[
+              `h-8 sm:h-10 md:h-12 lg:h-14 px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full transition-all duration-300 bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black`,
+              shapeClass,
+            ]"
           >
             {{ item.label }}
           </UButton>
@@ -65,7 +89,10 @@
             :variant="item.variant || 'outline'"
             :color="item.color || 'gray'"
             :icon="item.icon"
-            class="h-16 px-7 rounded-full backdrop-blur-md bg-white/90 text-lg"
+            :class="[
+              `h-8 sm:h-10 md:h-12 lg:h-14 px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full transition-all duration-300 bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black`,
+              shapeClass,
+            ]"
             @click="navigate"
           >
             {{ item.label }}
@@ -76,7 +103,10 @@
           :variant="item.variant || 'outline'"
           :color="item.color || 'gray'"
           :icon="item.icon"
-          class="h-16 px-7 rounded-full backdrop-blur-md bg-white/90 text-lg"
+          :class="[
+            `h-8 sm:h-10 md:h-12 lg:h-14 px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full transition-all duration-300 bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black`,
+            shapeClass,
+          ]"
           @click="item.onClick"
         >
           {{ item.label }}
@@ -85,8 +115,9 @@
     </div>
   </header>
 </template>
-
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
   leftItems: {
     type: Array,
@@ -108,5 +139,20 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  shape: {
+    type: String,
+    default: 'rounded',
+    validator: (value) => ['rounded', 'rectangular'].includes(value),
+  },
+})
+
+const shapeClass = computed(() => {
+  switch (props.shape) {
+    case 'rectangular':
+      return 'rounded-2xl'
+    case 'rounded':
+    default:
+      return 'rounded-full'
+  }
 })
 </script>

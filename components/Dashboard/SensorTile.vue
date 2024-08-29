@@ -1,59 +1,72 @@
 <template>
-  <el-card class="sensor-tile" shadow="hover">
-    <template #header>
-      <div class="sensor-header">
-        <h3>{{ sensor.location }}</h3>
-        <el-tag :type="getStatusType(sensor.status)">
-          {{ sensor.status }}
-        </el-tag>
+  <UCard class="sensor-tile" hover>
+    <div class="flex flex-col h-full">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">
+            {{ sensor.location }}
+          </h3>
+          <UBadge :color="getStatusColor(sensor.status)" class="mt-1">
+            {{ sensor.status }}
+          </UBadge>
+        </div>
+        <div class="flex items-center">
+          <UIcon
+            name="i-heroicons-battery-50"
+            class="w-6 h-6 mr-1"
+            :class="getBatteryIconColor(sensor.batteryLevel)"
+          />
+          <span class="text-sm font-semibold">{{ sensor.batteryLevel }}%</span>
+        </div>
       </div>
-    </template>
-    <el-row :gutter="20">
-      <el-col :span="10">
-        <el-progress
-          type="dashboard"
-          :percentage="sensor.batteryLevel"
-          :color="getColor(sensor.batteryLevel)"
-        >
-          <template #default="{ percentage }">
-            <span class="percentage-value">{{ percentage }}%</span>
-            <span class="percentage-label">Battery</span>
-          </template>
-        </el-progress>
-      </el-col>
-      <el-col :span="14">
-        <div class="sensor-data">
-          <div class="data-item">
-            <span class="label">Temperature:</span>
-            <span class="value">{{ sensor.temperature.toFixed(1) }}°C</span>
+
+      <UCard class="bg-gray-50 p-3 flex-grow">
+        <div class="grid grid-cols-2 gap-4 text-sm h-full">
+          <div class="text-center flex flex-col justify-center">
+            <span class="text-xl font-bold text-blue-500"
+              >{{ sensor.temperature.toFixed(1) }}°C</span
+            >
+            <p class="text-xs text-gray-600">Temperature</p>
           </div>
-          <div class="data-item">
-            <span class="label">Humidity:</span>
-            <span class="value">{{ sensor.humidity.toFixed(1) }}%</span>
+          <div class="text-center flex flex-col justify-center">
+            <span class="text-xl font-bold text-blue-500"
+              >{{ sensor.humidity.toFixed(1) }}%</span
+            >
+            <p class="text-xs text-gray-600">Humidity</p>
           </div>
-          <div class="data-item">
-            <span class="label">Air Quality:</span>
-            <span class="value">{{ sensor.airQuality }}</span>
+          <div class="text-center flex flex-col justify-center">
+            <span class="text-xl font-bold text-blue-500">{{
+              sensor.airQuality
+            }}</span>
+            <p class="text-xs text-gray-600">Air Quality</p>
           </div>
-          <div class="data-item">
-            <span class="label">Soil Moisture:</span>
-            <span class="value">{{ sensor.soilMoisture }}</span>
+          <div class="text-center flex flex-col justify-center">
+            <span class="text-xl font-bold text-blue-500">{{
+              sensor.soilMoisture
+            }}</span>
+            <p class="text-xs text-gray-600">Soil Moisture</p>
           </div>
         </div>
-      </el-col>
-    </el-row>
-    <div class="sensor-actions">
-      <el-button type="text" @click="openSensorDetail">
-        Details <el-icon class="el-icon--right"><ArrowRight /></el-icon>
-      </el-button>
+      </UCard>
+
+      <UButton
+        color="primary"
+        variant="ghost"
+        class="mt-4 self-center"
+        @click="openSensorDetail"
+      >
+        Details
+        <template #trailing>
+          <UIcon name="i-heroicons-arrow-right" />
+        </template>
+      </UButton>
     </div>
-  </el-card>
+  </UCard>
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
+import { computed } from 'vue'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
-import { ArrowRight } from '@element-plus/icons-vue'
 
 const props = defineProps({
   sensor: {
@@ -64,22 +77,28 @@ const props = defineProps({
 
 const store = useDashboardUIStore()
 
-const getColor = (value) => {
-  if (value < 30) return '#F56C6C'
-  if (value < 70) return '#E6A23C'
-  return '#67C23A'
+const getBatteryColor = (value) => {
+  if (value < 30) return 'red'
+  if (value < 70) return 'yellow'
+  return 'green'
 }
 
-const getStatusType = (status) => {
+const getBatteryIconColor = (value) => {
+  if (value < 30) return 'text-red-500'
+  if (value < 70) return 'text-yellow-500'
+  return 'text-green-500'
+}
+
+const getStatusColor = (status) => {
   switch (status) {
     case 'Active':
-      return 'success'
+      return 'green'
     case 'Inactive':
-      return 'danger'
+      return 'red'
     case 'Maintenance':
-      return 'warning'
+      return 'yellow'
     default:
-      return 'info'
+      return 'gray'
   }
 }
 
@@ -91,111 +110,9 @@ const openSensorDetail = () => {
 
 <style scoped>
 .sensor-tile {
-  height: 100%;
-  margin-bottom: 0;
-}
-
-.sensor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.sensor-header h3 {
-  margin: 0;
-  font-size: 1.2em;
-  color: #303133;
-}
-
-.percentage-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: #303133;
-  display: block;
-}
-
-.percentage-label {
-  font-size: 14px;
-  color: #606266;
-}
-
-.sensor-data {
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  padding: 15px;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-}
-
-.data-item {
-  margin-bottom: 10px;
-}
-
-.data-item:last-child {
-  margin-bottom: 0;
-}
-
-.data-item .label {
-  color: #606266;
-  font-size: 0.9em;
-  margin-right: 5px;
-}
-
-.data-item .value {
-  color: #303133;
-  font-weight: bold;
-}
-
-.sensor-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-:deep(.el-progress) {
-  margin: 0 auto;
-}
-
-@media (max-width: 1200px) {
-  .sensor-header h3 {
-    font-size: 1.1em;
-  }
-
-  .percentage-value {
-    font-size: 22px;
-  }
-
-  .data-item {
-    font-size: 0.9em;
-  }
-}
-
-@media (max-width: 768px) {
-  .sensor-header h3 {
-    font-size: 1em;
-  }
-
-  .percentage-value {
-    font-size: 20px;
-  }
-
-  .data-item {
-    font-size: 0.85em;
-  }
-
-  .el-row {
-    flex-direction: column;
-  }
-
-  .el-col {
-    width: 100% !important;
-  }
-
-  .sensor-data {
-    margin-top: 15px;
-  }
+  height: 100%;
+  min-height: 250px; /* Adjust this value as needed */
 }
 </style>

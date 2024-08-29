@@ -2,17 +2,17 @@
   <div v-if="isLoading" class="flex justify-center items-center h-screen">
     Loading...
   </div>
-  <div v-else class="flex overflow-hidden flex-col bg-white dark:bg-gray-900">
+  <div v-else class="flex overflow-hidden flex-col h-screen">
     <NewDashboardHeader class="app-header" />
 
-    <main class="main-content">
+    <main class="main-content flex-grow relative overflow-hidden">
       <MapDashboard />
       <FilterSidebar v-if="showFilter" class="filter-sidebar" />
       <DashboardOverlay
         :visible="showDashboard || showSensorDetail"
         class="dashboard-overlay"
       />
-      <Dashboard v-if="showDashboard" class="dashboard" />
+      <Dashboard v-if="showDashboard" class="dashboard-container" />
       <div class="sensor-tools-container">
         <SensorTools />
       </div>
@@ -29,19 +29,9 @@ import { useDashboardUIStore } from '@/stores/dashboardUI'
 const store = useDashboardUIStore()
 const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
 </script>
+
 <style scoped>
-.home {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.app-header {
-  z-index: 20;
-}
-
 .main-content {
-  flex-grow: 1;
   position: relative;
   overflow: hidden;
 }
@@ -61,16 +51,16 @@ const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
   z-index: 20;
   max-height: 95vh;
   overflow: hidden;
-  background-color: transparent;
 }
 
-.dashboard {
+.dashboard-container {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 20;
-  max-height: 95vh;
+  width: 90%;
+  height: 80%;
   overflow: hidden;
   background-color: transparent;
 }
@@ -83,6 +73,7 @@ const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
   z-index: 15;
 }
 
+.app-header,
 .app-footer {
   z-index: 15;
 }
