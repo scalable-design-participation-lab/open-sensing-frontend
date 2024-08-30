@@ -9,6 +9,9 @@ export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
 
   modules: ['@pinia/nuxt', '@nuxt/ui'],
+  devtools: {
+    enabled: true,
+  },
 
   components: [
     {

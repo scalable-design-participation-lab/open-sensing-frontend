@@ -23,7 +23,7 @@
               class="battery-indicator flex items-center bg-gray-200 rounded-full px-3 py-1"
             >
               <UIcon
-                :name="getBatteryIcon"
+                name="i-heroicons-battery-50"
                 class="w-6 h-6 mr-2"
                 :class="getBatteryIconColor(selectedSensor.batteryLevel)"
               />
@@ -228,14 +228,6 @@ const getStatusColor = (status) => {
       return 'gray'
   }
 }
-
-const getBatteryIcon = computed(() => {
-  const level = selectedSensor.value.batteryLevel
-  if (level > 75) return 'i-heroicons-battery-100'
-  if (level > 50) return 'i-heroicons-battery-75'
-  if (level > 25) return 'i-heroicons-battery-50'
-  return 'i-heroicons-battery-0'
-})
 
 const getBatteryIconColor = (value) => {
   if (value < 30) return 'text-red-500'
