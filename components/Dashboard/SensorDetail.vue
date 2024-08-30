@@ -4,84 +4,119 @@
       v-if="showSensorDetail && selectedSensor"
       class="sensor-detail-overlay"
     >
-      <div class="sensor-detail">
-        <header class="sensor-header">
-          <el-button class="back-button" text @click="goBackToDashboard">
-            <el-icon><Back /></el-icon>
-          </el-button>
-          <h1>{{ selectedSensor.location }}</h1>
-          <el-tag :type="getStatusType(selectedSensor.status)">
-            {{ selectedSensor.status }}
-          </el-tag>
-          <div class="navigation-buttons">
-            <el-button class="nav-button" @click="selectPreviousSensor">
-              <el-icon><ArrowUp /></el-icon>
-            </el-button>
-            <el-button class="nav-button" @click="selectNextSensor">
-              <el-icon><ArrowDown /></el-icon>
-            </el-button>
+      <div class="sensor-detail bg-white rounded-lg shadow-lg overflow-hidden">
+        <header
+          class="sensor-header bg-gray-100 p-4 flex items-center justify-between"
+        >
+          <UButton
+            icon="i-heroicons-arrow-left"
+            color="primary"
+            variant="ghost"
+            class="mr-4 hover:bg-gray-200 transition-colors"
+            @click="goBackToDashboard"
+          />
+          <h1 class="text-2xl font-bold text-gray-800 flex-grow">
+            {{ selectedSensor.location }}
+          </h1>
+          <div class="flex items-center space-x-4">
+            <div
+              class="battery-indicator flex items-center bg-gray-200 rounded-full px-3 py-1"
+            >
+              <UIcon
+                :name="getBatteryIcon"
+                class="w-6 h-6 mr-2"
+                :class="getBatteryIconColor(selectedSensor.batteryLevel)"
+              />
+              <span class="text-sm font-medium"
+                >{{ selectedSensor.batteryLevel }}%</span
+              >
+            </div>
+            <UBadge
+              :color="getStatusColor(selectedSensor.status)"
+              class="text-sm font-medium"
+            >
+              {{ selectedSensor.status }}
+            </UBadge>
           </div>
-          <el-button class="close-button" @click="closeSensorDetail">
-            <el-icon><Close /></el-icon>
-          </el-button>
+          <div class="navigation-buttons ml-4 flex">
+            <UButton
+              icon="i-heroicons-arrow-up"
+              color="primary"
+              variant="ghost"
+              class="mr-2 hover:bg-gray-200 transition-colors"
+              @click="selectPreviousSensor"
+            />
+            <UButton
+              icon="i-heroicons-arrow-down"
+              color="primary"
+              variant="ghost"
+              class="hover:bg-gray-200 transition-colors"
+              @click="selectNextSensor"
+            />
+          </div>
+          <UButton
+            icon="i-heroicons-x-mark"
+            color="gray"
+            variant="ghost"
+            class="ml-4 hover:bg-gray-200 transition-colors"
+            @click="closeSensorDetail"
+          />
         </header>
-        <div class="sensor-content">
-          <div class="sensor-stats">
+        <div class="sensor-content p-6">
+          <div class="sensor-stats grid grid-cols-5 gap-6">
             <div
               v-for="(value, key) in sensorStats"
               :key="key"
-              class="stat-item"
+              class="stat-item bg-gray-100 rounded-lg p-4 text-center transform hover:scale-105 transition-transform cursor-pointer"
+              @click="showStatDetails(key)"
             >
-              <h3>{{ value }}</h3>
-              <p>{{ key }}</p>
+              <h3 class="text-2xl font-bold" :class="getValueColor(key, value)">
+                {{ value }}
+              </h3>
+              <p class="text-sm text-gray-600 mt-2">{{ key }}</p>
             </div>
           </div>
-          <div class="sensor-details">
-            <div class="sensor-info">
-              <h2>Sensor Information</h2>
-              <div class="info-grid">
-                <div class="info-item battery-level">
-                  <el-progress
-                    type="circle"
-                    :percentage="selectedSensor.batteryLevel"
-                    :color="getBatteryColor"
-                  >
-                    <template #default="{ percentage }">
-                      <span class="percentage-value">{{ percentage }}%</span>
-                    </template>
-                  </el-progress>
-                  <p>Battery Level</p>
-                </div>
-                <div class="info-item">
-                  <h3>{{ selectedSensor.signalStrength }}/5</h3>
-                  <p>Signal Strength</p>
-                </div>
-                <div class="info-item">
-                  <h3>{{ selectedSensor.airQuality }}</h3>
-                  <p>Air Quality</p>
-                </div>
-                <div class="info-item">
-                  <h3>{{ selectedSensor.soilMoisture }}</h3>
-                  <p>Soil Moisture</p>
+          <div class="sensor-details flex gap-6 mt-8">
+            <div class="sensor-info flex-1">
+              <h2 class="text-xl font-bold mb-4 text-gray-800">
+                Sensor Information
+              </h2>
+              <div class="info-grid grid grid-cols-2 gap-6">
+                <div
+                  v-for="(item, index) in sensorInfoItems"
+                  :key="index"
+                  class="info-item bg-gray-100 rounded-lg p-4 text-center hover:shadow-md transition-shadow"
+                >
+                  <h3 class="text-xl font-bold" :class="item.color">
+                    {{ item.value }}
+                  </h3>
+                  <p class="text-sm text-gray-600 mt-2">{{ item.label }}</p>
                 </div>
               </div>
-              <p class="last-updated">
+              <p class="last-updated mt-4 text-sm text-gray-600">
                 Last Updated: {{ formatDate(selectedSensor.timestamp) }}
               </p>
-              <p class="last-maintenance">
+              <p class="last-maintenance mt-1 text-sm text-gray-600">
                 Last Maintenance:
                 {{ formatDate(selectedSensor.lastMaintenance) }}
               </p>
             </div>
-            <div class="sensor-location">
-              <h2>Location</h2>
-              <div id="mini-map" ref="miniMap"></div>
+            <div class="sensor-location flex-1">
+              <h2 class="text-xl font-bold mb-4 text-gray-800">Location</h2>
+              <div
+                id="mini-map"
+                ref="miniMap"
+                class="w-full h-72 rounded-lg overflow-hidden shadow-md"
+              ></div>
             </div>
           </div>
-          <div class="chart-container">
-            <h2>Sensor Data</h2>
-            <div ref="scrollContainer" class="scroll-container">
-              <div v-if="dataLoaded" class="charts-wrapper">
+          <div class="chart-container mt-8">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Sensor Data</h2>
+            <div
+              ref="scrollContainer"
+              class="scroll-container h-96 overflow-y-auto border border-gray-200 rounded-lg"
+            >
+              <div v-if="dataLoaded" class="charts-wrapper p-4 space-y-6">
                 <LineChart
                   v-for="(metric, metricName) in metrics"
                   v-show="selectedDatasets.includes(metricName)"
@@ -94,18 +129,27 @@
                   @date-range-update="updateGlobalDateRange"
                 />
               </div>
-              <div v-else class="loading">
-                <div class="loading-spinner"></div>
+              <div
+                v-else
+                class="loading flex flex-col items-center justify-center h-full"
+              >
+                <USpinner class="mb-2" />
                 <p>Loading data...</p>
               </div>
             </div>
-            <div class="dashboard-footer">
-              <el-button class="reset-button" @click="resetAllCharts">
-                Reset All
-              </el-button>
+            <div
+              class="dashboard-footer flex justify-between items-center py-4 border-t border-gray-200 mt-6"
+            >
+              <UButton
+                color="primary"
+                class="hover:bg-blue-600 transition-colors"
+                @click="resetAllCharts"
+              >
+                Reset All Charts
+              </UButton>
               <div
                 v-if="globalDateRange.length === 2"
-                class="date-range-display"
+                class="date-range-display text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"
               >
                 {{ formatDateRange(globalDateRange) }}
               </div>
@@ -122,7 +166,6 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { useResizeObserver } from '@vueuse/core'
-import { Back, ArrowUp, ArrowDown, Close } from '@element-plus/icons-vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import LineChart from './LineChart.vue'
@@ -173,24 +216,79 @@ const sensorStats = computed(() => {
   }
 })
 
-const getStatusType = (status) => {
+const getStatusColor = (status) => {
   switch (status) {
     case 'Active':
-      return 'success'
+      return 'green'
     case 'Inactive':
-      return 'danger'
+      return 'red'
     case 'Maintenance':
-      return 'warning'
+      return 'yellow'
     default:
-      return 'info'
+      return 'gray'
   }
 }
 
-const getBatteryColor = (percentage) => {
-  if (percentage < 20) return '#F56C6C'
-  if (percentage < 50) return '#E6A23C'
-  return '#67C23A'
+const getBatteryIcon = computed(() => {
+  const level = selectedSensor.value.batteryLevel
+  if (level > 75) return 'i-heroicons-battery-100'
+  if (level > 50) return 'i-heroicons-battery-75'
+  if (level > 25) return 'i-heroicons-battery-50'
+  return 'i-heroicons-battery-0'
+})
+
+const getBatteryIconColor = (value) => {
+  if (value < 30) return 'text-red-500'
+  if (value < 70) return 'text-yellow-500'
+  return 'text-green-500'
 }
+
+const getSignalStrengthColor = (value) => {
+  const strength = parseInt(value)
+  if (strength <= 2) return 'text-red-500'
+  if (strength <= 3) return 'text-yellow-500'
+  return 'text-green-500'
+}
+
+const getAirQualityColor = (value) => {
+  switch (value.toLowerCase()) {
+    case 'good':
+      return 'text-green-500'
+    case 'moderate':
+      return 'text-yellow-500'
+    case 'poor':
+      return 'text-orange-500'
+    case 'very poor':
+      return 'text-red-500'
+    default:
+      return 'text-gray-500'
+  }
+}
+
+const getSoilMoistureColor = (value) => {
+  const moisture = parseFloat(value)
+  if (moisture < 30) return 'text-red-500'
+  if (moisture < 60) return 'text-yellow-500'
+  return 'text-green-500'
+}
+
+const sensorInfoItems = computed(() => [
+  {
+    label: 'Signal Strength',
+    value: `${selectedSensor.value.signalStrength}/5`,
+    color: getSignalStrengthColor(selectedSensor.value.signalStrength),
+  },
+  {
+    label: 'Air Quality',
+    value: selectedSensor.value.airQuality,
+    color: getAirQualityColor(selectedSensor.value.airQuality),
+  },
+  {
+    label: 'Soil Moisture',
+    value: selectedSensor.value.soilMoisture,
+    color: getSoilMoistureColor(selectedSensor.value.soilMoisture),
+  },
+])
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString('en-US', {
@@ -314,6 +412,26 @@ const refreshSensorData = async () => {
   resetAllCharts()
 }
 
+const showStatDetails = (statKey) => {
+  console.log(`Showing details for ${statKey}`)
+}
+
+const getValueColor = (key, value) => {
+  if (key === 'Temperature') {
+    const temp = parseFloat(value)
+    if (temp < 10) return 'text-blue-500'
+    if (temp > 30) return 'text-red-500'
+    return 'text-green-500'
+  }
+  if (key === 'Humidity') {
+    const humidity = parseFloat(value)
+    if (humidity < 30) return 'text-yellow-500'
+    if (humidity > 70) return 'text-blue-500'
+    return 'text-green-500'
+  }
+  return 'text-blue-500'
+}
+
 watch(
   selectedSensor,
   async (newSensor, oldSensor) => {
@@ -339,8 +457,8 @@ watch(
   position: fixed;
   top: 0;
   left: 0;
-  width: 45%;
-  height: 45%;
+  width: 100%;
+  height: 85%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -349,281 +467,35 @@ watch(
 }
 
 .sensor-detail {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 1200px;
-  height: 100%;
+  max-height: 100%;
   overflow-y: auto;
-  display: flex;
-
-  flex-direction: column;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #409eff;
-  cursor: pointer;
-  padding: 0;
-  margin-right: 15px;
-}
-
-.back-button:hover {
-  color: #66b1ff;
-}
-
-.sensor-header {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 20px;
-  background-color: #f5f7fa;
-  border-bottom: 1px solid #e6e6e6;
-}
-
-.sensor-header h1 {
-  margin: 0;
-  font-size: 24px;
-  color: #303133;
-  flex-grow: 1;
-}
-
-.close-button {
-  font-size: 24px;
-  color: #909399;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.sensor-content {
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  gap: 20px;
-}
-
-.sensor-stats {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-}
-
-.stat-item,
-.info-item {
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  padding: 15px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.stat-item h3,
-.info-item h3 {
-  margin: 0;
-  font-size: 24px;
-  color: #409eff;
-}
-
-.stat-item p,
-.info-item p {
-  margin: 5px 0 0;
-  font-size: 14px;
-  color: #606266;
-}
-
-.sensor-details {
-  display: flex;
-  gap: 20px;
-}
-
-.sensor-info,
-.sensor-location {
-  flex: 1;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.battery-level {
-  grid-column: span 2;
-}
-
-.sensor-info h2,
-.sensor-location h2 {
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #303133;
-}
-
-.last-updated,
-.last-maintenance {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #606266;
-}
-
-#mini-map {
-  width: 100%;
-  height: 300px;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-:deep(.mapboxgl-ctrl-top-right) {
-  top: 10px;
-  right: 10px;
-}
-
-:deep(.mapboxgl-ctrl-scale) {
-  margin-bottom: 10px;
-  margin-right: 10px;
-}
-
-.chart-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.scroll-container {
-  height: 400px;
-  overflow-y: auto;
-  border: 1px solid #e6e6e6;
-  border-radius: 4px;
-}
-
-.charts-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 15px;
-}
-
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.loading-spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.dashboard-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-top: 1px solid #e0e0e0;
-}
-
-.navigation-buttons {
-  display: flex;
-  gap: 5px;
-  margin-right: 10px;
-}
-
-.nav-button {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #409eff;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.nav-button:hover {
-  color: #66b1ff;
-}
-
-.reset-button {
-  padding: 5px 10px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.reset-button:hover {
-  background-color: #45a049;
-}
-
-.date-range-display {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.percentage-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: #303133;
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  transform: scale(0.95);
 }
 
 @media (max-width: 1024px) {
-  .sensor-detail {
-    width: 95vw;
-    height: 95vh;
-  }
-  .sensor-stats,
-  .info-grid {
+  .sensor-stats {
     grid-template-columns: repeat(3, 1fr);
-  }
-  .battery-level {
-    grid-column: span 1;
   }
 }
 
 @media (max-width: 768px) {
-  .sensor-detail {
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0;
-  }
-  .sensor-stats,
-  .info-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .sensor-details {
     flex-direction: column;
+  }
+  .sensor-stats {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

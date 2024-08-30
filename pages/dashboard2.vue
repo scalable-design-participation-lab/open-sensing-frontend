@@ -18,7 +18,7 @@
       </div>
       <SensorDetail v-if="showSensorDetail" class="sensor-detail" />
     </main>
-    <Footer class="app-footer" title="Dashboard Footer" />
+    <Footer class="app-footer" />
   </div>
 </template>
 
