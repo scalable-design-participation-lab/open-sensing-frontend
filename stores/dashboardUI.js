@@ -126,10 +126,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     showFilter.value = !showFilter.value
   }
 
-  const closeFilter = () => {
-    showFilter.value = false
-  }
-
   // Dashboard related state and functions
   const showDashboard = ref(false)
 
@@ -384,7 +380,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     // Filter related
     showFilter,
     toggleFilter,
-    closeFilter,
 
     // Dashboard related
     showDashboard,

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showFilter" class="filter-sidebar-wrapper">
+  <div v-if="isVisible" class="filter-sidebar-wrapper">
     <UCard
       :ui="{
         base: 'overflow-hidden bg-white shadow-lg rounded-lg',
@@ -11,18 +11,18 @@
     >
       <template #header>
         <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold text-gray-800">Filters</h2>
+          <h2 class="text-xl font-semibold text-gray-800">{{ title }}</h2>
           <UButton
             icon="i-heroicons-x-mark"
             color="gray"
             variant="ghost"
-            @click="closeFilter"
+            @click="onClose"
           />
         </div>
       </template>
 
       <UAccordion
-        :items="accordionItems"
+        :items="filterSections"
         :ui="{
           wrapper: 'divide-y divide-gray-200',
           item: {
@@ -41,15 +41,11 @@
               body: { padding: 'p-4' },
             }"
           >
-            <div v-if="item.name === 'location'">
-              <LocationSelection />
-            </div>
-            <div v-else-if="item.name === 'datasets'">
-              <DataSelection />
-            </div>
-            <div v-else-if="item.name === 'datetime'">
-              <DateTimeSelection />
-            </div>
+            <component
+              :is="item.component"
+              v-bind="item.props"
+              @filter-change="handleFilterChange"
+            />
           </UCard>
         </template>
       </UAccordion>
@@ -60,7 +56,7 @@
             color="blue"
             variant="soft"
             class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
-            @click="resetFilters"
+            @click="onReset"
           >
             <template #leading>
               <UIcon name="i-heroicons-arrow-path" />
@@ -74,28 +70,33 @@
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
-import LocationSelection from './LocationSelection.vue'
-import DataSelection from './DataSelection.vue'
-import DateTimeSelection from './DateTimeSelection.vue'
-
-const store = useDashboardUIStore()
-const { showFilter } = storeToRefs(store)
-const { closeFilter, resetFilters } = store
-
-const accordionItems = [
-  {
-    name: 'location',
-    label: 'Location Selection',
-    icon: 'i-heroicons-map-pin',
+defineProps({
+  isVisible: {
+    type: Boolean,
+    default: false,
   },
-  { name: 'datasets', label: 'Data Selection', icon: 'i-heroicons-chart-bar' },
-  { name: 'datetime', label: 'Date & Time', icon: 'i-heroicons-calendar' },
-]
+  title: {
+    type: String,
+    default: 'Filters',
+  },
+  filterSections: {
+    type: Array,
+    required: true,
+  },
+})
 
-const handleFilterChange = () => {
-  console.log('Filter changed')
+const emit = defineEmits(['close', 'reset', 'filter-change'])
+
+const onClose = () => {
+  emit('close')
+}
+
+const onReset = () => {
+  emit('reset')
+}
+
+const handleFilterChange = (filterData) => {
+  emit('filter-change', filterData)
 }
 </script>
 

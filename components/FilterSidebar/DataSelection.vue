@@ -5,6 +5,7 @@
       :key="dataset"
       :label="dataset"
       :model-value="isActive"
+      @update:model-value="handleDatasetChange(dataset, $event)"
     >
       {{ dataset }}
     </UCheckbox>
@@ -18,6 +19,7 @@ import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 const store = useDashboardUIStore()
 const { existingDatasets } = storeToRefs(store)
+const { updateExistingDatasets, updateDateRangeUpdate } = store
 
 const selectedDatasets = computed({
   get: () =>
@@ -30,6 +32,11 @@ const selectedDatasets = computed({
     })
   },
 })
+
+const handleDatasetChange = (dataset, value) => {
+  updateExistingDatasets(dataset, value)
+  updateDateRangeUpdate(new Date())
+}
 </script>
 
 <style scoped>

@@ -5,7 +5,7 @@
       :key="name"
       :label="name"
       :model-value="isActive"
-      @update:model-value="() => toggleHub(name)"
+      @update:model-value="handleLocationChange(name, $event)"
     >
       {{ name }}
     </UCheckbox>
@@ -13,23 +13,32 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 
 const store = useDashboardUIStore()
 const { existingHubs } = storeToRefs(store)
-const { toggleHub } = store
+const { updateExistingHubs, updateDateRangeUpdate } = store
 
 const selectedLocations = computed({
   get: () =>
-    Object.keys(existingHubs.value).filter((hub) => existingHubs.value[hub]),
+    Object.keys(existingHubs.value || {}).filter(
+      (hub) => existingHubs.value[hub]
+    ),
   set: (newValue) => {
-    Object.keys(existingHubs.value).forEach((hub) => {
-      existingHubs.value[hub] = newValue.includes(hub)
-    })
+    if (existingHubs.value) {
+      Object.keys(existingHubs.value).forEach((hub) => {
+        updateExistingHubs(hub, newValue.includes(hub))
+      })
+    }
   },
 })
+
+const handleLocationChange = (name, value) => {
+  updateExistingHubs(name, value)
+  updateDateRangeUpdate(new Date())
+}
 </script>
 
 <style scoped>
