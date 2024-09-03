@@ -1,49 +1,39 @@
 <template>
-  <div class="dashboard-container">
-    <div class="dashboard-grid">
-      <UCard class="overview-card">
+  <div
+    class="flex justify-center items-center min-h-screen p-[2.5vh_2.5vw] bg-[rgba(240,242,245,0.7)]"
+  >
+    <div
+      class="w-[90%] h-[80vh] max-w-[1800px] flex flex-col gap-5 overflow-hidden"
+    >
+      <UCard
+        class="flex-shrink-0 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+      >
         <template #header>
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold">Sensor Overview</h2>
-            <UBadge color="gray" size="sm">
-              Last updated: {{ lastUpdated }}
-            </UBadge>
-          </div>
+          <DashboardHeader
+            title="Sensor Overview"
+            :badge-text="`Last updated: ${lastUpdated}`"
+            badge-color="gray"
+          />
         </template>
-        <div class="overview-content">
-          <p class="text-sm text-gray-600 mb-4">{{ overviewDescription }}</p>
-          <div class="flex gap-3 mb-6">
-            <UButton color="primary" icon="i-heroicons-download" size="sm">
-              Export
-            </UButton>
-            <UButton color="gray" icon="i-heroicons-share" size="sm">
-              Share
-            </UButton>
-            <UButton color="warning" icon="i-heroicons-pencil" size="sm">
-              Edit
-            </UButton>
-          </div>
-          <div class="grid grid-cols-3 gap-4">
-            <UCard
-              v-for="(stat, index) in overviewStats"
-              :key="index"
-              class="text-center p-4 bg-white hover:shadow-lg transition-shadow duration-300"
-            >
-              <h3 class="text-2xl font-bold text-blue-500">{{ stat.value }}</h3>
-              <p class="text-sm text-gray-600">{{ stat.label }}</p>
-            </UCard>
-          </div>
-        </div>
+        <OverviewContent
+          :description="overviewDescription"
+          :stats="overviewStats"
+        />
       </UCard>
 
-      <div class="sensors-container">
-        <div class="sensor-grid">
+      <div class="flex-grow overflow-y-auto p-5">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        >
           <SensorTile
             v-for="sensor in sensors"
             :key="sensor.id"
             :sensor="sensor"
-            class="sensor-card"
-            @click="openSensorDetail(sensor.id)"
+            :show-details="true"
+            :custom-colors="customColors"
+            :display-fields="displayFields"
+            class="w-full h-full"
+            @open-details="openSensorDetail"
           />
         </div>
       </div>
@@ -51,11 +41,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import SensorTile from './SensorTile.vue'
+import OverviewContent from './OverviewContent.vue'
+import DashboardHeader from './DashboardHeader.vue'
 
 const store = useDashboardUIStore()
 const { sensors } = storeToRefs(store)
@@ -76,10 +68,8 @@ const overviewStats = computed(() => [
     label: 'Active Sensors',
   },
   {
-    value: Object.keys(sensors.value[0]).filter((key) =>
-      ['temperature', 'humidity', 'voc', 'nox', 'pm25'].includes(key)
-    ).length,
-    label: 'Values Measured',
+    value: displayFields.value.length,
+    label: 'Measured Values',
   },
   {
     value: sensors.value.filter((sensor) => sensor.status === 'Maintenance')
@@ -88,122 +78,44 @@ const overviewStats = computed(() => [
   },
 ])
 
-const openSensorDetail = (sensorId) => {
+const openSensorDetail = (sensorId: string) => {
   store.updateSelectedSensor(sensorId)
   store.toggleSensorDetail()
 }
 
-// Rename the component to address the linter error
+const customColors = {
+  status: {
+    Active: 'green',
+    Inactive: 'red',
+    Maintenance: 'yellow',
+  },
+  battery: {
+    low: 'text-red-500',
+    medium: 'text-yellow-500',
+    high: 'text-green-500',
+  },
+  values: {
+    temperature: {
+      '0-15': 'text-blue-500',
+      '16-25': 'text-green-500',
+      '26-100': 'text-red-500',
+    },
+    humidity: {
+      '0-30': 'text-yellow-500',
+      '31-70': 'text-green-500',
+      '71-100': 'text-blue-500',
+    },
+  },
+}
+
+const displayFields = ref([
+  'temperature',
+  'humidity',
+  'airQuality',
+  'soilMoisture',
+])
+
 defineOptions({
-  name: 'DashboardView',
+  name: 'Dashboard',
 })
 </script>
-
-<style scoped>
-.dashboard-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2.5vh 2.5vw;
-  background-color: rgba(240, 242, 245, 0.7);
-}
-
-.dashboard-grid {
-  width: 90%;
-  height: 80vh;
-  max-width: 1800px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow: hidden;
-}
-
-.overview-card {
-  flex-shrink: 0;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.overview-card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.overview-content,
-.sensors-container {
-  padding: 20px;
-}
-
-.sensors-container {
-  flex-grow: 1;
-  overflow-y: auto;
-}
-
-.sensor-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-}
-
-.sensor-card {
-  width: 100%;
-  height: 100%;
-  transition: transform 0.3s ease-in-out;
-}
-
-.sensor-card:hover {
-  transform: translateY(-5px);
-}
-
-@media (max-width: 1400px) {
-  .sensor-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 1024px) {
-  .dashboard-container {
-    padding: 1.5vh 1.5vw;
-  }
-
-  .dashboard-grid {
-    width: 95%;
-    height: 85vh;
-  }
-
-  .sensor-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 1vh 1vw;
-  }
-
-  .dashboard-grid {
-    width: 98%;
-    height: 90vh;
-  }
-
-  .overview-content,
-  .sensors-container {
-    padding: 10px;
-  }
-
-  .sensor-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .sensor-grid {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

@@ -23,23 +23,27 @@
       <UCard class="bg-gray-50 p-3 flex-grow">
         <div class="grid grid-cols-2 gap-4 text-sm h-full">
           <div
-            v-for="(value, key) in sensorData"
-            :key="key"
+            v-for="field in displayFields"
+            :key="field"
             class="text-center flex flex-col justify-center"
           >
-            <span class="text-xl font-bold" :class="getValueColor(key, value)">
-              {{ formatValue(key, value) }}
+            <span
+              class="text-xl font-bold"
+              :class="getValueColor(field, sensor[field])"
+            >
+              {{ formatValue(field, sensor[field]) }}
             </span>
-            <p class="text-xs text-gray-600">{{ formatLabel(key) }}</p>
+            <p class="text-xs text-gray-600">{{ formatLabel(field) }}</p>
           </div>
         </div>
       </UCard>
 
       <UButton
+        v-if="showDetails"
         color="primary"
         variant="ghost"
         class="mt-4 self-center transition-colors duration-300 hover:bg-blue-100"
-        @click="openSensorDetail"
+        @click="$emit('open-details', sensor.id)"
       >
         Details
         <template #trailing>
@@ -50,26 +54,63 @@
   </UCard>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
+
+interface Sensor {
+  id: string
+  location: string
+  status: string
+  batteryLevel: number
+  temperature?: number
+  humidity?: number
+  airQuality?: number
+  soilMoisture?: number
+  [key: string]: any
+}
+
+interface CustomColors {
+  status?: Record<string, string>
+  battery?: Record<string, string>
+  values?: Record<string, Record<string, string>>
+}
 
 const props = defineProps({
   sensor: {
-    type: Object,
+    type: Object as () => Sensor,
     required: true,
+  },
+  showDetails: {
+    type: Boolean,
+    default: true,
+  },
+  customColors: {
+    type: Object as () => CustomColors,
+    default: () => ({}),
+  },
+  displayFields: {
+    type: Array as () => string[],
+    default: () => ['temperature', 'humidity', 'airQuality', 'soilMoisture'],
   },
 })
 
-const store = useDashboardUIStore()
+const emit = defineEmits(['open-details'])
 
-const getBatteryIconColor = (value) => {
+const getBatteryIconColor = (value: number) => {
+  if (props.customColors.battery) {
+    return props.customColors.battery[
+      value < 30 ? 'low' : value < 70 ? 'medium' : 'high'
+    ]
+  }
   if (value < 30) return 'text-red-500'
   if (value < 70) return 'text-yellow-500'
   return 'text-green-500'
 }
 
-const getStatusColor = (status) => {
+const getStatusColor = (status: string) => {
+  if (props.customColors.status && props.customColors.status[status]) {
+    return props.customColors.status[status]
+  }
   switch (status) {
     case 'Active':
       return 'green'
@@ -82,31 +123,27 @@ const getStatusColor = (status) => {
   }
 }
 
-const openSensorDetail = () => {
-  store.updateSelectedSensor(props.sensor.id)
-  store.toggleSensorDetail()
-}
-
-const sensorData = computed(() => ({
-  temperature: props.sensor.temperature,
-  humidity: props.sensor.humidity,
-  airQuality: props.sensor.airQuality,
-  soilMoisture: props.sensor.soilMoisture,
-}))
-
-const formatValue = (key, value) => {
-  if (key === 'temperature') return `${value.toFixed(1)}°C`
-  if (key === 'humidity') return `${value.toFixed(1)}%`
+const formatValue = (key: string, value: number | string) => {
+  if (key === 'temperature') return `${Number(value).toFixed(1)}°C`
+  if (key === 'humidity') return `${Number(value).toFixed(1)}%`
   return value
 }
 
-const formatLabel = (key) => {
+const formatLabel = (key: string) => {
   return key
     .replace(/([A-Z])/g, ' $1')
     .replace(/^./, (str) => str.toUpperCase())
 }
 
-const getValueColor = (key, value) => {
+const getValueColor = (key: string, value: number) => {
+  if (props.customColors.values && props.customColors.values[key]) {
+    const colorRanges = props.customColors.values[key]
+    for (const [range, color] of Object.entries(colorRanges)) {
+      const [min, max] = range.split('-').map(Number)
+      if (value >= min && value <= max) return color
+    }
+  }
+
   if (key === 'temperature') {
     if (value < 10) return 'text-blue-500'
     if (value > 30) return 'text-red-500'
