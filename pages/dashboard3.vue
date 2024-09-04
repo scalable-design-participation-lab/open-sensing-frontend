@@ -23,7 +23,7 @@
       />
       <Dashboard v-if="showDashboard" class="dashboard-container" />
       <div class="sensor-tools-container">
-        <SensorTools />
+        <GenericToolbar :tools="sensorTools" @tool-click="handleToolClick" />
       </div>
       <SensorDetail v-if="showSensorDetail" class="sensor-detail" />
     </main>
@@ -31,12 +31,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
-import Footer from '@/components/FrontPage/Footer.vue'
-import GenericFilterSidebar from '@/components/FilterSidebar/GenericFilterSidebar.vue'
 
 const store = useDashboardUIStore()
 const {
@@ -54,6 +52,8 @@ const {
   updateExistingHubs,
   updateExistingDatasets,
   updateDateRangeUpdate,
+  toggleFilter,
+  toggleDashboard,
 } = store
 
 const isLoading = ref(false)
@@ -127,6 +127,21 @@ const resetAllFilters = () => {
   updateDataDashboardValues('dateRange', [])
   updateDateRangeUpdate(new Date())
 }
+
+const sensorTools = [
+  { icon: 'i-heroicons-home', tooltip: 'Home' },
+  { icon: 'i-heroicons-funnel', tooltip: 'Filter', action: toggleFilter },
+  {
+    icon: 'i-heroicons-squares-2x2',
+    tooltip: 'Dashboard',
+    action: toggleDashboard,
+  },
+  { icon: 'i-heroicons-map-pin', tooltip: 'Location Info' },
+]
+
+const handleToolClick = (index: number) => {
+  console.log('Dashboard: Tool clicked:', sensorTools[index].tooltip)
+}
 </script>
 
 <style scoped>
@@ -177,4 +192,3 @@ const resetAllFilters = () => {
   z-index: 20;
 }
 </style>
-.
