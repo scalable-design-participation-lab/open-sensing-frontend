@@ -42,9 +42,11 @@
             }"
           >
             <component
-              :is="item.component"
+              :is="resolveComponent(item.component)"
               v-bind="item.props"
-              @filter-change="handleFilterChange"
+              @update:model-value="
+                (value) => handleFilterChange(item.name, value)
+              "
             />
           </UCard>
         </template>
@@ -70,6 +72,10 @@
 </template>
 
 <script setup>
+import { defineAsyncComponent } from 'vue'
+import GenericCheckboxGroup from './GenericCheckboxGroup.vue'
+import GenericDateRangePicker from './GenericDateRangePicker.vue'
+
 defineProps({
   isVisible: {
     type: Boolean,
@@ -95,8 +101,19 @@ const onReset = () => {
   emit('reset')
 }
 
-const handleFilterChange = (filterData) => {
-  emit('filter-change', filterData)
+const handleFilterChange = (name, value) => {
+  emit('filter-change', { name, value })
+}
+
+const resolveComponent = (componentName) => {
+  switch (componentName) {
+    case 'GenericCheckboxGroup':
+      return GenericCheckboxGroup
+    case 'GenericDateRangePicker':
+      return GenericDateRangePicker
+    default:
+      return defineAsyncComponent(() => import(`./${componentName}.vue`))
+  }
 }
 </script>
 

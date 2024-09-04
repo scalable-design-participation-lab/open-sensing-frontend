@@ -7,7 +7,16 @@
 
     <main class="main-content flex-grow relative overflow-hidden">
       <MapDashboard />
-      <FilterSidebar v-if="showFilter" class="filter-sidebar" />
+      <GenericFilterSidebar
+        v-if="showFilter"
+        :is-visible="showFilter"
+        title="Filters"
+        :filter-sections="filterSections"
+        class="filter-sidebar"
+        @close="closeFilter"
+        @reset="resetAllFilters"
+        @filter-change="handleFilterChange"
+      />
       <DashboardOverlay
         :visible="showDashboard || showSensorDetail"
         class="dashboard-overlay"
@@ -23,12 +32,101 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import Footer from '@/components/FrontPage/Footer.vue'
+import GenericFilterSidebar from '@/components/FilterSidebar/GenericFilterSidebar.vue'
 
 const store = useDashboardUIStore()
-const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
+const {
+  showFilter,
+  showDashboard,
+  showSensorDetail,
+  dataDashboardValues,
+  existingHubs,
+  existingDatasets,
+} = storeToRefs(store)
+const {
+  closeFilter,
+  resetFilters,
+  updateDataDashboardValues,
+  updateExistingHubs,
+  updateExistingDatasets,
+  updateDateRangeUpdate,
+} = store
+
+const isLoading = ref(false)
+
+const filterSections = computed(() => [
+  {
+    name: 'location',
+    label: 'Location Selection',
+    icon: 'i-heroicons-map-pin',
+    component: 'GenericCheckboxGroup',
+    props: {
+      items: Object.keys(existingHubs.value).map((hub) => ({
+        label: hub,
+        value: hub,
+      })),
+      modelValue: existingHubs.value,
+    },
+  },
+  {
+    name: 'datasets',
+    label: 'Data Selection',
+    icon: 'i-heroicons-chart-bar',
+    component: 'GenericCheckboxGroup',
+    props: {
+      items: Object.keys(existingDatasets.value).map((dataset) => ({
+        label: dataset,
+        value: dataset,
+      })),
+      modelValue: existingDatasets.value,
+    },
+  },
+  {
+    name: 'datetime',
+    label: 'Date & Time',
+    icon: 'i-heroicons-calendar',
+    component: 'GenericDateRangePicker',
+    props: {
+      modelValue: dataDashboardValues.value.dateRange,
+      placeholder: 'Select date range',
+      presetOptions: [
+        { label: 'Last 24 Hours', value: 1 },
+        { label: 'Last 7 Days', value: 7 },
+        { label: 'Last 30 Days', value: 30 },
+        { label: 'Last 365 Days', value: 365 },
+      ],
+    },
+  },
+])
+
+const handleFilterChange = (filterData) => {
+  const { name, value } = filterData
+  switch (name) {
+    case 'location':
+      updateExistingHubs(value)
+      break
+    case 'datasets':
+      updateExistingDatasets(value)
+      break
+    case 'datetime':
+      updateDataDashboardValues('dateRange', value)
+      break
+  }
+  updateDateRangeUpdate(new Date())
+}
+
+const resetAllFilters = () => {
+  const resetValue = (obj) =>
+    Object.fromEntries(Object.keys(obj).map((key) => [key, true]))
+  updateExistingHubs(resetValue(existingHubs.value))
+  updateExistingDatasets(resetValue(existingDatasets.value))
+  updateDataDashboardValues('dateRange', [])
+  updateDateRangeUpdate(new Date())
+}
 </script>
 
 <style scoped>
@@ -79,4 +177,4 @@ const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)
   z-index: 20;
 }
 </style>
-。
+.

@@ -1,18 +1,19 @@
 <template>
-  <UCheckboxGroup v-model="selectedItems" class="checkbox-group">
+  <div class="checkbox-group">
     <UCheckbox
       v-for="item in items"
       :key="item.value"
       :label="item.label"
-      :value="item.value"
+      :model-value="selectedItems[item.value]"
+      @update:model-value="updateItem(item.value, $event)"
     >
       {{ item.label }}
     </UCheckbox>
-  </UCheckboxGroup>
+  </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 
 const props = defineProps({
   items: {
@@ -20,17 +21,35 @@ const props = defineProps({
     required: true,
   },
   modelValue: {
-    type: Array,
-    default: () => [],
+    type: Object,
+    default: () => ({}),
   },
 })
 
 const emit = defineEmits(['update:modelValue'])
 
-const selectedItems = ref(props.modelValue)
+const selectedItems = ref({ ...props.modelValue })
 
-watch(selectedItems, (newValue) => {
-  emit('update:modelValue', newValue)
+const updateItem = (key, value) => {
+  selectedItems.value[key] = value
+  emit('update:modelValue', { ...selectedItems.value })
+}
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    selectedItems.value = { ...newValue }
+  },
+  { deep: true }
+)
+
+onMounted(() => {
+  if (Object.keys(selectedItems.value).length === 0 && props.items.length > 0) {
+    props.items.forEach((item) => {
+      selectedItems.value[item.value] = true
+    })
+    emit('update:modelValue', { ...selectedItems.value })
+  }
 })
 </script>
 

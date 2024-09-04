@@ -160,12 +160,12 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     pm10: true,
   })
 
-  const updateExistingHubs = (hub, val) => {
-    existingHubs.value[hub] = val
+  const updateExistingHubs = (newHubs) => {
+    existingHubs.value = { ...newHubs }
   }
 
-  const updateExistingDatasets = (dataset, val) => {
-    existingDatasets.value[dataset] = val
+  const updateExistingDatasets = (newDatasets) => {
+    existingDatasets.value = { ...newDatasets }
   }
 
   const toggleDataset = (datasetKey) => {
