@@ -39,7 +39,7 @@
       >
       <div class="sensor-data">
         <div class="data-item">
-          <UIcon name="i-heroicons-temperature" class="data-icon" />
+          <UIcon name="i-heroicons-beaker" class="data-icon" />
           <span>{{ selectedSensor.temperature.toFixed(1) }}°C</span>
         </div>
         <div class="data-item">
@@ -83,8 +83,8 @@ const {
 const positionStyle = computed(() => {
   const { x, y } = props.markerPosition
   const offset = 10
-  const infoWidth = 280 // 增加宽度
-  const infoHeight = 250 // 增加高度
+  const infoWidth = 280
+  const infoHeight = 250
 
   let left = x + offset
   let top = y - infoHeight - offset

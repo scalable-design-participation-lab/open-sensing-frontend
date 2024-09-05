@@ -5,110 +5,27 @@
       class="sensor-detail-overlay"
     >
       <div class="sensor-detail bg-white rounded-lg shadow-lg overflow-hidden">
-        <header
-          class="sensor-header bg-gray-100 p-4 flex items-center justify-between"
-        >
-          <UButton
-            icon="i-heroicons-arrow-left"
-            color="primary"
-            variant="ghost"
-            class="mr-4 hover:bg-gray-200 transition-colors"
-            @click="goBackToDashboard"
-          />
-          <h1 class="text-2xl font-bold text-gray-800 flex-grow">
-            {{ selectedSensor.location }}
-          </h1>
-          <div class="flex items-center space-x-4">
-            <div
-              class="battery-indicator flex items-center bg-gray-200 rounded-full px-3 py-1"
-            >
-              <UIcon
-                name="i-heroicons-battery-50"
-                class="w-6 h-6 mr-2"
-                :class="getBatteryIconColor(selectedSensor.batteryLevel)"
-              />
-              <span class="text-sm font-medium"
-                >{{ selectedSensor.batteryLevel }}%</span
-              >
-            </div>
-            <UBadge
-              :color="getStatusColor(selectedSensor.status)"
-              class="text-sm font-medium"
-            >
-              {{ selectedSensor.status }}
-            </UBadge>
-          </div>
-          <div class="navigation-buttons ml-4 flex">
-            <UButton
-              icon="i-heroicons-arrow-up"
-              color="primary"
-              variant="ghost"
-              class="mr-2 hover:bg-gray-200 transition-colors"
-              @click="selectPreviousSensor"
-            />
-            <UButton
-              icon="i-heroicons-arrow-down"
-              color="primary"
-              variant="ghost"
-              class="hover:bg-gray-200 transition-colors"
-              @click="selectNextSensor"
-            />
-          </div>
-          <UButton
-            icon="i-heroicons-x-mark"
-            color="gray"
-            variant="ghost"
-            class="ml-4 hover:bg-gray-200 transition-colors"
-            @click="closeSensorDetail"
-          />
-        </header>
+        <SensorHeader
+          :selected-sensor="selectedSensor"
+          @close="closeSensorDetail"
+          @go-back="goBackToDashboard"
+          @select-previous="selectPreviousSensor"
+          @select-next="selectNextSensor"
+        />
         <div class="sensor-content p-6">
-          <div class="sensor-stats grid grid-cols-5 gap-6">
-            <div
-              v-for="(value, key) in sensorStats"
-              :key="key"
-              class="stat-item bg-gray-100 rounded-lg p-4 text-center transform hover:scale-105 transition-transform cursor-pointer"
-              @click="showStatDetails(key)"
-            >
-              <h3 class="text-2xl font-bold" :class="getValueColor(key, value)">
-                {{ value }}
-              </h3>
-              <p class="text-sm text-gray-600 mt-2">{{ key }}</p>
-            </div>
-          </div>
+          <SensorStats
+            :sensor-stats="sensorStats"
+            @show-stat-details="showStatDetails"
+          />
           <div class="sensor-details flex gap-6 mt-8">
-            <div class="sensor-info flex-1">
-              <h2 class="text-xl font-bold mb-4 text-gray-800">
-                Sensor Information
-              </h2>
-              <div class="info-grid grid grid-cols-2 gap-6">
-                <div
-                  v-for="(item, index) in sensorInfoItems"
-                  :key="index"
-                  class="info-item bg-gray-100 rounded-lg p-4 text-center hover:shadow-md transition-shadow"
-                >
-                  <h3 class="text-xl font-bold" :class="item.color">
-                    {{ item.value }}
-                  </h3>
-                  <p class="text-sm text-gray-600 mt-2">{{ item.label }}</p>
-                </div>
-              </div>
-              <p class="last-updated mt-4 text-sm text-gray-600">
-                Last Updated: {{ formatDate(selectedSensor.timestamp) }}
-              </p>
-              <p class="last-maintenance mt-1 text-sm text-gray-600">
-                Last Maintenance:
-                {{ formatDate(selectedSensor.lastMaintenance) }}
-              </p>
-            </div>
-            <div class="sensor-location flex-1">
-              <h2 class="text-xl font-bold mb-4 text-gray-800">Location</h2>
-              <div
-                id="mini-map"
-                ref="miniMap"
-                class="w-full h-72 rounded-lg overflow-hidden shadow-md"
-              ></div>
-            </div>
+            <SensorInfo
+              :selected-sensor="selectedSensor"
+              :sensor-info-items="sensorInfoItems"
+            />
+            <SensorLocation
+              :selected-sensor="selectedSensor"
+              @init-map="initMiniMap"
+            />
           </div>
           <div class="chart-container mt-8">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Sensor Data</h2>
@@ -166,9 +83,6 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { useResizeObserver } from '@vueuse/core'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
-import LineChart from './LineChart.vue'
 
 const store = useDashboardUIStore()
 const {
@@ -179,7 +93,6 @@ const {
   showDashboard,
 } = storeToRefs(store)
 
-const miniMap = ref(null)
 const scrollContainer = ref(null)
 const chartWidth = ref(0)
 const chartHeight = 180
@@ -216,54 +129,6 @@ const sensorStats = computed(() => {
   }
 })
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case 'Active':
-      return 'green'
-    case 'Inactive':
-      return 'red'
-    case 'Maintenance':
-      return 'yellow'
-    default:
-      return 'gray'
-  }
-}
-
-const getBatteryIconColor = (value) => {
-  if (value < 30) return 'text-red-500'
-  if (value < 70) return 'text-yellow-500'
-  return 'text-green-500'
-}
-
-const getSignalStrengthColor = (value) => {
-  const strength = parseInt(value)
-  if (strength <= 2) return 'text-red-500'
-  if (strength <= 3) return 'text-yellow-500'
-  return 'text-green-500'
-}
-
-const getAirQualityColor = (value) => {
-  switch (value.toLowerCase()) {
-    case 'good':
-      return 'text-green-500'
-    case 'moderate':
-      return 'text-yellow-500'
-    case 'poor':
-      return 'text-orange-500'
-    case 'very poor':
-      return 'text-red-500'
-    default:
-      return 'text-gray-500'
-  }
-}
-
-const getSoilMoistureColor = (value) => {
-  const moisture = parseFloat(value)
-  if (moisture < 30) return 'text-red-500'
-  if (moisture < 60) return 'text-yellow-500'
-  return 'text-green-500'
-}
-
 const sensorInfoItems = computed(() => [
   {
     label: 'Signal Strength',
@@ -282,16 +147,6 @@ const sensorInfoItems = computed(() => [
   },
 ])
 
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
 useResizeObserver(scrollContainer, (entries) => {
   const entry = entries[0]
   if (entry) {
@@ -301,46 +156,9 @@ useResizeObserver(scrollContainer, (entries) => {
 
 onMounted(async () => {
   if (selectedSensor.value) {
-    initMiniMap()
     await store.loadSensorData()
   }
 })
-
-const initMiniMap = () => {
-  mapboxgl.accessToken =
-    'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
-
-  miniMap.value = new mapboxgl.Map({
-    container: 'mini-map',
-    style: 'mapbox://styles/mapbox/satellite-v9',
-    center: selectedSensor.value.coordinates,
-    zoom: 15,
-    attributionControl: false,
-  })
-
-  miniMap.value.addControl(new mapboxgl.NavigationControl(), 'top-right')
-  miniMap.value.addControl(new mapboxgl.ScaleControl(), 'bottom-right')
-
-  const marker = new mapboxgl.Marker({
-    color: '#FF0000',
-  })
-    .setLngLat(selectedSensor.value.coordinates)
-    .addTo(miniMap.value)
-
-  miniMap.value.on('style.load', () => {
-    miniMap.value.setPitch(45)
-    miniMap.value.setBearing(20)
-  })
-
-  miniMap.value.on('dblclick', () => {
-    miniMap.value.flyTo({
-      center: selectedSensor.value.coordinates,
-      zoom: 15,
-      pitch: 45,
-      bearing: 20,
-    })
-  })
-}
 
 const closeSensorDetail = () => {
   store.toggleSensorDetail()
@@ -392,14 +210,6 @@ const selectPreviousSensor = async () => {
 }
 
 const refreshSensorData = async () => {
-  if (miniMap.value) {
-    miniMap.value.flyTo({
-      center: selectedSensor.value.coordinates,
-      zoom: 15,
-      pitch: 45,
-      bearing: 20,
-    })
-  }
   await store.loadSensorData()
   resetAllCharts()
 }
@@ -424,18 +234,39 @@ const getValueColor = (key, value) => {
   return 'text-blue-500'
 }
 
+const getSignalStrengthColor = (value) => {
+  const strength = parseInt(value)
+  if (strength <= 2) return 'text-red-500'
+  if (strength <= 3) return 'text-yellow-500'
+  return 'text-green-500'
+}
+
+const getAirQualityColor = (value) => {
+  switch (value.toLowerCase()) {
+    case 'good':
+      return 'text-green-500'
+    case 'moderate':
+      return 'text-yellow-500'
+    case 'poor':
+      return 'text-orange-500'
+    case 'very poor':
+      return 'text-red-500'
+    default:
+      return 'text-gray-500'
+  }
+}
+
+const getSoilMoistureColor = (value) => {
+  const moisture = parseFloat(value)
+  if (moisture < 30) return 'text-red-500'
+  if (moisture < 60) return 'text-yellow-500'
+  return 'text-green-500'
+}
+
 watch(
   selectedSensor,
   async (newSensor, oldSensor) => {
     if (newSensor && newSensor !== oldSensor) {
-      if (miniMap.value) {
-        miniMap.value.flyTo({
-          center: newSensor.coordinates,
-          zoom: 15,
-          pitch: 45,
-          bearing: 20,
-        })
-      }
       await store.loadSensorData()
       resetAllCharts()
     }
@@ -492,8 +323,7 @@ watch(
 }
 
 @media (max-width: 480px) {
-  .sensor-stats,
-  .info-grid {
+  .sensor-stats {
     grid-template-columns: 1fr;
   }
 }

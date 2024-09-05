@@ -1,7 +1,7 @@
 <template>
   <div>
     <main id="main-container" />
-    <SensorInfo v-if="showSensorInfo" :marker-position="markerPosition" />
+    <SensorTag v-if="showSensorInfo" :marker-position="markerPosition" />
   </div>
 </template>
 

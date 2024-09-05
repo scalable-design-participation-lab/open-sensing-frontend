@@ -1,34 +1,60 @@
 <template>
-  <div :id="chartId">
-    <el-button class="reset-button" round @click="resetChart">
+  <div :id="chartId" class="relative">
+    <UButton
+      class="reset-button"
+      icon="i-heroicons-arrow-path"
+      @click="resetChart"
+    >
       Reset Chart
-    </el-button>
+    </UButton>
     <div class="tooltip" />
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import * as d3 from 'd3'
-import { ElButton } from 'element-plus'
-import 'element-plus/dist/index.css'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { storeToRefs } from 'pinia'
 
-const props = defineProps({
-  metric: { type: Object, required: true },
-  data: { type: Object, required: true },
-  width: { type: Number, required: true },
-  height: { type: Number, required: true },
-  margin: { type: Object, required: true },
-})
+interface DataPoint {
+  date: Date
+  value: number
+}
+
+interface Props {
+  metric: {
+    label: string
+  }
+  data: {
+    data: DataPoint[]
+    min: number
+    max: number
+  }
+  width: number
+  height: number
+  margin: {
+    top: number
+    right: number
+    bottom: number
+    left: number
+  }
+}
+
+const props = defineProps<Props>()
 
 const store = useDashboardUIStore()
 const { dataDashboardValues, dateRangeUpdate } = storeToRefs(store)
 const { updateDataDashboardValues } = store
 
 const chartId = ref(`chart-${Date.now()}`)
-let svg, x, y, xAxis, yAxis, line, brush
+let svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>
+let x: d3.ScaleTime<number, number>
+let y: d3.ScaleLinear<number, number>
+let xAxis: d3.Axis<Date>
+let yAxis: d3.Axis<number>
+let line: d3.Line<DataPoint>
+let brush: d3.BrushBehavior<unknown>
 
 const createLineChart = () => {
   if (props.width <= 0 || !props.data.data || props.data.data.length === 0)
@@ -50,10 +76,13 @@ const createLineChart = () => {
 
   // Ensure dates are parsed correctly
   const parseDate = d3.isoParse
-  const data = props.data.data.map((d) => ({ ...d, date: parseDate(d.date) }))
+  const data = props.data.data.map((d) => ({
+    ...d,
+    date: parseDate(d.date) as Date,
+  }))
 
   // Determine x and y domains from the data
-  const xDomain = d3.extent(data, (d) => d.date)
+  const xDomain = d3.extent(data, (d) => d.date) as [Date, Date]
   const yDomain = [props.data.min, props.data.max]
 
   x = d3.scaleTime().range([0, width]).domain(xDomain)
@@ -62,7 +91,7 @@ const createLineChart = () => {
   xAxis = d3
     .axisBottom(x)
     .ticks(5)
-    .tickFormat(d3.timeFormat('%Y-%m-%d'))
+    .tickFormat(d3.timeFormat('%Y-%m-%d') as any)
     .tickSizeOuter(0)
 
   yAxis = d3
@@ -84,7 +113,7 @@ const createLineChart = () => {
   svg.append('g').attr('class', 'y-axis').call(yAxis)
 
   line = d3
-    .line()
+    .line<DataPoint>()
     .x((d) => x(d.date))
     .y((d) => y(d.value))
     .defined((d) => !isNaN(d.value))
@@ -131,22 +160,25 @@ const createLineChart = () => {
     .text(props.metric.label)
 }
 
-const updateChart = (event) => {
-  if (!event || !event.selection) return
-  const [x0, x1] = event.selection.map(x.invert)
+const updateChart = (event: d3.D3BrushEvent<any>) => {
+  if (!event.selection) return
+  const [x0, x1] = event.selection.map(x.invert) as [Date, Date]
   updateDataDashboardValues('dateRange', [x0, x1])
   x.domain([x0, x1])
-  svg.select('.x-axis').call(xAxis)
+  svg.select('.x-axis').call(xAxis as any)
   svg.select('.line').attr('d', line)
 }
 
 const resetChart = () => {
-  const data = props.data.data.map((d) => ({ ...d, date: d3.isoParse(d.date) }))
-  const xDomain = d3.extent(data, (d) => d.date)
+  const data = props.data.data.map((d) => ({
+    ...d,
+    date: d3.isoParse(d.date) as Date,
+  }))
+  const xDomain = d3.extent(data, (d) => d.date) as [Date, Date]
   x.domain(xDomain)
   y.domain([props.data.min, props.data.max]).nice()
-  svg.select('.x-axis').call(xAxis)
-  svg.select('.y-axis').call(yAxis)
+  svg.select('.x-axis').call(xAxis as any)
+  svg.select('.y-axis').call(yAxis as any)
   svg.select('.line').attr('d', line)
   svg.select('.brush').call(brush.move, null)
 }
@@ -155,8 +187,8 @@ watch(() => props.data, createLineChart, { deep: true })
 watch(() => props.width, createLineChart)
 watch(dateRangeUpdate, () => {
   if (dataDashboardValues.value.dateRange.length === 2) {
-    x.domain(dataDashboardValues.value.dateRange)
-    svg.select('.x-axis').call(xAxis)
+    x.domain(dataDashboardValues.value.dateRange as [Date, Date])
+    svg.select('.x-axis').call(xAxis as any)
     svg.select('.line').attr('d', line)
   }
 })

@@ -3,16 +3,16 @@
     Loading...
   </div>
   <div v-else class="flex overflow-hidden flex-col h-screen">
-    <NewDashboardHeader class="z-20" />
+    <NewDashboardHeader class="app-header" />
 
-    <main class="flex-grow relative overflow-hidden">
+    <main class="main-content flex-grow relative overflow-hidden">
       <MapDashboard />
       <GenericFilterSidebar
         v-if="showFilter"
         :is-visible="showFilter"
         title="Filters"
         :filter-sections="filterSections"
-        class="absolute top-[100px] right-5 z-20"
+        class="filter-sidebar"
         @close="closeFilter"
         @reset="resetAllFilters"
         @filter-change="handleFilterChange"
@@ -21,19 +21,13 @@
         :visible="showDashboard || showSensorDetail"
         class="dashboard-overlay"
       />
-      <Dashboard
-        v-if="showDashboard"
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-[90%] h-[80%] overflow-hidden bg-transparent"
-      />
-      <div class="absolute left-5 top-1/2 transform -translate-y-1/2 z-20">
+      <Dashboard v-if="showDashboard" class="dashboard-container" />
+      <div class="sensor-tools-container">
         <GenericToolbar :tools="sensorTools" @tool-click="handleToolClick" />
       </div>
-      <SensorDetail
-        v-if="showSensorDetail"
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 max-h-[95vh] overflow-hidden"
-      />
+      <SensorDetail v-if="showSensorDetail" class="sensor-detail" />
     </main>
-    <Footer class="z-20" />
+    <Footer class="app-footer" />
   </div>
 </template>
 
@@ -152,3 +146,52 @@ const closeFilter = () => {
   toggleFilter()
 }
 </script>
+
+<style scoped>
+.main-content {
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-sidebar {
+  position: absolute;
+  top: 100px;
+  right: 20px;
+  z-index: 20;
+}
+
+.sensor-detail {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  max-height: 95vh;
+  overflow: hidden;
+}
+
+.dashboard-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  width: 90%;
+  height: 80%;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+.sensor-tools-container {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;
+}
+
+.app-header,
+.app-footer {
+  z-index: 20;
+}
+</style>
