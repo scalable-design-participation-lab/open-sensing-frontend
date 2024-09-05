@@ -35,6 +35,8 @@
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { sub } from 'date-fns'
+import GenericDateRangePicker from '@/components/FilterSidebar/GenericDateRangePicker.vue'
 
 const store = useDashboardUIStore()
 const {
@@ -56,6 +58,13 @@ const {
 } = store
 
 const isLoading = ref(false)
+const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
+
+function updateDateRange(newRange) {
+  selected.value = newRange
+  updateDataDashboardValues('dateRange', [newRange.start, newRange.end])
+  updateDateRangeUpdate(new Date())
+}
 
 const filterSections = computed(() => [
   {
@@ -90,14 +99,7 @@ const filterSections = computed(() => [
     icon: 'i-heroicons-calendar',
     component: 'GenericDateRangePicker',
     props: {
-      modelValue: dataDashboardValues.value.dateRange,
-      placeholder: 'Select date range',
-      presetOptions: [
-        { label: 'Last 24 Hours', value: 1 },
-        { label: 'Last 7 Days', value: 7 },
-        { label: 'Last 30 Days', value: 30 },
-        { label: 'Last 365 Days', value: 365 },
-      ],
+      modelValue: selected.value,
     },
   },
 ])
@@ -112,7 +114,7 @@ const handleFilterChange = (filterData) => {
       updateExistingDatasets(value)
       break
     case 'datetime':
-      updateDataDashboardValues('dateRange', value)
+      updateDateRange(value)
       break
   }
   updateDateRangeUpdate(new Date())

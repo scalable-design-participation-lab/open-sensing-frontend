@@ -1,79 +1,154 @@
 <template>
   <div>
-    <UDatePicker
-      v-model="dateRange"
-      range
-      :placeholder="placeholder"
-      class="mb-4 w-full"
-      @update:model-value="handleDateChange"
-    />
-    <div class="preset-date-filters">
-      <UButton
-        v-for="option in presetOptions"
-        :key="option.label"
-        size="sm"
-        class="date-filter-button"
-        @click="() => applyDateFilter(option.value)"
-      >
-        {{ option.label }}
-      </UButton>
-    </div>
+    <UButton icon="i-heroicons-calendar-days-20-solid" @click="isOpen = true">
+      {{ formatDateRange }}
+    </UButton>
+
+    <Teleport to="body">
+      <Transition name="fade">
+        <div
+          v-if="isOpen"
+          class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+        >
+          <div
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-2xl w-full mx-4"
+          >
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold">Select Date Range</h3>
+              <UButton
+                icon="i-heroicons-x-mark"
+                color="gray"
+                variant="ghost"
+                @click="isOpen = false"
+              />
+            </div>
+            <div class="flex flex-col md:flex-row gap-4">
+              <div class="flex flex-col space-y-2">
+                <UButton
+                  v-for="(range, index) in ranges"
+                  :key="index"
+                  :label="range.label"
+                  color="gray"
+                  variant="ghost"
+                  class="justify-start"
+                  :class="[
+                    isRangeSelected(range.duration)
+                      ? 'bg-gray-100 dark:bg-gray-700'
+                      : '',
+                  ]"
+                  @click="handleRangeClick(range.duration)"
+                />
+              </div>
+              <DatePicker
+                v-model="selected"
+                :min="minDate"
+                :max="maxDate"
+                range
+                @update:model-value="handleDateChange"
+              />
+            </div>
+            <div class="mt-4 flex justify-end">
+              <UButton color="primary" @click="applyDateRange">Apply</UButton>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
-<script setup>
-import { ref, watch } from 'vue'
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { sub, format, isSameDay, isValid, type Duration } from 'date-fns'
 
 const props = defineProps({
   modelValue: {
-    type: Array,
-    default: () => [],
-  },
-  placeholder: {
-    type: String,
-    default: 'Select date range',
-  },
-  presetOptions: {
-    type: Array,
-    default: () => [
-      { label: 'Last 24 Hours', value: 1 },
-      { label: 'Last 7 Days', value: 7 },
-      { label: 'Last 30 Days', value: 30 },
-      { label: 'Last 365 Days', value: 365 },
-    ],
+    type: Object,
+    default: () => ({ start: sub(new Date(), { days: 14 }), end: new Date() }),
   },
 })
 
 const emit = defineEmits(['update:modelValue'])
 
-const dateRange = ref(props.modelValue)
+const ranges = [
+  { label: 'Last 7 days', duration: { days: 7 } },
+  { label: 'Last 14 days', duration: { days: 14 } },
+  { label: 'Last 30 days', duration: { days: 30 } },
+  { label: 'Last 3 months', duration: { months: 3 } },
+  { label: 'Last 6 months', duration: { months: 6 } },
+  { label: 'Last year', duration: { years: 1 } },
+]
 
-watch(dateRange, (newValue) => {
-  emit('update:modelValue', newValue)
+const selected = ref(props.modelValue)
+
+const minDate = sub(new Date(), { years: 5 })
+const maxDate = new Date()
+
+const isOpen = ref(false)
+
+const formatDateRange = computed(() => {
+  if (isValid(selected.value.start) && isValid(selected.value.end)) {
+    return `${format(selected.value.start, 'd MMM, yyyy')} - ${format(
+      selected.value.end,
+      'd MMM, yyyy'
+    )}`
+  }
+  return 'Select date range'
 })
 
-const handleDateChange = () => {
-  emit('update:modelValue', dateRange.value)
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue && isValid(newValue.start) && isValid(newValue.end)) {
+      selected.value = newValue
+    }
+  },
+  { deep: true }
+)
+
+function isRangeSelected(duration: Duration) {
+  return (
+    isSameDay(selected.value.start, sub(new Date(), duration)) &&
+    isSameDay(selected.value.end, new Date())
+  )
 }
 
-const applyDateFilter = (days) => {
-  const endDate = new Date()
-  const startDate = new Date(endDate)
-  startDate.setDate(endDate.getDate() - days)
-  dateRange.value = [startDate, endDate]
-  handleDateChange()
+function selectRange(duration: Duration) {
+  const end = new Date()
+  const start = sub(end, duration)
+  selected.value = { start, end }
+  emitChange()
+}
+
+function handleDateChange(value) {
+  if (value && isValid(value.start) && isValid(value.end)) {
+    selected.value = value
+    emitChange()
+  }
+}
+
+function emitChange() {
+  emit('update:modelValue', selected.value)
+}
+
+function handleRangeClick(duration: Duration) {
+  selectRange(duration)
+}
+
+function applyDateRange() {
+  emitChange()
+  isOpen.value = false
 }
 </script>
 
 <style scoped>
-.preset-date-filters {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.date-filter-button {
-  font-size: 12px;
-  padding: 8px;
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -8,7 +8,7 @@
   />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 
@@ -38,6 +38,21 @@ const mapItems = [
   ],
 ]
 
+const downloadItems = [
+  [
+    {
+      label: 'Download CSV',
+      icon: 'i-heroicons-document-arrow-down-20-solid',
+      click: () => handleDownloadCSV(),
+    },
+    {
+      label: 'Download JSON',
+      icon: 'i-heroicons-document-arrow-down-20-solid',
+      click: () => handleDownloadJSON(),
+    },
+  ],
+]
+
 const rightItems = ref([
   {
     label: 'Map Selection',
@@ -49,5 +64,25 @@ const rightItems = ref([
       popper: { placement: 'bottom-end' },
     },
   },
+  {
+    label: 'Download',
+    icon: 'i-heroicons-arrow-down-tray-20-solid',
+    variant: 'outline',
+    color: 'gray',
+    dropdown: {
+      items: downloadItems,
+      popper: { placement: 'bottom-end' },
+    },
+  },
 ])
+
+const handleDownloadCSV = () => {
+  // 实现CSV下载逻辑
+  console.log('Downloading CSV...')
+}
+
+const handleDownloadJSON = () => {
+  // 实现JSON下载逻辑
+  console.log('Downloading JSON...')
+}
 </script>

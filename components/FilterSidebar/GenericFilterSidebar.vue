@@ -2,7 +2,7 @@
   <div v-if="isVisible" class="filter-sidebar-wrapper">
     <UCard
       :ui="{
-        base: 'overflow-hidden bg-white shadow-lg rounded-lg',
+        base: 'overflow-visible bg-white shadow-lg rounded-lg',
         header: { padding: 'px-6 py-4' },
         body: { base: 'overflow-y-auto px-6 py-4' },
         footer: { padding: 'px-6 py-4' },
@@ -126,7 +126,7 @@ const resolveComponent = (componentName) => {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border-radius: 1rem;
-  overflow: hidden;
+  overflow: visible !important;
 }
 
 @media (min-width: 640px) {
