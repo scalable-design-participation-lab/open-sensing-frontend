@@ -40,23 +40,3 @@ const getValueColor = (key, value) => {
   return 'text-blue-500'
 }
 </script>
-
-<style scoped>
-@media (max-width: 1024px) {
-  .sensor-stats {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .sensor-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .sensor-stats {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

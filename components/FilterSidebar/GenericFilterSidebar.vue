@@ -1,8 +1,8 @@
 <template>
-  <div v-if="isVisible" class="filter-sidebar-wrapper">
+  <div v-if="isVisible" class="pointer-events-auto">
     <UCard
       :ui="{
-        base: 'overflow-visible bg-white shadow-lg rounded-lg',
+        base: 'overflow-visible bg-white shadow-lg rounded-lg w-[340px] sm:w-[360px] max-h-[85vh]',
         header: { padding: 'px-6 py-4' },
         body: { base: 'overflow-y-auto px-6 py-4' },
         footer: { padding: 'px-6 py-4' },
@@ -28,7 +28,7 @@
         :ui="{
           wrapper: 'divide-y divide-gray-200',
           item: {
-            base: 'filter-box transition-all duration-200 ease-in-out hover:-translate-y-0.5',
+            base: 'shadow-sm mb-2 rounded-md transition-all duration-200 ease-in-out hover:-translate-y-0.5',
             trigger:
               'bg-gray-50 hover:bg-gray-100 rounded-md p-2 transition-colors duration-200',
             content: 'p-4',
@@ -68,17 +68,6 @@
               </template>
               Reset
             </UButton>
-            <UButton
-              color="blue"
-              variant="solid"
-              class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
-              @click="onDownload"
-            >
-              <template #leading>
-                <UIcon name="i-heroicons-arrow-down-tray" />
-              </template>
-              Download
-            </UButton>
           </slot>
         </div>
       </template>
@@ -116,10 +105,6 @@ const onReset = () => {
   emit('reset')
 }
 
-const onDownload = () => {
-  emit('download')
-}
-
 const handleFilterChange = (name, value) => {
   emit('filter-change', { name, value })
 }
@@ -135,27 +120,3 @@ const resolveComponent = (componentName) => {
   }
 }
 </script>
-
-<style scoped>
-.filter-sidebar {
-  width: 340px;
-  max-height: 85vh;
-  background-color: white;
-  pointer-events: auto;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border-radius: 1rem;
-  overflow: visible !important;
-}
-
-@media (min-width: 640px) {
-  .filter-sidebar {
-    width: 360px;
-  }
-}
-
-.filter-box {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 0.5rem;
-}
-</style>

@@ -55,7 +55,6 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import GenericFilterSidebar from './FilterSidebar/GenericFilterSidebar.vue'
 
 const props = defineProps({
   filterSections: {

@@ -1,10 +1,17 @@
 <template>
-  <transition name="fade">
+  <transition
+    enter-active-class="transition-opacity duration-300 ease-in-out"
+    leave-active-class="transition-opacity duration-300 ease-in-out"
+    enter-from-class="opacity-0"
+    leave-to-class="opacity-0"
+  >
     <div
       v-if="showSensorDetail && selectedSensor"
-      class="sensor-detail-overlay"
+      class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]"
     >
-      <div class="sensor-detail bg-white rounded-lg shadow-lg overflow-hidden">
+      <div
+        class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
+      >
         <SensorHeader
           :selected-sensor="selectedSensor"
           @close="closeSensorDetail"
@@ -12,12 +19,12 @@
           @select-previous="selectPreviousSensor"
           @select-next="selectNextSensor"
         />
-        <div class="sensor-content p-6">
+        <div class="p-6">
           <SensorStats
             :sensor-stats="sensorStats"
             @show-stat-details="showStatDetails"
           />
-          <div class="sensor-details flex gap-6 mt-8">
+          <div class="flex flex-col md:flex-row gap-6 mt-8">
             <SensorInfo
               :selected-sensor="selectedSensor"
               :sensor-info-items="sensorInfoItems"
@@ -27,13 +34,13 @@
               @init-map="initMiniMap"
             />
           </div>
-          <div class="chart-container mt-8">
+          <div class="mt-8">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Sensor Data</h2>
             <div
               ref="scrollContainer"
-              class="scroll-container h-96 overflow-y-auto border border-gray-200 rounded-lg"
+              class="h-96 overflow-y-auto border border-gray-200 rounded-lg"
             >
-              <div v-if="dataLoaded" class="charts-wrapper p-4 space-y-6">
+              <div v-if="dataLoaded" class="p-4 space-y-6">
                 <LineChart
                   v-for="(metric, metricName) in metrics"
                   v-show="selectedDatasets.includes(metricName)"
@@ -48,14 +55,14 @@
               </div>
               <div
                 v-else
-                class="loading flex flex-col items-center justify-center h-full"
+                class="flex flex-col items-center justify-center h-full"
               >
                 <USpinner class="mb-2" />
                 <p>Loading data...</p>
               </div>
             </div>
             <div
-              class="dashboard-footer flex justify-between items-center py-4 border-t border-gray-200 mt-6"
+              class="flex justify-between items-center py-4 border-t border-gray-200 mt-6"
             >
               <UButton
                 color="primary"
@@ -66,7 +73,7 @@
               </UButton>
               <div
                 v-if="globalDateRange.length === 2"
-                class="date-range-display text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"
+                class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"
               >
                 {{ formatDateRange(globalDateRange) }}
               </div>
@@ -274,57 +281,3 @@ watch(
   { deep: true }
 )
 </script>
-
-<style scoped>
-.sensor-detail-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 85%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.sensor-detail {
-  width: 100%;
-  max-width: 1200px;
-  max-height: 100%;
-  overflow-y: auto;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: scale(0.95);
-}
-
-@media (max-width: 1024px) {
-  .sensor-stats {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .sensor-details {
-    flex-direction: column;
-  }
-  .sensor-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .sensor-stats {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

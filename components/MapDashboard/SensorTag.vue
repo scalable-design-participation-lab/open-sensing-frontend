@@ -1,8 +1,12 @@
 <template>
-  <UCard class="sensor-info" :ui="cardStyle" :style="positionStyle">
+  <UCard
+    class="w-[280px] z-[1000] pointer-events-auto absolute"
+    :ui="cardStyle"
+    :style="positionStyle"
+  >
     <template #header>
-      <div class="info-header">
-        <div class="navigation-buttons">
+      <div class="flex justify-between items-center">
+        <div class="flex gap-2">
           <UButton
             color="gray"
             variant="ghost"
@@ -16,7 +20,7 @@
             @click="selectNextSensor"
           />
         </div>
-        <div class="action-buttons">
+        <div class="flex gap-2">
           <UButton
             color="primary"
             variant="ghost"
@@ -32,26 +36,26 @@
         </div>
       </div>
     </template>
-    <div class="info-content">
-      <h3 class="sensor-title">{{ selectedSensor.location }}</h3>
-      <span class="sensor-time"
-        >Last updated: {{ selectedSensor.timestamp }}</span
-      >
-      <div class="sensor-data">
-        <div class="data-item">
-          <UIcon name="i-heroicons-beaker" class="data-icon" />
+    <div class="p-4">
+      <h3 class="text-lg font-semibold mb-1">{{ selectedSensor.location }}</h3>
+      <span class="text-sm text-gray-500 block mb-4">
+        Last updated: {{ selectedSensor.timestamp }}
+      </span>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex items-center">
+          <UIcon name="i-heroicons-beaker" class="mr-2 text-gray-600" />
           <span>{{ selectedSensor.temperature.toFixed(1) }}°C</span>
         </div>
-        <div class="data-item">
-          <UIcon name="i-heroicons-cloud" class="data-icon" />
+        <div class="flex items-center">
+          <UIcon name="i-heroicons-cloud" class="mr-2 text-gray-600" />
           <span>{{ selectedSensor.humidity.toFixed(1) }}%</span>
         </div>
-        <div class="data-item">
-          <UIcon name="i-heroicons-sparkles" class="data-icon" />
+        <div class="flex items-center">
+          <UIcon name="i-heroicons-sparkles" class="mr-2 text-gray-600" />
           <span>{{ selectedSensor.airQuality }}</span>
         </div>
-        <div class="data-item">
-          <UIcon name="i-heroicons-battery-50" class="data-icon" />
+        <div class="flex items-center">
+          <UIcon name="i-heroicons-battery-50" class="mr-2 text-gray-600" />
           <span>{{ selectedSensor.batteryLevel }}%</span>
         </div>
       </div>
@@ -100,7 +104,6 @@ const positionStyle = computed(() => {
   return {
     left: `${left}px`,
     top: `${top}px`,
-    position: 'absolute',
   }
 })
 
@@ -114,57 +117,3 @@ const openSensorDetail = () => {
   toggleSensorDetail()
 }
 </script>
-
-<style scoped>
-.sensor-info {
-  width: 280px;
-  z-index: 1000;
-  pointer-events: auto;
-}
-
-.info-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.navigation-buttons,
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.info-content {
-  padding: 1rem;
-}
-
-.sensor-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.sensor-time {
-  font-size: 0.8rem;
-  color: #6b7280;
-  display: block;
-  margin-bottom: 1rem;
-}
-
-.sensor-data {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.data-item {
-  display: flex;
-  align-items: center;
-  font-size: 0.9rem;
-}
-
-.data-icon {
-  margin-right: 0.5rem;
-  color: #4b5563;
-}
-</style>

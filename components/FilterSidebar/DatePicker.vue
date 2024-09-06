@@ -43,7 +43,6 @@ const attrs = {
   />
   <VCalendarDatePicker v-else v-model="date" v-bind="{ ...attrs, ...$attrs }" />
 </template>
-
 <style>
 :root {
   --vc-gray-50: rgb(var(--color-gray-50));

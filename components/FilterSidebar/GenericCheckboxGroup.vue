@@ -1,5 +1,5 @@
 <template>
-  <div class="checkbox-group">
+  <div class="flex flex-col gap-2.5">
     <UCheckbox
       v-for="item in items"
       :key="item.value"
@@ -52,11 +52,3 @@ onMounted(() => {
   }
 })
 </script>
-
-<style scoped>
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-</style>

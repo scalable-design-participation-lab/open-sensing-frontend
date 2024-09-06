@@ -1,7 +1,15 @@
 <!-- DashboardOverlay.vue -->
 <template>
-  <Transition name="fade">
-    <div v-if="visible" class="dashboard-overlay"></div>
+  <Transition
+    enter-active-class="transition-opacity duration-300 ease-in-out"
+    leave-active-class="transition-opacity duration-300 ease-in-out"
+    enter-from-class="opacity-0"
+    leave-to-class="opacity-0"
+  >
+    <div
+      v-if="visible"
+      class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-15"
+    ></div>
   </Transition>
 </template>
 
@@ -13,26 +21,3 @@ defineProps({
   },
 })
 </script>
-
-<style scoped>
-.dashboard-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-  z-index: 15;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

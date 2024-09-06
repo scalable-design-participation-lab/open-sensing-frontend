@@ -1,5 +1,8 @@
 <template>
-  <UCard class="sensor-tile" hover>
+  <UCard
+    class="flex flex-col h-full min-h-[250px] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg"
+    hover
+  >
     <div class="flex flex-col h-full">
       <div class="flex justify-between items-start mb-4">
         <div>
@@ -157,19 +160,3 @@ const getValueColor = (key: string, value: number) => {
   return 'text-blue-500'
 }
 </script>
-
-<style scoped>
-.sensor-tile {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 250px;
-  transition: all 0.3s ease-in-out;
-}
-
-.sensor-tile:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-</style>

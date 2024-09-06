@@ -5,7 +5,12 @@
     </UButton>
 
     <Teleport to="body">
-      <Transition name="fade">
+      <Transition
+        enter-active-class="transition-opacity duration-300 ease-in-out"
+        leave-active-class="transition-opacity duration-300 ease-in-out"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
+      >
         <div
           v-if="isOpen"
           class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
@@ -140,15 +145,3 @@ function applyDateRange() {
   isOpen.value = false
 }
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
