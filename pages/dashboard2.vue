@@ -25,7 +25,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
-import Footer from '@/components/FrontPage/Footer.vue'
+import Footer from '~/components/FrontPage/GeneralizedFooter.vue'
 
 const store = useDashboardUIStore()
 const { showFilter, showDashboard, showSensorDetail } = storeToRefs(store)

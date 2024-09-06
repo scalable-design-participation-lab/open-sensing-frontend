@@ -64,7 +64,7 @@
       <MoreInThisSeries :items="moreSeriesItems" :cols="3" />
     </UContainer>
 
-    <Footer
+    <GeneralizedFooter
       title="Drawing Participation"
       :links="[
         { to: '#about', label: 'About' },

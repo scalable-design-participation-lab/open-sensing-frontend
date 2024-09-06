@@ -21,6 +21,8 @@
         </div>
       </template>
 
+      <slot name="before-filters"></slot>
+
       <UAccordion
         :items="filterSections"
         :ui="{
@@ -54,17 +56,30 @@
 
       <template #footer>
         <div class="flex justify-end space-x-2">
-          <UButton
-            color="blue"
-            variant="soft"
-            class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
-            @click="onReset"
-          >
-            <template #leading>
-              <UIcon name="i-heroicons-arrow-path" />
-            </template>
-            Reset
-          </UButton>
+          <slot name="footer-buttons">
+            <UButton
+              color="blue"
+              variant="soft"
+              class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
+              @click="onReset"
+            >
+              <template #leading>
+                <UIcon name="i-heroicons-arrow-path" />
+              </template>
+              Reset
+            </UButton>
+            <UButton
+              color="blue"
+              variant="solid"
+              class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
+              @click="onDownload"
+            >
+              <template #leading>
+                <UIcon name="i-heroicons-arrow-down-tray" />
+              </template>
+              Download
+            </UButton>
+          </slot>
         </div>
       </template>
     </UCard>
@@ -91,7 +106,7 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['close', 'reset', 'filter-change'])
+const emit = defineEmits(['close', 'reset', 'filter-change', 'download'])
 
 const onClose = () => {
   emit('close')
@@ -99,6 +114,10 @@ const onClose = () => {
 
 const onReset = () => {
   emit('reset')
+}
+
+const onDownload = () => {
+  emit('download')
 }
 
 const handleFilterChange = (name, value) => {

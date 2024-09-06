@@ -3,7 +3,10 @@
     Loading...
   </div>
   <div v-else class="flex overflow-hidden flex-col h-screen">
-    <NewDashboardHeader class="app-header" />
+    <NewDashboardHeader
+      class="app-header"
+      @show-download="showDownloadPopup = true"
+    />
 
     <main class="main-content flex-grow relative overflow-hidden">
       <MapDashboard />
@@ -27,7 +30,15 @@
       </div>
       <SensorDetail v-if="showSensorDetail" class="sensor-detail" />
     </main>
-    <Footer class="app-footer" />
+    <GeneralizedFooter class="app-footer" />
+    <Teleport to="body">
+      <DownloadPopup
+        v-if="showDownloadPopup"
+        :filter-sections="downloadFilterSections"
+        @close="showDownloadPopup = false"
+        @download="handleDownloadData"
+      />
+    </Teleport>
   </div>
 </template>
 
@@ -36,7 +47,6 @@ import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { sub } from 'date-fns'
-import GenericDateRangePicker from '@/components/FilterSidebar/GenericDateRangePicker.vue'
 
 const store = useDashboardUIStore()
 const {
@@ -59,6 +69,8 @@ const {
 
 const isLoading = ref(false)
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
+const showDownloadPopup = ref(false)
+const selectedDownloadFilters = ref({})
 
 function updateDateRange(newRange) {
   selected.value = newRange
@@ -67,6 +79,44 @@ function updateDateRange(newRange) {
 }
 
 const filterSections = computed(() => [
+  {
+    name: 'location',
+    label: 'Location Selection',
+    icon: 'i-heroicons-map-pin',
+    component: 'GenericCheckboxGroup',
+    props: {
+      items: Object.keys(existingHubs.value).map((hub) => ({
+        label: hub,
+        value: hub,
+      })),
+      modelValue: existingHubs.value,
+    },
+  },
+  {
+    name: 'datasets',
+    label: 'Data Selection',
+    icon: 'i-heroicons-chart-bar',
+    component: 'GenericCheckboxGroup',
+    props: {
+      items: Object.keys(existingDatasets.value).map((dataset) => ({
+        label: dataset,
+        value: dataset,
+      })),
+      modelValue: existingDatasets.value,
+    },
+  },
+  {
+    name: 'datetime',
+    label: 'Date & Time',
+    icon: 'i-heroicons-calendar',
+    component: 'GenericDateRangePicker',
+    props: {
+      modelValue: selected.value,
+    },
+  },
+])
+
+const downloadFilterSections = computed(() => [
   {
     name: 'location',
     label: 'Location Selection',
@@ -120,6 +170,11 @@ const handleFilterChange = (filterData) => {
   updateDateRangeUpdate(new Date())
 }
 
+const handleDownloadFilterChange = (filterData) => {
+  const { name, value } = filterData
+  selectedDownloadFilters.value[name] = value
+}
+
 const resetAllFilters = () => {
   const resetValue = (obj) =>
     Object.fromEntries(Object.keys(obj).map((key) => [key, true]))
@@ -146,6 +201,46 @@ const handleToolClick = (index: number) => {
 
 const closeFilter = () => {
   toggleFilter()
+}
+
+const handleDownloadData = async ({ filters, format }) => {
+  console.log('Download options:', filters)
+  console.log('File format:', format)
+
+  try {
+    const response = await $fetch('/api/download-sensor-data', {
+      method: 'POST',
+      body: {
+        datasets: filters.datasets,
+        dateRange: filters.datetime,
+        location: filters.location,
+        format: format,
+      },
+    })
+
+    if (response) {
+      // Handle download logic
+      const blob = new Blob(
+        [format === 'json' ? JSON.stringify(response) : response],
+        {
+          type: format === 'json' ? 'application/json' : 'text/csv',
+        }
+      )
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `sensor_data.${format}`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    }
+  } catch (error) {
+    console.error('Error downloading data:', error)
+    alert(`Download failed: ${error.message || 'Unknown error'}`)
+  }
+
+  showDownloadPopup.value = false
 }
 </script>
 
