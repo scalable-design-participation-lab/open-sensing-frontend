@@ -20,15 +20,16 @@ export default defineEventHandler(async (event) => {
 
     const query = `
       SELECT 
-        timestamp,
-        temperature,
-        relative_humidity,
-        voc,
-        nox,
-        pm1,
-        pm25,
-        pm4,
-        pm10
+        date_trunc('hour', timestamp) - 
+          (EXTRACT(HOUR FROM timestamp)::integer % 2) * INTERVAL '1 hour' AS timestamp,
+        AVG(temperature) AS temperature,
+        AVG(relative_humidity) AS relative_humidity,
+        AVG(voc) AS voc,
+        AVG(nox) AS nox,
+        AVG(pm1) AS pm1,
+        AVG(pm25) AS pm25,
+        AVG(pm4) AS pm4,
+        AVG(pm10) AS pm10
       FROM sen55
       WHERE 
         temperature != 0 OR
@@ -39,8 +40,9 @@ export default defineEventHandler(async (event) => {
         pm25 != 0 OR
         pm4 != 0 OR
         pm10 != 0
+      GROUP BY date_trunc('hour', timestamp) - 
+        (EXTRACT(HOUR FROM timestamp)::integer % 2) * INTERVAL '1 hour'
       ORDER BY timestamp DESC
-      LIMIT 1000
     `
 
     const result = await client.query(query)
