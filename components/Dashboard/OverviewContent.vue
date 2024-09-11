@@ -1,3 +1,17 @@
+<!--
+ * OverviewContent Component
+ * 
+ * This component displays an overview of the dashboard content, including
+ * a description and key statistics. It provides a summary view of the sensor
+ * data and system status, typically shown at the top of the dashboard.
+ * 
+ * @displayName OverviewContent
+ * @usage
+ * <OverviewContent
+ *   :description="dashboardDescription"
+ *   :stats="overviewStats"
+ * />
+ -->
 <template>
   <div class="overview-content">
     <p class="text-sm text-gray-600 mb-4">{{ description }}</p>

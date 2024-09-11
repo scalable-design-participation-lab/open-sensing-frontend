@@ -1,16 +1,15 @@
-<!-- 
-Dashboard component
-
-This component represents the main dashboard view, displaying an overview of sensor data and individual sensor tiles.
-
-@example
-<Dashboard />
-
-@displayName Dashboard
-@version 1.0.0
-@author Dezeng Kong
-@since 7/15/2024
--->
+<!--
+ * Dashboard Component
+ * 
+ * This is the main dashboard component that provides an overview of all sensors.
+ * It includes a header with summary statistics, and a grid of SensorTile components
+ * representing individual sensors. The dashboard is responsive and handles the
+ * overall layout and data management for the sensor monitoring system.
+ * 
+ * @displayName Dashboard
+ * @usage
+ * <Dashboard />
+ -->
 
 <template>
   <div

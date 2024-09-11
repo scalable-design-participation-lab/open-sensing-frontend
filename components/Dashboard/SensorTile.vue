@@ -1,3 +1,22 @@
+<!--
+ * SensorTile Component
+ * 
+ * This component represents an individual sensor tile in the dashboard.
+ * It displays key information about a sensor, including its location,
+ * status, battery level, and specific sensor readings (e.g., temperature,
+ * humidity). The component is designed to be reusable and customizable,
+ * allowing for custom color schemes and configurable display fields.
+ * 
+ * @displayName SensorTile
+ * @usage
+ * <SensorTile
+ *   :sensor="sensorData"
+ *   :showDetails="true"
+ *   :customColors="colorScheme"
+ *   :displayFields="['temperature', 'humidity']"
+ *   @open-details="handleOpenDetails"
+ * />
+ -->
 <template>
   <UCard
     class="flex flex-col h-full min-h-[250px] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg"
@@ -61,27 +80,28 @@
 import { computed } from 'vue'
 
 /**
+ * Represents a sensor with its properties.
  * @typedef {Object} Sensor
  * @property {string} id - Unique identifier for the sensor
  * @property {string} location - Location of the sensor
  * @property {string} status - Current status of the sensor
- * @property {number} batteryLevel - Battery level of the sensor
- * @property {number} [temperature] - Temperature reading (optional)
- * @property {number} [humidity] - Humidity reading (optional)
- * @property {number} [airQuality] - Air quality reading (optional)
- * @property {number} [soilMoisture] - Soil moisture reading (optional)
- * @property {any} [key: string] - Any other sensor properties
+ * @property {number} batteryLevel - Battery level of the sensor (0-100)
+ * @property {number} [temperature] - Temperature reading in Celsius (optional)
+ * @property {number} [humidity] - Humidity reading in percentage (optional)
+ * @property {string} [airQuality] - Air quality status (optional)
+ * @property {string} [soilMoisture] - Soil moisture level (optional)
  */
 
 /**
+ * Custom color configurations for the sensor tile.
  * @typedef {Object} CustomColors
- * @property {Record<string, string>} [status] - Custom colors for status
- * @property {Record<string, string>} [battery] - Custom colors for battery levels
- * @property {Record<string, Record<string, string>>} [values] - Custom colors for sensor values
+ * @property {Object.<string, string>} [status] - Custom colors for status
+ * @property {Object.<string, string>} [battery] - Custom colors for battery levels
+ * @property {Object.<string, Object.<string, string>>} [values] - Custom colors for sensor values
  */
 
 /**
- * Props for the SensorTile component
+ * Props for the SensorTile component.
  * @typedef {Object} SensorTileProps
  * @property {Sensor} sensor - The sensor object to display
  * @property {boolean} [showDetails=true] - Whether to show the details button
@@ -90,7 +110,7 @@ import { computed } from 'vue'
  */
 
 /**
- * Component props
+ * SensorTile component props
  * @type {SensorTileProps}
  */
 const props = defineProps({
@@ -114,6 +134,11 @@ const props = defineProps({
 
 const emit = defineEmits(['open-details'])
 
+/**
+ * Determines the color for the battery icon based on the battery level.
+ * @param {number} value - The battery level (0-100)
+ * @returns {string} The CSS class for the battery icon color
+ */
 const getBatteryIconColor = (value: number) => {
   if (props.customColors.battery) {
     return props.customColors.battery[
@@ -125,6 +150,11 @@ const getBatteryIconColor = (value: number) => {
   return 'text-green-500'
 }
 
+/**
+ * Determines the color for the status badge based on the sensor status.
+ * @param {string} status - The sensor status
+ * @returns {string} The color for the status badge
+ */
 const getStatusColor = (status: string) => {
   if (props.customColors.status && props.customColors.status[status]) {
     return props.customColors.status[status]
@@ -141,18 +171,35 @@ const getStatusColor = (status: string) => {
   }
 }
 
+/**
+ * Formats the sensor value for display.
+ * @param {string} key - The sensor field key
+ * @param {number|string} value - The sensor value
+ * @returns {string} The formatted value for display
+ */
 const formatValue = (key: string, value: number | string) => {
   if (key === 'temperature') return `${Number(value).toFixed(1)}°C`
   if (key === 'humidity') return `${Number(value).toFixed(1)}%`
   return value
 }
 
+/**
+ * Formats the label for a sensor field.
+ * @param {string} key - The sensor field key
+ * @returns {string} The formatted label
+ */
 const formatLabel = (key: string) => {
   return key
     .replace(/([A-Z])/g, ' $1')
     .replace(/^./, (str) => str.toUpperCase())
 }
 
+/**
+ * Determines the color for a sensor value based on its range.
+ * @param {string} key - The sensor field key
+ * @param {number} value - The sensor value
+ * @returns {string} The CSS class for the value color
+ */
 const getValueColor = (key: string, value: number) => {
   if (props.customColors.values && props.customColors.values[key]) {
     const colorRanges = props.customColors.values[key]
