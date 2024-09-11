@@ -1,3 +1,18 @@
+<!--
+ * GeneralizedFooter Component
+ * 
+ * This component renders a customizable footer with a title, navigation links,
+ * and action buttons. It's designed to be used across different pages of the application.
+ * 
+ * @displayName GeneralizedFooter
+ * @usage
+ * <GeneralizedFooter
+ *   title="Company Name"
+ *   :links="footerLinks"
+ *   :buttons="footerButtons"
+ * />
+ -->
+
 <template>
   <footer
     class="absolute bottom-6 left-6 right-6 flex justify-between items-end z-20 sm:flex-row sm:items-end flex-col items-start"
@@ -32,6 +47,18 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Props for the GeneralizedFooter component
+ * @typedef {Object} GeneralizedFooterProps
+ * @property {string} title - The title displayed in the footer
+ * @property {Array<{to: string, label: string}>} links - Navigation links for the footer
+ * @property {Array<{label: string}>} buttons - Action buttons for the footer
+ */
+
+/**
+ * Component props
+ * @type {GeneralizedFooterProps}
+ */
 defineProps({
   title: String,
   links: Array,

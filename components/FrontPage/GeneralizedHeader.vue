@@ -1,3 +1,22 @@
+<!--
+ * GeneralizedHeader Component
+ * 
+ * This component renders a customizable header with logo, navigation items,
+ * and action buttons. It's designed to be used across different pages of the application
+ * and supports responsive design.
+ * 
+ * @displayName GeneralizedHeader
+ * @usage
+ * <GeneralizedHeader
+ *   :leftItems="navItems"
+ *   :rightItems="actionItems"
+ *   logoSrc="/logo.png"
+ *   logoAlt="Company Logo"
+ *   :showIcon="true"
+ *   shape="rounded"
+ * />
+ -->
+
 <template>
   <header
     class="fixed top-8 left-8 right-8 flex justify-between items-center z-50"
@@ -118,6 +137,21 @@
 <script setup>
 import { computed } from 'vue'
 
+/**
+ * Props for the GeneralizedHeader component
+ * @typedef {Object} GeneralizedHeaderProps
+ * @property {Array<{label: string, to?: string, onClick?: Function, variant?: string, color?: string, icon?: string, primary?: boolean}>} leftItems - Items for the left side of the header
+ * @property {Array<{label: string, to?: string, onClick?: Function, variant?: string, color?: string, icon?: string, dropdown?: Object}>} rightItems - Items for the right side of the header
+ * @property {string} [logoSrc] - Source URL for the logo image
+ * @property {string} [logoAlt='Logo'] - Alt text for the logo image
+ * @property {boolean} [showIcon=true] - Whether to show the icon
+ * @property {'rounded' | 'rectangular'} [shape='rounded'] - Shape of the buttons and logo
+ */
+
+/**
+ * Component props
+ * @type {GeneralizedHeaderProps}
+ */
 const props = defineProps({
   leftItems: {
     type: Array,
@@ -146,6 +180,10 @@ const props = defineProps({
   },
 })
 
+/**
+ * Computed property to determine the shape class
+ * @type {import('vue').ComputedRef<string>}
+ */
 const shapeClass = computed(() => {
   switch (props.shape) {
     case 'rectangular':
