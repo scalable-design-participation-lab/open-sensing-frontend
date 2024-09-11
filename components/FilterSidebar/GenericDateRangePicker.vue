@@ -149,6 +149,11 @@ watch(
   { deep: true }
 )
 
+/**
+ * Checks if a given date range is selected
+ * @param {Duration} duration - The duration of the date range
+ * @returns {boolean} True if the date range is selected, false otherwise
+ */
 function isRangeSelected(duration: Duration) {
   return (
     isSameDay(selected.value.start, sub(new Date(), duration)) &&
@@ -156,6 +161,10 @@ function isRangeSelected(duration: Duration) {
   )
 }
 
+/**
+ * Selects a date range based on the given duration
+ * @param {Duration} duration - The duration of the date range
+ */
 function selectRange(duration: Duration) {
   const end = new Date()
   const start = sub(end, duration)
@@ -163,6 +172,10 @@ function selectRange(duration: Duration) {
   emitChange()
 }
 
+/**
+ * Handles changes in the selected date range
+ * @param {Object} value - The new selected date range
+ */
 function handleDateChange(value) {
   if (value && isValid(value.start) && isValid(value.end)) {
     selected.value = value
@@ -170,14 +183,24 @@ function handleDateChange(value) {
   }
 }
 
+/**
+ * Emits the updated date range to the parent component
+ */
 function emitChange() {
   emit('update:modelValue', selected.value)
 }
 
+/**
+ * Handles clicks on predefined date range options
+ * @param {Duration} duration - The duration of the date range
+ */
 function handleRangeClick(duration: Duration) {
   selectRange(duration)
 }
 
+/**
+ * Applies the selected date range and closes the date picker modal
+ */
 function applyDateRange() {
   emitChange()
   isOpen.value = false
