@@ -37,6 +37,7 @@
     "d3-scale": "^4.0.2",
     "date-fns": "^3.6.0",
     "deck.gl": "8.8",
+    "echarts": "^5.5.1",
     "express": "^4.19.2",
     "lodash": "^4.17.21",
     "mapbox-gl": "^2.15.0",

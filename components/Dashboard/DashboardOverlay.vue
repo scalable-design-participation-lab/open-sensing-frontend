@@ -1,4 +1,15 @@
-<!-- DashboardOverlay.vue -->
+<!--
+ * DashboardOverlay Component
+ * 
+ * This component provides a semi-transparent overlay for the dashboard.
+ * It is typically used to create a backdrop effect when displaying modals
+ * or when focusing on specific dashboard elements. The visibility of the
+ * overlay can be controlled via props.
+ * 
+ * @displayName DashboardOverlay
+ * @usage
+ * <DashboardOverlay :visible="showOverlay" />
+ -->
 <template>
   <Transition
     enter-active-class="transition-opacity duration-300 ease-in-out"
