@@ -29,6 +29,17 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Props for the OverviewContent component
+ * @typedef {Object} OverviewContentProps
+ * @property {string} description - The description text for the overview
+ * @property {Array<{value: number, label: string}>} stats - Array of statistic objects
+ */
+
+/**
+ * Component props
+ * @type {OverviewContentProps}
+ */
 defineProps<{
   description: string
   stats: Array<{ value: number; label: string }>

@@ -60,24 +60,39 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-interface Sensor {
-  id: string
-  location: string
-  status: string
-  batteryLevel: number
-  temperature?: number
-  humidity?: number
-  airQuality?: number
-  soilMoisture?: number
-  [key: string]: any
-}
+/**
+ * @typedef {Object} Sensor
+ * @property {string} id - Unique identifier for the sensor
+ * @property {string} location - Location of the sensor
+ * @property {string} status - Current status of the sensor
+ * @property {number} batteryLevel - Battery level of the sensor
+ * @property {number} [temperature] - Temperature reading (optional)
+ * @property {number} [humidity] - Humidity reading (optional)
+ * @property {number} [airQuality] - Air quality reading (optional)
+ * @property {number} [soilMoisture] - Soil moisture reading (optional)
+ * @property {any} [key: string] - Any other sensor properties
+ */
 
-interface CustomColors {
-  status?: Record<string, string>
-  battery?: Record<string, string>
-  values?: Record<string, Record<string, string>>
-}
+/**
+ * @typedef {Object} CustomColors
+ * @property {Record<string, string>} [status] - Custom colors for status
+ * @property {Record<string, string>} [battery] - Custom colors for battery levels
+ * @property {Record<string, Record<string, string>>} [values] - Custom colors for sensor values
+ */
 
+/**
+ * Props for the SensorTile component
+ * @typedef {Object} SensorTileProps
+ * @property {Sensor} sensor - The sensor object to display
+ * @property {boolean} [showDetails=true] - Whether to show the details button
+ * @property {CustomColors} [customColors={}] - Custom color configurations
+ * @property {string[]} [displayFields=['temperature', 'humidity', 'airQuality', 'soilMoisture']] - Fields to display
+ */
+
+/**
+ * Component props
+ * @type {SensorTileProps}
+ */
 const props = defineProps({
   sensor: {
     type: Object as () => Sensor,

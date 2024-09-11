@@ -13,7 +13,17 @@
   </Transition>
 </template>
 
-<script setup>
+<script setup lang="ts">
+/**
+ * Props for the DashboardOverlay component
+ * @typedef {Object} DashboardOverlayProps
+ * @property {boolean} [visible=false] - Whether the overlay is visible
+ */
+
+/**
+ * Component props
+ * @type {DashboardOverlayProps}
+ */
 defineProps({
   visible: {
     type: Boolean,

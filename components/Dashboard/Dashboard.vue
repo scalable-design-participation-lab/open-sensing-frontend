@@ -1,3 +1,17 @@
+<!-- 
+Dashboard component
+
+This component represents the main dashboard view, displaying an overview of sensor data and individual sensor tiles.
+
+@example
+<Dashboard />
+
+@displayName Dashboard
+@version 1.0.0
+@author Dezeng Kong
+@since 7/15/2024
+-->
+
 <template>
   <div
     class="flex justify-center items-center min-h-screen p-[2.5vh_2.5vw] bg-[rgba(240,242,245,0.7)]"
@@ -49,19 +63,40 @@ import SensorTile from './SensorTile.vue'
 import OverviewContent from './OverviewContent.vue'
 import DashboardHeader from './DashboardHeader.vue'
 
+/**
+ * Dashboard UI store instance
+ * @type {import('@/stores/dashboardUI').DashboardUIStore}
+ */
 const store = useDashboardUIStore()
+
+/**
+ * Destructured sensors from the store
+ * @type {import('vue').Ref<Array<import('@/types').Sensor>>}
+ */
 const { sensors } = storeToRefs(store)
 
+/**
+ * Description of the sensor data overview
+ * @type {import('vue').Ref<string>}
+ */
 const overviewDescription = ref(
   'This dashboard provides an overview of all sensor data across the Northeastern University campus.'
 )
 
+/**
+ * Computed property to get the latest update timestamp
+ * @returns {string} Formatted date string of the latest update
+ */
 const lastUpdated = computed(() => {
   const dates = sensors.value.map((sensor) => new Date(sensor.timestamp))
   const latestDate = new Date(Math.max.apply(null, dates))
   return latestDate.toLocaleString()
 })
 
+/**
+ * Computed property to generate overview statistics
+ * @returns {Array<{value: number, label: string}>} Array of statistic objects
+ */
 const overviewStats = computed(() => [
   {
     value: sensors.value.filter((sensor) => sensor.status === 'Active').length,
@@ -78,11 +113,19 @@ const overviewStats = computed(() => [
   },
 ])
 
+/**
+ * Opens the detail view for a specific sensor
+ * @param {string} sensorId - The ID of the sensor to display details for
+ */
 const openSensorDetail = (sensorId: string) => {
   store.updateSelectedSensor(sensorId)
   store.toggleSensorDetail()
 }
 
+/**
+ * Custom color configurations for various sensor data representations
+ * @type {Object}
+ */
 const customColors = {
   status: {
     Active: 'green',
@@ -108,6 +151,10 @@ const customColors = {
   },
 }
 
+/**
+ * List of sensor data fields to display in the tiles
+ * @type {import('vue').Ref<string[]>}
+ */
 const displayFields = ref([
   'temperature',
   'humidity',
