@@ -1,3 +1,17 @@
+<!--
+ * DatePicker Component
+ * 
+ * This component is a wrapper around the v-calendar DatePicker component.
+ * It provides a customizable date picker with single date and date range
+ * selection capabilities. The component is styled to match the overall
+ * design of the application and supports dark mode.
+ * 
+ * @displayName DatePicker
+ * @usage
+ * <DatePicker v-model="selectedDate" />
+ * <DatePicker v-model="dateRange" range />
+ -->
+
 <script setup lang="ts">
 import { DatePicker as VCalendarDatePicker } from 'v-calendar'
 import type {
@@ -6,6 +20,16 @@ import type {
 } from 'v-calendar/dist/types/src/use/datePicker'
 import 'v-calendar/dist/style.css'
 
+/**
+ * Props for the DatePicker component
+ * @typedef {Object} DatePickerProps
+ * @property {DatePickerDate | DatePickerRangeObject | null} [modelValue=null] - The selected date or date range
+ */
+
+/**
+ * Component props
+ * @type {DatePickerProps}
+ */
 const props = defineProps({
   modelValue: {
     type: [Date, Object] as PropType<
@@ -17,6 +41,10 @@ const props = defineProps({
 
 const emit = defineEmits(['update:model-value', 'close'])
 
+/**
+ * Computed property for two-way binding of the date value
+ * @type {import('vue').ComputedRef<DatePickerDate | DatePickerRangeObject | null>}
+ */
 const date = computed({
   get: () => props.modelValue,
   set: (value) => {
@@ -25,6 +53,10 @@ const date = computed({
   },
 })
 
+/**
+ * Attributes for the v-calendar DatePicker component
+ * @type {Object}
+ */
 const attrs = {
   transparent: true,
   borderless: true,

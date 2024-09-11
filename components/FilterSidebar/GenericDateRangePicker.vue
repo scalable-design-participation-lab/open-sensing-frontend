@@ -1,3 +1,15 @@
+<!--
+ * GenericDateRangePicker Component
+ * 
+ * This component provides a customizable date range picker with predefined
+ * range options and a calendar interface for custom date selection. It's
+ * designed to be used within filter sidebars or as a standalone date range
+ * selection tool.
+ * 
+ * @displayName GenericDateRangePicker
+ * @usage
+ * <GenericDateRangePicker v-model="selectedDateRange" />
+ -->
 <template>
   <div>
     <UButton icon="i-heroicons-calendar-days-20-solid" @click="isOpen = true">
@@ -66,6 +78,16 @@
 import { ref, computed, watch } from 'vue'
 import { sub, format, isSameDay, isValid, type Duration } from 'date-fns'
 
+/**
+ * Props for the GenericDateRangePicker component
+ * @typedef {Object} DateRangePickerProps
+ * @property {{ start: Date, end: Date }} [modelValue] - The selected date range
+ */
+
+/**
+ * Component props
+ * @type {DateRangePickerProps}
+ */
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -75,6 +97,10 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+/**
+ * Predefined date range options
+ * @type {Array<{ label: string, duration: Duration }>}
+ */
 const ranges = [
   { label: 'Last 7 days', duration: { days: 7 } },
   { label: 'Last 14 days', duration: { days: 14 } },
@@ -84,13 +110,25 @@ const ranges = [
   { label: 'Last year', duration: { years: 1 } },
 ]
 
+/**
+ * Currently selected date range
+ * @type {import('vue').Ref<{ start: Date, end: Date }>}
+ */
 const selected = ref(props.modelValue)
 
 const minDate = sub(new Date(), { years: 5 })
 const maxDate = new Date()
 
+/**
+ * Controls the visibility of the date picker modal
+ * @type {import('vue').Ref<boolean>}
+ */
 const isOpen = ref(false)
 
+/**
+ * Formats the selected date range for display
+ * @type {import('vue').ComputedRef<string>}
+ */
 const formatDateRange = computed(() => {
   if (isValid(selected.value.start) && isValid(selected.value.end)) {
     return `${format(selected.value.start, 'd MMM, yyyy')} - ${format(
