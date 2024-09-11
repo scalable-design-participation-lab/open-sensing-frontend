@@ -1,3 +1,20 @@
+<!--
+ * SensorHeader Component
+ * 
+ * This component displays the header for the sensor detail view, including
+ * the sensor location, status, battery level, and navigation controls.
+ * 
+ * @displayName SensorHeader
+ * @usage
+ * <SensorHeader
+ *   :selected-sensor="sensorData"
+ *   @go-back="handleGoBack"
+ *   @close="handleClose"
+ *   @select-previous="handlePreviousSensor"
+ *   @select-next="handleNextSensor"
+ * />
+ -->
+
 <template>
   <header
     class="sensor-header bg-gray-100 p-4 flex items-center justify-between"
@@ -59,6 +76,16 @@
 </template>
 
 <script setup>
+/**
+ * Props for the SensorHeader component
+ * @typedef {Object} SensorHeaderProps
+ * @property {Object} selectedSensor - The selected sensor object
+ */
+
+/**
+ * Component props
+ * @type {SensorHeaderProps}
+ */
 defineProps({
   selectedSensor: {
     type: Object,
@@ -66,8 +93,16 @@ defineProps({
   },
 })
 
+/**
+ * Emits events for navigation and closing
+ */
 defineEmits(['go-back', 'close', 'select-previous', 'select-next'])
 
+/**
+ * Gets the color for the status badge
+ * @param {string} status - The sensor status
+ * @returns {string} The color for the status badge
+ */
 const getStatusColor = (status) => {
   switch (status) {
     case 'Active':
@@ -81,6 +116,11 @@ const getStatusColor = (status) => {
   }
 }
 
+/**
+ * Gets the color for the battery icon
+ * @param {number} value - The battery level
+ * @returns {string} The CSS color class for the battery icon
+ */
 const getBatteryIconColor = (value) => {
   if (value < 30) return 'text-red-500'
   if (value < 70) return 'text-yellow-500'

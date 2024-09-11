@@ -1,3 +1,14 @@
+<!--
+ * SensorInfo Component
+ * 
+ * This component displays detailed information about a sensor,
+ * including signal strength, air quality, soil moisture, and timestamps.
+ * 
+ * @displayName SensorInfo
+ * @usage
+ * <SensorInfo :selected-sensor="sensorData" />
+ -->
+
 <template>
   <div class="flex-1">
     <h2 class="text-xl font-bold mb-4 text-gray-800">Sensor Information</h2>
@@ -25,6 +36,16 @@
 <script setup>
 import { computed } from 'vue'
 
+/**
+ * Props for the SensorInfo component
+ * @typedef {Object} SensorInfoProps
+ * @property {Object} selectedSensor - The selected sensor object
+ */
+
+/**
+ * Component props
+ * @type {SensorInfoProps}
+ */
 const props = defineProps({
   selectedSensor: {
     type: Object,
@@ -32,6 +53,11 @@ const props = defineProps({
   },
 })
 
+/**
+ * Gets the color for the signal strength indicator
+ * @param {number|string} value - The signal strength value
+ * @returns {string} The CSS color class
+ */
 const getSignalStrengthColor = (value) => {
   const strength = parseInt(value)
   if (strength <= 2) return 'text-red-500'
@@ -39,6 +65,11 @@ const getSignalStrengthColor = (value) => {
   return 'text-green-500'
 }
 
+/**
+ * Gets the color for the air quality indicator
+ * @param {string} value - The air quality value
+ * @returns {string} The CSS color class
+ */
 const getAirQualityColor = (value) => {
   switch (value.toLowerCase()) {
     case 'good':
@@ -54,6 +85,11 @@ const getAirQualityColor = (value) => {
   }
 }
 
+/**
+ * Gets the color for the soil moisture indicator
+ * @param {string} value - The soil moisture value
+ * @returns {string} The CSS color class
+ */
 const getSoilMoistureColor = (value) => {
   const moisture = parseFloat(value)
   if (moisture < 30) return 'text-red-500'
@@ -61,6 +97,10 @@ const getSoilMoistureColor = (value) => {
   return 'text-green-500'
 }
 
+/**
+ * Computed property to generate sensor information items
+ * @type {import('vue').ComputedRef<Array<{label: string, value: string, color: string}>>}
+ */
 const sensorInfoItems = computed(() => [
   {
     label: 'Signal Strength',
@@ -79,6 +119,11 @@ const sensorInfoItems = computed(() => [
   },
 ])
 
+/**
+ * Formats a date string for display
+ * @param {string} dateString - The date string to format
+ * @returns {string} The formatted date string
+ */
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString('en-US', {
     year: 'numeric',

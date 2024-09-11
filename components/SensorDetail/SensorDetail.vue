@@ -1,3 +1,15 @@
+<!--
+ * SensorDetail Component
+ * 
+ * This component displays detailed information about a selected sensor.
+ * It includes sensor statistics, location information, and historical data charts.
+ * The component is designed to be displayed as a modal overlay on the dashboard.
+ * 
+ * @displayName SensorDetail
+ * @usage
+ * <SensorDetail />
+ -->
+
 <template>
   <transition
     enter-active-class="transition-opacity duration-300 ease-in-out"
@@ -91,7 +103,21 @@ import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { useResizeObserver } from '@vueuse/core'
 
+/**
+ * Dashboard UI store instance
+ * @type {import('@/stores/dashboardUI').DashboardUIStore}
+ */
 const store = useDashboardUIStore()
+
+/**
+ * Destructured reactive references from the store
+ * @type {Object}
+ * @property {import('vue').Ref<import('@/types').Sensor>} selectedSensor - The currently selected sensor
+ * @property {import('vue').Ref<boolean>} showSensorDetail - Whether to show the sensor detail modal
+ * @property {import('vue').Ref<string[]>} selectedDatasets - The currently selected datasets to display
+ * @property {import('vue').Ref<Object>} sensorData - The historical data for the selected sensor
+ * @property {import('vue').Ref<boolean>} showDashboard - Whether to show the main dashboard
+ */
 const {
   selectedSensor,
   showSensorDetail,
@@ -100,17 +126,48 @@ const {
   showDashboard,
 } = storeToRefs(store)
 
+/**
+ * Reference to the scroll container for charts
+ * @type {import('vue').Ref<HTMLElement | null>}
+ */
 const scrollContainer = ref(null)
+
+/**
+ * Width of the chart, dynamically updated
+ * @type {import('vue').Ref<number>}
+ */
 const chartWidth = ref(0)
+
+/**
+ * Height of each chart
+ * @type {number}
+ */
 const chartHeight = 180
+
+/**
+ * Global date range for all charts
+ * @type {import('vue').Ref<[Date, Date] | []>}
+ */
 const globalDateRange = ref([])
 
+/**
+ * Margin configuration for charts
+ * @type {Object}
+ */
 const margin = { top: 20, right: 20, bottom: 30, left: 40 }
 
+/**
+ * Computed property to determine if data is loaded and ready to display
+ * @type {import('vue').ComputedRef<boolean>}
+ */
 const dataLoaded = computed(
   () => Object.keys(sensorData.value).length > 0 && chartWidth.value > 0
 )
 
+/**
+ * Metrics configuration for sensor data
+ * @type {import('vue').Ref<Object>}
+ */
 const metrics = ref({
   Temperature: { name: 'temperature', label: 'Temperature (°C)' },
   'Relative Humidity': {
@@ -125,6 +182,10 @@ const metrics = ref({
   pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
 })
 
+/**
+ * Computed property to generate sensor statistics
+ * @type {import('vue').ComputedRef<Object>}
+ */
 const sensorStats = computed(() => {
   if (!selectedSensor.value) return {}
   return {
@@ -136,6 +197,10 @@ const sensorStats = computed(() => {
   }
 })
 
+/**
+ * Computed property to generate sensor information items
+ * @type {import('vue').ComputedRef<Array<{label: string, value: string, color: string}>>}
+ */
 const sensorInfoItems = computed(() => [
   {
     label: 'Signal Strength',
@@ -167,20 +232,33 @@ onMounted(async () => {
   }
 })
 
+/**
+ * Closes the sensor detail modal
+ */
 const closeSensorDetail = () => {
   store.toggleSensorDetail()
 }
 
+/**
+ * Navigates back to the main dashboard
+ */
 const goBackToDashboard = () => {
   store.toggleSensorDetail()
   store.toggleDashboard()
 }
 
+/**
+ * Updates the global date range for all charts
+ * @param {[Date, Date]} range - The new date range
+ */
 const updateGlobalDateRange = (range) => {
   globalDateRange.value = range
   store.updateDataDashboardValues('dateRange', range)
 }
 
+/**
+ * Resets all charts to their original state
+ */
 const resetAllCharts = () => {
   globalDateRange.value = []
   store.updateDataDashboardValues('dateRange', [])
@@ -194,6 +272,11 @@ const resetAllCharts = () => {
   chartWidth.value = chartWidth.value + 1
 }
 
+/**
+ * Formats a date range for display
+ * @param {[Date, Date]} range - The date range to format
+ * @returns {string} The formatted date range string
+ */
 const formatDateRange = (range) => {
   if (range.length !== 2) return ''
   const formatDate = (date) => {
@@ -206,25 +289,44 @@ const formatDateRange = (range) => {
   return `${formatDate(range[0])} - ${formatDate(range[1])}`
 }
 
+/**
+ * Selects the next sensor in the list
+ */
 const selectNextSensor = async () => {
   await store.selectNextSensor()
   refreshSensorData()
 }
 
+/**
+ * Selects the previous sensor in the list
+ */
 const selectPreviousSensor = async () => {
   await store.selectPreviousSensor()
   refreshSensorData()
 }
 
+/**
+ * Refreshes the sensor data and resets all charts
+ */
 const refreshSensorData = async () => {
   await store.loadSensorData()
   resetAllCharts()
 }
 
+/**
+ * Shows detailed information for a specific statistic
+ * @param {string} statKey - The key of the statistic to show details for
+ */
 const showStatDetails = (statKey) => {
   console.log(`Showing details for ${statKey}`)
 }
 
+/**
+ * Gets the color for a sensor value based on its key and value
+ * @param {string} key - The key of the sensor value
+ * @param {number|string} value - The sensor value
+ * @returns {string} The CSS color class
+ */
 const getValueColor = (key, value) => {
   if (key === 'Temperature') {
     const temp = parseFloat(value)
@@ -241,6 +343,11 @@ const getValueColor = (key, value) => {
   return 'text-blue-500'
 }
 
+/**
+ * Gets the color for the signal strength indicator
+ * @param {number|string} value - The signal strength value
+ * @returns {string} The CSS color class
+ */
 const getSignalStrengthColor = (value) => {
   const strength = parseInt(value)
   if (strength <= 2) return 'text-red-500'
@@ -248,6 +355,11 @@ const getSignalStrengthColor = (value) => {
   return 'text-green-500'
 }
 
+/**
+ * Gets the color for the air quality indicator
+ * @param {string} value - The air quality value
+ * @returns {string} The CSS color class
+ */
 const getAirQualityColor = (value) => {
   switch (value.toLowerCase()) {
     case 'good':
@@ -263,6 +375,11 @@ const getAirQualityColor = (value) => {
   }
 }
 
+/**
+ * Gets the color for the soil moisture indicator
+ * @param {string} value - The soil moisture value
+ * @returns {string} The CSS color class
+ */
 const getSoilMoistureColor = (value) => {
   const moisture = parseFloat(value)
   if (moisture < 30) return 'text-red-500'

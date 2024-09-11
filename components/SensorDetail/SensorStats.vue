@@ -1,3 +1,14 @@
+<!--
+ * SensorStats Component
+ * 
+ * This component displays a grid of sensor statistics, including temperature,
+ * humidity, VOC, NOx, and PM2.5 levels. Each statistic is clickable to show more details.
+ * 
+ * @displayName SensorStats
+ * @usage
+ * <SensorStats :sensor-stats="sensorStatistics" @show-stat-details="handleStatDetails" />
+ -->
+
 <template>
   <div class="sensor-stats grid grid-cols-5 gap-6">
     <div
@@ -15,6 +26,16 @@
 </template>
 
 <script setup>
+/**
+ * Props for the SensorStats component
+ * @typedef {Object} SensorStatsProps
+ * @property {Object.<string, string|number>} sensorStats - Object containing sensor statistics
+ */
+
+/**
+ * Component props
+ * @type {SensorStatsProps}
+ */
 const props = defineProps({
   sensorStats: {
     type: Object,
@@ -22,8 +43,17 @@ const props = defineProps({
   },
 })
 
+/**
+ * Emits an event when a statistic is clicked
+ */
 defineEmits(['show-stat-details'])
 
+/**
+ * Gets the color for a sensor value based on its key and value
+ * @param {string} key - The key of the sensor value
+ * @param {string|number} value - The sensor value
+ * @returns {string} The CSS color class
+ */
 const getValueColor = (key, value) => {
   if (key === 'Temperature') {
     const temp = parseFloat(value)

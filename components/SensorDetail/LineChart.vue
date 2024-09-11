@@ -1,3 +1,20 @@
+<!--
+ * LineChart Component
+ * 
+ * This component renders a line chart for sensor data using D3.js.
+ * It supports zooming, brushing, and dynamic updates based on global date range changes.
+ * 
+ * @displayName LineChart
+ * @usage
+ * <LineChart
+ *   :metric="{ label: 'Temperature (°C)' }"
+ *   :data="{ data: [...], min: 0, max: 100 }"
+ *   :width="600"
+ *   :height="300"
+ *   :margin="{ top: 20, right: 20, bottom: 30, left: 40 }"
+ * />
+ -->
+
 <template>
   <div :id="chartId" class="relative">
     <UButton
@@ -17,45 +34,90 @@ import * as d3 from 'd3'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import { storeToRefs } from 'pinia'
 
-interface DataPoint {
-  date: Date
-  value: number
-}
+/**
+ * Represents a single data point in the chart
+ * @typedef {Object} DataPoint
+ * @property {Date} date - The date of the data point
+ * @property {number} value - The value of the data point
+ */
 
-interface Props {
-  metric: {
-    label: string
-  }
-  data: {
-    data: DataPoint[]
-    min: number
-    max: number
-  }
+/**
+ * Props for the LineChart component
+ * @typedef {Object} LineChartProps
+ * @property {{label: string}} metric - The metric information for the chart
+ * @property {{data: DataPoint[], min: number, max: number}} data - The chart data and range
+ * @property {number} width - The width of the chart
+ * @property {number} height - The height of the chart
+ * @property {{top: number, right: number, bottom: number, left: number}} margin - The chart margins
+ */
+
+/**
+ * Component props
+ * @type {LineChartProps}
+ */
+const props = defineProps<{
+  metric: { label: string }
+  data: { data: DataPoint[]; min: number; max: number }
   width: number
   height: number
-  margin: {
-    top: number
-    right: number
-    bottom: number
-    left: number
-  }
-}
-
-const props = defineProps<Props>()
+  margin: { top: number; right: number; bottom: number; left: number }
+}>()
 
 const store = useDashboardUIStore()
 const { dataDashboardValues, dateRangeUpdate } = storeToRefs(store)
 const { updateDataDashboardValues } = store
 
+/**
+ * Unique ID for the chart container
+ * @type {import('vue').Ref<string>}
+ */
 const chartId = ref(`chart-${Date.now()}`)
+
+/**
+ * D3 selection for the SVG element
+ * @type {d3.Selection<SVGGElement, unknown, HTMLElement, any>}
+ */
 let svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>
+
+/**
+ * D3 scale for the x-axis (time)
+ * @type {d3.ScaleTime<number, number>}
+ */
 let x: d3.ScaleTime<number, number>
+
+/**
+ * D3 scale for the y-axis (values)
+ * @type {d3.ScaleLinear<number, number>}
+ */
 let y: d3.ScaleLinear<number, number>
+
+/**
+ * D3 axis generator for the x-axis
+ * @type {d3.Axis<Date>}
+ */
 let xAxis: d3.Axis<Date>
+
+/**
+ * D3 axis generator for the y-axis
+ * @type {d3.Axis<number>}
+ */
 let yAxis: d3.Axis<number>
+
+/**
+ * D3 line generator for the chart
+ * @type {d3.Line<DataPoint>}
+ */
 let line: d3.Line<DataPoint>
+
+/**
+ * D3 brush behavior for the chart
+ * @type {d3.BrushBehavior<unknown>}
+ */
 let brush: d3.BrushBehavior<unknown>
 
+/**
+ * Creates and renders the line chart
+ */
 const createLineChart = () => {
   if (props.width <= 0 || !props.data.data || props.data.data.length === 0)
     return
@@ -160,6 +222,10 @@ const createLineChart = () => {
     .text(props.metric.label)
 }
 
+/**
+ * Updates the chart based on brush selection
+ * @param {d3.D3BrushEvent<any>} event - The brush event
+ */
 const updateChart = (event: d3.D3BrushEvent<any>) => {
   if (!event.selection) return
   const [x0, x1] = event.selection.map(x.invert) as [Date, Date]
@@ -169,6 +235,9 @@ const updateChart = (event: d3.D3BrushEvent<any>) => {
   svg.select('.line').attr('d', line)
 }
 
+/**
+ * Resets the chart to its initial state
+ */
 const resetChart = () => {
   const data = props.data.data.map((d) => ({
     ...d,
