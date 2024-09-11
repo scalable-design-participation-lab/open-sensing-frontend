@@ -1,3 +1,15 @@
+<!--
+ * MapDashboard Component
+ * 
+ * This component renders a map with sensor markers using Mapbox GL and deck.gl.
+ * It displays sensor locations, allows interaction with sensors, and updates
+ * the map based on user interactions and selected sensors.
+ * 
+ * @displayName MapDashboard
+ * @usage
+ * <MapDashboard />
+ -->
+
 <template>
   <div>
     <main id="main-container" />
@@ -13,6 +25,10 @@ import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 import mapboxgl from 'mapbox-gl'
 
+/**
+ * Mapbox access token
+ * @type {string}
+ */
 const accessToken =
   'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
 
@@ -21,15 +37,31 @@ const { sensors, selectedSensorId, mapType, showSensorInfo } =
   storeToRefs(store)
 const { updateSelectedSensor, updateClickPosition, updateMapCenter } = store
 
+/**
+ * Mapbox map instance
+ * @type {mapboxgl.Map}
+ */
 let map
+
+/**
+ * Position of the marker for the selected sensor
+ * @type {import('vue').Ref<{x: number, y: number}>}
+ */
 const markerPosition = ref({ x: 0, y: 0 })
 
+/**
+ * Computed property for the currently selected sensor
+ * @type {import('vue').ComputedRef<import('@/types').Sensor | undefined>}
+ */
 const selectedSensor = computed(() =>
   sensors.value.find((s) => s.id === selectedSensorId.value)
 )
 
 onMounted(() => loadMapDraw())
 
+/**
+ * Adds an icon layer to the map for sensor markers
+ */
 const addIconLayer = () => {
   const ICON_MAPPING = {
     marker: { x: 0, y: 0, width: 128, height: 128, mask: true },
@@ -64,6 +96,9 @@ const addIconLayer = () => {
   )
 }
 
+/**
+ * Initializes and loads the Mapbox map
+ */
 const loadMapDraw = () => {
   mapboxgl.accessToken = accessToken
 
@@ -81,6 +116,9 @@ const loadMapDraw = () => {
   })
 }
 
+/**
+ * Updates the position of the marker for the selected sensor
+ */
 const updateMarkerPosition = () => {
   if (selectedSensor.value && map) {
     const pixelPosition = map.project(selectedSensor.value.coordinates)

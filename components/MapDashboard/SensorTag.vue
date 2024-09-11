@@ -1,3 +1,15 @@
+<!--
+ * MapDashboard Component
+ * 
+ * This component renders a map with sensor markers using Mapbox GL and deck.gl.
+ * It displays sensor locations, allows interaction with sensors, and updates
+ * the map based on user interactions and selected sensors.
+ * 
+ * @displayName MapDashboard
+ * @usage
+ * <MapDashboard />
+ -->
+
 <template>
   <UCard
     class="w-[280px] z-[1000] pointer-events-auto absolute"
@@ -68,6 +80,16 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardUIStore } from '@/stores/dashboardUI'
 
+/**
+ * Props for the SensorTag component
+ * @typedef {Object} SensorTagProps
+ * @property {{ x: number, y: number }} markerPosition - The position of the marker on the screen
+ */
+
+/**
+ * Component props
+ * @type {SensorTagProps}
+ */
 const props = defineProps({
   markerPosition: {
     type: Object as () => { x: number; y: number },
@@ -84,6 +106,10 @@ const {
   selectPreviousSensor,
 } = store
 
+/**
+ * Computed style for positioning the sensor tag
+ * @type {import('vue').ComputedRef<{ left: string, top: string }>}
+ */
 const positionStyle = computed(() => {
   const { x, y } = props.markerPosition
   const offset = 10
@@ -107,12 +133,19 @@ const positionStyle = computed(() => {
   }
 })
 
+/**
+ * Style configuration for the card component
+ * @type {Object}
+ */
 const cardStyle = {
   base: 'bg-white dark:bg-gray-800 shadow-lg',
   body: 'p-0',
   header: 'p-3 border-b border-gray-200 dark:border-gray-700',
 }
 
+/**
+ * Opens the detailed view of the selected sensor
+ */
 const openSensorDetail = () => {
   toggleSensorDetail()
 }
