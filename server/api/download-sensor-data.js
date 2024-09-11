@@ -2,6 +2,33 @@ import { defineEventHandler } from 'h3'
 import pg from 'pg'
 const { Pool } = pg
 
+/**
+ * API endpoint for downloading sensor data
+ *
+ * This endpoint allows clients to request specific sensor data within a given date range.
+ * It connects to a PostgreSQL database, executes a query based on the provided parameters,
+ * and returns the requested sensor data.
+ *
+ * @async
+ * @function
+ * @param {Object} event - The H3 event object
+ * @returns {Promise<Array>} An array of sensor data objects
+ * @throws {Error} 400 if the request body is invalid
+ * @throws {Error} 500 if there's an internal server error
+ *
+ * @example
+ * // Request body
+ * {
+ *   datasets: { temperature: true, humidity: true },
+ *   dateRange: { start: '2023-01-01', end: '2023-01-31' }
+ * }
+ *
+ * // Response
+ * [
+ *   { timestamp: '2023-01-01T00:00:00Z', temperature: 22.5, humidity: 45 },
+ *   // ... more data points
+ * ]
+ */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
