@@ -2,6 +2,7 @@
   "name": "autonomous-sensor-module-frontend",
   "private": true,
   "scripts": {
+    "test": "vitest",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
@@ -15,6 +16,7 @@
     "@iconify/vue": "^4.1.1",
     "@types/node": "^18.17.1",
     "@vitejs/plugin-vue-jsx": "^4.0.1",
+    "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.20",
     "babel-eslint": "^10.1.0",
     "eslint": "^8.42.0",
@@ -22,10 +24,12 @@
     "eslint-loader": "^4.0.2",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.14.1",
+    "happy-dom": "^15.7.4",
     "nuxt": "^3.12.4",
     "postcss": "^8.4.41",
     "prettier": "^2.8.8",
-    "tailwindcss": "^3.4.10"
+    "tailwindcss": "^3.4.10",
+    "vitest": "^2.1.0"
   },
   "dependencies": {
     "@nuxt/ui": "^2.18.4",
