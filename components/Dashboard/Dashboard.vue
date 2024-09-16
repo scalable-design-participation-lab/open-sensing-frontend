@@ -57,7 +57,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { useDashboardUIStore } from '../../stores/dashboardUI'
 import SensorTile from './SensorTile.vue'
 import OverviewContent from './OverviewContent.vue'
 import DashboardHeader from './DashboardHeader.vue'
@@ -89,7 +89,16 @@ const overviewDescription = ref(
 const lastUpdated = computed(() => {
   const dates = sensors.value.map((sensor) => new Date(sensor.timestamp))
   const latestDate = new Date(Math.max.apply(null, dates))
-  return latestDate.toLocaleString()
+  return latestDate.toLocaleString('en-US', {
+    timeZone: 'UTC',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  })
 })
 
 /**
@@ -116,7 +125,7 @@ const overviewStats = computed(() => [
  * Opens the detail view for a specific sensor
  * @param {string} sensorId - The ID of the sensor to display details for
  */
-const openSensorDetail = (sensorId: string) => {
+const openSensorDetail = (sensorId) => {
   store.updateSelectedSensor(sensorId)
   store.toggleSensorDetail()
 }
@@ -162,6 +171,6 @@ const displayFields = ref([
 ])
 
 defineOptions({
-  name: 'Dashboard',
+  name: 'SensorDashboard',
 })
 </script>

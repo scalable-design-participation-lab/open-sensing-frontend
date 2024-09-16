@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import sensorLocations from '~/static/Sensor_Locations_NEU.json'
+import sensorLocations from '../static/Sensor_Locations_NEU.json'
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
