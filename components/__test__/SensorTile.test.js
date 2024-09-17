@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import SensorTile from '../SensorTile.vue'
+import SensorTile from '../Dashboard/SensorTile.vue'
 
 // Mock UCard, UBadge, UIcon, and UButton components
 const UCard = {

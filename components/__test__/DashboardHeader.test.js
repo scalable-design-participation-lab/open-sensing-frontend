@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import DashboardHeader from '../DashboardHeader.vue'
+import DashboardHeader from '../Dashboard/DashboardHeader.vue'
 
 // Mock UBadge component
 const UBadge = {

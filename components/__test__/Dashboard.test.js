@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
-import Dashboard from '../Dashboard.vue'
-import { useDashboardUIStore } from '../../../stores/dashboardUI'
+import Dashboard from '../Dashboard/Dashboard.vue'
+import { useDashboardStore } from '../../stores/dashboard'
+import { useSensorDetailStore } from '../../stores/sensorDetail'
 import { nextTick } from 'vue'
 
 const mockNuxtUI = {
@@ -16,14 +17,18 @@ const mockNuxtUI = {
 }
 
 describe('Dashboard', () => {
-  const mountComponent = () => {
-    const wrapper = mount(Dashboard, {
+  let wrapper
+  let dashboardStore
+  let sensorDetailStore
+
+  beforeEach(() => {
+    wrapper = mount(Dashboard, {
       global: {
         plugins: [
           createTestingPinia({
             createSpy: vi.fn,
             initialState: {
-              dashboardUI: {
+              sensorDetail: {
                 sensors: [
                   {
                     id: '1',
@@ -55,18 +60,12 @@ describe('Dashboard', () => {
         },
       },
     })
-    const store = useDashboardUIStore()
-    return { wrapper, store }
-  }
-
-  beforeAll(() => {
-    process.env.TZ = 'UTC'
+    dashboardStore = useDashboardStore()
+    sensorDetailStore = useSensorDetailStore()
   })
 
   it('renders the dashboard layout correctly', async () => {
-    const { wrapper } = mountComponent()
     await nextTick()
-
     expect(wrapper.find('.u-card').exists()).toBe(true)
     expect(wrapper.findComponent({ name: 'DashboardHeader' }).exists()).toBe(
       true
@@ -82,23 +81,12 @@ describe('Dashboard', () => {
     const testDate = new Date('2023-05-01T14:00:00Z')
     vi.setSystemTime(testDate)
 
-    const { wrapper } = mountComponent()
     await nextTick()
 
     const headerComponent = wrapper.findComponent({ name: 'DashboardHeader' })
     expect(headerComponent.exists()).toBe(true)
 
-    const expectedDateString = testDate.toLocaleString('en-US', {
-      timeZone: 'UTC',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true,
-    })
-
+    const expectedDateString = '05/01/2023, 02:00:00 PM'
     const expectedBadgeText = `Last updated: ${expectedDateString}`
     expect(headerComponent.props('badgeText')).toBe(expectedBadgeText)
 
@@ -106,7 +94,6 @@ describe('Dashboard', () => {
   })
 
   it('computes overviewStats correctly', async () => {
-    const { wrapper } = mountComponent()
     await nextTick()
 
     const overviewComponent = wrapper.findComponent({ name: 'OverviewContent' })
@@ -118,18 +105,16 @@ describe('Dashboard', () => {
   })
 
   it('calls openSensorDetail when a sensor tile is clicked', async () => {
-    const { wrapper, store } = mountComponent()
     await nextTick()
 
     const sensorTile = wrapper.findComponent({ name: 'SensorTile' })
     await sensorTile.vm.$emit('open-details', '1')
 
-    expect(store.updateSelectedSensor).toHaveBeenCalledWith('1')
-    expect(store.toggleSensorDetail).toHaveBeenCalled()
+    expect(sensorDetailStore.updateSelectedSensor).toHaveBeenCalledWith('1')
+    expect(sensorDetailStore.toggleSensorDetail).toHaveBeenCalled()
   })
 
   it('applies custom colors to sensor tiles', async () => {
-    const { wrapper } = mountComponent()
     await nextTick()
 
     const sensorTile = wrapper.findComponent({ name: 'SensorTile' })
