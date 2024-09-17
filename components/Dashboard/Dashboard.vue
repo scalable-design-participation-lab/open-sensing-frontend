@@ -26,6 +26,7 @@
             title="Sensor Overview"
             :badge-text="`Last updated: ${lastUpdated}`"
             badge-color="gray"
+            @close="dashboardStore.toggleDashboard"
           />
         </template>
         <OverviewContent
@@ -57,22 +58,36 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDashboardUIStore } from '../../stores/dashboardUI'
+import { useSensorDetailStore } from '../../stores/sensorDetail'
+import { useDashboardStore } from '../../stores/dashboard'
+import { useDatasetStore } from '../../stores/datasets'
 import SensorTile from './SensorTile.vue'
 import OverviewContent from './OverviewContent.vue'
 import DashboardHeader from './DashboardHeader.vue'
 
 /**
- * Dashboard UI store instance
- * @type {import('@/stores/dashboardUI').DashboardUIStore}
+ * Sensor Detail store instance
+ * @type {import('@/stores/sensorDetail').SensorDetailStore}
  */
-const store = useDashboardUIStore()
+const sensorDetailStore = useSensorDetailStore()
 
 /**
- * Destructured sensors from the store
+ * Dashboard store instance
+ * @type {import('@/stores/dashboard').DashboardStore}
+ */
+const dashboardStore = useDashboardStore()
+
+/**
+ * Dataset store instance
+ * @type {import('@/stores/datasets').DatasetStore}
+ */
+const datasetStore = useDatasetStore()
+
+/**
+ * Destructured sensors from the sensor detail store
  * @type {import('vue').Ref<Array<import('@/types').Sensor>>}
  */
-const { sensors } = storeToRefs(store)
+const { sensors } = storeToRefs(sensorDetailStore)
 
 /**
  * Description of the sensor data overview
@@ -126,8 +141,8 @@ const overviewStats = computed(() => [
  * @param {string} sensorId - The ID of the sensor to display details for
  */
 const openSensorDetail = (sensorId) => {
-  store.updateSelectedSensor(sensorId)
-  store.toggleSensorDetail()
+  sensorDetailStore.updateSelectedSensor(sensorId)
+  sensorDetailStore.toggleSensorDetail()
 }
 
 /**

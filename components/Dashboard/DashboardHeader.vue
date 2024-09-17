@@ -18,9 +18,19 @@
 <template>
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-xl font-semibold">{{ title }}</h2>
-    <UBadge :color="badgeColor" size="sm">
-      {{ badgeText }}
-    </UBadge>
+    <div class="flex items-center space-x-4">
+      <UBadge :color="badgeColor" size="sm">
+        {{ badgeText }}
+      </UBadge>
+      <UButton
+        icon="i-heroicons-x-mark"
+        color="gray"
+        variant="ghost"
+        size="sm"
+        @click="$emit('close')"
+        aria-label="Close dashboard"
+      />
+    </div>
   </div>
 </template>
 

@@ -32,13 +32,19 @@
         v-if="showDashboard"
         class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-[90%] h-[80%] overflow-hidden bg-transparent"
       />
-      <div class="absolute left-5 top-1/2 transform -translate-y-1/2 z-15">
+      <div class="absolute left-5 top-1/2 transform -translate-y-1/2 z-20">
         <GenericToolbar :tools="sensorTools" @tool-click="handleToolClick" />
       </div>
       <SensorDetail
         v-if="showSensorDetail"
         class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 h-[80%] overflow-hidden"
       />
+
+      <div
+        v-if="showDashboard"
+        class="fixed inset-0 bg-black bg-opacity-50 z-10"
+        @click="closeDashboard"
+      ></div>
     </main>
     <GeneralizedFooter class="z-20" />
     <Teleport to="body">
@@ -55,28 +61,41 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { useDashboardStore } from '@/stores/dashboard'
+import { useFilterStore } from '@/stores/filter'
+import { useMapStore } from '@/stores/map'
+import { useSensorDetailStore } from '@/stores/sensorDetail'
+import { useDatasetStore } from '@/stores/datasets'
+import { useSensorDataStore } from '@/stores/sensorData'
 import { sub } from 'date-fns'
 
-const store = useDashboardUIStore()
-const {
-  showFilter,
-  showDashboard,
-  showSensorDetail,
-  dataDashboardValues,
-  existingHubs,
-  existingDatasets,
-} = storeToRefs(store)
-const {
-  toggleFilter,
-  resetFilters,
-  updateDataDashboardValues,
-  updateExistingHubs,
-  updateExistingDatasets,
-  updateDateRangeUpdate,
-  toggleDashboard,
-  setMapType,
-} = store
+// Dashboard store
+const dashboardStore = useDashboardStore()
+const { showDashboard, dataDashboardValues, dateRangeUpdate } =
+  storeToRefs(dashboardStore)
+const { toggleDashboard, updateDataDashboardValues, updateDateRangeUpdate } =
+  dashboardStore
+
+// Filter store
+const filterStore = useFilterStore()
+const { showFilter } = storeToRefs(filterStore)
+const { toggleFilter, resetFilters } = filterStore
+
+// Map store
+const mapStore = useMapStore()
+const { setMapType } = mapStore
+
+// Sensor Detail store
+const sensorDetailStore = useSensorDetailStore()
+const { showSensorDetail } = storeToRefs(sensorDetailStore)
+
+// Dataset store
+const datasetStore = useDatasetStore()
+const { existingHubs, existingDatasets } = storeToRefs(datasetStore)
+const { updateExistingHubs, updateExistingDatasets } = datasetStore
+
+// Sensor Data store
+const sensorDataStore = useSensorDataStore()
 
 const isLoading = ref(false)
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
@@ -259,7 +278,7 @@ const leftItems = ref([
     label: 'Open Sensing',
     variant: 'solid',
     color: 'black',
-    onClick: () => store.toggleDashboard(),
+    onClick: () => toggleDashboard(),
   },
 ])
 
@@ -297,4 +316,10 @@ const rightItems = ref([
     onClick: () => (showDownloadPopup.value = true),
   },
 ])
+
+const closeDashboard = () => {
+  if (showDashboard.value) {
+    toggleDashboard()
+  }
+}
 </script>

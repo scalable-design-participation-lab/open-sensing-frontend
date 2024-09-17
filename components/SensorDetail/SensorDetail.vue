@@ -5,8 +5,8 @@
  * It includes sensor statistics, location information, and historical data charts.
  * The component is designed to be displayed as a modal overlay on the dashboard.
  * 
- * @displayName SensorDetail
- * @usage
+ * @component
+ * @example
  * <SensorDetail />
  -->
 
@@ -20,9 +20,11 @@
     <div
       v-if="showSensorDetail && selectedSensor"
       class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]"
+      @click="closeSensorDetail"
     >
       <div
         class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
+        @click.stop
       >
         <SensorHeader
           :selected-sensor="selectedSensor"
@@ -100,40 +102,88 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { useSensorDetailStore } from '@/stores/sensorDetail'
+import { useDashboardStore } from '@/stores/dashboard'
+import { useDatasetStore } from '@/stores/datasets'
+import { useSensorDataStore } from '@/stores/sensorData'
 import { useResizeObserver } from '@vueuse/core'
 
 /**
- * Dashboard UI store instance
- * @type {import('@/stores/dashboardUI').DashboardUIStore}
+ * Store for managing sensor detail state
+ * @type {import('@/stores/sensorDetail').SensorDetailStore}
  */
-const store = useDashboardUIStore()
+const sensorDetailStore = useSensorDetailStore()
 
 /**
- * Destructured reactive references from the store
- * @type {Object}
- * @property {import('vue').Ref<import('@/types').Sensor>} selectedSensor - The currently selected sensor
- * @property {import('vue').Ref<boolean>} showSensorDetail - Whether to show the sensor detail modal
- * @property {import('vue').Ref<string[]>} selectedDatasets - The currently selected datasets to display
- * @property {import('vue').Ref<Object>} sensorData - The historical data for the selected sensor
- * @property {import('vue').Ref<boolean>} showDashboard - Whether to show the main dashboard
+ * Store for managing dashboard state
+ * @type {import('@/stores/dashboard').DashboardStore}
  */
-const {
-  selectedSensor,
-  showSensorDetail,
-  selectedDatasets,
-  sensorData,
-  showDashboard,
-} = storeToRefs(store)
+const dashboardStore = useDashboardStore()
 
 /**
- * Reference to the scroll container for charts
+ * Store for managing dataset state
+ * @type {import('@/stores/datasets').DatasetStore}
+ */
+const datasetStore = useDatasetStore()
+
+/**
+ * Store for managing sensor data state
+ * @type {import('@/stores/sensorData').SensorDataStore}
+ */
+const sensorDataStore = useSensorDataStore()
+
+/**
+ * Destructured reactive references from the sensor detail store
+ * @type {{selectedSensor: import('vue').Ref, showSensorDetail: import('vue').Ref, sensors: import('vue').Ref}}
+ */
+const { selectedSensor, showSensorDetail, sensors } =
+  storeToRefs(sensorDetailStore)
+
+/**
+ * Destructured reactive references from the dashboard store
+ * @type {{dataDashboardValues: import('vue').Ref}}
+ */
+const { dataDashboardValues } = storeToRefs(dashboardStore)
+
+/**
+ * Destructured reactive references from the dataset store
+ * @type {{selectedDatasets: import('vue').Ref}}
+ */
+const { selectedDatasets } = storeToRefs(datasetStore)
+
+/**
+ * Destructured reactive references from the sensor data store
+ * @type {{sensorData: import('vue').Ref}}
+ */
+const { sensorData } = storeToRefs(sensorDataStore)
+
+/**
+ * Methods destructured from the sensor detail store
+ * @type {{toggleSensorDetail: Function, selectNextSensor: Function, selectPreviousSensor: Function}}
+ */
+const { toggleSensorDetail, selectNextSensor, selectPreviousSensor } =
+  sensorDetailStore
+
+/**
+ * Methods destructured from the dashboard store
+ * @type {{updateDataDashboardValues: Function}}
+ */
+const { updateDataDashboardValues } = dashboardStore
+
+/**
+ * Methods destructured from the sensor data store
+ * @type {{loadSensorData: Function}}
+ */
+const { loadSensorData } = sensorDataStore
+
+/**
+ * Reference to the scroll container element
  * @type {import('vue').Ref<HTMLElement | null>}
  */
 const scrollContainer = ref(null)
 
 /**
- * Width of the chart, dynamically updated
+ * Width of the chart, reactive to container size changes
  * @type {import('vue').Ref<number>}
  */
 const chartWidth = ref(0)
@@ -146,18 +196,18 @@ const chartHeight = 180
 
 /**
  * Global date range for all charts
- * @type {import('vue').Ref<[Date, Date] | []>}
+ * @type {import('vue').Ref<Date[]>}
  */
 const globalDateRange = ref([])
 
 /**
- * Margin configuration for charts
- * @type {Object}
+ * Margin for charts
+ * @type {{top: number, right: number, bottom: number, left: number}}
  */
 const margin = { top: 20, right: 20, bottom: 30, left: 40 }
 
 /**
- * Computed property to determine if data is loaded and ready to display
+ * Computed property to check if data is loaded and chart width is set
  * @type {import('vue').ComputedRef<boolean>}
  */
 const dataLoaded = computed(
@@ -165,7 +215,7 @@ const dataLoaded = computed(
 )
 
 /**
- * Metrics configuration for sensor data
+ * Metrics configuration for charts
  * @type {import('vue').Ref<Object>}
  */
 const metrics = ref({
@@ -183,7 +233,7 @@ const metrics = ref({
 })
 
 /**
- * Computed property to generate sensor statistics
+ * Computed property for sensor statistics
  * @type {import('vue').ComputedRef<Object>}
  */
 const sensorStats = computed(() => {
@@ -198,7 +248,7 @@ const sensorStats = computed(() => {
 })
 
 /**
- * Computed property to generate sensor information items
+ * Computed property for sensor info items
  * @type {import('vue').ComputedRef<Array<{label: string, value: string, color: string}>>}
  */
 const sensorInfoItems = computed(() => [
@@ -228,7 +278,7 @@ useResizeObserver(scrollContainer, (entries) => {
 
 onMounted(async () => {
   if (selectedSensor.value) {
-    await store.loadSensorData()
+    await loadSensorData()
   }
 })
 
@@ -236,36 +286,36 @@ onMounted(async () => {
  * Closes the sensor detail modal
  */
 const closeSensorDetail = () => {
-  store.toggleSensorDetail()
+  toggleSensorDetail()
 }
 
 /**
- * Navigates back to the main dashboard
+ * Navigates back to the dashboard
  */
 const goBackToDashboard = () => {
-  store.toggleSensorDetail()
-  store.toggleDashboard()
+  toggleSensorDetail()
+  dashboardStore.toggleDashboard()
 }
 
 /**
  * Updates the global date range for all charts
- * @param {[Date, Date]} range - The new date range
+ * @param {Date[]} range - The new date range
  */
 const updateGlobalDateRange = (range) => {
   globalDateRange.value = range
-  store.updateDataDashboardValues('dateRange', range)
+  updateDataDashboardValues('dateRange', range)
 }
 
 /**
- * Resets all charts to their original state
+ * Resets all charts to their initial state
  */
 const resetAllCharts = () => {
   globalDateRange.value = []
-  store.updateDataDashboardValues('dateRange', [])
+  updateDataDashboardValues('dateRange', [])
 
   Object.keys(metrics.value).forEach((metricName) => {
     if (sensorData.value[metricName]) {
-      store.updateDataDashboardValues(metricName, sensorData.value[metricName])
+      updateDataDashboardValues(metricName, sensorData.value[metricName])
     }
   })
 
@@ -273,9 +323,9 @@ const resetAllCharts = () => {
 }
 
 /**
- * Formats a date range for display
- * @param {[Date, Date]} range - The date range to format
- * @returns {string} The formatted date range string
+ * Formats a date range into a string
+ * @param {Date[]} range - The date range to format
+ * @returns {string} Formatted date range string
  */
 const formatDateRange = (range) => {
   if (range.length !== 2) return ''
@@ -290,42 +340,18 @@ const formatDateRange = (range) => {
 }
 
 /**
- * Selects the next sensor in the list
- */
-const selectNextSensor = async () => {
-  await store.selectNextSensor()
-  refreshSensorData()
-}
-
-/**
- * Selects the previous sensor in the list
- */
-const selectPreviousSensor = async () => {
-  await store.selectPreviousSensor()
-  refreshSensorData()
-}
-
-/**
- * Refreshes the sensor data and resets all charts
- */
-const refreshSensorData = async () => {
-  await store.loadSensorData()
-  resetAllCharts()
-}
-
-/**
- * Shows detailed information for a specific statistic
- * @param {string} statKey - The key of the statistic to show details for
+ * Shows details for a specific stat
+ * @param {string} statKey - The key of the stat to show details for
  */
 const showStatDetails = (statKey) => {
   console.log(`Showing details for ${statKey}`)
 }
 
 /**
- * Gets the color for a sensor value based on its key and value
- * @param {string} key - The key of the sensor value
- * @param {number|string} value - The sensor value
- * @returns {string} The CSS color class
+ * Gets the color for a value based on its key and value
+ * @param {string} key - The key of the value
+ * @param {string|number} value - The value to get the color for
+ * @returns {string} The color class for the value
  */
 const getValueColor = (key, value) => {
   if (key === 'Temperature') {
@@ -344,9 +370,9 @@ const getValueColor = (key, value) => {
 }
 
 /**
- * Gets the color for the signal strength indicator
+ * Gets the color for signal strength
  * @param {number|string} value - The signal strength value
- * @returns {string} The CSS color class
+ * @returns {string} The color class for the signal strength
  */
 const getSignalStrengthColor = (value) => {
   const strength = parseInt(value)
@@ -356,9 +382,9 @@ const getSignalStrengthColor = (value) => {
 }
 
 /**
- * Gets the color for the air quality indicator
+ * Gets the color for air quality
  * @param {string} value - The air quality value
- * @returns {string} The CSS color class
+ * @returns {string} The color class for the air quality
  */
 const getAirQualityColor = (value) => {
   switch (value.toLowerCase()) {
@@ -376,9 +402,9 @@ const getAirQualityColor = (value) => {
 }
 
 /**
- * Gets the color for the soil moisture indicator
- * @param {string} value - The soil moisture value
- * @returns {string} The CSS color class
+ * Gets the color for soil moisture
+ * @param {number|string} value - The soil moisture value
+ * @returns {string} The color class for the soil moisture
  */
 const getSoilMoistureColor = (value) => {
   const moisture = parseFloat(value)
@@ -391,7 +417,7 @@ watch(
   selectedSensor,
   async (newSensor, oldSensor) => {
     if (newSensor && newSensor !== oldSensor) {
-      await store.loadSensorData()
+      await loadSensorData()
       resetAllCharts()
     }
   },

@@ -22,7 +22,8 @@ import { onMounted, ref, watch, computed } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { IconLayer } from '@deck.gl/layers'
 import { storeToRefs } from 'pinia'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { useSensorDetailStore } from '@/stores/sensorDetail'
+import { useMapStore } from '@/stores/map'
 import mapboxgl from 'mapbox-gl'
 
 /**
@@ -32,10 +33,14 @@ import mapboxgl from 'mapbox-gl'
 const accessToken =
   'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
 
-const store = useDashboardUIStore()
-const { sensors, selectedSensorId, mapType, showSensorInfo } =
-  storeToRefs(store)
-const { updateSelectedSensor, updateClickPosition, updateMapCenter } = store
+const sensorDetailStore = useSensorDetailStore()
+const mapStore = useMapStore()
+
+const { sensors, selectedSensorId, showSensorInfo } =
+  storeToRefs(sensorDetailStore)
+const { mapType, mapCenter } = storeToRefs(mapStore)
+const { updateSelectedSensor, updateClickPosition } = sensorDetailStore
+const { updateMapCenter } = mapStore
 
 /**
  * Mapbox map instance

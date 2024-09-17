@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { useSensorDetailStore } from '@/stores/sensorDetail'
 
 /**
  * Props for the SensorTag component
@@ -92,19 +92,19 @@ import { useDashboardUIStore } from '@/stores/dashboardUI'
  */
 const props = defineProps({
   markerPosition: {
-    type: Object as () => { x: number; y: number },
+    type: Object as PropType<{ x: number; y: number }>,
     required: true,
   },
 })
 
-const store = useDashboardUIStore()
-const { selectedSensor } = storeToRefs(store)
+const sensorDetailStore = useSensorDetailStore()
+const { selectedSensor } = storeToRefs(sensorDetailStore)
 const {
   toggleSensorDetail,
   closeSensorInfo,
   selectNextSensor,
   selectPreviousSensor,
-} = store
+} = sensorDetailStore
 
 /**
  * Computed style for positioning the sensor tag

@@ -5,7 +5,6 @@ import Dashboard from '../Dashboard.vue'
 import { useDashboardUIStore } from '../../../stores/dashboardUI'
 import { nextTick } from 'vue'
 
-// 模拟 NuxtUI 组件
 const mockNuxtUI = {
   UCard: {
     template:
@@ -61,7 +60,6 @@ describe('Dashboard', () => {
   }
 
   beforeAll(() => {
-    // 设置时区为 UTC
     process.env.TZ = 'UTC'
   })
 
