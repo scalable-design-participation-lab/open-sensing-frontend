@@ -22,8 +22,8 @@ import { onMounted, ref, watch, computed } from 'vue'
 import { MapboxLayer } from '@deck.gl/mapbox'
 import { IconLayer } from '@deck.gl/layers'
 import { storeToRefs } from 'pinia'
-import { useSensorDetailStore } from '@/stores/sensorDetail'
-import { useMapStore } from '@/stores/map'
+import { useSensorDetailStore } from '../../stores/sensorDetail'
+import { useMapStore } from '../../stores/map'
 import mapboxgl from 'mapbox-gl'
 
 /**

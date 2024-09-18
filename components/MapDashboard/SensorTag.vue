@@ -1,15 +1,17 @@
 <!--
- * MapDashboard Component
+ * SensorTag Component
  * 
- * This component renders a map with sensor markers using Mapbox GL and deck.gl.
- * It displays sensor locations, allows interaction with sensors, and updates
- * the map based on user interactions and selected sensors.
+ * This component displays detailed information about a selected sensor on a map.
+ * It is designed to be positioned dynamically based on the sensor's location on the screen.
+ * The component shows various sensor readings such as temperature, humidity, air quality,
+ * and battery level, and provides navigation controls to switch between sensors.
  * 
- * @displayName MapDashboard
+ * @displayName SensorTag
  * @usage
- * <MapDashboard />
+ * <SensorTag
+ *   :markerPosition="{ x: 100, y: 200 }"
+ * />
  -->
-
 <template>
   <UCard
     class="w-[280px] z-[1000] pointer-events-auto absolute"
@@ -20,30 +22,34 @@
       <div class="flex justify-between items-center">
         <div class="flex gap-2">
           <UButton
+            data-testid="previous-sensor"
             color="gray"
             variant="ghost"
             icon="i-heroicons-arrow-left"
-            @click="selectPreviousSensor"
+            @click="sensorDetailStore.selectPreviousSensor"
           />
           <UButton
+            data-testid="next-sensor"
             color="gray"
             variant="ghost"
             icon="i-heroicons-arrow-right"
-            @click="selectNextSensor"
+            @click="sensorDetailStore.selectNextSensor"
           />
         </div>
         <div class="flex gap-2">
           <UButton
+            data-testid="open-detail"
             color="primary"
             variant="ghost"
             icon="i-heroicons-arrow-top-right-on-square"
             @click="openSensorDetail"
           />
           <UButton
+            data-testid="close-info"
             color="gray"
             variant="ghost"
             icon="i-heroicons-x-mark"
-            @click="closeSensorInfo"
+            @click="sensorDetailStore.closeSensorInfo"
           />
         </div>
       </div>
@@ -76,29 +82,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useSensorDetailStore } from '@/stores/sensorDetail'
+import { computed, PropType } from 'vue'
+import { useSensorDetailStore } from '../../stores/sensorDetail'
 
-/**
- * Props for the SensorTag component
- * @typedef {Object} SensorTagProps
- * @property {{ x: number, y: number }} markerPosition - The position of the marker on the screen
- */
+interface MarkerPosition {
+  x: number
+  y: number
+}
 
-/**
- * Component props
- * @type {SensorTagProps}
- */
 const props = defineProps({
   markerPosition: {
-    type: Object as PropType<{ x: number; y: number }>,
+    type: Object as PropType<MarkerPosition>,
     required: true,
   },
 })
 
 const sensorDetailStore = useSensorDetailStore()
-const { selectedSensor } = storeToRefs(sensorDetailStore)
+
+const selectedSensor = computed(() => sensorDetailStore.selectedSensor)
+
 const {
   toggleSensorDetail,
   closeSensorInfo,
@@ -117,14 +119,14 @@ const positionStyle = computed(() => {
   const infoHeight = 250
 
   let left = x + offset
-  let top = y - infoHeight - offset
+  let top = y + offset
 
   const { innerWidth, innerHeight } = window
   if (left + infoWidth > innerWidth) {
     left = x - infoWidth - offset
   }
-  if (top < 0) {
-    top = y + offset
+  if (top + infoHeight > innerHeight) {
+    top = y - infoHeight - offset
   }
 
   return {
@@ -147,6 +149,6 @@ const cardStyle = {
  * Opens the detailed view of the selected sensor
  */
 const openSensorDetail = () => {
-  toggleSensorDetail()
+  sensorDetailStore.toggleSensorDetail()
 }
 </script>
