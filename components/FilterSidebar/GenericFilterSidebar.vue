@@ -139,6 +139,7 @@ const onClose = () => {
  * Handles the reset of all filters
  */
 const onReset = () => {
+  console.log('Reset button clicked')
   emit('reset')
 }
 

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
-import Dashboard from '../Dashboard/Dashboard.vue'
-import { useDashboardStore } from '../../stores/dashboard'
-import { useSensorDetailStore } from '../../stores/sensorDetail'
+import Dashboard from '../../Dashboard/Dashboard.vue'
+import { useDashboardStore } from '../../../stores/dashboard'
+import { useSensorDetailStore } from '../../../stores/sensorDetail'
 import { nextTick } from 'vue'
 
 const mockNuxtUI = {

@@ -1,12 +1,17 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import DashboardHeader from '../Dashboard/DashboardHeader.vue'
+import DashboardHeader from '../../Dashboard/DashboardHeader.vue'
 
 // Mock UBadge component
 const UBadge = {
   name: 'UBadge',
   template: '<span><slot></slot></span>',
   props: ['color', 'size'],
+}
+
+const UButton = {
+  name: 'UButton',
+  template: '<button><slot></slot></button>',
 }
 
 describe('DashboardHeader', () => {
@@ -16,6 +21,7 @@ describe('DashboardHeader', () => {
       global: {
         components: {
           UBadge,
+          UButton,
         },
       },
     })

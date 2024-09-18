@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import DashboardOverlay from '../Dashboard/DashboardOverlay.vue'
+import DashboardOverlay from '../../Dashboard/DashboardOverlay.vue'
 
 describe('DashboardOverlay', () => {
   const mountComponent = (props = {}) => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import OverviewContent from '../Dashboard/OverviewContent.vue'
+import OverviewContent from '../../Dashboard/OverviewContent.vue'
 
 // Mock UButton and UCard components
 const UButton = {
