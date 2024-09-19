@@ -24,37 +24,44 @@
       color="primary"
       variant="ghost"
       class="mr-4 hover:bg-gray-200 transition-colors"
+      data-testid="go-back-button"
       @click="$emit('go-back')"
     />
-    <h1 class="text-2xl font-bold text-gray-800 flex-grow">
+    <h1
+      class="text-2xl font-bold text-gray-800 flex-grow"
+      data-testid="sensor-location"
+    >
       {{ selectedSensor.location }}
     </h1>
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-4" data-testid="sensor-info">
       <div
         class="battery-indicator flex items-center bg-gray-200 rounded-full px-3 py-1"
+        data-testid="battery-indicator"
       >
         <UIcon
           name="i-heroicons-battery-50"
           class="w-6 h-6 mr-2"
           :class="getBatteryIconColor(selectedSensor.batteryLevel)"
         />
-        <span class="text-sm font-medium"
-          >{{ selectedSensor.batteryLevel }}%</span
-        >
+        <span class="text-sm font-medium" data-testid="battery-level">
+          {{ selectedSensor.batteryLevel }}%
+        </span>
       </div>
       <UBadge
         :color="getStatusColor(selectedSensor.status)"
         class="text-sm font-medium"
+        data-testid="sensor-status"
       >
         {{ selectedSensor.status }}
       </UBadge>
     </div>
-    <div class="navigation-buttons ml-4 flex">
+    <div class="navigation-buttons ml-4 flex" data-testid="navigation-buttons">
       <UButton
         icon="i-heroicons-arrow-up"
         color="primary"
         variant="ghost"
         class="mr-2 hover:bg-gray-200 transition-colors"
+        data-testid="select-previous-button"
         @click="$emit('select-previous')"
       />
       <UButton
@@ -62,6 +69,7 @@
         color="primary"
         variant="ghost"
         class="hover:bg-gray-200 transition-colors"
+        data-testid="select-next-button"
         @click="$emit('select-next')"
       />
     </div>
@@ -70,6 +78,7 @@
       color="gray"
       variant="ghost"
       class="ml-4 hover:bg-gray-200 transition-colors"
+      data-testid="close-button"
       @click="$emit('close')"
     />
   </header>

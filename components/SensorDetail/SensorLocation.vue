@@ -12,11 +12,17 @@
 
 <template>
   <div class="sensor-location flex-1">
-    <h2 class="text-xl font-bold mb-4 text-gray-800">Location</h2>
+    <h2
+      class="text-xl font-bold mb-4 text-gray-800"
+      data-testid="location-header"
+    >
+      Location
+    </h2>
     <div
       id="mini-map"
       ref="miniMap"
       class="w-full h-72 rounded-lg overflow-hidden shadow-md"
+      data-testid="mini-map"
     ></div>
   </div>
 </template>

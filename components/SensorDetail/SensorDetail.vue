@@ -1,15 +1,3 @@
-<!--
- * SensorDetail Component
- * 
- * This component displays detailed information about a selected sensor.
- * It includes sensor statistics, location information, and historical data charts.
- * The component is designed to be displayed as a modal overlay on the dashboard.
- * 
- * @component
- * @example
- * <SensorDetail />
- -->
-
 <template>
   <transition
     enter-active-class="transition-opacity duration-300 ease-in-out"
@@ -20,10 +8,12 @@
     <div
       v-if="showSensorDetail && selectedSensor"
       class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]"
+      data-testid="sensor-detail-modal"
       @click="closeSensorDetail"
     >
       <div
         class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
+        data-testid="sensor-detail-content"
         @click.stop
       >
         <SensorHeader
@@ -81,6 +71,7 @@
               <UButton
                 color="primary"
                 class="hover:bg-blue-600 transition-colors"
+                data-testid="reset-charts-button"
                 @click="resetAllCharts"
               >
                 Reset All Charts
@@ -102,10 +93,10 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useSensorDetailStore } from '@/stores/sensorDetail'
-import { useDashboardStore } from '@/stores/dashboard'
-import { useDatasetStore } from '@/stores/datasets'
-import { useSensorDataStore } from '@/stores/sensorData'
+import { useSensorDetailStore } from '../../stores/sensorDetail'
+import { useDashboardStore } from '../../stores/dashboard'
+import { useDatasetStore } from '../../stores/datasets'
+import { useSensorDataStore } from '../../stores/sensorData'
 import { useResizeObserver } from '@vueuse/core'
 
 /**
@@ -423,4 +414,12 @@ watch(
   },
   { deep: true }
 )
+
+/**
+ * Initializes the mini map
+ * This is a placeholder function that can be overridden by parent components
+ */
+const initMiniMap = () => {
+  console.log('Mini map initialization placeholder')
+}
 </script>

@@ -10,24 +10,45 @@
  -->
 
 <template>
-  <div class="flex-1">
-    <h2 class="text-xl font-bold mb-4 text-gray-800">Sensor Information</h2>
+  <div class="flex-1" data-testid="sensor-info-container">
+    <h2
+      class="text-xl font-bold mb-4 text-gray-800"
+      data-testid="sensor-info-title"
+    >
+      Sensor Information
+    </h2>
     <div class="grid grid-cols-2 gap-6">
       <div
         v-for="(item, index) in sensorInfoItems"
         :key="index"
         class="bg-gray-100 rounded-lg p-4 text-center hover:shadow-md transition-shadow"
+        :data-testid="`sensor-info-item-${item.label
+          .toLowerCase()
+          .replace(' ', '-')}`"
       >
-        <h3 class="text-xl font-bold" :class="item.color">
+        <h3
+          class="text-xl font-bold"
+          :class="item.color"
+          :data-testid="`sensor-info-value-${item.label
+            .toLowerCase()
+            .replace(' ', '-')}`"
+        >
           {{ item.value }}
         </h3>
-        <p class="text-sm text-gray-600 mt-2">{{ item.label }}</p>
+        <p
+          class="text-sm text-gray-600 mt-2"
+          :data-testid="`sensor-info-label-${item.label
+            .toLowerCase()
+            .replace(' ', '-')}`"
+        >
+          {{ item.label }}
+        </p>
       </div>
     </div>
-    <p class="mt-4 text-sm text-gray-600">
+    <p class="mt-4 text-sm text-gray-600" data-testid="last-updated">
       Last Updated: {{ formatDate(selectedSensor.timestamp) }}
     </p>
-    <p class="mt-1 text-sm text-gray-600">
+    <p class="mt-1 text-sm text-gray-600" data-testid="last-maintenance">
       Last Maintenance: {{ formatDate(selectedSensor.lastMaintenance) }}
     </p>
   </div>
@@ -131,6 +152,7 @@ const formatDate = (dateString) => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timezone: 'UTC',
   })
 }
 </script>

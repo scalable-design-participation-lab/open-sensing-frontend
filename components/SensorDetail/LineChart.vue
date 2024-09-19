@@ -16,8 +16,9 @@
  -->
 
 <template>
-  <div :id="chartId" class="relative">
+  <div :id="chartId" class="relative" data-testid="chart-container">
     <UButton
+      data-testid="reset-button"
       class="reset-button"
       icon="i-heroicons-arrow-path"
       @click="resetChart"
@@ -31,13 +32,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import * as d3 from 'd3'
-import { useDashboardUIStore } from '@/stores/dashboardUI'
+import { useDashboardStore } from '../../stores/dashboard'
 import { storeToRefs } from 'pinia'
 
 /**
  * Represents a single data point in the chart
  * @typedef {Object} DataPoint
- * @property {Date} date - The date of the data point
+ * @property {string} date - The date of the data point in ISO string format
  * @property {number} value - The value of the data point
  */
 
@@ -57,13 +58,13 @@ import { storeToRefs } from 'pinia'
  */
 const props = defineProps<{
   metric: { label: string }
-  data: { data: DataPoint[]; min: number; max: number }
+  data: { data: { date: string; value: number }[]; min: number; max: number }
   width: number
   height: number
   margin: { top: number; right: number; bottom: number; left: number }
 }>()
 
-const store = useDashboardUIStore()
+const store = useDashboardStore()
 const { dataDashboardValues, dateRangeUpdate } = storeToRefs(store)
 const { updateDataDashboardValues } = store
 
@@ -133,6 +134,7 @@ const createLineChart = () => {
     .append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
+    .attr('data-testid', 'chart-svg') // Added data-testid
     .append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`)
 
@@ -250,6 +252,9 @@ const resetChart = () => {
   svg.select('.y-axis').call(yAxis as any)
   svg.select('.line').attr('d', line)
   svg.select('.brush').call(brush.move, null)
+
+  // Add this line to update the store's dateRange
+  updateDataDashboardValues('dateRange', xDomain)
 }
 
 watch(() => props.data, createLineChart, { deep: true })

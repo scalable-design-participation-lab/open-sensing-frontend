@@ -15,12 +15,17 @@
       v-for="(value, key) in sensorStats"
       :key="key"
       class="stat-item bg-gray-100 rounded-lg p-4 text-center transform hover:scale-105 transition-transform cursor-pointer"
+      :data-testid="`stat-item-${key}`"
       @click="$emit('show-stat-details', key)"
     >
-      <h3 class="text-2xl font-bold" :class="getValueColor(key, value)">
+      <h3
+        class="text-2xl font-bold"
+        :class="getValueColor(key, value)"
+        data-testid="stat-value"
+      >
         {{ value }}
       </h3>
-      <p class="text-sm text-gray-600 mt-2">{{ key }}</p>
+      <p class="text-sm text-gray-600 mt-2" data-testid="stat-key">{{ key }}</p>
     </div>
   </div>
 </template>
