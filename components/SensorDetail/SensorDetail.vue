@@ -7,7 +7,7 @@
   >
     <div
       v-if="showSensorDetail && selectedSensor"
-      class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]"
+      class="fixed inset-0 flex justify-center items-center z-[20]"
       data-testid="sensor-detail-modal"
       @click="closeSensorDetail"
     >

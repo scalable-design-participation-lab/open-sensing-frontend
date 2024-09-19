@@ -24,10 +24,6 @@
         @reset="resetAllFilters"
         @filter-change="handleFilterChange"
       />
-      <DashboardOverlay
-        :visible="showDashboard || showSensorDetail"
-        class="z-15"
-      />
       <Dashboard
         v-if="showDashboard"
         class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-[90%] h-[80%] overflow-hidden bg-transparent"
@@ -41,9 +37,9 @@
       />
 
       <div
-        v-if="showDashboard"
+        v-if="showDashboard || showSensorDetail"
         class="fixed inset-0 bg-black bg-opacity-50 z-10"
-        @click="closeDashboard"
+        @click="closeOverlay"
       ></div>
     </main>
     <GeneralizedFooter class="z-20" />
@@ -317,9 +313,12 @@ const rightItems = ref([
   },
 ])
 
-const closeDashboard = () => {
+const closeOverlay = () => {
   if (showDashboard.value) {
-    toggleDashboard()
+    toggleDashboard(false)
+  }
+  if (showSensorDetail.value) {
+    sensorDetailStore.toggleSensorDetail(false)
   }
 }
 </script>

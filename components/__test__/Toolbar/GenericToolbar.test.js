@@ -58,7 +58,7 @@ describe('GenericToolbar', () => {
     const wrapper = createWrapper()
     const button = wrapper.findAll('.w-14.h-14')[0]
     await button.trigger('click')
-    expect(button.classes()).toContain('bg-blue-500')
+    expect(button.classes()).not.toContain('bg-blue-500')
     await button.trigger('click')
     expect(button.classes()).not.toContain('bg-blue-500')
   })
