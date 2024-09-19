@@ -19,6 +19,7 @@
   <Teleport to="body">
     <div
       class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+      data-test="download-popup"
     >
       <GenericFilterSidebar
         :is-visible="true"
@@ -38,6 +39,7 @@
                 value="json"
                 label="JSON"
                 class="flex-1"
+                data-test="file-format-option-json"
               />
               <URadio
                 v-model="fileFormat"
@@ -45,12 +47,18 @@
                 value="csv"
                 label="CSV"
                 class="flex-1"
+                data-test="file-format-option-csv"
               />
             </div>
           </div>
         </template>
         <template #footer-buttons>
-          <UButton color="gray" variant="soft" @click="$emit('close')">
+          <UButton
+            color="gray"
+            variant="soft"
+            @click="$emit('close')"
+            data-test="cancel-button"
+          >
             Cancel
           </UButton>
           <UButton
@@ -58,6 +66,7 @@
             variant="solid"
             class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
             @click="handleDownload"
+            data-test="download-button"
           >
             <template #leading>
               <UIcon name="i-heroicons-arrow-down-tray" />
