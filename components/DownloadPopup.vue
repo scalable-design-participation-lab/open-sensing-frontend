@@ -20,6 +20,7 @@
     <div
       class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
       data-test="download-popup"
+      @click="handleOutsideClick"
     >
       <GenericFilterSidebar
         :is-visible="true"
@@ -148,5 +149,16 @@ const handleDownload = () => {
   console.log('Selected filters:', selectedFilters.value)
   console.log('File format:', fileFormat.value)
   emit('download', { filters: selectedFilters.value, format: fileFormat.value })
+}
+
+/**
+ * Handles clicks outside the GenericFilterSidebar
+ * @param {Event} event - The click event object
+ */
+const handleOutsideClick = (event: Event) => {
+  // Check if the click event occurred outside the GenericFilterSidebar
+  if ((event.target as HTMLElement).classList.contains('bg-black')) {
+    emit('close')
+  }
 }
 </script>

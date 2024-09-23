@@ -33,7 +33,7 @@
       </div>
       <SensorDetail
         v-if="showSensorDetail"
-        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[90%] h-[calc(100vh-8rem-4vh)] overflow-hidden"
+        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[50%] h-[calc(100vh-8rem-4vh)] overflow-hidden"
       />
 
       <div
