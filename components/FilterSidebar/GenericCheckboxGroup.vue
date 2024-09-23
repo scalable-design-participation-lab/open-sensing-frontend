@@ -18,6 +18,9 @@
  -->
 <template>
   <div class="flex flex-col gap-2.5">
+    <UButton size="sm" color="gray" variant="soft" @click="toggleAll">
+      {{ allSelected ? 'Deselect All' : 'Select All' }}
+    </UButton>
     <UCheckbox
       v-for="item in items"
       :key="item.value"
@@ -31,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 
 /**
  * Props for the GenericCheckboxGroup component
@@ -62,6 +65,25 @@ const emit = defineEmits(['update:modelValue'])
  * @type {import('vue').Ref<Object>}
  */
 const selectedItems = ref({ ...props.modelValue })
+
+/**
+ * Checks if all items are selected
+ * @type {import('vue').ComputedRef<boolean>}
+ */
+const allSelected = computed(() => {
+  return Object.values(selectedItems.value).every((value) => value === true)
+})
+
+/**
+ * Toggles the selection of all items
+ */
+const toggleAll = () => {
+  const newValue = !allSelected.value
+  props.items.forEach((item) => {
+    selectedItems.value[item.value] = newValue
+  })
+  emit('update:modelValue', { ...selectedItems.value })
+}
 
 /**
  * Updates the selected state of an item

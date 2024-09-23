@@ -2,7 +2,7 @@
   <div v-if="isLoading" class="flex justify-center items-center h-screen">
     Loading...
   </div>
-  <div v-else class="flex overflow-hidden flex-col h-screen">
+  <div v-else class="flex flex-col min-h-screen">
     <GeneralizedHeader
       class="z-20"
       :left-items="leftItems"
@@ -12,28 +12,28 @@
       :show-icon="true"
     />
 
-    <main class="flex-grow relative overflow-hidden">
-      <MapDashboard />
+    <main class="flex-grow relative overflow-hidden pt-16">
+      <MapDashboard class="absolute inset-0" />
       <GenericFilterSidebar
-        v-if="showFilter"
-        :is-visible="showFilter"
+        v-if="showFilter && !showDashboard"
+        :is-visible="showFilter && !showDashboard"
         title="Filters"
         :filter-sections="filterSections"
-        class="absolute top-[100px] right-5 z-20"
+        class="fixed top-[calc(4rem+6vh)] right-5 z-[1001] w-[calc(100%-2.5rem)] sm:w-[240px] md:w-[300px] lg:w-[360px] h-[calc(100vh-8rem-8vh)] max-h-[800px] overflow-auto"
         @close="closeFilter"
         @reset="resetAllFilters"
         @filter-change="handleFilterChange"
       />
       <Dashboard
         v-if="showDashboard"
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-[90%] h-[80%] overflow-hidden bg-transparent"
+        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[90%] h-[calc(100vh-8rem-4vh)] overflow-hidden bg-transparent"
       />
       <div class="absolute left-5 top-1/2 transform -translate-y-1/2 z-20">
         <GenericToolbar :tools="sensorTools" @tool-click="handleToolClick" />
       </div>
       <SensorDetail
         v-if="showSensorDetail"
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 h-[80%] overflow-hidden"
+        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[90%] h-[calc(100vh-8rem-4vh)] overflow-hidden"
       />
 
       <div
@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useFilterStore } from '@/stores/filter'
@@ -190,7 +190,11 @@ const handleFilterChange = (filterData) => {
       updateExistingDatasets(value)
       break
     case 'datetime':
-      updateDateRange(value)
+      if (value.isAllTime) {
+        updateDateRange({ start: null, end: null })
+      } else {
+        updateDateRange(value)
+      }
       break
   }
   updateDateRangeUpdate(new Date())
@@ -321,4 +325,25 @@ const closeOverlay = () => {
     sensorDetailStore.toggleSensorDetail(false)
   }
 }
+
+watch(showDashboard, (newValue) => {
+  if (newValue && showFilter.value) {
+    toggleFilter()
+  }
+})
+
+watch(showFilter, (newValue) => {
+  if (newValue && showDashboard.value) {
+    toggleDashboard()
+  }
+})
 </script>
+
+<style scoped>
+.top-\[calc\(4rem\+2vh\)\] {
+  top: calc(4rem + 2vh);
+}
+.h-\[calc\(100vh-8rem-4vh\)\] {
+  height: calc(100vh - 8rem - 4vh);
+}
+</style>

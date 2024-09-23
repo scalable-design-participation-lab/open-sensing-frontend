@@ -15,20 +15,6 @@
 <template>
   <div class="overview-content">
     <p class="text-sm text-gray-600 mb-4">{{ description }}</p>
-    <div class="flex gap-3 mb-6">
-      <UButton color="primary" size="sm" class="flex items-center">
-        <UIcon name="i-heroicons-arrow-down-tray" class="mr-2" />
-        Export
-      </UButton>
-      <UButton color="gray" size="sm" class="flex items-center">
-        <UIcon name="i-heroicons-share" class="mr-2" />
-        Share
-      </UButton>
-      <UButton color="gray" size="sm" class="flex items-center">
-        <UIcon name="i-heroicons-pencil" class="mr-2" />
-        Edit
-      </UButton>
-    </div>
     <div class="grid grid-cols-3 gap-4">
       <UCard
         v-for="(stat, index) in stats"

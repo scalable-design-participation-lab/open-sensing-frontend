@@ -62,6 +62,11 @@ export default defineEventHandler(async (event) => {
     const selectedDatasets = Object.keys(body.datasets).filter(
       (key) => body.datasets[key]
     )
+
+    if (selectedDatasets.length === 0) {
+      selectedDatasets.push('temperature')
+    }
+
     selectedDatasets.forEach((dataset) => {
       query += `, ${dataset}`
     })
@@ -80,13 +85,34 @@ export default defineEventHandler(async (event) => {
     return result.rows
   } catch (err) {
     console.error('Error executing query for download', err)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal server error',
-      data: {
-        message: err.message,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-      },
-    })
+
+    try {
+      const client = await pool.connect()
+      const fallbackQuery =
+        'SELECT timestamp, temperature FROM sen55 WHERE timestamp BETWEEN $1 AND $2'
+      console.log('Executing fallback query:', fallbackQuery)
+      const result = await client.query(fallbackQuery, [
+        body.dateRange.start,
+        body.dateRange.end,
+      ])
+      client.release()
+      console.log(
+        `Fallback query executed. Returned ${result.rows.length} rows.`
+      )
+      return result.rows
+    } catch (fallbackErr) {
+      console.error('Error executing fallback query', fallbackErr)
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Internal server error',
+        data: {
+          message: 'Failed to retrieve data, even with fallback query.',
+          stack:
+            process.env.NODE_ENV === 'development'
+              ? fallbackErr.stack
+              : undefined,
+        },
+      })
+    }
   }
 })

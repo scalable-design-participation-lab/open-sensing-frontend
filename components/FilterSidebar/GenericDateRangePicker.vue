@@ -42,6 +42,16 @@
             <div class="flex flex-col md:flex-row gap-4">
               <div class="flex flex-col space-y-2">
                 <UButton
+                  label="All Time"
+                  color="gray"
+                  variant="ghost"
+                  class="justify-start"
+                  :class="[
+                    isAllTimeSelected ? 'bg-gray-100 dark:bg-gray-700' : '',
+                  ]"
+                  @click="selectAllTime"
+                />
+                <UButton
                   v-for="(range, index) in ranges"
                   :key="index"
                   :label="range.label"
@@ -115,6 +125,7 @@ const ranges = [
  * @type {import('vue').Ref<{ start: Date, end: Date }>}
  */
 const selected = ref(props.modelValue)
+const isAllTimeSelected = ref(false)
 
 const minDate = sub(new Date(), { years: 5 })
 const maxDate = new Date()
@@ -130,6 +141,9 @@ const isOpen = ref(false)
  * @type {import('vue').ComputedRef<string>}
  */
 const formatDateRange = computed(() => {
+  if (isAllTimeSelected.value) {
+    return 'All Time'
+  }
   if (isValid(selected.value.start) && isValid(selected.value.end)) {
     return `${format(selected.value.start, 'd MMM, yyyy')} - ${format(
       selected.value.end,
@@ -178,6 +192,7 @@ function selectRange(duration: Duration) {
  */
 function handleDateChange(value) {
   if (value && isValid(value.start) && isValid(value.end)) {
+    isAllTimeSelected.value = false
     selected.value = value
     emitChange()
   }
@@ -187,7 +202,10 @@ function handleDateChange(value) {
  * Emits the updated date range to the parent component
  */
 function emitChange() {
-  emit('update:modelValue', selected.value)
+  emit('update:modelValue', {
+    ...selected.value,
+    isAllTime: isAllTimeSelected.value,
+  })
 }
 
 /**
@@ -195,6 +213,7 @@ function emitChange() {
  * @param {Duration} duration - The duration of the date range
  */
 function handleRangeClick(duration: Duration) {
+  isAllTimeSelected.value = false
   selectRange(duration)
 }
 
@@ -204,5 +223,11 @@ function handleRangeClick(duration: Duration) {
 function applyDateRange() {
   emitChange()
   isOpen.value = false
+}
+
+function selectAllTime() {
+  isAllTimeSelected.value = true
+  selected.value = { start: minDate, end: maxDate }
+  emitChange()
 }
 </script>

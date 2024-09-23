@@ -13,10 +13,12 @@
 
 <template>
   <div
-    class="flex justify-center items-center min-h-screen p-[2.5vh_2.5vw] bg-[rgba(240,242,245,0.7)]"
+    class="fixed inset-0 flex justify-center items-center"
+    @click="closeDashboard"
   >
     <div
-      class="w-[90%] h-[80vh] max-w-[1800px] flex flex-col gap-5 overflow-hidden"
+      class="w-[85%] h-[73vh] max-w-[1800px] flex flex-col gap-5 overflow-hidden rounded-lg"
+      @click.stop
     >
       <UCard
         class="flex-shrink-0 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
@@ -26,7 +28,7 @@
             title="Sensor Overview"
             :badge-text="`Last updated: ${lastUpdated}`"
             badge-color="gray"
-            @close="dashboardStore.toggleDashboard"
+            @close="closeDashboard"
           />
         </template>
         <OverviewContent
@@ -184,6 +186,10 @@ const displayFields = ref([
   'airQuality',
   'soilMoisture',
 ])
+
+const closeDashboard = () => {
+  dashboardStore.toggleDashboard()
+}
 
 defineOptions({
   name: 'SensorDashboard',
