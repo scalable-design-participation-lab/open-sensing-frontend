@@ -18,10 +18,7 @@
  * />
  -->
 <template>
-  <div
-    v-if="isVisible"
-    class="h-full flex flex-col bg-white shadow-lg rounded-lg overflow-hidden"
-  >
+  <div v-if="isVisible" class="pointer-events-auto">
     <UCard
       :ui="{
         base: 'overflow-visible bg-white shadow-lg rounded-lg w-[340px] sm:w-[360px] max-h-[85vh]',
