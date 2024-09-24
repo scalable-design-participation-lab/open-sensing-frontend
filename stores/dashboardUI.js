@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import sensorLocations from '~/static/Sensor_Locations_NEU.json'
+import sensorLocations from '../static/Sensor_Locations_NEU.json'
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
@@ -126,10 +126,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     showFilter.value = !showFilter.value
   }
 
-  const closeFilter = () => {
-    showFilter.value = false
-  }
-
   // Dashboard related state and functions
   const showDashboard = ref(false)
 
@@ -164,12 +160,12 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     pm10: true,
   })
 
-  const updateExistingHubs = (hub, val) => {
-    existingHubs.value[hub] = val
+  const updateExistingHubs = (newHubs) => {
+    existingHubs.value = { ...newHubs }
   }
 
-  const updateExistingDatasets = (dataset, val) => {
-    existingDatasets.value[dataset] = val
+  const updateExistingDatasets = (newDatasets) => {
+    existingDatasets.value = { ...newDatasets }
   }
 
   const toggleDataset = (datasetKey) => {
@@ -384,7 +380,6 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
     // Filter related
     showFilter,
     toggleFilter,
-    closeFilter,
 
     // Dashboard related
     showDashboard,

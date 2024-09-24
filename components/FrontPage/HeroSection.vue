@@ -1,3 +1,21 @@
+<!--
+ * HeroSection Component
+ * 
+ * This component renders a hero section typically used at the top of a landing page.
+ * It includes a title, description, call-to-action links, and a featured image.
+ * 
+ * @displayName HeroSection
+ * @usage
+ * <HeroSection
+ *   title="Welcome to Our App"
+ *   description="Discover amazing features"
+ *   :links="ctaLinks"
+ *   :headlineButton="headlineButtonConfig"
+ *   imageSrc="/hero-image.jpg"
+ *   imageAlt="Hero Image"
+ * />
+ -->
+
 <template>
   <ULandingHero :title="title" :description="description" :links="links">
     <template #headline>
@@ -21,6 +39,21 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Props for the HeroSection component
+ * @typedef {Object} HeroSectionProps
+ * @property {string} title - The main title of the hero section
+ * @property {string} description - A brief description or tagline
+ * @property {Array<{label: string, to: string}>} links - Call-to-action links
+ * @property {{to: string, label: string, icon: string}} headlineButton - Configuration for the headline button
+ * @property {string} imageSrc - Source URL for the hero image
+ * @property {string} imageAlt - Alt text for the hero image
+ */
+
+/**
+ * Component props
+ * @type {HeroSectionProps}
+ */
 defineProps({
   title: String,
   description: String,

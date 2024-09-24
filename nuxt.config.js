@@ -1,4 +1,6 @@
-export default defineNuxtConfig({
+const { defineNuxtConfig } = require('nuxt/config')
+
+module.exports = defineNuxtConfig({
   css: ['~/assets/css/tailwind.css'],
   postcss: {
     plugins: {
