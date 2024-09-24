@@ -1,5 +1,6 @@
 import { defineEventHandler } from 'h3'
 import pg from 'pg'
+import { parse } from 'json2csv' // Import json2csv for CSV conversion
 const { Pool } = pg
 
 /**
@@ -20,7 +21,8 @@ const { Pool } = pg
  * // Request body
  * {
  *   datasets: { temperature: true, humidity: true },
- *   dateRange: { start: '2023-01-01', end: '2023-01-31' }
+ *   dateRange: { start: '2023-01-01', end: '2023-01-31' },
+ *   format: 'csv' // Optional, for CSV format response
  * }
  *
  * // Response
@@ -35,13 +37,14 @@ export default defineEventHandler(async (event) => {
 
   console.log('Received request body:', body)
 
-  if (!body || !body.datasets || !body.dateRange) {
+  if (!body || !body.datasets || !body.dateRange || !body.format) {
     console.error('Invalid request body:', body)
     throw createError({
       statusCode: 400,
       statusMessage: 'Bad Request',
       data: {
-        message: 'Invalid request body. Missing datasets or dateRange.',
+        message:
+          'Invalid request body. Missing datasets, dateRange, or format.',
       },
     })
   }
@@ -82,7 +85,13 @@ export default defineEventHandler(async (event) => {
     client.release()
     console.log(`Query executed. Returned ${result.rows.length} rows.`)
 
-    return result.rows
+    if (body.format === 'csv') {
+      // Convert JSON to CSV
+      const csv = parse(result.rows)
+      return csv
+    } else {
+      return result.rows
+    }
   } catch (err) {
     console.error('Error executing query for download', err)
 
@@ -99,7 +108,14 @@ export default defineEventHandler(async (event) => {
       console.log(
         `Fallback query executed. Returned ${result.rows.length} rows.`
       )
-      return result.rows
+
+      if (body.format === 'csv') {
+        // Convert JSON to CSV
+        const csv = parse(result.rows)
+        return csv
+      } else {
+        return result.rows
+      }
     } catch (fallbackErr) {
       console.error('Error executing fallback query', fallbackErr)
       throw createError({

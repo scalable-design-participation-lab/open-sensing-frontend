@@ -45,6 +45,7 @@
     "deck.gl": "8.8",
     "echarts": "^5.5.1",
     "express": "^4.19.2",
+    "json2csv": "^6.0.0-alpha.2",
     "lodash": "^4.17.21",
     "mapbox-gl": "^2.15.0",
     "parcoord-es": "^2.2.10",
