@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     // css files
     // '@/assets/less/antd.less',
   ],
+
   /*
    ** Plugins to load before mounting the App
    */
@@ -27,6 +28,8 @@ export default defineNuxtConfig({
     },
   ],
 
+  // Element
+  // modules: ['@element-plus/nuxt'],
   runtimeConfig: {
     dbUser: process.env.DB_USER,
     dbHost: process.env.DB_HOST,
@@ -35,6 +38,5 @@ export default defineNuxtConfig({
     dbPort: process.env.DB_PORT,
   },
 
-  // Element
-  // modules: ['@element-plus/nuxt'],
+  compatibilityDate: '2024-10-04',
 })
