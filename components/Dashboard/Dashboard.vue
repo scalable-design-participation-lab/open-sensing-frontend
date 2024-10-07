@@ -21,12 +21,12 @@
       @click.stop
     >
       <UCard
-        class="flex-shrink-0 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+        class="flex-shrink-0 bg-white rounded-lg shadow-md hover:shadow-lg"
       >
         <template #header>
           <DashboardHeader
             title="Sensor Overview"
-            :badge-text="`Last updated: ${lastUpdated}`"
+            :badge-text="`Updated: ${lastUpdated}`"
             badge-color="gray"
             @close="closeDashboard"
           />
@@ -37,7 +37,7 @@
         />
       </UCard>
 
-      <div class="flex-grow overflow-y-auto p-5">
+      <div class="flex-grow overflow-y-auto">
         <div
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
@@ -113,8 +113,7 @@ const lastUpdated = computed(() => {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
+    hour12: false,
   })
 })
 
