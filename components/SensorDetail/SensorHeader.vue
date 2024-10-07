@@ -17,7 +17,7 @@
 
 <template>
   <header
-    class="sensor-header border-b-1 p-4 flex items-center"
+    class="sensor-header border-b border-grey-100 p-4 flex items-center"
   >
     <UButton
       icon="i-heroicons-arrow-left"
@@ -35,13 +35,14 @@
     </h1>
     <UBadge
         :color="getStatusColor(selectedSensor.status)"
-        class="h-6 rounded-full px-3 mx-1"
+        class="h-5 w-5 rounded-full mx-2"
         data-testid="sensor-status"
       >
-      </UBadge>
-    <div class="flex items-center space-x-4" data-testid="sensor-info">
+    </UBadge>
+    <div class="flex-grow"></div>
+    <div class="flex" data-testid="sensor-info">
       <div
-        class="battery-indicator flex items-center bg-gray-200 rounded-full px-3 py-1"
+        class="battery-indicator flex items-center bg-gray-100 rounded-full px-3 py-1"
         data-testid="battery-indicator"
       >
         <UIcon
@@ -49,12 +50,11 @@
           class="w-6 h-6 mr-2"
           :class="getBatteryIconColor(selectedSensor.batteryLevel)"
         />
-        <span class="text-sm font-medium" data-testid="battery-level">
+        <span class="text-sm" data-testid="battery-level">
           {{ selectedSensor.batteryLevel }}%
         </span>
       </div>
     </div>
-    <div class="flex-grow"></div>
     <div class="navigation-buttons ml-4 flex" data-testid="navigation-buttons">
       <UButton
         icon="i-heroicons-arrow-up"

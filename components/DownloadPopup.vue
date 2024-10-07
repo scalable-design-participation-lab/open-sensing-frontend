@@ -32,7 +32,7 @@
       >
         <template #before-filters>
           <div class="mb-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-2">File Format</h3>
+            <h3 class="text-lg text-gray-900 mb-2">File Format</h3>
             <div class="flex space-x-4">
               <URadio
                 v-model="fileFormat"
