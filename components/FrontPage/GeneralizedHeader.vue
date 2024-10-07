@@ -19,14 +19,14 @@
 
 <template>
   <header
-    class="h-10 md:h-12 fixed top-6 left-6 right-6 flex justify-between z-50"
+    class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between z-50"
   >
     <div class="h-full flex space-x-2 sm:space-x-3">
       <UButton
         v-if="logoSrc"
         color="gray"
         :class="[
-          `md:w-14 lg:h-14 lg:w-14 flex justify-center bg-white hover:animate-bounce`,
+          `md:w-14 lg:w-14 rounded-lg flex justify-center  bg-white hover:animate-bounce`,
           shapeClass,
         ]"
       >
@@ -40,7 +40,7 @@
         v-if="showIcon"
         color="gray"
         :class="[
-          `h-full md:w-14 text-xl sm:text-2xl bg-white flex justify-center shadow-md hover:animate-spin`,
+          `md:w-14 text-xl sm:text-2xl rounded-lg flex justify-center shadow-md hover:animate-bounce`,
           shapeClass,
         ]"
       >
@@ -70,7 +70,7 @@
           :color="item.color || (item.primary ? 'black' : 'gray')"
           :icon="item.icon"
           :class="[
-            `h-full px-3 sm:px-4 text-xs sm:text-sm md:text-base lg:text-lg hover:animate-pulse`,
+            `h-full px-3 sm:px-4 rounded-lg text-xs sm:text-sm md:text-base lg:text-lg hover:animate-pulse`,
             item.primary
               ? '!bg-white text-black'
               : '!bg-black text-white',

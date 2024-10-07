@@ -16,7 +16,7 @@
       v-for="(tool, index) in tools"
       :key="index"
       :class="[
-        'w-14 h-14 my-1 rounded-full',
+        'w-12 h-12 my-1 rounded-full',
         'hover:translate-y-[-2px] hover:shadow-md hover:border hover:border-gray-200',
         'flex items-center justify-center',
       ]"
