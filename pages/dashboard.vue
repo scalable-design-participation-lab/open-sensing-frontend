@@ -56,6 +56,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useFilterStore } from '@/stores/filter'
@@ -80,7 +81,7 @@ const { toggleFilter, resetFilters } = filterStore
 // Map store
 const mapStore = useMapStore()
 const { setMapType } = mapStore
-const currentMapType = ref('light')
+const currentMapType = ref('satellite')
 
 // Sensor Detail store
 const sensorDetailStore = useSensorDetailStore()
@@ -98,6 +99,10 @@ const isLoading = ref(false)
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
 const showDownloadPopup = ref(false)
 const selectedDownloadFilters = ref({})
+
+// Routing
+const router = useRouter();
+const goHome = () => router.push('/');
 
 function updateDateRange(newRange) {
   selected.value = newRange
@@ -216,7 +221,7 @@ const resetAllFilters = () => {
 }
 
 const sensorTools = [
-  { icon: 'i-heroicons-solid:home', tooltip: 'Home',  action: toggleFilter },
+  { icon: 'i-heroicons-solid:home', tooltip: 'Home',  action: goHome },
   { icon: 'i-heroicons-solid:filter', tooltip: 'Filter', action: toggleFilter },
   {
     icon: 'i-heroicons-solid:squares-2x2',
