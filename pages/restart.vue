@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <BackgroundMap /> -->
+    <BackgroundMap />
     <NavBar />
   </div>
 </template>

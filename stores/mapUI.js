@@ -1,15 +1,13 @@
 import { defineStore } from 'pinia'
-import { ref, reactive } from 'vue'
-import * as turf from '@turf/turf'
+import { ref, reactive, computed } from 'vue'
 
 export const useMapUIStore = defineStore('mapUI', () => {
-  const map = ref(null)
-  const draw = ref(null)
-  const markers = reactive([])
+  const drawEnable = ref(true)
+  const drawType = ref('Point')
   const currentFrequency = ref(null)
-  const calculatedArea = ref(0)
   const currentSubwindow = ref(1)
   const comment = ref('')
+  const features = reactive([])
 
   const colors = {
     'every day': '#FF0000',
@@ -19,92 +17,45 @@ export const useMapUIStore = defineStore('mapUI', () => {
     never: '#FF00FF',
   }
 
-  function initializeMap(mapInstance, drawInstance) {
-    if (map.value) return // 防止重复初始化
-
-    map.value = mapInstance
-    draw.value = drawInstance
-
-    map.value.on('draw.create', handleDrawCreate)
-    map.value.on('draw.delete', updateArea)
-    map.value.on('draw.update', updateArea)
-  }
+  const currentColor = computed(
+    () => colors[currentFrequency.value] || '#000000'
+  )
 
   function activateDrawing(frequency) {
-    if (draw.value) {
-      currentFrequency.value = frequency
-      draw.value.changeMode('draw_point')
-    } else {
-      console.error('Draw is not initialized')
-    }
+    currentFrequency.value = frequency
+    drawType.value = 'Point'
+    drawEnable.value = true
   }
 
-  function handleDrawCreate(e) {
-    try {
-      if (e.features[0].geometry.type === 'Point' && currentFrequency.value) {
-        const feature = e.features[0]
-        const color = colors[currentFrequency.value]
-
-        markers.push({
-          id: feature.id,
-          frequency: currentFrequency.value,
-          color,
-          coordinates: feature.geometry.coordinates,
-        })
-
-        renderMarker(feature.id, color, feature.geometry.coordinates)
-        currentFrequency.value = null
-      } else {
-        updateArea(e)
-      }
-    } catch (error) {
-      console.error('Error in handleDrawCreate:', error)
-    }
+  function handleDrawStart(event) {
+    console.log('Draw started:', event)
   }
 
-  function renderMarker(id, color, coordinates) {
-    if (!map.value.getLayer(`point-${id}`)) {
-      map.value.addLayer({
-        id: `point-${id}`,
-        type: 'circle',
-        source: {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: coordinates,
-            },
-          },
-        },
-        paint: {
-          'circle-radius': 10,
-          'circle-color': color,
-        },
+  function handleDrawEnd(event) {
+    console.log('Draw ended:', event)
+    if (event.feature.getGeometry().getType() === 'Point') {
+      const coordinates = event.feature.getGeometry().getCoordinates()
+      features.push({
+        id: Date.now(),
+        type: 'Point',
+        frequency: currentFrequency.value,
+        coordinates: coordinates,
+      })
+    } else if (event.feature.getGeometry().getType() === 'Polygon') {
+      const coordinates = event.feature.getGeometry().getCoordinates()
+      features.push({
+        id: Date.now(),
+        type: 'Polygon',
+        coordinates: coordinates,
       })
     }
-  }
-
-  function updateArea(e) {
-    try {
-      const data = draw.value.getAll()
-      if (data.features.length > 0) {
-        const area = turf.area(data)
-        calculatedArea.value = Math.round(area * 100) / 100
-      } else {
-        calculatedArea.value = 0
-      }
-    } catch (error) {
-      console.error('Error in updateArea:', error)
-    }
+    currentFrequency.value = null
+    drawEnable.value = false
   }
 
   function activatePolygonDrawing() {
-    if (draw.value) {
-      draw.value.changeMode('draw_polygon')
-    } else {
-      console.error('Draw is not initialized')
-    }
+    drawType.value = 'Polygon'
+    drawEnable.value = true
   }
 
   function nextSubwindow() {
@@ -124,19 +75,25 @@ export const useMapUIStore = defineStore('mapUI', () => {
     comment.value = ''
   }
 
+  function getColorForFrequency(frequency) {
+    return colors[frequency] || '#000000'
+  }
+
   return {
-    map,
-    draw,
-    markers,
-    calculatedArea,
+    drawEnable,
+    drawType,
+    currentFrequency,
     currentSubwindow,
     comment,
-    initializeMap,
+    features,
+    currentColor,
     activateDrawing,
-    updateArea,
+    handleDrawStart,
+    handleDrawEnd,
     activatePolygonDrawing,
     nextSubwindow,
     prevSubwindow,
     addComment,
+    getColorForFrequency,
   }
 })
