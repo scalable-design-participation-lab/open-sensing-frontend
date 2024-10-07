@@ -11,7 +11,7 @@
  -->
 
 <template>
-  <div class="flex flex-col bg-white rounded-full py-3">
+  <div class="flex flex-col bg-white shadow-lg rounded-full py-3">
     <UButton
       v-for="(tool, index) in tools"
       :key="index"

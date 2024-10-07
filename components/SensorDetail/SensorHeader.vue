@@ -17,22 +17,28 @@
 
 <template>
   <header
-    class="sensor-header bg-gray-100 p-4 flex items-center justify-between"
+    class="sensor-header border-b-1 p-4 flex items-center"
   >
     <UButton
       icon="i-heroicons-arrow-left"
       color="primary"
       variant="ghost"
-      class="mr-4 hover:bg-gray-200 transition-colors"
+      class="mr-2 hover:bg-gray-200"
       data-testid="go-back-button"
       @click="$emit('go-back')"
     />
     <h1
-      class="text-2xl font-bold text-gray-800 flex-grow"
+      class="text-2xl font-bold text-gray-800"
       data-testid="sensor-location"
     >
       {{ selectedSensor.location }}
     </h1>
+    <UBadge
+        :color="getStatusColor(selectedSensor.status)"
+        class="h-6 rounded-full px-3 mx-1"
+        data-testid="sensor-status"
+      >
+      </UBadge>
     <div class="flex items-center space-x-4" data-testid="sensor-info">
       <div
         class="battery-indicator flex items-center bg-gray-200 rounded-full px-3 py-1"
@@ -47,14 +53,8 @@
           {{ selectedSensor.batteryLevel }}%
         </span>
       </div>
-      <UBadge
-        :color="getStatusColor(selectedSensor.status)"
-        class="text-sm font-medium"
-        data-testid="sensor-status"
-      >
-        {{ selectedSensor.status }}
-      </UBadge>
     </div>
+    <div class="flex-grow"></div>
     <div class="navigation-buttons ml-4 flex" data-testid="navigation-buttons">
       <UButton
         icon="i-heroicons-arrow-up"

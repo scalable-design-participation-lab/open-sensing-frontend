@@ -24,23 +24,21 @@
     <div class="h-full flex space-x-2 sm:space-x-3">
       <UButton
         v-if="logoSrc"
-        color="gray"
         :class="[
-          `md:w-14 lg:w-14 rounded-lg flex justify-center  bg-white hover:animate-bounce`,
+          `lg:w-12 rounded-lg flex justify-center !bg-white shadow-md hover:animate-bounce`,
           shapeClass,
         ]"
       >
         <img
           :src="logoSrc"
           :alt="logoAlt"
-          class="w-11/12 h-auto"
+          class="w-full h-auto"
         />
       </UButton>
       <UButton
         v-if="showIcon"
-        color="gray"
         :class="[
-          `md:w-14 text-xl sm:text-2xl rounded-lg flex justify-center shadow-md hover:animate-bounce`,
+          `lg:w-12 text-xl sm:text-2xl rounded-lg flex justify-center !bg-white shadow-md hover:animate-bounce`,
           shapeClass,
         ]"
       >
@@ -53,7 +51,7 @@
             :color="item.color || (item.primary ? 'black' : 'gray')"
             :icon="item.icon"
             :class="[
-              `h-full sm:h-10 md:h-12 px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
+              `h-full px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
               item.primary
                 ? 'bg-white text-black hover:bg-black hover:text-white'
                 : 'bg-black text-white hover:bg-white hover:text-black',
@@ -70,7 +68,7 @@
           :color="item.color || (item.primary ? 'black' : 'gray')"
           :icon="item.icon"
           :class="[
-            `h-full px-3 sm:px-4 rounded-lg text-xs sm:text-sm md:text-base lg:text-lg hover:animate-pulse`,
+            `h-full px-3 sm:px-4 rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-md hover:animate-pulse`,
             item.primary
               ? '!bg-white text-black'
               : '!bg-black text-white',
@@ -88,7 +86,7 @@
           <UButton
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white text-black hover:invert`,
+              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white shadow-md text-black hover:invert`,
               shapeClass,
             ]"
           >
@@ -118,7 +116,7 @@
           v-else
           :icon="item.icon"
           :class="[
-            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white text-black hover:invert`,
+            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white shadow-md text-black hover:invert`,
             shapeClass,
           ]"
           @click="item.onClick"
