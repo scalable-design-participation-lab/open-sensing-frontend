@@ -80,6 +80,7 @@ const { toggleFilter, resetFilters } = filterStore
 // Map store
 const mapStore = useMapStore()
 const { setMapType } = mapStore
+const currentMapType = ref('light')
 
 // Sensor Detail store
 const sensorDetailStore = useSensorDetailStore()
@@ -215,7 +216,7 @@ const resetAllFilters = () => {
 }
 
 const sensorTools = [
-  { icon: 'i-heroicons-solid:home', tooltip: 'Home' },
+  { icon: 'i-heroicons-solid:home', tooltip: 'Home',  action: toggleFilter },
   { icon: 'i-heroicons-solid:filter', tooltip: 'Filter', action: toggleFilter },
   {
     icon: 'i-heroicons-solid:squares-2x2',
@@ -280,6 +281,11 @@ const leftItems = ref([
     color: 'black',
     onClick: () => toggleDashboard(),
   },
+  {
+    label: 'Northeastern University',
+    variant: 'solid',
+    color: 'black',
+  },
 ])
 
 const mapItems = [
@@ -299,21 +305,29 @@ const mapItems = [
 
 const rightItems = ref([
   {
-    label: 'Map Selection',
-    icon: 'i-heroicons-map-20-solid',
-    variant: 'outline',
-    color: 'gray',
-    dropdown: {
-      items: mapItems,
-      popper: { placement: 'bottom-end' },
+    label: computed(() => 
+      currentMapType.value === 'light'
+        ? 'Satellite Map'
+        : 'Vector Map'
+  ),
+    icon: computed(() =>
+      currentMapType.value === 'light'
+        ? 'i-heroicons:globe-americas-20-solid'
+        : 'i-heroicons:map'
+    ),
+    onClick: () => {
+      currentMapType.value = currentMapType.value === 'light' ? 'satellite' : 'light';
+      setMapType(currentMapType.value);
     },
   },
   {
     label: 'Download',
     icon: 'i-heroicons-arrow-down-tray-20-solid',
-    variant: 'outline',
     color: 'gray',
     onClick: () => (showDownloadPopup.value = true),
+  },
+  {
+    label: '•••',
   },
 ])
 

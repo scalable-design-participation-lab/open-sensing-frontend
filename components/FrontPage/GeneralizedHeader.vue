@@ -49,7 +49,7 @@
       <template v-for="(item, index) in leftItems" :key="index">
         <NuxtLink v-if="item.to" v-slot="{ navigate }" :to="item.to" custom>
           <UButton
-            :variant="item.variant || (item.primary ? 'solid' : 'outline')"
+            :variant="item.variant"
             :color="item.color || (item.primary ? 'black' : 'gray')"
             :icon="item.icon"
             :class="[
@@ -66,7 +66,7 @@
         </NuxtLink>
         <UButton
           v-else
-          :variant="item.variant || (item.primary ? 'solid' : 'outline')"
+          :variant="item.variant"
           :color="item.color || (item.primary ? 'black' : 'gray')"
           :icon="item.icon"
           :class="[
@@ -102,8 +102,8 @@
           custom
         >
           <UButton
-            :variant="item.variant || 'outline'"
-            :color="item.color || 'gray'"
+            :variant="item.variant"
+            :color="item.color"
             :icon="item.icon"
             :class="[
               `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white text-black hover:invert`,

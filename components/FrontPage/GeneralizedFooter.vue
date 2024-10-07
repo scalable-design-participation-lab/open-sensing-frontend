@@ -37,7 +37,7 @@
         />
       </div>
       <button
-        class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-semibold text-lg sm:text-xl cursor-pointer shadow-md hover:bg-white hover:animate-spin"
+        class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-semibold text-lg md:text-xl cursor-pointer shadow-md hover:bg-white hover:animate-spin"
         aria-label="Help"
       >
         ?

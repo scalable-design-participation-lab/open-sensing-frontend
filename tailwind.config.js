@@ -11,10 +11,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: [
-          'DM Sans',
-          ...require('tailwindcss/defaultTheme').fontFamily.sans,
-        ],
+        sans: ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
       },
       colors: {
         green: {
