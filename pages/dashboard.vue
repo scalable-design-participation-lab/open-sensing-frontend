@@ -8,7 +8,7 @@
       :left-items="leftItems"
       :right-items="rightItems"
       logo-src="/vector.svg"
-      logo-alt="NEU Logo"
+      logo-alt="Northeastern University Logo"
       :show-icon="true"
     />
 
