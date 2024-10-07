@@ -24,7 +24,7 @@
     >
       <GenericFilterSidebar
         :is-visible="true"
-        title="Download Options"
+        title="Download the Sensor Data"
         :filter-sections="filterSections"
         @close="$emit('close')"
         @filter-change="handleFilterChange"
@@ -65,7 +65,7 @@
           <UButton
             color="blue"
             variant="solid"
-            class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
+            class="!bg-black hover:animate-bounce"
             @click="handleDownload"
             data-test="download-button"
           >
