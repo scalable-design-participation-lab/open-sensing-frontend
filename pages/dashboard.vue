@@ -215,14 +215,14 @@ const resetAllFilters = () => {
 }
 
 const sensorTools = [
-  { icon: 'i-heroicons-home', tooltip: 'Home' },
-  { icon: 'i-heroicons-funnel', tooltip: 'Filter', action: toggleFilter },
+  { icon: 'i-heroicons-solid:home', tooltip: 'Home' },
+  { icon: 'i-heroicons-solid:filter', tooltip: 'Filter', action: toggleFilter },
   {
-    icon: 'i-heroicons-squares-2x2',
+    icon: 'i-heroicons-solid:squares-2x2',
     tooltip: 'Dashboard',
     action: toggleDashboard,
   },
-  { icon: 'i-heroicons-map-pin', tooltip: 'Location Info' },
+  { icon: 'i-heroicons-solid:location-marker', tooltip: 'Location Info' },
 ]
 
 const handleToolClick = (index: number) => {
