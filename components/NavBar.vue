@@ -32,20 +32,6 @@
               </template>
 
               <template v-if="currentSubwindow >= 2 && currentSubwindow <= 4">
-                <UTextarea
-                  v-model="comment"
-                  placeholder="Write a comment"
-                  rows="3"
-                  class="w-full mb-2"
-                />
-                <UButton
-                  color="primary"
-                  class="w-full mb-2"
-                  @click="mapUIStore.addComment()"
-                >
-                  Add
-                </UButton>
-
                 <template v-if="currentSubwindow >= 3 && currentSubwindow <= 4">
                   <UButton
                     color="primary"
