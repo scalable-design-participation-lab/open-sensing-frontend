@@ -18,9 +18,16 @@ export const useMapUIStore = defineStore('mapUI', () => {
     never: '#FF00FF',
   }
 
-  const currentColor = computed(
-    () => colors[currentFrequency.value] || '#000000'
-  )
+  const currentColor = computed(() => {
+    if (drawType.value === 'Point') {
+      return colors[currentFrequency.value] || '#000000'
+    } else if (drawType.value === 'Polygon') {
+      return 'black'
+    } else if (drawType.value === 'LineString') {
+      return 'red'
+    }
+    return 'black'
+  })
 
   function activateDrawing(frequency) {
     currentFrequency.value = frequency
@@ -34,18 +41,27 @@ export const useMapUIStore = defineStore('mapUI', () => {
 
   function handleDrawEnd(event) {
     const feature = event.feature
-    console.log('Draw ended:', event)
-    if (event.feature.getGeometry().getType() === 'Point') {
-      const coordinates = event.feature.getGeometry().getCoordinates()
+    const geometryType = feature.getGeometry().getType()
+
+    if (geometryType === 'LineString') {
+      const coordinates = feature.getGeometry().getCoordinates()
       features.push({
         id: Date.now(),
-        type: 'Point',
-        frequency: currentFrequency.value,
+        type: 'LineString',
         coordinates: coordinates,
         comment: '',
       })
-    } else if (event.feature.getGeometry().getType() === 'Polygon') {
-      const coordinates = event.feature.getGeometry().getCoordinates()
+    } else if (geometryType === 'Point') {
+      const coordinates = feature.getGeometry().getCoordinates()
+      features.push({
+        id: Date.now(),
+        type: 'Point',
+        coordinates: coordinates,
+        frequency: currentFrequency.value,
+        comment: '',
+      })
+    } else if (geometryType === 'Polygon') {
+      const coordinates = feature.getGeometry().getCoordinates()
       features.push({
         id: Date.now(),
         type: 'Polygon',
@@ -53,13 +69,20 @@ export const useMapUIStore = defineStore('mapUI', () => {
         comment: '',
       })
     }
-    currentFrequency.value = null
+
     drawEnable.value = false
   }
 
   function activatePolygonDrawing() {
     drawType.value = 'Polygon'
     drawEnable.value = true
+    currentFrequency.value = null
+  }
+
+  function activateLineStringDrawing() {
+    drawType.value = 'LineString'
+    drawEnable.value = true
+    currentFrequency.value = null
   }
 
   function nextSubwindow() {
@@ -113,6 +136,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     handleDrawStart,
     handleDrawEnd,
     activatePolygonDrawing,
+    activateLineStringDrawing,
     nextSubwindow,
     prevSubwindow,
     addComment,

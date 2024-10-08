@@ -32,7 +32,7 @@
               </template>
 
               <template v-if="currentSubwindow >= 2 && currentSubwindow <= 4">
-                <template v-if="currentSubwindow >= 3 && currentSubwindow <= 4">
+                <template v-if="currentSubwindow === 3">
                   <UButton
                     color="primary"
                     class="w-full mb-2"
@@ -43,6 +43,15 @@
                   <p v-if="calculatedArea > 0" class="text-center text-primary">
                     Area: {{ calculatedArea }} square meters
                   </p>
+                </template>
+                <template v-if="currentSubwindow === 4">
+                  <UButton
+                    color="red"
+                    class="w-full mb-2"
+                    @click="mapUIStore.activateLineStringDrawing()"
+                  >
+                    Draw Restricted Access
+                  </UButton>
                 </template>
               </template>
 
@@ -112,13 +121,13 @@ const subwindowContent = computed(() => {
         title:
           'Outline the area where you would like to see recreational or cultural events.',
         description:
-          'Using the "marker" tool, outline the boundaries of the area that, in your opinion, has the potential for hosting recreational, cultural, sports, educational, or other leisure activities. In the comment section below, explain why this area is suitable and what activities you would like to see there. Click "add" to move on to mapping the next area.',
+          'Using the "Draw Polygon" tool, outline the boundaries of the area that, in your opinion, has the potential for hosting recreational, cultural, sports, educational, or other leisure activities. In the comment section below, explain why this area is suitable and what activities you would like to see there. Click "add" to move on to mapping the next area.',
       }
     case 4:
       return {
-        title: 'Outline the area that restricts access to the river.',
+        title: 'Mark the areas that restrict access to the river.',
         description:
-          'Using the "marker" tool, draw the boundaries of the area that creates obstacles to access the river. In the window below, comment on what this obstacle is. Click "add" to proceed to mapping the next area.',
+          'Using the "Draw Restricted Access" tool, draw lines to indicate areas that create obstacles to access the river. After drawing, click on the red prohibition icon to add a comment about the obstacle. Click "add" to proceed to mapping the next restricted area.',
       }
     default:
       return { title: '', description: '' }

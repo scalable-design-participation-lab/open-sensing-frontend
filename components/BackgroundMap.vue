@@ -26,9 +26,9 @@
         >
           <ol-style>
             <ol-style-stroke
-              :color="currentColor"
+              :color="getDrawColor"
               :width="2"
-              :line-dash="[6, 6]"
+              :line-dash="drawType === 'LineString' ? [6, 6] : undefined"
             />
             <ol-style-fill :color="[0, 0, 0, 0]" />
           </ol-style>
@@ -43,6 +43,10 @@
             v-else-if="feature.type === 'Polygon'"
             :coordinates="feature.coordinates"
           />
+          <ol-geom-line-string
+            v-else-if="feature.type === 'LineString'"
+            :coordinates="feature.coordinates"
+          />
           <ol-style>
             <template v-if="feature.type === 'Point'">
               <ol-style-circle :radius="10">
@@ -54,12 +58,11 @@
               </ol-style-circle>
             </template>
             <template v-else-if="feature.type === 'Polygon'">
-              <ol-style-stroke
-                :color="currentColor"
-                :width="2"
-                :line-dash="[6, 6]"
-              />
+              <ol-style-stroke color="black" :width="2" :line-dash="[10, 10]" />
               <ol-style-fill :color="[0, 0, 0, 0]" />
+            </template>
+            <template v-else-if="feature.type === 'LineString'">
+              <ol-style-stroke color="red" :width="2" :line-dash="[6, 6]" />
             </template>
           </ol-style>
         </ol-feature>
@@ -67,13 +70,12 @@
     </ol-vector-layer>
 
     <ol-overlay
-      v-for="feature in allFeatures"
+      v-for="feature in visibleFeatures"
       :key="feature.id"
       :position="getFeatureIconPosition(feature)"
       :offset="[0, 0]"
     >
       <div
-        v-if="mapUIStore.currentSubwindow >= 2"
         class="cursor-pointer text-black-500 rounded-full p-0.5 flex justify-center items-center shadow-md"
         @click.stop="toggleCommentPopup(feature)"
       >
@@ -102,6 +104,28 @@
         class="z-50"
         @close="closeCommentPopup"
       />
+    </ol-overlay>
+
+    <ol-overlay
+      v-for="feature in lineStringFeatures"
+      :key="`start-${feature.id}`"
+      :position="getLineStringStartPoint(feature)"
+      :offset="[0, 0]"
+    >
+      <div class="prohibit-icon" @click.stop="toggleCommentPopup(feature)">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="red"
+          width="24"
+          height="24"
+        >
+          <path d="M0 0h24v24H0z" fill="none" />
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9z"
+          />
+        </svg>
+      </div>
     </ol-overlay>
   </ol-map>
 
@@ -135,27 +159,53 @@ const commentPopupVisible = ref(false)
 const selectedFeatureId = ref(null)
 const commentPopupPosition = ref(null)
 
+const visibleFeatures = computed(() => {
+  const currentSubwindow = mapUIStore.currentSubwindow
+  if (currentSubwindow === 2) {
+    return validFeatures.value.filter((feature) => feature.type === 'Point')
+  } else if (currentSubwindow === 3) {
+    return validFeatures.value.filter((feature) => feature.type === 'Polygon')
+  } else {
+    return []
+  }
+})
+
+const lineStringFeatures = computed(() =>
+  validFeatures.value.filter((feature) => feature.type === 'LineString')
+)
+
+function getLineStringStartPoint(feature) {
+  return feature.coordinates[0]
+}
+
 function handleDrawStart(event) {
   mapUIStore.handleDrawStart(event)
 }
 
 function handleDrawEnd(event) {
   const feature = event.feature
-  feature.set('frequency', mapUIStore.currentFrequency)
-  mapUIStore.handleDrawEnd(event)
-  console.log('New feature:', feature.getProperties())
+  const geometry = feature.getGeometry()
+  const geometryType = geometry.getType()
 
-  if (feature.getGeometry().getType() === 'Polygon') {
-    const coordinates = feature.getGeometry().getCoordinates()
-    const lastPoint = coordinates[0][coordinates[0].length - 1]
-    openCommentPopup(
-      {
-        id: Date.now(),
-        type: 'Polygon',
-        coordinates: coordinates,
-      },
-      lastPoint
-    )
+  if (geometryType === 'LineString') {
+    const coordinates = geometry.getCoordinates()
+    mapUIStore.addFeature({
+      type: 'LineString',
+      coordinates: coordinates,
+    })
+  } else if (geometryType === 'Point') {
+    const coordinate = geometry.getCoordinates()
+    mapUIStore.addFeature({
+      type: 'Point',
+      coordinates: coordinate,
+      frequency: mapUIStore.currentFrequency,
+    })
+  } else if (geometryType === 'Polygon') {
+    const coordinates = geometry.getCoordinates()
+    mapUIStore.addFeature({
+      type: 'Polygon',
+      coordinates: coordinates,
+    })
   }
 }
 
@@ -210,7 +260,6 @@ function handleMapClick(event) {
       coordinates: coordinate,
       frequency: mapUIStore.currentFrequency,
     })
-    openCommentPopup(mapUIStore.features[mapUIStore.features.length - 1])
   }
 }
 
@@ -229,9 +278,27 @@ function getFeatureIconPosition(feature) {
     const startPoint = feature.coordinates[0][0]
     return [startPoint[0] - 0.008, startPoint[1] + 0.005]
   }
+  return [0, 0]
 }
+
+const getDrawColor = computed(() => {
+  if (drawType.value === 'Point') {
+    return currentColor.value
+  } else if (drawType.value === 'Polygon') {
+    return 'black'
+  } else if (drawType.value === 'LineString') {
+    return 'red'
+  }
+  return 'black'
+})
 
 onMounted(() => {
   console.log('BackgroundMap component mounted')
 })
 </script>
+
+<style scoped>
+.prohibit-icon {
+  cursor: pointer;
+}
+</style>
