@@ -25,12 +25,12 @@
           @drawstart="handleDrawStart"
         >
           <ol-style>
-            <ol-style-stroke :color="currentColor" :width="2" />
-            <ol-style-fill :color="[...hexToRgb(currentColor), 0.4]" />
-            <ol-style-circle :radius="5">
-              <ol-style-fill :color="currentColor" />
-              <ol-style-stroke :color="currentColor" :width="2" />
-            </ol-style-circle>
+            <ol-style-stroke
+              :color="currentColor"
+              :width="2"
+              :line-dash="[6, 6]"
+            />
+            <ol-style-fill :color="[0, 0, 0, 0]" />
           </ol-style>
         </ol-interaction-draw>
 
@@ -54,8 +54,12 @@
               </ol-style-circle>
             </template>
             <template v-else-if="feature.type === 'Polygon'">
-              <ol-style-stroke :color="currentColor" :width="2" />
-              <ol-style-fill :color="[...hexToRgb(currentColor), 0.4]" />
+              <ol-style-stroke
+                :color="currentColor"
+                :width="2"
+                :line-dash="[6, 6]"
+              />
+              <ol-style-fill :color="[0, 0, 0, 0]" />
             </template>
           </ol-style>
         </ol-feature>
@@ -63,17 +67,27 @@
     </ol-vector-layer>
 
     <ol-overlay
-      v-for="feature in pointFeatures"
+      v-for="feature in allFeatures"
       :key="feature.id"
-      :position="feature.coordinates"
-      :offset="[0, 5]"
+      :position="getFeatureIconPosition(feature)"
+      :offset="[0, 0]"
     >
       <div
         v-if="mapUIStore.currentSubwindow >= 2"
-        class="text-3xl cursor-pointer text-black-500 rounded-full p-0.5 flex justify-center items-center shadow-md"
+        class="cursor-pointer text-black-500 rounded-full p-0.5 flex justify-center items-center shadow-md"
         @click.stop="toggleCommentPopup(feature)"
       >
-        <UIcon name="i-heroicons-plus-circle" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 512 512"
+        >
+          <path
+            fill="currentColor"
+            d="M256 48C141.31 48 48 141.31 48 256s93.31 208 208 208s208-93.31 208-208S370.69 48 256 48m96 224h-80v80h-32v-80h-80v-32h80v-80h32v80h80Z"
+          />
+        </svg>
       </div>
     </ol-overlay>
 
@@ -115,6 +129,8 @@ const validFeatures = computed(() =>
   features.value.filter((feature) => feature && feature.type)
 )
 
+const allFeatures = computed(() => validFeatures.value)
+
 const commentPopupVisible = ref(false)
 const selectedFeatureId = ref(null)
 const commentPopupPosition = ref(null)
@@ -128,6 +144,19 @@ function handleDrawEnd(event) {
   feature.set('frequency', mapUIStore.currentFrequency)
   mapUIStore.handleDrawEnd(event)
   console.log('New feature:', feature.getProperties())
+
+  if (feature.getGeometry().getType() === 'Polygon') {
+    const coordinates = feature.getGeometry().getCoordinates()
+    const lastPoint = coordinates[0][coordinates[0].length - 1]
+    openCommentPopup(
+      {
+        id: Date.now(),
+        type: 'Polygon',
+        coordinates: coordinates,
+      },
+      lastPoint
+    )
+  }
 }
 
 function getColor(frequency) {
@@ -159,7 +188,7 @@ function openCommentPopup(feature) {
   console.log('openCommentPopup called with feature:', feature)
   selectedFeatureId.value = feature.id
   commentPopupVisible.value = true
-  commentPopupPosition.value = feature.coordinates
+  commentPopupPosition.value = getFeatureIconPosition(feature)
   console.log('commentPopupVisible set to:', commentPopupVisible.value)
   console.log('selectedFeatureId set to:', selectedFeatureId.value)
   console.log('commentPopupPosition set to:', commentPopupPosition.value)
@@ -192,6 +221,15 @@ const pointFeatures = computed(() => {
   console.log('pointFeatures computed:', features)
   return features
 })
+
+function getFeatureIconPosition(feature) {
+  if (feature.type === 'Point') {
+    return feature.coordinates
+  } else if (feature.type === 'Polygon') {
+    const startPoint = feature.coordinates[0][0]
+    return [startPoint[0] - 0.008, startPoint[1] + 0.005]
+  }
+}
 
 onMounted(() => {
   console.log('BackgroundMap component mounted')

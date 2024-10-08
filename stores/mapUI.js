@@ -34,8 +34,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
 
   function handleDrawEnd(event) {
     const feature = event.feature
-    const frequency = feature.get('frequency') || 'every day'
-    feature.set('frequency', frequency)
     console.log('Draw ended:', event)
     if (event.feature.getGeometry().getType() === 'Point') {
       const coordinates = event.feature.getGeometry().getCoordinates()
@@ -52,6 +50,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
         id: Date.now(),
         type: 'Polygon',
         coordinates: coordinates,
+        comment: '',
       })
     }
     currentFrequency.value = null
