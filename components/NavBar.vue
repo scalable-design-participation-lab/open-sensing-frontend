@@ -5,74 +5,25 @@
     <UCard>
       <UAccordion :items="menuItems" class="space-y-4">
         <template #item="{ item }">
-          <UCard>
-            <div v-if="item.label === 'Space'" class="space-y-4">
-              <UProgress
-                :value="progressPercentage"
-                color="yellow"
-                class="mb-4"
-              />
-              <h2 class="text-xl font-semibold text-black">
-                {{ subwindowContent.title }}
-              </h2>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ subwindowContent.description }}
+          <SubWindow
+            v-if="item.label === 'Space'"
+            :current-subwindow="currentSubwindow"
+            :max-subwindow="4"
+            :progress-percentage="progressPercentage"
+            :title="subwindowContent.title"
+            :icon="subwindowContent.icon"
+            :paragraph="subwindowContent.description"
+            :button="subwindowContent.button"
+            :button-group="subwindowContent.buttonGroup"
+            @prev="mapUIStore.prevSubwindow()"
+            @next="mapUIStore.nextSubwindow()"
+          >
+            <template v-if="currentSubwindow === 3 && calculatedArea > 0">
+              <p class="text-center text-primary">
+                Area: {{ calculatedArea }} square meters
               </p>
-
-              <template v-if="currentSubwindow === 1">
-                <UButton
-                  v-for="button in spaceButtons"
-                  :key="button.text"
-                  :color="button.color"
-                  class="w-full mb-2"
-                  @click="mapUIStore.activateDrawing(button.text)"
-                >
-                  {{ button.text }}
-                </UButton>
-              </template>
-
-              <template v-if="currentSubwindow >= 2 && currentSubwindow <= 4">
-                <template v-if="currentSubwindow === 3">
-                  <UButton
-                    color="primary"
-                    class="w-full mb-2"
-                    @click="mapUIStore.activatePolygonDrawing()"
-                  >
-                    Draw Polygon
-                  </UButton>
-                  <p v-if="calculatedArea > 0" class="text-center text-primary">
-                    Area: {{ calculatedArea }} square meters
-                  </p>
-                </template>
-                <template v-if="currentSubwindow === 4">
-                  <UButton
-                    color="red"
-                    class="w-full mb-2"
-                    @click="mapUIStore.activateLineStringDrawing()"
-                  >
-                    Draw Restricted Access
-                  </UButton>
-                </template>
-              </template>
-
-              <UButtonGroup class="mt-4">
-                <UButton
-                  icon="i-heroicons-arrow-left-20-solid"
-                  color="gray"
-                  variant="ghost"
-                  :disabled="currentSubwindow === 1"
-                  @click="mapUIStore.prevSubwindow()"
-                />
-                <UButton
-                  icon="i-heroicons-arrow-right-20-solid"
-                  color="gray"
-                  variant="ghost"
-                  :disabled="currentSubwindow === 4"
-                  @click="mapUIStore.nextSubwindow()"
-                />
-              </UButtonGroup>
-            </div>
-          </UCard>
+            </template>
+          </SubWindow>
         </template>
       </UAccordion>
     </UCard>
@@ -82,57 +33,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
+import SubWindow from './SubWindow.vue'
 
 const mapUIStore = useMapUIStore()
 
 const currentSubwindow = computed(() => mapUIStore.currentSubwindow)
-const comment = computed({
-  get: () => mapUIStore.comment,
-  set: (value) => (mapUIStore.comment = value),
-})
 const calculatedArea = computed(() => mapUIStore.calculatedArea)
-
-const spaceButtons = [
-  { text: 'every day', color: 'red' },
-  { text: 'every week', color: 'green' },
-  { text: 'sometimes', color: 'blue' },
-  { text: 'only once', color: 'yellow' },
-  { text: 'never', color: 'purple' },
-]
-
-const subwindowContent = computed(() => {
-  switch (currentSubwindow.value) {
-    case 1:
-      return {
-        title:
-          'Mark the places on the map that you visited near the Tyazhilivka River.',
-        description:
-          'Using the "marker" tool, mark the places on the map where you have been near the Tyazhilivka River (up to 10 markers). For each marker, select how often you visit this location:',
-      }
-    case 2:
-      return {
-        title:
-          'For what purpose do you visit the places you marked on the map and with whom?',
-        description:
-          'Click on a tag and comment on how and with whom you spend your time at that location. Click "add" to continue commenting on the next tag.',
-      }
-    case 3:
-      return {
-        title:
-          'Outline the area where you would like to see recreational or cultural events.',
-        description:
-          'Using the "Draw Polygon" tool, outline the boundaries of the area that, in your opinion, has the potential for hosting recreational, cultural, sports, educational, or other leisure activities. In the comment section below, explain why this area is suitable and what activities you would like to see there. Click "add" to move on to mapping the next area.',
-      }
-    case 4:
-      return {
-        title: 'Mark the areas that restrict access to the river.',
-        description:
-          'Using the "Draw Restricted Access" tool, draw lines to indicate areas that create obstacles to access the river. After drawing, click on the red prohibition icon to add a comment about the obstacle. Click "add" to proceed to mapping the next restricted area.',
-      }
-    default:
-      return { title: '', description: '' }
-  }
-})
 
 const menuItems = [
   { icon: 'i-heroicons-map-pin-20-solid', label: 'Space' },
@@ -142,4 +48,72 @@ const menuItems = [
 ]
 
 const progressPercentage = computed(() => (currentSubwindow.value / 4) * 100)
+
+const subwindowContent = computed(() => {
+  const contents = {
+    1: {
+      title:
+        'Mark the places on the map that you visited near the Tyazhilivka River.',
+      icon: 'i-heroicons-map-pin-20-solid',
+      description:
+        'Using the "marker" tool, mark the places on the map where you have been near the Tyazhilivka River (up to 10 markers). For each marker, select how often you visit this location:',
+      buttonGroup: [
+        {
+          text: 'every day',
+          color: 'red',
+          action: () => mapUIStore.activateDrawing('every day'),
+        },
+        {
+          text: 'every week',
+          color: 'green',
+          action: () => mapUIStore.activateDrawing('every week'),
+        },
+        {
+          text: 'sometimes',
+          color: 'blue',
+          action: () => mapUIStore.activateDrawing('sometimes'),
+        },
+        {
+          text: 'only once',
+          color: 'yellow',
+          action: () => mapUIStore.activateDrawing('only once'),
+        },
+        {
+          text: 'never',
+          color: 'purple',
+          action: () => mapUIStore.activateDrawing('never'),
+        },
+      ],
+    },
+    2: {
+      title:
+        'For what purpose do you visit the places you marked on the map and with whom?',
+      description:
+        'Click on a tag and comment on how and with whom you spend your time at that location. Click "add" to continue commenting on the next tag.',
+    },
+    3: {
+      title:
+        'Outline the area where you would like to see recreational or cultural events.',
+      description:
+        'Using the "Draw Polygon" tool, outline the boundaries of the area that, in your opinion, has the potential for hosting recreational, cultural, sports, educational, or other leisure activities. In the comment section below, explain why this area is suitable and what activities you would like to see there. Click "add" to move on to mapping the next area.',
+      button: {
+        text: 'Draw Polygon',
+        color: 'primary',
+        action: () => mapUIStore.activatePolygonDrawing(),
+      },
+    },
+    4: {
+      title: 'Mark the areas that restrict access to the river.',
+      description:
+        'Using the "Draw Restricted Access" tool, draw lines to indicate areas that create obstacles to access the river. After drawing, click on the red prohibition icon to add a comment about the obstacle. Click "add" to proceed to mapping the next restricted area.',
+      button: {
+        text: 'Draw Restricted Access',
+        color: 'red',
+        action: () => mapUIStore.activateLineStringDrawing(),
+      },
+    },
+  }
+
+  return contents[currentSubwindow.value] || { title: '', description: '' }
+})
 </script>
