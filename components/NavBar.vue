@@ -18,11 +18,6 @@
             @prev="mapUIStore.prevSubwindow()"
             @next="mapUIStore.nextSubwindow()"
           >
-            <template v-if="currentSubwindow === 3 && calculatedArea > 0">
-              <p class="text-center text-primary">
-                Area: {{ calculatedArea }} square meters
-              </p>
-            </template>
           </SubWindow>
         </template>
       </UAccordion>
@@ -38,7 +33,6 @@ import SubWindow from './SubWindow.vue'
 const mapUIStore = useMapUIStore()
 
 const currentSubwindow = computed(() => mapUIStore.currentSubwindow)
-const calculatedArea = computed(() => mapUIStore.calculatedArea)
 
 const menuItems = [
   { icon: 'i-heroicons-map-pin-20-solid', label: 'Space' },
