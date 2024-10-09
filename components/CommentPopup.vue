@@ -1,7 +1,7 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="w-56 bg-white rounded-lg shadow-lg flex flex-col h-33"
+    class="w-56 bg-black rounded-lg shadow-lg flex flex-col h-33"
   >
     <UTextarea
       v-model="localComment"

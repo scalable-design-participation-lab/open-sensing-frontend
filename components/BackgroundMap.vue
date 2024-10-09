@@ -7,13 +7,21 @@
   >
     <ol-view
       ref="view"
-      :center="[28.48097, 49.23278]"
-      :zoom="12"
+      :center="[28.41097, 49.23278]"
+      :zoom="18"
       :projection="projection"
     />
 
     <ol-tile-layer>
       <ol-source-osm />
+    </ol-tile-layer>
+
+    <ol-tile-layer>
+      <ol-source-tile-arcgis-rest
+        :url="arcgisUrl"
+        :tile-size="[1024, 1024]"
+        :params="requestParams"
+      />
     </ol-tile-layer>
 
     <ol-vector-layer>
@@ -31,6 +39,10 @@
               :line-dash="drawType === 'LineString' ? [6, 6] : undefined"
             />
             <ol-style-fill :color="[0, 0, 0, 0]" />
+            <ol-style-circle :radius="5">
+              <ol-style-fill :color="getDrawColor" />
+              <ol-style-stroke :color="getDrawColor" :width="1" />
+            </ol-style-circle>
           </ol-style>
         </ol-interaction-draw>
 
@@ -159,6 +171,20 @@ const commentPopupVisible = ref(false)
 const selectedFeatureId = ref(null)
 const commentPopupPosition = ref(null)
 
+const arcgisUrl =
+  'https://services.wvgis.wvu.edu/arcgis/rest/services/Imagery_BaseMaps_EarthCover/wv_imagery_WVGISTC_leaf_off_mosaic/MapServer'
+const requestParams = {
+  layers: 'show:30,27,24,23,22',
+  format: 'PNG32',
+  f: 'image',
+  dpi: 96,
+  transparent: true,
+  bboxSR: 102100,
+  imageSR: 102100,
+  size: '1024,1024',
+  _ts: false,
+}
+
 const visibleFeatures = computed(() => {
   const currentSubwindow = mapUIStore.currentSubwindow
   if (currentSubwindow === 2) {
@@ -276,7 +302,7 @@ function getFeatureIconPosition(feature) {
     return feature.coordinates
   } else if (feature.type === 'Polygon') {
     const startPoint = feature.coordinates[0][0]
-    return [startPoint[0] - 0.008, startPoint[1] + 0.005]
+    return [startPoint[0], startPoint[1]]
   }
   return [0, 0]
 }
