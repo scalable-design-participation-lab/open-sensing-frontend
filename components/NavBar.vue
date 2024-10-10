@@ -32,6 +32,19 @@
             @next="nextBelongingSubwindow"
           >
           </SubWindow>
+          <SubWindow
+            v-if="item.label === 'Safety'"
+            :current-subwindow="safetySubwindow"
+            :max-subwindow="2"
+            :progress-percentage="safetyProgressPercentage"
+            :title="safetyContent.title"
+            :icon="safetyContent.icon"
+            :paragraph="safetyContent.description"
+            :icon-grid="safetySubwindow === 1 ? safetyIconGrid : null"
+            @prev="prevSafetySubwindow"
+            @next="nextSafetySubwindow"
+          >
+          </SubWindow>
         </template>
       </UAccordion>
     </UCard>
@@ -46,11 +59,15 @@ import SubWindow from './SubWindow.vue'
 import dislikeIcon from '@/assets/icons/dislike.svg'
 import heartIcon from '@/assets/icons/heart.svg'
 import smileIcon from '@/assets/icons/smile.svg'
+import brokenIcon from '@/assets/icons/broken.svg'
+import calmIcon from '@/assets/icons/calm.svg'
+import lockIcon from '@/assets/icons/lock.svg'
 
 const mapUIStore = useMapUIStore()
 
 const currentSubwindow = computed(() => mapUIStore.currentSubwindow)
 const belongingSubwindow = ref(1)
+const safetySubwindow = ref(1)
 
 const menuItems = [
   { icon: 'i-heroicons-map-pin-20-solid', label: 'Space' },
@@ -62,6 +79,9 @@ const menuItems = [
 const progressPercentage = computed(() => (currentSubwindow.value / 4) * 100)
 const belongingProgressPercentage = computed(
   () => (belongingSubwindow.value / 2) * 100
+)
+const safetyProgressPercentage = computed(
+  () => (safetySubwindow.value / 2) * 100
 )
 
 const subwindowContent = computed(() => {
@@ -173,6 +193,34 @@ const belongingIconGrid = computed(() => ({
   onSelect: selectBelongingIcon,
 }))
 
+const safetyContent = computed(() => {
+  const contents = {
+    1: {
+      title: 'Mark safe and unsafe areas',
+      icon: 'i-heroicons-shield-check-20-solid',
+      description:
+        'Select an icon and place it on the map to mark safe or unsafe locations.',
+    },
+    2: {
+      title: 'Describe safety concerns',
+      icon: 'i-heroicons-chat-bubble-left-20-solid',
+      description:
+        'Click on the icons you placed and add comments to explain your safety concerns or positive aspects.',
+    },
+  }
+  return contents[safetySubwindow.value] || { title: '', description: '' }
+})
+
+const safetyIconGrid = computed(() => ({
+  title: 'Select an icon:',
+  icons: [
+    { name: 'broken', src: brokenIcon },
+    { name: 'calm', src: calmIcon },
+    { name: 'lock', src: lockIcon },
+  ],
+  onSelect: selectSafetyIcon,
+}))
+
 function nextBelongingSubwindow() {
   if (belongingSubwindow.value < 2) {
     belongingSubwindow.value++
@@ -188,5 +236,22 @@ function prevBelongingSubwindow() {
 function selectBelongingIcon(iconName: string) {
   console.log('Selected icon:', iconName)
   mapUIStore.activateBelongingDrawing(iconName)
+}
+
+function nextSafetySubwindow() {
+  if (safetySubwindow.value < 2) {
+    safetySubwindow.value++
+  }
+}
+
+function prevSafetySubwindow() {
+  if (safetySubwindow.value > 1) {
+    safetySubwindow.value--
+  }
+}
+
+function selectSafetyIcon(iconName: string) {
+  console.log('Selected safety icon:', iconName)
+  mapUIStore.activateSafetyDrawing(iconName)
 }
 </script>

@@ -10,6 +10,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const features = reactive([])
   const isCommentPopupOpen = ref(false)
   const currentBelongingIcon = ref(null)
+  const currentSafetyIcon = ref(null)
 
   const colors = {
     'every day': '#FF0000',
@@ -50,7 +51,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
         id: Date.now(),
         type: 'Point',
         coordinates: coordinates,
-        iconName: currentBelongingIcon.value,
+        iconName: currentBelongingIcon.value || currentSafetyIcon.value,
         frequency: currentFrequency.value,
         comment: '',
       })
@@ -74,6 +75,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
 
     drawEnable.value = false
     currentBelongingIcon.value = null
+    currentSafetyIcon.value = null
     currentFrequency.value = null
   }
 
@@ -134,6 +136,12 @@ export const useMapUIStore = defineStore('mapUI', () => {
     drawEnable.value = true
   }
 
+  function activateSafetyDrawing(iconName) {
+    currentSafetyIcon.value = iconName
+    drawType.value = 'Point'
+    drawEnable.value = true
+  }
+
   return {
     drawEnable,
     drawType,
@@ -156,5 +164,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     setCommentPopupOpen,
     currentBelongingIcon,
     activateBelongingDrawing,
+    currentSafetyIcon,
+    activateSafetyDrawing,
   }
 })

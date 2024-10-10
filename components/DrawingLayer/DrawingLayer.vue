@@ -48,6 +48,9 @@ import purpleIcon from '@/assets/icons/purple.svg'
 import dislikeIcon from '@/assets/icons/dislike.svg'
 import heartIcon from '@/assets/icons/heart.svg'
 import smileIcon from '@/assets/icons/smile.svg'
+import brokenIcon from '@/assets/icons/broken.svg'
+import calmIcon from '@/assets/icons/calm.svg'
+import lockIcon from '@/assets/icons/lock.svg'
 
 const props = defineProps({
   projection: {
@@ -100,6 +103,12 @@ function getIconForFeature(feature) {
         return heartIcon
       case 'smile':
         return smileIcon
+      case 'broken':
+        return brokenIcon
+      case 'calm':
+        return calmIcon
+      case 'lock':
+        return lockIcon
       default:
         return getIconForPoint(feature)
     }
