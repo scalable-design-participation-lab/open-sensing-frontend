@@ -55,8 +55,8 @@ const polygonFeatures = computed(() =>
 )
 
 const visiblePolygonFeatures = computed(() => {
-  const currentSubwindow = mapUIStore.currentSubwindow
-  return currentSubwindow === 3 ? polygonFeatures.value : []
+  const spaceSubwindow = mapUIStore.spaceSubwindow
+  return spaceSubwindow === 3 ? polygonFeatures.value : []
 })
 
 function getFeatureIconPosition(feature) {

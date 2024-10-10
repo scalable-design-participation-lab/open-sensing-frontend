@@ -51,6 +51,8 @@ import smileIcon from '@/assets/icons/smile.svg'
 import brokenIcon from '@/assets/icons/broken.svg'
 import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
+import polutionIcon from '@/assets/icons/polution.svg'
+import leafIcon from '@/assets/icons/leaf.svg'
 
 const props = defineProps({
   projection: {
@@ -97,18 +99,22 @@ function toggleCommentPopup(feature) {
 function getIconForFeature(feature) {
   if (feature.iconName) {
     switch (feature.iconName) {
+      case 'pollution':
+        return polutionIcon
+      case 'leaf':
+        return leafIcon
+      case 'lock':
+        return lockIcon
+      case 'calm':
+        return calmIcon
+      case 'broken':
+        return brokenIcon
       case 'dislike':
         return dislikeIcon
       case 'heart':
         return heartIcon
       case 'smile':
         return smileIcon
-      case 'broken':
-        return brokenIcon
-      case 'calm':
-        return calmIcon
-      case 'lock':
-        return lockIcon
       default:
         return getIconForPoint(feature)
     }

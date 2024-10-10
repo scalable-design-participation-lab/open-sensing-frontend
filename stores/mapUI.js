@@ -5,12 +5,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const drawEnable = ref(true)
   const drawType = ref('Point')
   const currentFrequency = ref(null)
-  const currentSubwindow = ref(1)
+  const spaceSubwindow = ref(1)
   const comment = ref('')
   const features = reactive([])
   const isCommentPopupOpen = ref(false)
   const currentBelongingIcon = ref(null)
   const currentSafetyIcon = ref(null)
+  const currentEnvironmentIcon = ref(null)
 
   const colors = {
     'every day': '#FF0000',
@@ -51,7 +52,10 @@ export const useMapUIStore = defineStore('mapUI', () => {
         id: Date.now(),
         type: 'Point',
         coordinates: coordinates,
-        iconName: currentBelongingIcon.value || currentSafetyIcon.value,
+        iconName:
+          currentBelongingIcon.value ||
+          currentSafetyIcon.value ||
+          currentEnvironmentIcon.value,
         frequency: currentFrequency.value,
         comment: '',
       })
@@ -76,6 +80,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     drawEnable.value = false
     currentBelongingIcon.value = null
     currentSafetyIcon.value = null
+    currentEnvironmentIcon.value = null
     currentFrequency.value = null
   }
 
@@ -91,16 +96,16 @@ export const useMapUIStore = defineStore('mapUI', () => {
     currentFrequency.value = null
   }
 
-  function nextSubwindow() {
-    if (currentSubwindow.value < 4) {
-      currentSubwindow.value++
-      console.log('Current subwindow:', currentSubwindow.value)
+  function nextSpaceSubwindow() {
+    if (spaceSubwindow.value < 4) {
+      spaceSubwindow.value++
+      console.log('Current space subwindow:', spaceSubwindow.value)
     }
   }
 
-  function prevSubwindow() {
-    if (currentSubwindow.value > 1) {
-      currentSubwindow.value--
+  function prevSpaceSubwindow() {
+    if (spaceSubwindow.value > 1) {
+      spaceSubwindow.value--
     }
   }
 
@@ -142,11 +147,17 @@ export const useMapUIStore = defineStore('mapUI', () => {
     drawEnable.value = true
   }
 
+  function activateEnvironmentDrawing(iconName) {
+    currentEnvironmentIcon.value = iconName
+    drawType.value = 'Point'
+    drawEnable.value = true
+  }
+
   return {
     drawEnable,
     drawType,
     currentFrequency,
-    currentSubwindow,
+    spaceSubwindow,
     comment,
     features,
     currentColor,
@@ -155,8 +166,8 @@ export const useMapUIStore = defineStore('mapUI', () => {
     handleDrawEnd,
     activatePolygonDrawing,
     activateLineStringDrawing,
-    nextSubwindow,
-    prevSubwindow,
+    nextSpaceSubwindow,
+    prevSpaceSubwindow,
     addComment,
     getColorForFrequency,
     addFeature,
@@ -166,5 +177,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     activateBelongingDrawing,
     currentSafetyIcon,
     activateSafetyDrawing,
+    currentEnvironmentIcon,
+    activateEnvironmentDrawing,
   }
 })

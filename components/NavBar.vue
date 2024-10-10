@@ -7,16 +7,16 @@
         <template #item="{ item }">
           <SubWindow
             v-if="item.label === 'Space'"
-            :current-subwindow="currentSubwindow"
+            :current-subwindow="spaceSubwindow"
             :max-subwindow="4"
-            :progress-percentage="progressPercentage"
-            :title="subwindowContent.title"
-            :icon="subwindowContent.icon"
-            :paragraph="subwindowContent.description"
-            :button="subwindowContent.button"
-            :button-group="subwindowContent.buttonGroup"
-            @prev="mapUIStore.prevSubwindow()"
-            @next="mapUIStore.nextSubwindow()"
+            :progress-percentage="spaceProgressPercentage"
+            :title="spaceContent.title"
+            :icon="spaceContent.icon"
+            :paragraph="spaceContent.description"
+            :button="spaceContent.button"
+            :button-group="spaceContent.buttonGroup"
+            @prev="mapUIStore.prevSpaceSubwindow()"
+            @next="mapUIStore.nextSpaceSubwindow()"
           >
           </SubWindow>
           <SubWindow
@@ -45,6 +45,25 @@
             @next="nextSafetySubwindow"
           >
           </SubWindow>
+          <SubWindow
+            v-if="item.label === 'Environment'"
+            :current-subwindow="environmentSubwindow"
+            :max-subwindow="2"
+            :progress-percentage="environmentProgressPercentage"
+            :title="environmentContent.title"
+            :icon="environmentContent.icon"
+            :paragraph="environmentContent.description"
+            :icon-grid="
+              environmentSubwindow === 1
+                ? pollutionIconGrid
+                : environmentSubwindow === 2
+                ? leafIconGrid
+                : null
+            "
+            @prev="prevEnvironmentSubwindow"
+            @next="nextEnvironmentSubwindow"
+          >
+          </SubWindow>
         </template>
       </UAccordion>
     </UCard>
@@ -62,12 +81,15 @@ import smileIcon from '@/assets/icons/smile.svg'
 import brokenIcon from '@/assets/icons/broken.svg'
 import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
+import pollutionIcon from '@/assets/icons/polution.svg'
+import leafIcon from '@/assets/icons/leaf.svg'
 
 const mapUIStore = useMapUIStore()
 
-const currentSubwindow = computed(() => mapUIStore.currentSubwindow)
+const spaceSubwindow = computed(() => mapUIStore.spaceSubwindow)
 const belongingSubwindow = ref(1)
 const safetySubwindow = ref(1)
+const environmentSubwindow = ref(1)
 
 const menuItems = [
   { icon: 'i-heroicons-map-pin-20-solid', label: 'Space' },
@@ -76,15 +98,18 @@ const menuItems = [
   { icon: 'i-heroicons-sun-20-solid', label: 'Environment' },
 ]
 
-const progressPercentage = computed(() => (currentSubwindow.value / 4) * 100)
+const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)
 const belongingProgressPercentage = computed(
   () => (belongingSubwindow.value / 2) * 100
 )
 const safetyProgressPercentage = computed(
   () => (safetySubwindow.value / 2) * 100
 )
+const environmentProgressPercentage = computed(
+  () => (environmentSubwindow.value / 2) * 100
+)
 
-const subwindowContent = computed(() => {
+const spaceContent = computed(() => {
   const contents = {
     1: {
       title:
@@ -147,22 +172,8 @@ const subwindowContent = computed(() => {
         action: () => mapUIStore.activateLineStringDrawing(),
       },
     },
-    Belonging: {
-      1: {
-        title: 'Mark places that are important to you',
-        icon: 'i-heroicons-home-20-solid',
-        description:
-          'Select an icon and place it on the map to mark locations that are significant to you.',
-      },
-      2: {
-        title: 'Describe why these places are important',
-        icon: 'i-heroicons-chat-bubble-left-20-solid',
-        description:
-          'Click on the icons you placed and add comments to explain why these locations are meaningful to you.',
-      },
-    },
   }
-  return contents[currentSubwindow.value] || { title: '', description: '' }
+  return contents[spaceSubwindow.value] || { title: '', description: '' }
 })
 
 const belongingContent = computed(() => {
@@ -221,6 +232,36 @@ const safetyIconGrid = computed(() => ({
   onSelect: selectSafetyIcon,
 }))
 
+const environmentContent = computed(() => {
+  const contents = {
+    1: {
+      title: 'Mark areas with environmental pollution',
+      icon: 'i-heroicons-exclamation-circle-20-solid',
+      description:
+        'Select the pollution icon and place it on the map to mark locations where you have noticed environmental pollution.',
+    },
+    2: {
+      title: 'Mark locations with unique flora or fauna',
+      icon: 'i-heroicons-leaf-20-solid',
+      description:
+        'Select the leaf icon and place it on the map to mark locations where you have encountered special flora or fauna.',
+    },
+  }
+  return contents[environmentSubwindow.value] || { title: '', description: '' }
+})
+
+const pollutionIconGrid = computed(() => ({
+  title: 'Select the pollution icon:',
+  icons: [{ name: 'pollution', src: pollutionIcon }],
+  onSelect: selectEnvironmentIcon,
+}))
+
+const leafIconGrid = computed(() => ({
+  title: 'Select the leaf icon:',
+  icons: [{ name: 'leaf', src: leafIcon }],
+  onSelect: selectEnvironmentIcon,
+}))
+
 function nextBelongingSubwindow() {
   if (belongingSubwindow.value < 2) {
     belongingSubwindow.value++
@@ -253,5 +294,22 @@ function prevSafetySubwindow() {
 function selectSafetyIcon(iconName: string) {
   console.log('Selected safety icon:', iconName)
   mapUIStore.activateSafetyDrawing(iconName)
+}
+
+function nextEnvironmentSubwindow() {
+  if (environmentSubwindow.value < 2) {
+    environmentSubwindow.value++
+  }
+}
+
+function prevEnvironmentSubwindow() {
+  if (environmentSubwindow.value > 1) {
+    environmentSubwindow.value--
+  }
+}
+
+function selectEnvironmentIcon(iconName: string) {
+  console.log('Selected environment icon:', iconName)
+  mapUIStore.activateEnvironmentDrawing(iconName)
 }
 </script>
