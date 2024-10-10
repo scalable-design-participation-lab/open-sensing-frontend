@@ -53,8 +53,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
-import CommentPopup from '@/components/CommentPopup.vue'
-import DrawingLayer from '@/components/DrawingLayer.vue'
 
 const mapUIStore = useMapUIStore()
 
