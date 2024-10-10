@@ -25,6 +25,9 @@ module.exports = defineNuxtConfig({
     dbName: process.env.DB_NAME,
     dbPassword: process.env.DB_PASSWORD,
     dbPort: process.env.DB_PORT,
+    public: {
+      MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
+    },
   },
 
   compatibilityDate: '2024-08-15',
