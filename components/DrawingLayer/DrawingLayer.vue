@@ -23,10 +23,10 @@
 
       <IconLayer
         :features="pointFeatures"
-        :get-icon-for-feature="getIconForPoint"
-        :visible-in-subwindow="2"
+        :get-icon-for-feature="getIconForFeature"
         @toggle-comment-popup="toggleCommentPopup"
       />
+
       <PolygonLayer @toggle-comment-popup="toggleCommentPopup" />
       <LineStringLayer @toggle-comment-popup="toggleCommentPopup" />
     </ol-source-vector>
@@ -40,12 +40,14 @@ import IconLayer from './IconLayer.vue'
 import PolygonLayer from './PolygonLayer.vue'
 import LineStringLayer from './LineStringLayer.vue'
 
-// 导入 SVG 图标
 import redIcon from '@/assets/icons/red.svg'
 import greenIcon from '@/assets/icons/green.svg'
 import blueIcon from '@/assets/icons/blue.svg'
 import yellowIcon from '@/assets/icons/yellow.svg'
 import purpleIcon from '@/assets/icons/purple.svg'
+import dislikeIcon from '@/assets/icons/dislike.svg'
+import heartIcon from '@/assets/icons/heart.svg'
+import smileIcon from '@/assets/icons/smile.svg'
 
 const props = defineProps({
   projection: {
@@ -87,6 +89,22 @@ const getDrawColor = computed(() => {
 
 function toggleCommentPopup(feature) {
   emit('toggle-comment-popup', feature)
+}
+
+function getIconForFeature(feature) {
+  if (feature.iconName) {
+    switch (feature.iconName) {
+      case 'dislike':
+        return dislikeIcon
+      case 'heart':
+        return heartIcon
+      case 'smile':
+        return smileIcon
+      default:
+        return getIconForPoint(feature)
+    }
+  }
+  return getIconForPoint(feature)
 }
 
 function getIconForPoint(feature) {

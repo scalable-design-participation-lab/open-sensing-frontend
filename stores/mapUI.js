@@ -9,6 +9,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const comment = ref('')
   const features = reactive([])
   const isCommentPopupOpen = ref(false)
+  const currentBelongingIcon = ref(null)
 
   const colors = {
     'every day': '#FF0000',
@@ -43,21 +44,22 @@ export const useMapUIStore = defineStore('mapUI', () => {
     const feature = event.feature
     const geometryType = feature.getGeometry().getType()
 
-    if (geometryType === 'LineString') {
-      const coordinates = feature.getGeometry().getCoordinates()
-      features.push({
-        id: Date.now(),
-        type: 'LineString',
-        coordinates: coordinates,
-        comment: '',
-      })
-    } else if (geometryType === 'Point') {
+    if (geometryType === 'Point') {
       const coordinates = feature.getGeometry().getCoordinates()
       features.push({
         id: Date.now(),
         type: 'Point',
         coordinates: coordinates,
+        iconName: currentBelongingIcon.value,
         frequency: currentFrequency.value,
+        comment: '',
+      })
+    } else if (geometryType === 'LineString') {
+      const coordinates = feature.getGeometry().getCoordinates()
+      features.push({
+        id: Date.now(),
+        type: 'LineString',
+        coordinates: coordinates,
         comment: '',
       })
     } else if (geometryType === 'Polygon') {
@@ -71,6 +73,8 @@ export const useMapUIStore = defineStore('mapUI', () => {
     }
 
     drawEnable.value = false
+    currentBelongingIcon.value = null
+    currentFrequency.value = null
   }
 
   function activatePolygonDrawing() {
@@ -124,6 +128,12 @@ export const useMapUIStore = defineStore('mapUI', () => {
     this.isCommentPopupOpen = isOpen
   }
 
+  function activateBelongingDrawing(iconName) {
+    currentBelongingIcon.value = iconName
+    drawType.value = 'Point'
+    drawEnable.value = true
+  }
+
   return {
     drawEnable,
     drawType,
@@ -144,5 +154,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     addFeature,
     isCommentPopupOpen,
     setCommentPopupOpen,
+    currentBelongingIcon,
+    activateBelongingDrawing,
   }
 })

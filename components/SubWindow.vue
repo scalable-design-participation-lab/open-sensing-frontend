@@ -33,6 +33,21 @@
         </UButton>
       </div>
 
+      <div v-if="iconGrid" class="mt-4">
+        <p class="text-sm text-gray-600 mb-2">{{ iconGrid.title }}</p>
+        <div class="grid grid-cols-3 gap-4">
+          <UButton
+            v-for="icon in iconGrid.icons"
+            :key="icon.name"
+            variant="ghost"
+            class="p-2 flex items-center justify-center"
+            @click="iconGrid.onSelect(icon.name)"
+          >
+            <img :src="icon.src" :alt="icon.name" class="w-12 h-12" />
+          </UButton>
+        </div>
+      </div>
+
       <slot></slot>
 
       <UButtonGroup class="mt-4">
@@ -60,6 +75,17 @@ interface Button {
   text: string
   color: string
   action: () => void
+}
+
+interface IconGridItem {
+  name: string
+  src: string
+}
+
+interface IconGrid {
+  title: string
+  icons: IconGridItem[]
+  onSelect: (iconName: string) => void
 }
 
 defineProps({
@@ -94,6 +120,10 @@ defineProps({
   buttonGroup: {
     type: Array as () => Button[],
     default: () => [],
+  },
+  iconGrid: {
+    type: Object as () => IconGrid,
+    default: null,
   },
 })
 
