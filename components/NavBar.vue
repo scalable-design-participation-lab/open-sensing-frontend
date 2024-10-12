@@ -81,15 +81,15 @@ import smileIcon from '@/assets/icons/smile.svg'
 import brokenIcon from '@/assets/icons/broken.svg'
 import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
-import pollutionIcon from '@/assets/icons/polution.svg'
+import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
 
 const mapUIStore = useMapUIStore()
 
 const spaceSubwindow = computed(() => mapUIStore.spaceSubwindow)
-const belongingSubwindow = ref(1)
-const safetySubwindow = ref(1)
-const environmentSubwindow = ref(1)
+const belongingSubwindow = computed(() => mapUIStore.belongingSubwindow)
+const safetySubwindow = computed(() => mapUIStore.safetySubwindow)
+const environmentSubwindow = computed(() => mapUIStore.environmentSubwindow)
 
 const menuItems = [
   { icon: 'i-heroicons-map-pin-20-solid', label: 'Space' },
@@ -263,15 +263,11 @@ const leafIconGrid = computed(() => ({
 }))
 
 function nextBelongingSubwindow() {
-  if (belongingSubwindow.value < 2) {
-    belongingSubwindow.value++
-  }
+  mapUIStore.nextBelongingSubwindow()
 }
 
 function prevBelongingSubwindow() {
-  if (belongingSubwindow.value > 1) {
-    belongingSubwindow.value--
-  }
+  mapUIStore.prevBelongingSubwindow()
 }
 
 function selectBelongingIcon(iconName: string) {
@@ -280,15 +276,11 @@ function selectBelongingIcon(iconName: string) {
 }
 
 function nextSafetySubwindow() {
-  if (safetySubwindow.value < 2) {
-    safetySubwindow.value++
-  }
+  mapUIStore.nextSafetySubwindow()
 }
 
 function prevSafetySubwindow() {
-  if (safetySubwindow.value > 1) {
-    safetySubwindow.value--
-  }
+  mapUIStore.prevSafetySubwindow()
 }
 
 function selectSafetyIcon(iconName: string) {
@@ -297,15 +289,11 @@ function selectSafetyIcon(iconName: string) {
 }
 
 function nextEnvironmentSubwindow() {
-  if (environmentSubwindow.value < 2) {
-    environmentSubwindow.value++
-  }
+  mapUIStore.nextEnvironmentSubwindow()
 }
 
 function prevEnvironmentSubwindow() {
-  if (environmentSubwindow.value > 1) {
-    environmentSubwindow.value--
-  }
+  mapUIStore.prevEnvironmentSubwindow()
 }
 
 function selectEnvironmentIcon(iconName: string) {

@@ -52,7 +52,7 @@ import smileIcon from '@/assets/icons/smile.svg'
 import brokenIcon from '@/assets/icons/broken.svg'
 import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
-import polutionIcon from '@/assets/icons/polution.svg'
+import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
 
 const props = defineProps({
@@ -105,7 +105,7 @@ function getIconForFeature(feature) {
   if (feature.iconName) {
     switch (feature.iconName) {
       case 'pollution':
-        return polutionIcon
+        return pollutionIcon
       case 'leaf':
         return leafIcon
       case 'lock':
