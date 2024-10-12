@@ -153,6 +153,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
     drawEnable.value = true
   }
 
+  function updateFeatureImages(featureId, images) {
+    const feature = this.features.find((f) => f.id === featureId)
+    if (feature) {
+      feature.images = images
+    }
+  }
+
   return {
     drawEnable,
     drawType,
@@ -179,5 +186,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
     activateSafetyDrawing,
     currentEnvironmentIcon,
     activateEnvironmentDrawing,
+    updateFeatureImages,
   }
 })

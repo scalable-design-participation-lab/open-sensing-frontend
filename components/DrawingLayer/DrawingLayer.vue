@@ -25,6 +25,7 @@
         :features="pointFeatures"
         :get-icon-for-feature="getIconForFeature"
         @toggle-comment-popup="toggleCommentPopup"
+        @toggle-image-upload-popup="toggleImageUploadPopup"
       />
 
       <PolygonLayer @toggle-comment-popup="toggleCommentPopup" />
@@ -61,7 +62,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['toggle-comment-popup'])
+const emit = defineEmits(['toggle-comment-popup', 'toggle-image-upload-popup'])
 
 const mapUIStore = useMapUIStore()
 
@@ -94,6 +95,10 @@ const getDrawColor = computed(() => {
 
 function toggleCommentPopup(feature) {
   emit('toggle-comment-popup', feature)
+}
+
+function toggleImageUploadPopup(feature) {
+  emit('toggle-image-upload-popup', feature)
 }
 
 function getIconForFeature(feature) {

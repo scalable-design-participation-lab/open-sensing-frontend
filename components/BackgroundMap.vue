@@ -25,6 +25,7 @@
     <DrawingLayer
       :projection="projection"
       @toggle-comment-popup="toggleCommentPopup"
+      @toggle-image-upload-popup="toggleImageUploadPopup"
     />
 
     <ol-overlay
@@ -39,27 +40,40 @@
         @close="closeCommentPopup"
       />
     </ol-overlay>
-  </ol-map>
 
-  <CommentPopup
-    :is-visible="commentPopupVisible"
-    :feature-id="selectedFeatureId"
-    @close="closeCommentPopup"
-  />
+    <ol-overlay
+      v-if="imageUploadPopupVisible"
+      :position="imageUploadPopupPosition"
+      :offset="[30, 20]"
+    >
+      <ImageUploadPopup
+        :is-visible="imageUploadPopupVisible"
+        :feature-id="selectedFeatureId"
+        class="z-50"
+        @close="closeImageUploadPopup"
+        @upload="handleImageUpload"
+      />
+    </ol-overlay>
+  </ol-map>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
 import { useRuntimeConfig } from '#app'
+import DrawingLayer from './DrawingLayer/DrawingLayer.vue'
+import CommentPopup from './CommentPopup.vue'
+import ImageUploadPopup from './ImageUploadPopup.vue'
 
 const mapUIStore = useMapUIStore()
 const config = useRuntimeConfig()
 
 const projection = ref('EPSG:4326')
 const commentPopupVisible = ref(false)
+const imageUploadPopupVisible = ref(false)
 const selectedFeatureId = ref(null)
 const commentPopupPosition = ref(null)
+const imageUploadPopupPosition = ref(null)
 
 const mapboxStyle = 'cesandoval09/clxkxw58f01tt01qj2ep8g1qr'
 const mapboxToken = config.public.MAPBOX_ACCESS_TOKEN
@@ -78,26 +92,55 @@ function toggleCommentPopup(feature) {
   }
 }
 
+function toggleImageUploadPopup(feature) {
+  if (imageUploadPopupVisible.value && selectedFeatureId.value === feature.id) {
+    closeImageUploadPopup()
+  } else {
+    openImageUploadPopup(feature)
+  }
+}
+
 function openCommentPopup(feature) {
   selectedFeatureId.value = feature.id
   commentPopupVisible.value = true
+  imageUploadPopupVisible.value = false
+  commentPopupPosition.value = getFeaturePosition(feature)
+}
+
+function openImageUploadPopup(feature) {
+  selectedFeatureId.value = feature.id
+  imageUploadPopupVisible.value = true
+  commentPopupVisible.value = false
+  imageUploadPopupPosition.value = getFeaturePosition(feature)
+}
+
+function getFeaturePosition(feature) {
   if (feature.type === 'Point') {
-    commentPopupPosition.value = feature.coordinates
+    return feature.coordinates
   } else if (feature.type === 'Polygon') {
-    const coordinates = feature.coordinates[0] // 取外环坐标
+    const coordinates = feature.coordinates[0]
     const sumX = coordinates.reduce((sum, coord) => sum + coord[0], 0)
     const sumY = coordinates.reduce((sum, coord) => sum + coord[1], 0)
-    const centerX = sumX / coordinates.length
-    const centerY = sumY / coordinates.length
-    commentPopupPosition.value = [centerX, centerY]
+    return [sumX / coordinates.length, sumY / coordinates.length]
   } else {
-    commentPopupPosition.value = feature.coordinates[0]
+    return feature.coordinates[0]
   }
 }
 
 function closeCommentPopup() {
   commentPopupVisible.value = false
   selectedFeatureId.value = null
+}
+
+function closeImageUploadPopup() {
+  imageUploadPopupVisible.value = false
+  selectedFeatureId.value = null
+}
+
+function handleImageUpload(images) {
+  console.log('Uploaded images:', images)
+  mapUIStore.updateFeatureImages(selectedFeatureId.value, images)
+  closeImageUploadPopup()
 }
 
 function handleMapClick(event) {

@@ -13,7 +13,7 @@
     <ol-overlay :position="feature.coordinates" :offset="[0, 0]">
       <div
         class="cursor-pointer text-black-500 rounded-full p-0.5 flex justify-center items-center shadow-md"
-        @click.stop="$emit('toggle-comment-popup', feature)"
+        @click.stop="handleIconClick(feature)"
       >
         <img
           src="@/assets/icons/open-icon.svg"
@@ -26,7 +26,9 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
+import { useMapUIStore } from '@/stores/mapUI'
+
+const props = defineProps({
   features: {
     type: Array,
     required: true,
@@ -37,5 +39,22 @@ defineProps({
   },
 })
 
-defineEmits(['toggle-comment-popup'])
+const emit = defineEmits(['toggle-comment-popup', 'toggle-image-upload-popup'])
+
+const mapUIStore = useMapUIStore()
+
+function handleIconClick(feature) {
+  if (
+    feature.iconName === 'heart' ||
+    feature.iconName === 'smile' ||
+    feature.iconName === 'dislike' ||
+    feature.iconName === 'broken' ||
+    feature.iconName === 'calm' ||
+    feature.iconName === 'lock'
+  ) {
+    emit('toggle-image-upload-popup', feature)
+  } else {
+    emit('toggle-comment-popup', feature)
+  }
+}
 </script>
