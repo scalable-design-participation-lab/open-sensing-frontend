@@ -14,7 +14,7 @@
       <div
         v-if="shouldShowPlusIcon(feature)"
         class="cursor-pointer text-black-500 rounded-full p-0.5 flex justify-center items-center shadow-md"
-        @click.stop="handleIconClick(feature)"
+        @click.stop.prevent="handleIconClick(feature)"
       >
         <img
           src="@/assets/icons/open-icon.svg"
