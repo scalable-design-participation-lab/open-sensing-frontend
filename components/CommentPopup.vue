@@ -9,7 +9,13 @@
       class="flex-grow text-sm resize-none"
     />
     <div class="flex justify-between mt-2">
-      <UButton color="gray" size="sm" class="w-[48%]" @click="closePopup">
+      <UButton
+        color="gray"
+        size="sm"
+        variant="ghost"
+        class="w-[48%]"
+        @click="closePopup"
+      >
         Close
       </UButton>
       <UButton color="primary" size="sm" class="w-[48%]" @click="addComment">

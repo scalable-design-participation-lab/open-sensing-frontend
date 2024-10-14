@@ -51,7 +51,7 @@ function getLineStringStartPoint(feature) {
   if (feature.coordinates.length > 0) {
     return feature.coordinates[0]
   }
-  return [0, 0] // 默认值，以防坐标不存在
+  return [0, 0]
 }
 
 function toggleCommentPopup(feature) {

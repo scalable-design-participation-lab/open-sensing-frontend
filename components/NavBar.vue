@@ -3,7 +3,12 @@
     class="fixed left-4 top-4 w-80 z-50 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden"
   >
     <UCard>
-      <UAccordion :items="menuItems" class="space-y-4">
+      <UAccordion
+        color="black"
+        variant="solid"
+        :items="menuItems"
+        class="space-y-4"
+      >
         <template #item="{ item }">
           <SubWindow
             v-if="item.label === 'Space'"
@@ -114,7 +119,6 @@ const spaceContent = computed(() => {
     1: {
       title:
         'Mark the places on the map that you visited near the Tyazhilivka River.',
-      icon: 'i-heroicons-map-pin-20-solid',
       description:
         'Using the "marker" tool, mark the places on the map where you have been near the Tyazhilivka River (up to 10 markers). For each marker, select how often you visit this location:',
       buttonGroup: [
@@ -180,13 +184,11 @@ const belongingContent = computed(() => {
   const contents = {
     1: {
       title: 'Mark places that are important to you',
-      icon: 'i-heroicons-home-20-solid',
       description:
         'Select an icon and place it on the map to mark locations that are significant to you.',
     },
     2: {
       title: 'Describe why these places are important',
-      icon: 'i-heroicons-chat-bubble-left-20-solid',
       description:
         'Click on the icons you placed and add comments to explain why these locations are meaningful to you.',
     },
@@ -208,13 +210,11 @@ const safetyContent = computed(() => {
   const contents = {
     1: {
       title: 'Mark safe and unsafe areas',
-      icon: 'i-heroicons-shield-check-20-solid',
       description:
         'Select an icon and place it on the map to mark safe or unsafe locations.',
     },
     2: {
       title: 'Describe safety concerns',
-      icon: 'i-heroicons-chat-bubble-left-20-solid',
       description:
         'Click on the icons you placed and add comments to explain your safety concerns or positive aspects.',
     },
@@ -236,13 +236,11 @@ const environmentContent = computed(() => {
   const contents = {
     1: {
       title: 'Mark areas with environmental pollution',
-      icon: 'i-heroicons-exclamation-circle-20-solid',
       description:
         'Select the pollution icon and place it on the map to mark locations where you have noticed environmental pollution.',
     },
     2: {
       title: 'Mark locations with unique flora or fauna',
-      icon: 'i-heroicons-leaf-20-solid',
       description:
         'Select the leaf icon and place it on the map to mark locations where you have encountered special flora or fauna.',
     },

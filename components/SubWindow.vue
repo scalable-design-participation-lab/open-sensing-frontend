@@ -1,14 +1,14 @@
 <template>
-  <UCard>
+  <UCard class="bg-black text-white">
     <div class="space-y-4">
       <UProgress :value="progressPercentage" color="yellow" class="mb-4" />
       <div v-if="title || icon" class="flex items-center space-x-2">
-        <UIcon v-if="icon" :name="icon" class="text-2xl" />
-        <h2 v-if="title" class="text-xl font-semibold text-black">
+        <UIcon v-if="icon" :name="icon" class="text-2xl text-white" />
+        <h2 v-if="title" class="text-xl font-semibold text-white">
           {{ title }}
         </h2>
       </div>
-      <p v-if="paragraph" class="text-sm text-gray-500 dark:text-gray-400">
+      <p v-if="paragraph" class="text-sm text-gray-300">
         {{ paragraph }}
       </p>
 
@@ -26,7 +26,24 @@
           v-for="btn in buttonGroup"
           :key="btn.text"
           :color="btn.color"
-          class="w-full mb-2"
+          variant="outline"
+          :ui="{
+            rounded: 'rounded-full',
+            base: 'transition-all duration-300 ease-in-out transform hover:scale-105',
+            padding: { sm: 'px-3 py-1.5', md: 'px-4 py-2', lg: 'px-5 py-2.5' },
+            font: { weight: 'font-medium' },
+            size: 'text-sm',
+          }"
+          :class="[
+            'w-full mb-2',
+            {
+              'hover:bg-red-500 hover:text-white': btn.color === 'red',
+              'hover:bg-green-500 hover:text-white': btn.color === 'green',
+              'hover:bg-blue-500 hover:text-white': btn.color === 'blue',
+              'hover:bg-yellow-500 hover:text-white': btn.color === 'yellow',
+              'hover:bg-purple-500 hover:text-white': btn.color === 'purple',
+            },
+          ]"
           @click="btn.action"
         >
           {{ btn.text }}
@@ -34,38 +51,44 @@
       </div>
 
       <div v-if="iconGrid" class="mt-4">
-        <p class="text-sm text-gray-600 mb-2">{{ iconGrid.title }}</p>
-        <div class="grid grid-cols-3 gap-4">
-          <UButton
-            v-for="icon in iconGrid.icons"
-            :key="icon.name"
-            variant="ghost"
-            class="p-2 flex items-center justify-center"
-            @click="iconGrid.onSelect(icon.name)"
-          >
-            <img :src="icon.src" :alt="icon.name" class="w-12 h-12" />
-          </UButton>
-        </div>
+        <p class="text-sm text-gray-300 mb-2">{{ iconGrid.title }}</p>
+        <UCard class="bg-white p-2">
+          <div class="grid grid-cols-3 gap-3">
+            <UButton
+              v-for="icon in iconGrid.icons"
+              :key="icon.name"
+              variant="ghost"
+              class="p-1 flex items-center justify-center"
+              @click="iconGrid.onSelect(icon.name)"
+            >
+              <img
+                :src="icon.src"
+                :alt="icon.name"
+                class="w-full h-full object-contain"
+              />
+            </UButton>
+          </div>
+        </UCard>
       </div>
 
       <slot></slot>
 
-      <UButtonGroup class="mt-4">
+      <div class="flex justify-between mt-4">
         <UButton
           icon="i-heroicons-arrow-left-20-solid"
-          color="gray"
-          variant="ghost"
+          color="white"
+          variant="solid"
           :disabled="currentSubwindow === 1"
           @click="$emit('prev')"
         />
         <UButton
           icon="i-heroicons-arrow-right-20-solid"
-          color="gray"
-          variant="ghost"
+          color="white"
+          variant="solid"
           :disabled="currentSubwindow === maxSubwindow"
           @click="$emit('next')"
         />
-      </UButtonGroup>
+      </div>
     </div>
   </UCard>
 </template>
