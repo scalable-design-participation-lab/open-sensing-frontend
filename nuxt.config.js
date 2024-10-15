@@ -32,14 +32,4 @@ module.exports = defineNuxtConfig({
 
   compatibilityDate: '2024-08-15',
   plugins: [{ src: '~/plugins/vue3-openlayers.js', mode: 'client' }],
-
-  nitro: {
-    externals: {
-      inline: ['pg'],
-      exclude: ['pg-native', 'pg/lib/native'],
-    },
-    alias: {
-      'pg-native': false,
-    },
-  },
 })
