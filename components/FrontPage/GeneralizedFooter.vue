@@ -35,9 +35,26 @@
           color="gray"
           :label="button.label"
         />
+        <!-- Custom icons -->
+        <UButton
+          v-for="icon in icons"
+          :key="icon.name"
+          color="gray"
+          variant="ghost"
+          class="w-14 h-14 rounded-2xl bg-white bg-opacity-90 flex items-center justify-center shadow-md hover:bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out"
+        >
+          <img
+            v-if="icon.name.endsWith('.svg')"
+            :src="icon.name"
+            alt="Icon"
+            class="w-6 h-6"
+          />
+          <span v-else class="text-xl">{{ icon.name }}</span>
+        </UButton>
       </div>
+      <!-- Help button -->
       <button
-        class="w-14 h-14 sm:w-14 sm:h-14 rounded-2xl bg-white bg-opacity-90 border-none flex items-center justify-center font-semibold text-lg sm:text-xl text-gray-700 cursor-pointer transition-all duration-200 ease-in-out shadow-md hover:bg-white hover:shadow-lg hover:-translate-y-1"
+        class="w-14 h-14 rounded-2xl bg-white bg-opacity-90 border-none flex items-center justify-center font-semibold text-lg sm:text-xl text-gray-700 cursor-pointer transition-all duration-200 ease-in-out shadow-md hover:bg-white hover:shadow-lg hover:-translate-y-1"
         aria-label="Help"
       >
         ?
@@ -47,12 +64,15 @@
 </template>
 
 <script setup lang="ts">
+import { PropType } from 'vue'
+
 /**
  * Props for the GeneralizedFooter component
  * @typedef {Object} GeneralizedFooterProps
  * @property {string} title - The title displayed in the footer
  * @property {Array<{to: string, label: string}>} links - Navigation links for the footer
  * @property {Array<{label: string}>} buttons - Action buttons for the footer
+ * @property {Array<{name: string}>} icons - Custom icons for the footer
  */
 
 /**
@@ -61,7 +81,17 @@
  */
 defineProps({
   title: String,
-  links: Array,
-  buttons: Array,
+  links: {
+    type: Array as PropType<Array<{ to: string; label: string }>>,
+    default: () => [],
+  },
+  buttons: {
+    type: Array as PropType<Array<{ label: string }>>,
+    default: () => [],
+  },
+  icons: {
+    type: Array as PropType<Array<{ name: string }>>,
+    default: () => [],
+  },
 })
 </script>
