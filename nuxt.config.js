@@ -36,8 +36,10 @@ module.exports = defineNuxtConfig({
   nitro: {
     externals: {
       inline: ['pg'],
-      // Explicitly exclude pg-native if needed
-      exclude: ['pg-native'],
+      exclude: ['pg-native', 'pg/lib/native'],
+    },
+    alias: {
+      'pg-native': false,
     },
   },
 })
