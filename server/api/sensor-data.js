@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3'
-import pg from 'pg'
-const { Pool } = pg
+// import pg from 'pg'
+// const { Pool } = pg
 
 /**
  * API endpoint for retrieving aggregated sensor data

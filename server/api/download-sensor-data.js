@@ -1,7 +1,7 @@
 import { defineEventHandler } from 'h3'
-import pg from 'pg'
+// import pg from 'pg'
 import { parse } from 'json2csv' // Import json2csv for CSV conversion
-const { Pool } = pg
+// const { Pool } = pg
 
 /**
  * API endpoint for downloading sensor data
