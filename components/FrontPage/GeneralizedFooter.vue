@@ -13,9 +13,9 @@
  * />
  -->
 
-<template>
+ <template>
   <footer
-    class="absolute bottom-6 left-6 right-6 flex justify-between items-end z-20 sm:flex-row sm:items-end flex-col items-start"
+    class="fixed bottom-6 left-6 right-6 flex justify-between items-end sm:flex-row flex-col z-50"
   >
     <div class="footer-left">
       <h2 class="text-2xl">{{ title }}</h2>
@@ -35,26 +35,9 @@
           color="gray"
           :label="button.label"
         />
-        <!-- Custom icons -->
-        <UButton
-          v-for="icon in icons"
-          :key="icon.name"
-          color="gray"
-          variant="ghost"
-          class="w-14 h-14 rounded-2xl bg-white bg-opacity-90 flex items-center justify-center shadow-md hover:bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out"
-        >
-          <img
-            v-if="icon.name.endsWith('.svg')"
-            :src="icon.name"
-            alt="Icon"
-            class="w-6 h-6"
-          />
-          <span v-else class="text-xl">{{ icon.name }}</span>
-        </UButton>
       </div>
-      <!-- Help button -->
       <button
-        class="w-14 h-14 rounded-2xl bg-white bg-opacity-90 border-none flex items-center justify-center font-semibold text-lg sm:text-xl text-gray-700 cursor-pointer transition-all duration-200 ease-in-out shadow-md hover:bg-white hover:shadow-lg hover:-translate-y-1"
+        class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-semibold text-lg md:text-xl cursor-pointer shadow-md hover:bg-white hover:animate-spin"
         aria-label="Help"
       >
         ?
