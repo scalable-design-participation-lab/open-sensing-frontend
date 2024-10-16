@@ -19,6 +19,16 @@ module.exports = defineNuxtConfig({
     },
   ],
 
+  router: {
+    extendRoutes(routes, resolve) {
+      routes.push({
+        name: 'custom',
+        path: '*',
+        component: resolve(__dirname, 'pages/restart.vue')
+      })
+    }
+  },
+
   runtimeConfig: {
     dbUser: process.env.DB_USER,
     dbHost: process.env.DB_HOST,
