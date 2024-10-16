@@ -54,11 +54,20 @@
           size="xs"
         />
       </div>
+
+      <UTextarea
+        v-model="localComment"
+        placeholder="Write a comment"
+        class="flex-grow text-sm resize-none mt-4"
+      />
+
       <div class="flex justify-between items-center mt-4">
         <UButton color="gray" size="sm" variant="ghost" @click="closePopup">
           Close
         </UButton>
-        <UButton color="primary" size="sm" @click="uploadImages"> Add </UButton>
+        <UButton color="primary" size="sm" @click="addCommentAndUpload">
+          Add
+        </UButton>
       </div>
     </div>
   </UCard>
@@ -66,12 +75,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useMapUIStore } from '../stores/mapUI'
 
 const props = defineProps({
   isVisible: Boolean,
+  featureId: Number,
 })
 
 const emit = defineEmits(['close', 'upload'])
+
+const mapUIStore = useMapUIStore()
 
 interface ImageUpload {
   name: string
@@ -81,6 +94,7 @@ interface ImageUpload {
 
 const images = ref<ImageUpload[]>([])
 const selectedImage = ref<string | null>(null)
+const localComment = ref('')
 
 function handleImageSelect(event: Event) {
   const fileInput = event.target as HTMLInputElement
@@ -149,7 +163,10 @@ function closePopup() {
   resetUpload()
 }
 
-function uploadImages() {
+function addCommentAndUpload() {
+  if (props.featureId !== null) {
+    mapUIStore.addComment(props.featureId, localComment.value)
+  }
   console.log('Uploading images:', images.value)
   emit('upload', images.value)
   closePopup()
@@ -165,5 +182,15 @@ function removeImage(index: number) {
 function resetUpload() {
   images.value = []
   selectedImage.value = null
+  localComment.value = ''
 }
+
+watch(
+  () => props.isVisible,
+  (newValue) => {
+    if (newValue) {
+      resetUpload()
+    }
+  }
+)
 </script>
