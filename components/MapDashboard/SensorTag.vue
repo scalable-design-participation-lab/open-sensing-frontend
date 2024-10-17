@@ -13,44 +13,20 @@
  * />
  -->
 <template>
-  <UCard
-    class="w-[280px] z-[1000] pointer-events-auto absolute"
-    :ui="cardStyle"
-    :style="positionStyle"
-  >
+  <UCard class="w-[280px] z-[1000] pointer-events-auto absolute" :ui="cardStyle" :style="positionStyle">
     <template #header>
       <div class="flex justify-between items-center">
         <div class="flex gap-2">
-          <UButton
-            data-testid="previous-sensor"
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-arrow-left"
-            @click="sensorDetailStore.selectPreviousSensor"
-          />
-          <UButton
-            data-testid="next-sensor"
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-arrow-right"
-            @click="sensorDetailStore.selectNextSensor"
-          />
+          <UButton data-testid="previous-sensor" color="gray" variant="ghost" icon="i-heroicons-arrow-left"
+            @click="sensorDetailStore.selectPreviousSensor" />
+          <UButton data-testid="next-sensor" color="gray" variant="ghost" icon="i-heroicons-arrow-right"
+            @click="sensorDetailStore.selectNextSensor" />
         </div>
         <div class="flex gap-2">
-          <UButton
-            data-testid="open-detail"
-            color="primary"
-            variant="ghost"
-            icon="i-heroicons-arrow-top-right-on-square"
-            @click="openSensorDetail"
-          />
-          <UButton
-            data-testid="close-info"
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-x-mark"
-            @click="sensorDetailStore.closeSensorInfo"
-          />
+          <UButton data-testid="open-detail" color="primary" variant="ghost"
+            icon="i-heroicons-arrow-top-right-on-square" @click="openSensorDetail" />
+          <UButton data-testid="close-info" color="gray" variant="ghost" icon="i-heroicons-x-mark"
+            @click="sensorDetailStore.closeSensorInfo" />
         </div>
       </div>
     </template>
