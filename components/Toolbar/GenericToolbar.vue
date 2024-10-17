@@ -11,24 +11,13 @@
  -->
 
 <template>
-  <div class="flex flex-col bg-white/90 rounded-3xl p-4 shadow-lg">
-    <UButton
-      v-for="(tool, index) in tools"
-      :key="index"
-      :class="[
-        'w-14 h-14 my-2 rounded-full transition-all duration-300 ease-in-out bg-white',
-        'hover:translate-y-[-2px] hover:shadow-md hover:bg-gray-100',
-        'flex items-center justify-center',
-      ]"
-      color="white"
-      variant="ghost"
-      icon
-      @click="handleToolClick(index)"
-    >
-      <UIcon
-        :name="tool.icon"
-        class="text-2xl text-gray-800 transform translate-y-[0.5px]"
-      />
+  <div class="flex flex-col bg-white shadow-lg rounded-full py-3">
+    <UButton v-for="(tool, index) in tools" :key="index" :class="[
+      'w-12 h-12 my-1 rounded-full',
+      'hover:translate-y-[-2px] hover:shadow-md hover:border hover:border-gray-200',
+      'flex items-center justify-center',
+    ]" color="white" variant="ghost" icon @click="handleToolClick(index)">
+      <UIcon :name="tool.icon" class="text-2xl text-gray-800 transform translate-y-[0.5px]" />
     </UButton>
   </div>
 </template>

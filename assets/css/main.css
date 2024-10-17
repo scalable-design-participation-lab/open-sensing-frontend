@@ -1,5 +1,0 @@
-@layer components {
-  .header-btn {
-    @apply rounded-full px-8 py-4 text-xl font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md;
-  }
-}

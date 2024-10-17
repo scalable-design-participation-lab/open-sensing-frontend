@@ -16,20 +16,14 @@
  -->
 
 <template>
-  <div class="flex justify-between items-center mb-4">
+  <div class="flex justify-between items-center">
     <h2 class="text-xl font-semibold">{{ title }}</h2>
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center">
       <UBadge :color="badgeColor" size="sm">
         {{ badgeText }}
       </UBadge>
-      <UButton
-        icon="i-heroicons-x-mark"
-        color="gray"
-        variant="ghost"
-        size="sm"
-        @click="$emit('close')"
-        aria-label="Close dashboard"
-      />
+      <UButton icon="i-heroicons-x-mark" color="gray" variant="ghost" size="sm" @click="$emit('close')"
+        aria-label="Close dashboard" />
     </div>
   </div>
 </template>
