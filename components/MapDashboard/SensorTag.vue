@@ -14,7 +14,7 @@
  -->
 <template>
   <UCard
-    class="w-[280px] z-[1000] pointer-events-auto absolute"
+    class="w-[280px] z-50 pointer-events-auto absolute"
     :ui="cardStyle"
     :style="positionStyle"
   >

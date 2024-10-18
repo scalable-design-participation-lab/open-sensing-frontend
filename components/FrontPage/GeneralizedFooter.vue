@@ -15,7 +15,7 @@
 
  <template>
   <footer
-    class="fixed bottom-6 left-6 right-6 flex justify-between items-end sm:flex-row flex-col z-50"
+    class="fixed bottom-6 left-6 right-6 flex justify-between items-end sm:flex-row flex-col z-30"
   >
     <div class="footer-left">
       <h2 class="text-2xl">{{ title }}</h2>

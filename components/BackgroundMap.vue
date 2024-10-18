@@ -36,7 +36,7 @@
       <CommentPopup
         :is-visible="commentPopupVisible"
         :feature-id="selectedFeatureId"
-        class="z-50"
+        class="z-10"
         @close="closeCommentPopup"
       />
     </ol-overlay>
@@ -49,7 +49,7 @@
       <ImageUploadPopup
         :is-visible="imageUploadPopupVisible"
         :feature-id="selectedFeatureId"
-        class="z-50"
+        class="z-30"
         @close="closeImageUploadPopup"
         @upload="handleImageUpload"
       />

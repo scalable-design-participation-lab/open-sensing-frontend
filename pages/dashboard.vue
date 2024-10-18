@@ -4,11 +4,11 @@
   </div>
   <div v-else class="flex flex-col min-h-screen">
     <GeneralizedHeader
-      class="z-20"
+      class="z-50"
       :left-items="leftItems"
       :right-items="rightItems"
-      logo-src="/vector.svg"
-      logo-alt="NEU Logo"
+      logo-src="/neu-logo.svg"
+      logo-alt="Northeastern Logo"
       :show-icon="true"
     />
 
@@ -23,7 +23,7 @@
         :is-visible="showFilter && !showDashboard"
         title="Filters"
         :filter-sections="filterSections"
-        class="fixed top-[calc(4rem+6vh)] right-5 z-[1001] w-[calc(100%-2.5rem)] sm:w-[240px] md:w-[300px] lg:w-[360px] h-[calc(100vh-8rem-8vh)] max-h-[800px] overflow-auto"
+        class="fixed top-[calc(4rem+6vh)] right-5 z-40 w-[calc(100%-2.5rem)] sm:w-[240px] md:w-[300px] lg:w-[360px] h-[calc(100vh-8rem-8vh)] max-h-[800px] overflow-auto"
         @close="closeFilter"
         @reset="resetAllFilters"
         @filter-change="handleFilterChange"

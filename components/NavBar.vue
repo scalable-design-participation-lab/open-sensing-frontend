@@ -1,13 +1,13 @@
 <template>
   <div
-    class="fixed right-6 top-6 w-80 z-50 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden"
+    class="fixed right-6 top-6 w-80 z-50 bg-white dark:bg-gray-800 rounded-lg overflow-hidden"
   >
     <UCard>
       <UAccordion
         color="black"
         variant="solid"
         :items="menuItems"
-        class="space-y-4"
+        class="space-y-2"
       >
         <template #item="{ item }">
           <SubWindow

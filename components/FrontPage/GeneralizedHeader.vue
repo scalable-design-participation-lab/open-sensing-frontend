@@ -19,7 +19,7 @@
 
  <template>
   <header
-    class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between z-50"
+    class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between z-40"
   >
     <div class="h-full flex space-x-2 sm:space-x-3">
       <UButton
