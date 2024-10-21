@@ -11,27 +11,73 @@
  -->
 
 <template>
-  <div>
-    <main id="main-container" />
-    <SensorTag v-if="showSensorInfo" :marker-position="markerPosition" />
+  <div class="map-container">
+    <ol-map
+      ref="map"
+      :load-tiles-while-animating="true"
+      :load-tiles-while-interacting="true"
+      style="width: 100%; height: 100vh"
+      @click="handleMapClick"
+      @moveend="updateSelectedSensorOverlay"
+    >
+      <ol-view
+        ref="view"
+        :center="initialCenter"
+        :zoom="initialZoom"
+        :projection="projection"
+      />
+
+      <ol-tile-layer>
+        <ol-source-xyz
+          :url="mapboxUrl"
+          :attributions="mapboxAttribution"
+          :max-zoom="19"
+          :tile-size="512"
+          :tile-pixel-ratio="2"
+        />
+      </ol-tile-layer>
+
+      <ol-vector-layer>
+        <ol-source-vector>
+          <ol-feature
+            v-for="sensor in sensors"
+            :key="sensor.id"
+            :properties="{ id: sensor.id }"
+          >
+            <ol-geom-point :coordinates="sensor.coordinates" />
+            <ol-style>
+              <ol-style-icon
+                :src="getIconUrl(sensor)"
+                :scale="0.5"
+                :anchor="[0.5, 1]"
+              />
+            </ol-style>
+          </ol-feature>
+        </ol-source-vector>
+      </ol-vector-layer>
+
+      <ol-overlay
+        v-if="showSensorInfo"
+        :position="selectedSensorPosition"
+        :offset="[0, 0]"
+        positioning="top-left"
+      >
+        <SensorTag :marker-position="markerPosition" />
+      </ol-overlay>
+    </ol-map>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch, computed } from 'vue'
-import { MapboxLayer } from '@deck.gl/mapbox'
-import { IconLayer } from '@deck.gl/layers'
+import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSensorDetailStore } from '../../stores/sensorDetail'
 import { useMapStore } from '../../stores/map'
-import mapboxgl from 'mapbox-gl'
+import SensorTag from './SensorTag.vue'
+import { useGeographic } from 'ol/proj'
+import { click } from 'ol/events/condition'
 
-/**
- * Mapbox access token
- * @type {string}
- */
-const accessToken =
-  'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
+useGeographic()
 
 const sensorDetailStore = useSensorDetailStore()
 const mapStore = useMapStore()
@@ -42,129 +88,90 @@ const { mapType, mapCenter } = storeToRefs(mapStore)
 const { updateSelectedSensor, updateClickPosition } = sensorDetailStore
 const { updateMapCenter } = mapStore
 
-/**
- * Mapbox map instance
- * @type {mapboxgl.Map}
- */
-let map
-
-/**
- * Position of the marker for the selected sensor
- * @type {import('vue').Ref<{x: number, y: number}>}
- */
+const view = ref(null)
+const map = ref(null)
+const projection = ref('EPSG:4326')
 const markerPosition = ref({ x: 0, y: 0 })
+const selectedSensorPosition = ref(null)
 
-/**
- * Computed property for the currently selected sensor
- * @type {import('vue').ComputedRef<import('@/types').Sensor | undefined>}
- */
-const selectedSensor = computed(() =>
-  sensors.value.find((s) => s.id === selectedSensorId.value)
-)
+const initialCenter = ref([-71.0892, 42.3398])
+const initialZoom = ref(18)
 
-onMounted(() => loadMapDraw())
+const mapboxToken =
+  'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
 
-/**
- * Adds an icon layer to the map for sensor markers
- */
-const addIconLayer = () => {
-  const ICON_MAPPING = {
-    marker: { x: 0, y: 0, width: 128, height: 128, mask: true },
+const mapboxUrl = computed(() => {
+  const style = mapType.value === 'satellite' ? 'satellite-v9' : 'streets-v11'
+  return `https://api.mapbox.com/styles/v1/mapbox/${style}/tiles/{z}/{x}/{y}@2x?access_token=${mapboxToken}`
+})
+
+const mapboxAttribution =
+  '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+
+function getIconUrl(sensor) {
+  const color =
+    sensor.status === 'Active'
+      ? 'green'
+      : sensor.status === 'Inactive'
+      ? 'red'
+      : 'yellow'
+  return `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`
+}
+
+function updateSensorOverlay(sensorId) {
+  const sensor = sensors.value.find((s) => s.id === sensorId)
+  if (sensor) {
+    selectedSensorPosition.value = sensor.coordinates
   }
+}
 
-  map.addLayer(
-    new MapboxLayer({
-      id: 'sensor-markers',
-      type: IconLayer,
-      data: sensors.value,
-      pickable: true,
-      iconAtlas:
-        'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-      iconMapping: ICON_MAPPING,
-      getIcon: () => 'marker',
-      getPosition: (d) => d.coordinates,
-      getSize: () => 40,
-      getColor: (d) =>
-        d.status === 'Active'
-          ? [0, 255, 0]
-          : d.status === 'Inactive'
-          ? [255, 0, 0]
-          : [255, 255, 0],
-      onClick: (info) => {
-        if (info.object) {
-          updateSelectedSensor(info.object.id)
-          updateClickPosition({ x: info.x, y: info.y })
-          updateMarkerPosition()
-        }
-      },
-    })
+function handleMapClick(event) {
+  const feature = event.map.forEachFeatureAtPixel(
+    event.pixel,
+    (feature) => feature
   )
-}
-
-/**
- * Initializes and loads the Mapbox map
- */
-const loadMapDraw = () => {
-  mapboxgl.accessToken = accessToken
-
-  map = new mapboxgl.Map({
-    container: 'main-container',
-    style: `mapbox://styles/mapbox/${mapType.value}-v9`,
-    center: [-71.0892, 42.3398], // Center of NEU campus
-    zoom: 15,
-    attributionControl: false,
-  })
-
-  map.on('load', () => {
-    addIconLayer()
-    map.on('move', updateMarkerPosition)
-  })
-}
-
-/**
- * Updates the position of the marker for the selected sensor
- */
-const updateMarkerPosition = () => {
-  if (selectedSensor.value && map) {
-    const pixelPosition = map.project(selectedSensor.value.coordinates)
-    markerPosition.value = {
-      x: pixelPosition.x,
-      y: pixelPosition.y,
+  if (feature) {
+    const sensorId = feature.get('id')
+    if (sensorId) {
+      updateSelectedSensor(sensorId)
+      const coordinate = feature.getGeometry().getCoordinates()
+      updateClickPosition({ x: coordinate[0], y: coordinate[1] })
+      selectedSensorPosition.value = coordinate
     }
+  } else {
+    sensorDetailStore.closeSensorInfo()
   }
 }
 
-watch(mapType, (newMapType) => {
-  if (map) {
-    map.setStyle(`mapbox://styles/mapbox/${newMapType}-v9`)
-    map.once('style.load', () => {
-      addIconLayer()
-    })
+function updateSelectedSensorOverlay(event) {
+  if (selectedSensorId.value && event.map) {
+    updateSensorOverlay(selectedSensorId.value)
+  }
+}
+
+watch(selectedSensorId, (newId) => {
+  if (newId) {
+    updateSensorOverlay(newId)
+    if (view.value) {
+      const sensor = sensors.value.find((s) => s.id === newId)
+      if (sensor) {
+        view.value.animate({
+          center: sensor.coordinates,
+          zoom: 18,
+          duration: 1000,
+        })
+      }
+    }
   }
 })
 
-watch(selectedSensorId, (newId) => {
-  if (newId && map) {
-    const sensor = sensors.value.find((s) => s.id === newId)
-    if (sensor) {
-      map.flyTo({
-        center: sensor.coordinates,
-        zoom: 17,
-        duration: 1000,
-      })
-
-      map.once('moveend', () => {
-        const center = map.getCenter()
-        updateMapCenter({ lng: center.lng, lat: center.lat })
-        updateMarkerPosition()
-      })
-    }
-  }
+onMounted(() => {
+  console.log('MapDashboard mounted')
 })
 </script>
 
-<style lang="postcss" scoped>
-#main-container {
+<style scoped>
+.map-container {
   width: 100%;
   min-height: 100vh;
   margin: 0;

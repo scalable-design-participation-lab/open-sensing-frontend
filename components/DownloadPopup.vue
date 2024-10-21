@@ -18,13 +18,13 @@
 <template>
   <Teleport to="body">
     <div
-      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+      class="fixed inset-0 bg-black bg-opacity-50 z-20 flex items-center justify-center"
       data-test="download-popup"
       @click="handleOutsideClick"
     >
       <GenericFilterSidebar
         :is-visible="true"
-        title="Download the Sensor Data"
+        title="Download Options"
         :filter-sections="filterSections"
         @close="$emit('close')"
         @filter-change="handleFilterChange"
@@ -32,7 +32,7 @@
       >
         <template #before-filters>
           <div class="mb-6">
-            <h3 class="text-lg text-gray-900 mb-2">File Format</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">File Format</h3>
             <div class="flex space-x-4">
               <URadio
                 v-model="fileFormat"
@@ -65,7 +65,7 @@
           <UButton
             color="blue"
             variant="solid"
-            class="!bg-black hover:animate-bounce"
+            class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
             @click="handleDownload"
             data-test="download-button"
           >
