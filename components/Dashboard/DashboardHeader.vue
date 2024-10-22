@@ -22,14 +22,8 @@
       <UBadge :color="badgeColor" size="sm">
         {{ badgeText }}
       </UBadge>
-      <UButton
-        icon="i-heroicons-x-mark"
-        color="gray"
-        variant="ghost"
-        size="sm"
-        @click="$emit('close')"
-        aria-label="Close dashboard"
-      />
+      <UButton icon="i-heroicons-x-mark" color="gray" variant="ghost" size="sm" @click="$emit('close')"
+        aria-label="Close dashboard" />
     </div>
   </div>
 </template>
