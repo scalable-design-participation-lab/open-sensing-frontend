@@ -17,6 +17,7 @@
       :load-tiles-while-animating="true"
       :load-tiles-while-interacting="true"
       style="width: 100%; height: 100vh"
+      :controls="[]"
       @click="handleMapClick"
       @moveend="updateSelectedSensorOverlay"
     >
