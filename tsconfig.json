@@ -2,6 +2,10 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "types": ["@types/node", "@types/tailwindcss"]
-  }
+    "types": ["@types/node"]
+  },
+  "include": [
+    // ... 其他包含的文件
+    "knexfile.js"
+  ]
 }

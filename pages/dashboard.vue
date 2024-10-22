@@ -8,7 +8,7 @@
       :left-items="leftItems"
       :right-items="rightItems"
       logo-src="/vector.svg"
-      logo-alt="NEU Logo"
+      logo-alt="Northeastern University Logo"
       :show-icon="true"
     />
 
@@ -56,6 +56,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useFilterStore } from '@/stores/filter'
@@ -80,6 +81,7 @@ const { toggleFilter, resetFilters } = filterStore
 // Map store
 const mapStore = useMapStore()
 const { setMapType } = mapStore
+const currentMapType = ref('satellite')
 
 // Sensor Detail store
 const sensorDetailStore = useSensorDetailStore()
@@ -97,6 +99,10 @@ const isLoading = ref(false)
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
 const showDownloadPopup = ref(false)
 const selectedDownloadFilters = ref({})
+
+// Routing
+const router = useRouter();
+const goHome = () => router.push('/');
 
 function updateDateRange(newRange) {
   selected.value = newRange
@@ -215,14 +221,14 @@ const resetAllFilters = () => {
 }
 
 const sensorTools = [
-  { icon: 'i-heroicons-home', tooltip: 'Home' },
-  { icon: 'i-heroicons-funnel', tooltip: 'Filter', action: toggleFilter },
+  { icon: 'i-heroicons-solid:home', tooltip: 'Home',  action: goHome },
+  { icon: 'i-heroicons-solid:filter', tooltip: 'Filter', action: toggleFilter },
   {
-    icon: 'i-heroicons-squares-2x2',
+    icon: 'i-heroicons-solid:squares-2x2',
     tooltip: 'Dashboard',
     action: toggleDashboard,
   },
-  { icon: 'i-heroicons-map-pin', tooltip: 'Location Info' },
+  { icon: 'i-heroicons-solid:location-marker', tooltip: 'Location Info' },
 ]
 
 const handleToolClick = (index: number) => {
@@ -280,6 +286,11 @@ const leftItems = ref([
     color: 'black',
     onClick: () => toggleDashboard(),
   },
+  {
+    label: 'Northeastern University',
+    variant: 'solid',
+    color: 'black',
+  },
 ])
 
 const mapItems = [
@@ -299,21 +310,29 @@ const mapItems = [
 
 const rightItems = ref([
   {
-    label: 'Map Selection',
-    icon: 'i-heroicons-map-20-solid',
-    variant: 'outline',
-    color: 'gray',
-    dropdown: {
-      items: mapItems,
-      popper: { placement: 'bottom-end' },
+    label: computed(() => 
+      currentMapType.value === 'light'
+        ? 'Satellite Map'
+        : 'Vector Map'
+  ),
+    icon: computed(() =>
+      currentMapType.value === 'light'
+        ? 'i-heroicons:globe-americas-20-solid'
+        : 'i-heroicons:map'
+    ),
+    onClick: () => {
+      currentMapType.value = currentMapType.value === 'light' ? 'satellite' : 'light';
+      setMapType(currentMapType.value);
     },
   },
   {
     label: 'Download',
     icon: 'i-heroicons-arrow-down-tray-20-solid',
-    variant: 'outline',
     color: 'gray',
     onClick: () => (showDownloadPopup.value = true),
+  },
+  {
+    label: '•••',
   },
 ])
 

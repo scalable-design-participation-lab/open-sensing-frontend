@@ -1,6 +1,5 @@
 import { defineEventHandler } from 'h3'
-import pg from 'pg'
-const { Pool } = pg
+import db from '../../utils/db'
 
 /**
  * API endpoint for retrieving aggregated sensor data
@@ -33,22 +32,10 @@ const { Pool } = pg
  * ]
  */
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-
-  const pool = new Pool({
-    user: config.dbUser,
-    host: config.dbHost,
-    database: config.dbName,
-    password: config.dbPassword,
-    port: config.dbPort,
-  })
-
   try {
-    console.log('Attempting to connect to database...')
-    const client = await pool.connect()
-    console.log('Connected to database. Executing query...')
+    console.log('Executing query...')
 
-    const query = `
+    const result = await db.raw(`
       SELECT 
         date_trunc('hour', timestamp) - 
           (EXTRACT(HOUR FROM timestamp)::integer % 2) * INTERVAL '1 hour' AS timestamp,
@@ -73,10 +60,8 @@ export default defineEventHandler(async (event) => {
       GROUP BY date_trunc('hour', timestamp) - 
         (EXTRACT(HOUR FROM timestamp)::integer % 2) * INTERVAL '1 hour'
       ORDER BY timestamp DESC
-    `
+    `)
 
-    const result = await client.query(query)
-    client.release()
     console.log(`Query executed. Returned ${result.rows.length} rows.`)
 
     return result.rows

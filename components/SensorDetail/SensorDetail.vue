@@ -12,7 +12,7 @@
       @click="closeSensorDetail"
     >
       <div
-        class="w-[54%] h-[73vh] bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
+        class="h-[80vh] bg-white rounded-lg overflow-hidden w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
         data-testid="sensor-detail-content"
         @click.stop
       >
