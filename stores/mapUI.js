@@ -15,6 +15,8 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const belongingSubwindow = ref(1)
   const safetySubwindow = ref(1)
   const environmentSubwindow = ref(1)
+  const showRegistration = ref(true)
+  const userData = ref(null)
 
   const colors = {
     'every day': '#FF0000',
@@ -214,6 +216,11 @@ export const useMapUIStore = defineStore('mapUI', () => {
     }
   }
 
+  function setUserData(data) {
+    userData.value = data
+    showRegistration.value = false
+  }
+
   return {
     drawEnable,
     drawType,
@@ -250,5 +257,8 @@ export const useMapUIStore = defineStore('mapUI', () => {
     belongingSubwindow,
     safetySubwindow,
     environmentSubwindow,
+    showRegistration,
+    userData,
+    setUserData,
   }
 })
