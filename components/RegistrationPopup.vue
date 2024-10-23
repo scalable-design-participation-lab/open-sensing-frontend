@@ -7,49 +7,57 @@
       <h3 class="text-lg font-bold">Registration</h3>
     </template>
     <p class="mb-4">
-      In order to participate in Restart-Ukraine, please register by answering
-      the following questions.
+      In order to participate in Restart-Ukraine, please answer the following
+      questions.
     </p>
     <UForm :state="formState" class="space-y-4" @submit="onSubmit">
-      <UFormGroup label="How old are you?" name="age">
+      <UFormGroup label="Last Name" name="lastname">
+        <UInput
+          v-model="formState.lastname"
+          placeholder="Enter your last name"
+        />
+      </UFormGroup>
+      <UFormGroup label="First Name" name="firstname">
+        <UInput
+          v-model="formState.firstname"
+          placeholder="Enter your first name"
+        />
+      </UFormGroup>
+      <UFormGroup label="Age" name="age">
         <UInput
           v-model="formState.age"
           type="number"
           placeholder="Enter your age"
         />
       </UFormGroup>
-      <UFormGroup label="Indicate your gender:" name="gender">
+      <UFormGroup label="Gender" name="gender">
         <USelect
           v-model="formState.gender"
           :options="genderOptions"
-          placeholder="Choose an answer"
+          placeholder="Choose your gender"
         />
       </UFormGroup>
-      <UFormGroup label="What's your education level?" name="educationLevel">
+      <UFormGroup label="Education Level" name="educationLevel">
         <USelect
           v-model="formState.educationLevel"
           :options="educationOptions"
-          placeholder="Choose an answer"
+          placeholder="Choose your education level"
         />
       </UFormGroup>
-      <UFormGroup
-        label="How long have you lived in the city?"
-        name="residentSince"
-      >
+      <UFormGroup label="Resident Since" name="residentSince">
         <USelect
           v-model="formState.residentSince"
           :options="residentOptions"
-          placeholder="Choose an answer"
+          placeholder="How long have you lived here?"
         />
       </UFormGroup>
       <UFormGroup
-        label="Do you live next to Tyazhylivka river?"
-        name="residentNearRiver"
+        label="Resident Near River Since"
+        name="residentNearRiverSince"
       >
-        <USelect
-          v-model="formState.residentNearRiver"
-          :options="yesNoOptions"
-          placeholder="Choose an answer"
+        <UInput
+          v-model="formState.residentNearRiverSince"
+          placeholder="Enter year (e.g. 2022)"
         />
       </UFormGroup>
       <UButton type="submit" color="primary" class="w-full">
@@ -72,6 +80,10 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
+import { useFirebaseAuth } from 'vuefire'
+import { signInAnonymously } from 'firebase/auth'
+import { useFirestore } from 'vuefire'
+import { collection, addDoc } from 'firebase/firestore'
 
 const props = defineProps({
   isVisible: Boolean,
@@ -80,13 +92,17 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 
 const mapUIStore = useMapUIStore()
+const auth = useFirebaseAuth()
+const db = useFirestore()
 
 const formState = reactive({
+  lastname: '',
+  firstname: '',
   age: '',
   gender: '',
   educationLevel: '',
   residentSince: '',
-  residentNearRiver: '',
+  residentNearRiverSince: '',
 })
 
 const genderOptions = [
@@ -109,15 +125,33 @@ const residentOptions = [
   { label: 'More than 10 years', value: 'more_than_10_years' },
 ]
 
-const yesNoOptions = [
-  { label: 'Yes', value: 'yes' },
-  { label: 'No', value: 'no' },
-]
+const onSubmit = async () => {
+  try {
+    // 创建匿名用户
+    const userCredential = await signInAnonymously(auth)
+    const user = userCredential.user
 
-const onSubmit = () => {
-  // Here you would typically send the form data to your backend or Firestore
-  console.log('Form submitted:', formState)
-  mapUIStore.setUserData(formState)
-  emit('close')
+    // 保存用户数据到 Firestore
+    const usersCollection = collection(db, 'users')
+    await addDoc(usersCollection, {
+      uid: user.uid,
+      name: {
+        lastname: formState.lastname,
+        firstname: formState.firstname,
+      },
+      age: parseInt(formState.age),
+      gender: formState.gender,
+      'education level': formState.educationLevel,
+      'resident since': formState.residentSince,
+      'resident near river since': formState.residentNearRiverSince,
+    })
+
+    console.log('User registered and data saved:', formState)
+    mapUIStore.setUserData(formState)
+    emit('close')
+  } catch (error) {
+    console.error('Error registering user:', error)
+    // 这里可以添加错误处理,比如显示错误消息给用户
+  }
 }
 </script>

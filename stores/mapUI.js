@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, reactive, computed } from 'vue'
+import { useFirebaseAuth } from 'vuefire'
+import { signOut } from 'firebase/auth'
 
 export const useMapUIStore = defineStore('mapUI', () => {
   const drawEnable = ref(true)
@@ -17,6 +19,8 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const environmentSubwindow = ref(1)
   const showRegistration = ref(true)
   const userData = ref(null)
+  const auth = useFirebaseAuth()
+  const currentUser = ref(null)
 
   const colors = {
     'every day': '#FF0000',
@@ -218,7 +222,19 @@ export const useMapUIStore = defineStore('mapUI', () => {
 
   function setUserData(data) {
     userData.value = data
+    currentUser.value = auth.currentUser
     showRegistration.value = false
+  }
+
+  async function logoutUser() {
+    try {
+      await signOut(auth)
+      currentUser.value = null
+      userData.value = null
+      showRegistration.value = true
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
   }
 
   return {
@@ -260,5 +276,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     showRegistration,
     userData,
     setUserData,
+    currentUser,
+    logoutUser,
   }
 })
