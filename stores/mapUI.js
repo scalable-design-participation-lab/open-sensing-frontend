@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, reactive, computed } from 'vue'
 import { useFirebaseAuth } from 'vuefire'
 import { signOut } from 'firebase/auth'
+import { useFirestore, useCollection } from 'vuefire'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore'
 
 export const useMapUIStore = defineStore('mapUI', () => {
   const drawEnable = ref(true)
@@ -40,6 +43,9 @@ export const useMapUIStore = defineStore('mapUI', () => {
     }
     return 'black'
   })
+
+  const db = useFirestore()
+  const projectsCollection = useCollection(collection(db, 'projects'))
 
   function activateDrawing(frequency) {
     currentFrequency.value = frequency
@@ -237,6 +243,156 @@ export const useMapUIStore = defineStore('mapUI', () => {
     }
   }
 
+  async function saveDataToDatabase() {
+    const db = getFirestore()
+    const projectsCollection = collection(db, 'projects')
+
+    const userId = currentUser.value?.uid || 'anonymous'
+    const timestamp = new Date().toISOString()
+
+    const projectData = {
+      userId: userId,
+      timestamp: timestamp,
+      space: {
+        visited: {
+          everyday: [],
+          everyweek: [],
+          sometimes: [],
+          once: [],
+          never: [],
+        },
+        recreational: [],
+        restricted: [],
+      },
+      belonging: {
+        negative: [],
+        love: [],
+        positive: [],
+      },
+      safety: {
+        safe: [],
+        unsafe: [],
+        great: [],
+      },
+      environment: {
+        pollution: [],
+        'flora-fauna': [],
+      },
+    }
+
+    features.forEach((feature) => {
+      if (feature.type === 'Point' && feature.frequency) {
+        const frequencyKey = getFrequencyKey(feature.frequency)
+        projectData.space.visited[frequencyKey].push({
+          lat: feature.coordinates[1],
+          lon: feature.coordinates[0],
+          timestamp: feature.timestamp || timestamp,
+          comment: feature.comment || '',
+        })
+      } else if (feature.type === 'Polygon') {
+        projectData.space.recreational.push({
+          geometry: feature.coordinates,
+          timestamp: feature.timestamp || timestamp,
+          comment: feature.comment || '',
+        })
+      } else if (feature.type === 'LineString') {
+        projectData.space.restricted.push({
+          geometry: feature.coordinates,
+          timestamp: feature.timestamp || timestamp,
+          comment: feature.comment || '',
+        })
+      }
+    })
+
+    features.forEach((feature) => {
+      if (feature.type === 'Point' && feature.iconName) {
+        const belongingKey = getBelongingKey(feature.iconName)
+        if (belongingKey) {
+          projectData.belonging[belongingKey].push({
+            lat: feature.coordinates[1],
+            lon: feature.coordinates[0],
+            timestamp: feature.timestamp || timestamp,
+            comment: feature.comment || '',
+          })
+        }
+      }
+    })
+
+    features.forEach((feature) => {
+      if (feature.type === 'Point' && feature.iconName) {
+        const safetyKey = getSafetyKey(feature.iconName)
+        if (safetyKey) {
+          projectData.safety[safetyKey].push({
+            lat: feature.coordinates[1],
+            lon: feature.coordinates[0],
+            timestamp: feature.timestamp || timestamp,
+            comment: feature.comment || '',
+          })
+        }
+      }
+    })
+
+    features.forEach((feature) => {
+      if (feature.type === 'Point' && feature.iconName) {
+        const environmentKey = getEnvironmentKey(feature.iconName)
+        if (environmentKey) {
+          projectData.environment[environmentKey].push({
+            lat: feature.coordinates[1],
+            lon: feature.coordinates[0],
+            timestamp: feature.timestamp || timestamp,
+            comment: feature.comment || '',
+          })
+        }
+      }
+    })
+
+    try {
+      await addDoc(projectsCollection, projectData)
+      console.log('Data saved to database successfully')
+      features.length = 0
+    } catch (error) {
+      console.error('Error saving data to database:', error)
+      throw error
+    }
+  }
+
+  function getFrequencyKey(frequency) {
+    const frequencyMap = {
+      'every day': 'everyday',
+      'every week': 'everyweek',
+      sometimes: 'sometimes',
+      'only once': 'once',
+      never: 'never',
+    }
+    return frequencyMap[frequency] || 'sometimes'
+  }
+
+  function getBelongingKey(iconName) {
+    const belongingMap = {
+      dislike: 'negative',
+      heart: 'love',
+      smile: 'positive',
+    }
+    return belongingMap[iconName]
+  }
+
+  function getSafetyKey(iconName) {
+    const safetyMap = {
+      broken: 'unsafe',
+      calm: 'safe',
+      lock: 'great',
+    }
+    return safetyMap[iconName]
+  }
+
+  function getEnvironmentKey(iconName) {
+    const environmentMap = {
+      pollution: 'pollution',
+      leaf: 'flora-fauna',
+    }
+    return environmentMap[iconName]
+  }
+
   return {
     drawEnable,
     drawType,
@@ -278,5 +434,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
     setUserData,
     currentUser,
     logoutUser,
+    saveDataToDatabase,
   }
 })

@@ -71,6 +71,16 @@
           </SubWindow>
         </template>
       </UAccordion>
+
+      <UButton
+        class="mt-4 w-full"
+        color="primary"
+        :loading="isSaving"
+        :disabled="isSaving"
+        @click="saveData"
+      >
+        {{ isSaving ? 'Saving...' : 'Add to Database' }}
+      </UButton>
     </UCard>
   </div>
 </template>
@@ -297,5 +307,40 @@ function prevEnvironmentSubwindow() {
 function selectEnvironmentIcon(iconName: string) {
   console.log('Selected environment icon:', iconName)
   mapUIStore.activateEnvironmentDrawing(iconName)
+}
+
+// 修改 saveData 方法
+const isSaving = ref(false)
+const showNotification = ref(false)
+const notificationColor = ref('green')
+const notificationTitle = ref('')
+const notificationText = ref('')
+const notificationId = ref('save-notification')
+
+async function saveData() {
+  isSaving.value = true
+  try {
+    await mapUIStore.saveDataToDatabase()
+    showSuccessNotification('Data saved successfully')
+  } catch (error) {
+    console.error('Error saving data to database:', error)
+    showErrorNotification('Failed to save data')
+  } finally {
+    isSaving.value = false
+  }
+}
+
+function showSuccessNotification(message: string) {
+  notificationColor.value = 'green'
+  notificationTitle.value = 'Success'
+  notificationText.value = message
+  showNotification.value = true
+}
+
+function showErrorNotification(message: string) {
+  notificationColor.value = 'red'
+  notificationTitle.value = 'Error'
+  notificationText.value = message
+  showNotification.value = true
 }
 </script>
