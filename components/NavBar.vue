@@ -73,13 +73,14 @@
       </UAccordion>
 
       <UButton
+        v-if="showSubmitButton"
         class="mt-4 w-full"
         color="primary"
         :loading="isSaving"
         :disabled="isSaving"
         @click="saveData"
       >
-        {{ isSaving ? 'Saving...' : 'Add to Database' }}
+        {{ isSaving ? 'Submitting...' : 'Submit' }}
       </UButton>
     </UCard>
   </div>
@@ -270,6 +271,10 @@ const leafIconGrid = computed(() => ({
   onSelect: selectEnvironmentIcon,
 }))
 
+const showSubmitButton = computed(() => {
+  return environmentSubwindow.value === 2
+})
+
 function nextBelongingSubwindow() {
   mapUIStore.nextBelongingSubwindow()
 }
@@ -309,7 +314,6 @@ function selectEnvironmentIcon(iconName: string) {
   mapUIStore.activateEnvironmentDrawing(iconName)
 }
 
-// 修改 saveData 方法
 const isSaving = ref(false)
 const showNotification = ref(false)
 const notificationColor = ref('green')
@@ -321,10 +325,11 @@ async function saveData() {
   isSaving.value = true
   try {
     await mapUIStore.saveDataToDatabase()
-    showSuccessNotification('Data saved successfully')
+    showSuccessNotification('Data submitted successfully')
+    mapUIStore.resetAllSubwindows()
   } catch (error) {
-    console.error('Error saving data to database:', error)
-    showErrorNotification('Failed to save data')
+    console.error('Error submitting data to database:', error)
+    showErrorNotification('Failed to submit data')
   } finally {
     isSaving.value = false
   }

@@ -291,13 +291,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
         })
       } else if (feature.type === 'Polygon') {
         projectData.space.recreational.push({
-          geometry: feature.coordinates,
+          geometry: JSON.stringify(feature.coordinates),
           timestamp: feature.timestamp || timestamp,
           comment: feature.comment || '',
         })
       } else if (feature.type === 'LineString') {
         projectData.space.restricted.push({
-          geometry: feature.coordinates,
+          geometry: JSON.stringify(feature.coordinates),
           timestamp: feature.timestamp || timestamp,
           comment: feature.comment || '',
         })
@@ -393,6 +393,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
     return environmentMap[iconName]
   }
 
+  function resetAllSubwindows() {
+    spaceSubwindow.value = 1
+    belongingSubwindow.value = 1
+    safetySubwindow.value = 1
+    environmentSubwindow.value = 1
+  }
+
   return {
     drawEnable,
     drawType,
@@ -435,5 +442,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
     currentUser,
     logoutUser,
     saveDataToDatabase,
+    resetAllSubwindows,
   }
 })
