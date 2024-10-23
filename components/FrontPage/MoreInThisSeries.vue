@@ -11,7 +11,7 @@
 
 <template>
   <section>
-    <h2 class="text-2xl font-medium text-black dark:text-white mb-5">
+    <h2 class="text-2xl text-black dark:text-white mb-5">
       More in this series
     </h2>
     <ULandingGrid :cols="cols" :gap="5">

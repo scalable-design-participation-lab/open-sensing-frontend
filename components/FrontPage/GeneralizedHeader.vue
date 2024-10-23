@@ -34,6 +34,7 @@
       </UButton>
       <template v-for="(item, index) in leftItems" :key="index">
         <NuxtLink v-if="item.to" v-slot="{ navigate }" :to="item.to" custom>
+
           <UButton :variant="item.variant" :color="item.color || (item.primary ? 'black' : 'gray')" :icon="item.icon"
             :class="[
               `h-full px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
@@ -134,7 +135,7 @@ const props = defineProps({
 /**
  * Computed property to determine the shape class
  * @type {import('vue').ComputedRef<string>}
- */
+ 
 const shapeClass = computed(() => {
   switch (props.shape) {
     case 'rectangular':
@@ -144,4 +145,5 @@ const shapeClass = computed(() => {
       return 'rounded-full'
   }
 })
+*/
 </script>

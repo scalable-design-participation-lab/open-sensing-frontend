@@ -23,23 +23,57 @@
       ref="miniMap"
       class="w-full h-72 rounded-lg overflow-hidden shadow-md"
       data-testid="mini-map"
-    ></div>
+    >
+      <ol-map
+        :load-tiles-while-animating="true"
+        :load-tiles-while-interacting="true"
+        style="width: 100%; height: 100%"
+      >
+        <ol-view
+          :center="selectedSensor.coordinates"
+          :zoom="15"
+          :projection="projection"
+        />
+
+        <ol-tile-layer>
+          <ol-source-xyz
+            :url="mapboxUrl"
+            :attributions="mapboxAttribution"
+            :max-zoom="19"
+            :tile-size="512"
+            :tile-pixel-ratio="2"
+          />
+        </ol-tile-layer>
+
+        <ol-vector-layer>
+          <ol-source-vector>
+            <ol-feature>
+              <ol-geom-point :coordinates="selectedSensor.coordinates" />
+              <ol-style>
+                <ol-style-icon
+                  src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png"
+                  :scale="0.5"
+                  :anchor="[0.5, 1]"
+                />
+              </ol-style>
+            </ol-feature>
+          </ol-source-vector>
+        </ol-vector-layer>
+
+        <ol-control-defaults />
+        <ol-control-scale-line />
+        <ol-control-full-screen />
+      </ol-map>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import { ref, computed } from 'vue'
+import { useGeographic } from 'ol/proj'
 
-/**
- * @typedef {Object} Sensor
- * @property {[number, number]} coordinates - The [longitude, latitude] coordinates of the sensor
- */
+useGeographic()
 
-/**
- * @type {import('vue').PropType<Sensor>}
- */
 const props = defineProps({
   selectedSensor: {
     type: Object,
@@ -47,82 +81,15 @@ const props = defineProps({
   },
 })
 
-/**
- * Reference to the mini map container element
- * @type {import('vue').Ref<HTMLElement | null>}
- */
-const miniMap = ref(null)
+const projection = ref('EPSG:4326')
 
-/**
- * Mapbox GL map instance
- * @type {mapboxgl.Map | null}
- */
-let map = null
+const mapboxToken =
+  'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
 
-/**
- * Initializes the mini map with Mapbox GL
- * @method
- */
-const initMiniMap = () => {
-  mapboxgl.accessToken =
-    'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
-
-  map = new mapboxgl.Map({
-    container: 'mini-map',
-    style: 'mapbox://styles/mapbox/satellite-v9',
-    center: props.selectedSensor.coordinates,
-    zoom: 15,
-    attributionControl: false,
-  })
-
-  map.addControl(new mapboxgl.NavigationControl(), 'top-right')
-  map.addControl(new mapboxgl.ScaleControl(), 'bottom-right')
-
-  const marker = new mapboxgl.Marker({
-    color: '#FF0000',
-  })
-    .setLngLat(props.selectedSensor.coordinates)
-    .addTo(map)
-
-  map.on('style.load', () => {
-    map.setPitch(45)
-    map.setBearing(20)
-  })
-
-  map.on('dblclick', () => {
-    map.flyTo({
-      center: props.selectedSensor.coordinates,
-      zoom: 15,
-      pitch: 45,
-      bearing: 20,
-    })
-  })
-}
-
-/**
- * Lifecycle hook to initialize the map when the component is mounted
- * @see https://vuejs.org/api/composition-api-lifecycle.html#onmounted
- */
-onMounted(() => {
-  initMiniMap()
+const mapboxUrl = computed(() => {
+  return `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}@2x?access_token=${mapboxToken}`
 })
 
-/**
- * Watch for changes in the selected sensor and update the map view
- * @see https://vuejs.org/api/reactivity-core.html#watch
- */
-watch(
-  () => props.selectedSensor,
-  (newSensor) => {
-    if (map) {
-      map.flyTo({
-        center: newSensor.coordinates,
-        zoom: 15,
-        pitch: 45,
-        bearing: 20,
-      })
-    }
-  },
-  { deep: true }
-)
+const mapboxAttribution =
+  '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 </script>
