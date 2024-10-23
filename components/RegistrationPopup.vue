@@ -1,26 +1,34 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="w-96 z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+    class="w-[600px] z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-4 border-red-500 rounded-3xl bg-white shadow-xl"
   >
     <template #header>
-      <h3 class="text-lg font-bold">Registration</h3>
+      <h3 class="text-2xl font-bold text-center mb-4">Registration</h3>
     </template>
     <p class="mb-4">
       In order to participate in Restart-Ukraine, please answer the following
       questions.
     </p>
-    <UForm :state="formState" class="space-y-4" @submit="onSubmit">
+    <UForm :state="formState" class="space-y-4 px-8" @submit="onSubmit">
       <UFormGroup label="Last Name" name="lastname">
         <UInput
           v-model="formState.lastname"
           placeholder="Enter your last name"
+          color="yellow"
+          variant="outline"
+          size="lg"
+          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="First Name" name="firstname">
         <UInput
           v-model="formState.firstname"
           placeholder="Enter your first name"
+          color="yellow"
+          variant="outline"
+          size="lg"
+          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Age" name="age">
@@ -28,6 +36,10 @@
           v-model="formState.age"
           type="number"
           placeholder="Enter your age"
+          color="yellow"
+          variant="outline"
+          size="lg"
+          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Gender" name="gender">
@@ -35,6 +47,10 @@
           v-model="formState.gender"
           :options="genderOptions"
           placeholder="Choose your gender"
+          color="yellow"
+          variant="outline"
+          size="lg"
+          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Education Level" name="educationLevel">
@@ -42,6 +58,10 @@
           v-model="formState.educationLevel"
           :options="educationOptions"
           placeholder="Choose your education level"
+          color="yellow"
+          variant="outline"
+          size="lg"
+          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Resident Since" name="residentSince">
@@ -49,6 +69,10 @@
           v-model="formState.residentSince"
           :options="residentOptions"
           placeholder="How long have you lived here?"
+          color="yellow"
+          variant="outline"
+          size="lg"
+          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup
@@ -58,14 +82,24 @@
         <UInput
           v-model="formState.residentNearRiverSince"
           placeholder="Enter year (e.g. 2022)"
+          color="yellow"
+          variant="outline"
+          size="lg"
+          class="rounded-full"
         />
       </UFormGroup>
-      <UButton type="submit" color="primary" class="w-full">
-        Go to the map
-      </UButton>
+
+      <div class="flex justify-center mt-8 mb-4">
+        <UButton
+          type="submit"
+          class="rounded-full bg-sky-400 hover:bg-sky-500 text-white px-8 py-2 text-lg"
+        >
+          go to the map
+        </UButton>
+      </div>
     </UForm>
     <template #footer>
-      <p class="text-xs text-gray-500">
+      <p class="text-xs text-gray-500 px-8 py-4 text-justify">
         By participating in this survey, you consent to the collection and use
         of your responses for research purposes. Your personal data will remain
         confidential and will not be shared with third parties without your
