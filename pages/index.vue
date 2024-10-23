@@ -9,7 +9,6 @@ const leftItems = ref([
     label: 'Drawing Participation',
     variant: 'solid',
     color: 'black',
-    onClick: () => toggleDashboard(),
   },
   {
     label: 'Restart Ukraine',
@@ -19,15 +18,11 @@ const leftItems = ref([
 ])
 
 const isMapBlurred = computed(() => mapUIStore.showRegistration)
-
-const toggleDashboard = () => {
-  // 实现切换仪表板的逻辑
-}
 </script>
 
 <template>
   <div class="relative">
-    <NavBar />
+    <NavBar class="z-30" />
     <BackgroundMap :class="{ 'filter blur-md': isMapBlurred }" />
     <GeneralizedHeader
       class="z-20"
@@ -48,7 +43,6 @@ const toggleDashboard = () => {
     ></div>
   </div>
 </template>
-
 <style scoped>
 .blur-md {
   filter: blur(8px);

@@ -7,8 +7,8 @@
   >
     <ol-view
       ref="view"
-      :center="[28.48097, 49.23278]"
-      :zoom="18"
+      :center="[28.476908, 49.249253]"
+      :zoom="17.68"
       :projection="projection"
     />
 
