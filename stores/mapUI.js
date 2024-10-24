@@ -192,7 +192,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
       id: Date.now(),
       ...feature,
       comment: '',
-      frequency: feature.type === 'Point' ? currentFrequency.value : null,
+      frequency: feature.frequency || null,
     })
     drawEnable.value = false
   }
@@ -254,13 +254,12 @@ export const useMapUIStore = defineStore('mapUI', () => {
       userId: userId,
       timestamp: timestamp,
       space: {
-        visited: {
-          everyday: [],
-          everyweek: [],
-          sometimes: [],
-          once: [],
-          never: [],
-        },
+        // Removed visited property definition
+        everyday: [],
+        everyweek: [],
+        sometimes: [],
+        once: [],
+        never: [],
         recreational: [],
         restricted: [],
       },
@@ -283,7 +282,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     features.forEach((feature) => {
       if (feature.type === 'Point' && feature.frequency) {
         const frequencyKey = getFrequencyKey(feature.frequency)
-        projectData.space.visited[frequencyKey].push({
+        projectData.space[frequencyKey].push({
           lat: feature.coordinates[1],
           lon: feature.coordinates[0],
           timestamp: feature.timestamp || timestamp,

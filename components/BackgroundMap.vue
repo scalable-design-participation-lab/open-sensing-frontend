@@ -25,6 +25,7 @@
 
     <DrawingLayer
       :projection="projection"
+      :show-all-plus-icons="showAllPlusIcons"
       @toggle-comment-popup="toggleCommentPopup"
       @toggle-image-upload-popup="toggleImageUploadPopup"
     />
@@ -65,6 +66,13 @@ import { useRuntimeConfig } from '#app'
 import DrawingLayer from './DrawingLayer/DrawingLayer.vue'
 import CommentPopup from './CommentPopup.vue'
 import ImageUploadPopup from './ImageUploadPopup.vue'
+
+const props = defineProps({
+  showAllPlusIcons: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const mapUIStore = useMapUIStore()
 const config = useRuntimeConfig()

@@ -46,6 +46,13 @@
 import { computed } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
 
+const props = defineProps({
+  showAllPlusIcons: {
+    type: Boolean,
+    default: false,
+  },
+})
+
 const emit = defineEmits(['toggle-comment-popup'])
 
 const mapUIStore = useMapUIStore()
@@ -55,6 +62,12 @@ const polygonFeatures = computed(() =>
 )
 
 const visiblePolygonFeatures = computed(() => {
+  // Show all plus-icons if the flag is true
+  if (props.showAllPlusIcons) {
+    return polygonFeatures.value
+  }
+
+  // Original logic for showing plus-icons
   const spaceSubwindow = mapUIStore.spaceSubwindow
   return spaceSubwindow === 3 ? polygonFeatures.value : []
 })

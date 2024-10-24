@@ -24,11 +24,15 @@
       <IconLayer
         :features="pointFeatures"
         :get-icon-for-feature="getIconForFeature"
+        :show-all-plus-icons="showAllPlusIcons"
         @toggle-comment-popup="toggleCommentPopup"
         @toggle-image-upload-popup="toggleImageUploadPopup"
       />
 
-      <PolygonLayer @toggle-comment-popup="toggleCommentPopup" />
+      <PolygonLayer
+        :show-all-plus-icons="showAllPlusIcons"
+        @toggle-comment-popup="toggleCommentPopup"
+      />
       <LineStringLayer @toggle-comment-popup="toggleCommentPopup" />
     </ol-source-vector>
   </ol-vector-layer>
@@ -59,6 +63,10 @@ const props = defineProps({
   projection: {
     type: String,
     required: true,
+  },
+  showAllPlusIcons: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -107,18 +115,25 @@ function getIconForFeature(feature) {
       case 'pollution':
         return pollutionIcon
       case 'leaf':
+      case 'flora-fauna':
         return leafIcon
       case 'lock':
+      case 'great':
         return lockIcon
       case 'calm':
+      case 'safe':
         return calmIcon
       case 'broken':
+      case 'unsafe':
         return brokenIcon
       case 'dislike':
+      case 'negative':
         return dislikeIcon
       case 'heart':
+      case 'love':
         return heartIcon
       case 'smile':
+      case 'positive':
         return smileIcon
       default:
         return getIconForPoint(feature)
@@ -128,14 +143,18 @@ function getIconForFeature(feature) {
 }
 
 function getIconForPoint(feature) {
+  console.log(feature)
   switch (feature.frequency) {
     case 'every day':
+    case 'everyday':
       return blueIcon
     case 'every week':
+    case 'everyweek':
       return greenIcon
     case 'sometimes':
       return purpleIcon
     case 'only once':
+    case 'once':
       return yellowIcon
     case 'never':
       return redIcon

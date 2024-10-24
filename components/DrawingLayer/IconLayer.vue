@@ -39,6 +39,10 @@ const props = defineProps({
     type: Function,
     required: true,
   },
+  showAllPlusIcons: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['toggle-comment-popup', 'toggle-image-upload-popup'])
@@ -46,6 +50,10 @@ const emit = defineEmits(['toggle-comment-popup', 'toggle-image-upload-popup'])
 const mapUIStore = useMapUIStore()
 
 function shouldShowPlusIcon(feature) {
+  if (props.showAllPlusIcons) {
+    return true
+  }
+
   const spaceSubwindow = mapUIStore.spaceSubwindow
   const belongingSubwindow = mapUIStore.belongingSubwindow
   const safetySubwindow = mapUIStore.safetySubwindow
