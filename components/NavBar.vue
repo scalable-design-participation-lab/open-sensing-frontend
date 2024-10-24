@@ -135,27 +135,27 @@ const spaceContent = computed(() => {
       buttonGroup: [
         {
           text: 'every day',
-          color: 'red',
+          color: 'blue', // Updated color
           action: () => mapUIStore.activateDrawing('every day'),
         },
         {
           text: 'every week',
-          color: 'green',
+          color: 'green', // Updated color
           action: () => mapUIStore.activateDrawing('every week'),
         },
         {
           text: 'sometimes',
-          color: 'blue',
+          color: 'purple', // Updated color
           action: () => mapUIStore.activateDrawing('sometimes'),
         },
         {
           text: 'only once',
-          color: 'yellow',
+          color: 'yellow', // Updated color
           action: () => mapUIStore.activateDrawing('only once'),
         },
         {
           text: 'never',
-          color: 'purple',
+          color: 'red', // Updated color
           action: () => mapUIStore.activateDrawing('never'),
         },
       ],

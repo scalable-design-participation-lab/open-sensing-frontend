@@ -130,15 +130,15 @@ function getIconForFeature(feature) {
 function getIconForPoint(feature) {
   switch (feature.frequency) {
     case 'every day':
-      return redIcon
+      return blueIcon
     case 'every week':
       return greenIcon
     case 'sometimes':
-      return blueIcon
+      return purpleIcon
     case 'only once':
       return yellowIcon
     case 'never':
-      return purpleIcon
+      return redIcon
     default:
       return redIcon
   }

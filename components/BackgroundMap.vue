@@ -10,6 +10,7 @@
       :center="[28.476908, 49.249253]"
       :zoom="17.68"
       :projection="projection"
+      :rotation="0"
     />
 
     <ol-tile-layer>
