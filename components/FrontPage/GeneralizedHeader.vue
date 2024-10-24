@@ -17,10 +17,8 @@
  * />
  -->
 
- <template>
-  <header
-    class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between z-40"
-  >
+<template>
+  <header class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between">
     <div class="h-full flex space-x-2 sm:space-x-3">
       <UButton
         v-if="logoSrc"
@@ -29,11 +27,7 @@
           shapeClass,
         ]"
       >
-        <img
-          :src="logoSrc"
-          :alt="logoAlt"
-          class="w-full h-auto"
-        />
+        <img :src="logoSrc" :alt="logoAlt" class="w-full h-auto" />
       </UButton>
       <UButton
         v-if="showIcon"
@@ -69,9 +63,7 @@
           :icon="item.icon"
           :class="[
             `h-full px-3 sm:px-4 rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-md hover:animate-pulse`,
-            item.primary
-              ? '!bg-white text-black'
-              : '!bg-black text-white',
+            item.primary ? '!bg-white text-black' : '!bg-black text-white',
             shapeClass,
           ]"
           @click="item.onClick"

@@ -131,3 +131,5 @@ dist
 
 # Mac files
 .DS_Store
+
+service-account.json

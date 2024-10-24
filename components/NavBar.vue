@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed right-6 top-6 w-80 z-50 bg-white dark:bg-gray-800 rounded-lg overflow-hidden"
+    class="fixed right-6 top-6 w-80 z-40 bg-white dark:bg-gray-800 rounded-lg overflow-hidden"
   >
     <UCard>
       <UAccordion
@@ -71,6 +71,17 @@
           </SubWindow>
         </template>
       </UAccordion>
+
+      <UButton
+        v-if="showSubmitButton"
+        class="mt-4 w-full"
+        color="primary"
+        :loading="isSaving"
+        :disabled="isSaving"
+        @click="saveData"
+      >
+        {{ isSaving ? 'Submitting...' : 'Submit' }}
+      </UButton>
     </UCard>
   </div>
 </template>
@@ -260,6 +271,10 @@ const leafIconGrid = computed(() => ({
   onSelect: selectEnvironmentIcon,
 }))
 
+const showSubmitButton = computed(() => {
+  return environmentSubwindow.value === 2
+})
+
 function nextBelongingSubwindow() {
   mapUIStore.nextBelongingSubwindow()
 }
@@ -297,5 +312,40 @@ function prevEnvironmentSubwindow() {
 function selectEnvironmentIcon(iconName: string) {
   console.log('Selected environment icon:', iconName)
   mapUIStore.activateEnvironmentDrawing(iconName)
+}
+
+const isSaving = ref(false)
+const showNotification = ref(false)
+const notificationColor = ref('green')
+const notificationTitle = ref('')
+const notificationText = ref('')
+const notificationId = ref('save-notification')
+
+async function saveData() {
+  isSaving.value = true
+  try {
+    await mapUIStore.saveDataToDatabase()
+    showSuccessNotification('Data submitted successfully')
+    mapUIStore.resetAllSubwindows()
+  } catch (error) {
+    console.error('Error submitting data to database:', error)
+    showErrorNotification('Failed to submit data')
+  } finally {
+    isSaving.value = false
+  }
+}
+
+function showSuccessNotification(message: string) {
+  notificationColor.value = 'green'
+  notificationTitle.value = 'Success'
+  notificationText.value = message
+  showNotification.value = true
+}
+
+function showErrorNotification(message: string) {
+  notificationColor.value = 'red'
+  notificationTitle.value = 'Error'
+  notificationText.value = message
+  showNotification.value = true
 }
 </script>

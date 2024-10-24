@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import NavBar from '../components/NavBar.vue'
-import BackgroundMap from '../components/BackgroundMap.vue'
-import GeneralizedHeader from '../components/FrontPage/GeneralizedHeader.vue'
-import GeneralizedFooter from '../components/FrontPage/GeneralizedFooter.vue'
+import { ref, computed } from 'vue'
+import { useMapUIStore } from '../stores/mapUI'
+
+const mapUIStore = useMapUIStore()
 
 const leftItems = ref([
   {
     label: 'Drawing Participation',
     variant: 'solid',
     color: 'black',
-    onClick: () => toggleDashboard(),
   },
   {
     label: 'Restart Ukraine',
@@ -17,20 +16,35 @@ const leftItems = ref([
     color: 'black',
   },
 ])
+
+const isMapBlurred = computed(() => mapUIStore.showRegistration)
 </script>
 
 <template>
-  <div>
-    <NavBar />
-    <BackgroundMap />
+  <div class="relative">
+    <NavBar class="z-30" />
+    <BackgroundMap :class="{ 'filter blur-md': isMapBlurred }" />
     <GeneralizedHeader
       class="z-20"
       :left-items="leftItems"
-      :right-items="rightItems"
       logo-src="/neu-logo.svg"
       logo-alt="Northeastern University Logo"
       :show-icon="true"
     />
     <GeneralizedFooter />
+    <RegistrationPopup
+      :is-visible="mapUIStore.showRegistration"
+      @close="mapUIStore.showRegistration = false"
+    />
+    <div
+      v-if="isMapBlurred"
+      class="absolute inset-0 bg-black bg-opacity-50 z-40"
+      @click.self="mapUIStore.showRegistration = true"
+    ></div>
   </div>
 </template>
+<style scoped>
+.blur-md {
+  filter: blur(8px);
+}
+</style>
