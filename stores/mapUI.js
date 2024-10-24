@@ -349,7 +349,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
     try {
       await addDoc(projectsCollection, projectData)
       console.log('Data saved to database successfully')
-      features.length = 0
     } catch (error) {
       console.error('Error saving data to database:', error)
       throw error

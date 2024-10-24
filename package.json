@@ -60,6 +60,7 @@
     "ol-ext": "^4.0.23",
     "parcoord-es": "^2.2.10",
     "pinia": "^2.1.7",
+    "tailwind-scrollbar": "^3.1.0",
     "turf": "^3.0.14",
     "v-calendar": "^3.1.2",
     "vue-chart-3": "^3.1.8",
