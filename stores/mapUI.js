@@ -60,6 +60,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   function handleDrawEnd(event) {
     const feature = event.feature
     const geometryType = feature.getGeometry().getType()
+    const timestamp = new Date().toISOString()
 
     if (geometryType === 'Point') {
       const coordinates = feature.getGeometry().getCoordinates()
@@ -73,6 +74,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
           currentEnvironmentIcon.value,
         frequency: currentFrequency.value,
         comment: '',
+        name: userData.value
+          ? {
+              firstname: userData.value.firstname,
+              lastname: userData.value.lastname,
+            }
+          : null,
+        timestamp: timestamp,
       })
     } else if (geometryType === 'LineString') {
       const coordinates = feature.getGeometry().getCoordinates()
@@ -81,6 +89,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
         type: 'LineString',
         coordinates: coordinates,
         comment: '',
+        name: userData.value
+          ? {
+              firstname: userData.value.firstname,
+              lastname: userData.value.lastname,
+            }
+          : null,
+        timestamp: timestamp,
       })
     } else if (geometryType === 'Polygon') {
       const coordinates = feature.getGeometry().getCoordinates()
@@ -89,6 +104,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
         type: 'Polygon',
         coordinates: coordinates,
         comment: '',
+        name: userData.value
+          ? {
+              firstname: userData.value.firstname,
+              lastname: userData.value.lastname,
+            }
+          : null,
+        timestamp: timestamp,
       })
     }
 
@@ -191,8 +213,10 @@ export const useMapUIStore = defineStore('mapUI', () => {
     features.push({
       id: Date.now(),
       ...feature,
-      comment: '',
+      comment: feature.comment || '',
       frequency: feature.frequency || null,
+      name: feature.name || null,
+      timestamp: feature.timestamp || new Date().toISOString(),
     })
     drawEnable.value = false
   }
@@ -252,9 +276,14 @@ export const useMapUIStore = defineStore('mapUI', () => {
 
     const projectData = {
       userId: userId,
+      name: userData.value
+        ? {
+            lastname: userData.value.lastname,
+            firstname: userData.value.firstname,
+          }
+        : null,
       timestamp: timestamp,
       space: {
-        // Removed visited property definition
         everyday: [],
         everyweek: [],
         sometimes: [],

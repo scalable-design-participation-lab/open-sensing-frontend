@@ -18,69 +18,94 @@ onMounted(async () => {
   querySnapshot.forEach((doc) => {
     const projectData = doc.data()
 
+    // Process space data
     Object.keys(projectData.space).forEach((frequency) => {
-      projectData.space[frequency].forEach((point) => {
-        mapUIStore.addFeature({
-          type: 'Point',
-          coordinates: [point.lon, point.lat],
-          frequency: frequency,
-          comment: point.comment,
+      if (Array.isArray(projectData.space[frequency])) {
+        projectData.space[frequency].forEach((point) => {
+          mapUIStore.addFeature({
+            type: 'Point',
+            coordinates: [point.lon, point.lat],
+            frequency: frequency,
+            comment: point.comment,
+            name: projectData.name,
+            timestamp: point.timestamp,
+          })
         })
-      })
+      }
     })
 
     // Process space.recreational data
-    projectData.space.recreational.forEach((polygon) => {
-      mapUIStore.addFeature({
-        type: 'Polygon',
-        coordinates: JSON.parse(polygon.geometry),
-        comment: polygon.comment,
+    if (Array.isArray(projectData.space.recreational)) {
+      projectData.space.recreational.forEach((polygon) => {
+        mapUIStore.addFeature({
+          type: 'Polygon',
+          coordinates: JSON.parse(polygon.geometry),
+          comment: polygon.comment,
+          name: projectData.name,
+          timestamp: polygon.timestamp,
+        })
       })
-    })
+    }
 
     // Process space.restricted data
-    projectData.space.restricted.forEach((lineString) => {
-      mapUIStore.addFeature({
-        type: 'LineString',
-        coordinates: JSON.parse(lineString.geometry),
-        comment: lineString.comment,
+    if (Array.isArray(projectData.space.restricted)) {
+      projectData.space.restricted.forEach((lineString) => {
+        mapUIStore.addFeature({
+          type: 'LineString',
+          coordinates: JSON.parse(lineString.geometry),
+          comment: lineString.comment,
+          name: projectData.name,
+          timestamp: lineString.timestamp,
+        })
       })
-    })
+    }
 
     // Process belonging data
     Object.keys(projectData.belonging).forEach((key) => {
-      projectData.belonging[key].forEach((point) => {
-        mapUIStore.addFeature({
-          type: 'Point',
-          coordinates: [point.lon, point.lat],
-          iconName: key,
-          comment: point.comment,
+      if (Array.isArray(projectData.belonging[key])) {
+        projectData.belonging[key].forEach((point) => {
+          mapUIStore.addFeature({
+            type: 'Point',
+            coordinates: [point.lon, point.lat],
+            iconName: key,
+            comment: point.comment,
+            name: projectData.name,
+            timestamp: point.timestamp,
+          })
         })
-      })
+      }
     })
 
     // Process safety data
     Object.keys(projectData.safety).forEach((key) => {
-      projectData.safety[key].forEach((point) => {
-        mapUIStore.addFeature({
-          type: 'Point',
-          coordinates: [point.lon, point.lat],
-          iconName: key,
-          comment: point.comment,
+      if (Array.isArray(projectData.safety[key])) {
+        projectData.safety[key].forEach((point) => {
+          mapUIStore.addFeature({
+            type: 'Point',
+            coordinates: [point.lon, point.lat],
+            iconName: key,
+            comment: point.comment,
+            name: projectData.name,
+            timestamp: point.timestamp,
+          })
         })
-      })
+      }
     })
 
     // Process environment data
     Object.keys(projectData.environment).forEach((key) => {
-      projectData.environment[key].forEach((point) => {
-        mapUIStore.addFeature({
-          type: 'Point',
-          coordinates: [point.lon, point.lat],
-          iconName: key,
-          comment: point.comment,
+      if (Array.isArray(projectData.environment[key])) {
+        projectData.environment[key].forEach((point) => {
+          mapUIStore.addFeature({
+            type: 'Point',
+            coordinates: [point.lon, point.lat],
+            iconName: key,
+            comment: point.comment,
+            name: projectData.name,
+            timestamp: point.timestamp,
+          })
         })
-      })
+      }
     })
   })
 })

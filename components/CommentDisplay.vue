@@ -16,13 +16,27 @@
         </div>
       </template>
 
-      <div class="p-2">
-        <p v-if="feature?.comment?.length > 0" class="text-sm text-gray-700">
-          {{ feature.comment }}
-        </p>
-        <p v-else class="text-sm text-gray-500 italic">
-          No comment available for this location
-        </p>
+      <div class="p-2 space-y-2">
+        <!-- User name display -->
+        <div v-if="feature?.name" class="text-sm text-gray-600">
+          <span class="font-medium">Added by:</span>
+          {{ feature.name.firstname }} {{ feature.name.lastname }}
+        </div>
+
+        <!-- Comment display -->
+        <div class="space-y-1">
+          <p v-if="feature?.comment?.length > 0" class="text-sm text-gray-700">
+            {{ feature.comment }}
+          </p>
+          <p v-else class="text-sm text-gray-500 italic">
+            No comment available for this location
+          </p>
+        </div>
+
+        <!-- Timestamp display -->
+        <div v-if="feature?.timestamp" class="text-xs text-gray-500">
+          Added on: {{ formatDate(feature.timestamp) }}
+        </div>
       </div>
     </UCard>
   </ol-overlay>
@@ -31,6 +45,11 @@
 <script setup lang="ts">
 import { watch, computed } from 'vue'
 
+interface Name {
+  firstname: string
+  lastname: string
+}
+
 interface Feature {
   id?: string
   type: string
@@ -38,6 +57,8 @@ interface Feature {
   comment?: string
   iconName?: string
   frequency?: string
+  name?: Name
+  timestamp?: string
 }
 
 const props = defineProps<{
@@ -51,6 +72,15 @@ const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value),
 })
+
+function formatDate(timestamp: string): string {
+  if (!timestamp) return ''
+  return new Date(timestamp).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
 
 function getFeatureTitle(feature: Feature | null) {
   if (!feature) return 'Location Details'
@@ -118,7 +148,7 @@ const getDisplayPosition = computed(() => {
       return props.feature.coordinates
     case 'Polygon':
       // Calculate center of polygon
-      const polygonCoords = props.feature.coordinates[0]
+      const polygonCoords = props.feature.coordinates[0] as number[][]
       const sumX = polygonCoords.reduce((sum, coord) => sum + coord[0], 0)
       const sumY = polygonCoords.reduce((sum, coord) => sum + coord[1], 0)
       return [sumX / polygonCoords.length, sumY / polygonCoords.length]
@@ -130,3 +160,13 @@ const getDisplayPosition = computed(() => {
   }
 })
 </script>
+
+<style scoped>
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.space-y-1 > * + * {
+  margin-top: 0.25rem;
+}
+</style>

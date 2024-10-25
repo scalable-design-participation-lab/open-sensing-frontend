@@ -14,6 +14,7 @@ const db = {
   projects: {
     projectId: {
       userId: {
+        name: { lastname: 'lovelace', firstname: 'ada' },
         timestamp: {
           space: {
             everyday: [
