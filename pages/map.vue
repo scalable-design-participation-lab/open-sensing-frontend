@@ -1,5 +1,5 @@
 <template>
-  <BackgroundMap :show-all-plus-icons="true" />
+  <BackgroundMap :show-all-plus-icons="false" />
 </template>
 
 <script setup lang="ts">
@@ -18,7 +18,6 @@ onMounted(async () => {
   querySnapshot.forEach((doc) => {
     const projectData = doc.data()
 
-    // Process space.visited data
     Object.keys(projectData.space).forEach((frequency) => {
       projectData.space[frequency].forEach((point) => {
         mapUIStore.addFeature({

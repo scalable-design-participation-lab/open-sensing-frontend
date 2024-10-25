@@ -27,13 +27,20 @@
         :show-all-plus-icons="showAllPlusIcons"
         @toggle-comment-popup="toggleCommentPopup"
         @toggle-image-upload-popup="toggleImageUploadPopup"
+        @show-comment-display="handleShowCommentDisplay"
       />
 
       <PolygonLayer
         :show-all-plus-icons="showAllPlusIcons"
         @toggle-comment-popup="toggleCommentPopup"
+        @show-comment-display="handleShowCommentDisplay"
       />
-      <LineStringLayer @toggle-comment-popup="toggleCommentPopup" />
+      <LineStringLayer
+        :enable-click="enableClick"
+        :is-map-page="isMapPage"
+        @toggle-comment-popup="toggleCommentPopup"
+        @show-comment-display="handleShowCommentDisplay"
+      />
     </ol-source-vector>
   </ol-vector-layer>
 </template>
@@ -66,11 +73,23 @@ const props = defineProps({
   },
   showAllPlusIcons: {
     type: Boolean,
+    default: undefined,
+  },
+  enableClick: {
+    type: Boolean,
+    default: false,
+  },
+  isMapPage: {
+    type: Boolean,
     default: false,
   },
 })
 
-const emit = defineEmits(['toggle-comment-popup', 'toggle-image-upload-popup'])
+const emit = defineEmits([
+  'toggle-comment-popup',
+  'toggle-image-upload-popup',
+  'show-comment-display',
+])
 
 const mapUIStore = useMapUIStore()
 
@@ -109,6 +128,10 @@ function toggleImageUploadPopup(feature) {
   emit('toggle-image-upload-popup', feature)
 }
 
+function handleShowCommentDisplay(feature) {
+  emit('show-comment-display', feature)
+}
+
 function getIconForFeature(feature) {
   if (feature.iconName) {
     switch (feature.iconName) {
@@ -143,7 +166,6 @@ function getIconForFeature(feature) {
 }
 
 function getIconForPoint(feature) {
-  console.log(feature)
   switch (feature.frequency) {
     case 'every day':
     case 'everyday':
