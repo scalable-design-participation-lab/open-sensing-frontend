@@ -2,28 +2,27 @@
   <ol-overlay v-if="isOpen" :position="getDisplayPosition" :offset="[30, 0]">
     <UCard class="min-w-[200px] max-w-[300px] shadow-lg">
       <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-sm font-medium">
-            {{ getFeatureTitle(feature) }}
-          </h3>
-          <UButton
-            icon="i-heroicons-x-mark"
-            color="gray"
-            variant="ghost"
-            size="xs"
-            @click="closeModal"
-          />
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-medium">
+              {{ getFeatureTitle(feature) }}
+            </h3>
+            <UButton
+              icon="i-heroicons-x-mark"
+              color="gray"
+              variant="ghost"
+              size="xs"
+              @click="closeModal"
+            />
+          </div>
+
+          <div v-if="feature?.name" class="text-xs text-gray-500">
+            Added by: {{ feature.name.firstname }} {{ feature.name.lastname }}
+          </div>
         </div>
       </template>
 
       <div class="p-2 space-y-2">
-        <!-- User name display -->
-        <div v-if="feature?.name" class="text-sm text-gray-600">
-          <span class="font-medium">Added by:</span>
-          {{ feature.name.firstname }} {{ feature.name.lastname }}
-        </div>
-
-        <!-- Comment display -->
         <div class="space-y-1">
           <p v-if="feature?.comment?.length > 0" class="text-sm text-gray-700">
             {{ feature.comment }}
@@ -33,7 +32,6 @@
           </p>
         </div>
 
-        <!-- Timestamp display -->
         <div v-if="feature?.timestamp" class="text-xs text-gray-500">
           Added on: {{ formatDate(feature.timestamp) }}
         </div>

@@ -61,11 +61,22 @@
         class="flex-grow text-sm resize-none mt-4"
       />
 
-      <div class="flex justify-between items-center mt-4">
-        <UButton color="gray" size="sm" variant="ghost" @click="closePopup">
+      <div class="flex justify-between mt-2">
+        <UButton
+          color="gray"
+          size="sm"
+          variant="ghost"
+          class="w-[48%] rounded-full flex justify-center"
+          @click="closePopup"
+        >
           Close
         </UButton>
-        <UButton color="primary" size="sm" @click="addCommentAndUpload">
+        <UButton
+          color="primary"
+          size="sm"
+          class="w-[48%] rounded-full flex justify-center"
+          @click="addCommentAndUpload"
+        >
           Add
         </UButton>
       </div>

@@ -13,12 +13,17 @@
         color="gray"
         size="sm"
         variant="ghost"
-        class="w-[48%]"
+        class="w-[48%] rounded-full flex justify-center"
         @click="closePopup"
       >
         Close
       </UButton>
-      <UButton color="primary" size="sm" class="w-[48%]" @click="addComment">
+      <UButton
+        color="primary"
+        size="sm"
+        class="w-[48%] rounded-full flex justify-center"
+        @click="addComment"
+      >
         Add
       </UButton>
     </div>
