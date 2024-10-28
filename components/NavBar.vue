@@ -13,7 +13,7 @@
           <SubWindow
             v-if="item.label === 'Space'"
             :current-subwindow="spaceSubwindow"
-            :max-subwindow="4"
+            :max-subwindow="3"
             :progress-percentage="spaceProgressPercentage"
             :title="spaceContent.title"
             :icon="spaceContent.icon"
@@ -27,7 +27,7 @@
           <SubWindow
             v-if="item.label === 'Belonging'"
             :current-subwindow="belongingSubwindow"
-            :max-subwindow="2"
+            :max-subwindow="1"
             :progress-percentage="belongingProgressPercentage"
             :title="belongingContent.title"
             :icon="belongingContent.icon"
@@ -40,7 +40,7 @@
           <SubWindow
             v-if="item.label === 'Safety'"
             :current-subwindow="safetySubwindow"
-            :max-subwindow="2"
+            :max-subwindow="1"
             :progress-percentage="safetyProgressPercentage"
             :title="safetyContent.title"
             :icon="safetyContent.icon"
@@ -114,12 +114,12 @@ const menuItems = [
   { icon: 'i-heroicons-sun-20-solid', label: 'Environment' },
 ]
 
-const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)
+const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 3) * 100)
 const belongingProgressPercentage = computed(
-  () => (belongingSubwindow.value / 2) * 100
+  () => (belongingSubwindow.value / 1) * 100
 )
 const safetyProgressPercentage = computed(
-  () => (safetySubwindow.value / 2) * 100
+  () => (safetySubwindow.value / 1) * 100
 )
 const environmentProgressPercentage = computed(
   () => (environmentSubwindow.value / 2) * 100
@@ -135,38 +135,32 @@ const spaceContent = computed(() => {
       buttonGroup: [
         {
           text: 'every day',
-          color: 'blue', // Updated color
+          color: 'blue',
           action: () => mapUIStore.activateDrawing('every day'),
         },
         {
           text: 'every week',
-          color: 'green', // Updated color
+          color: 'green',
           action: () => mapUIStore.activateDrawing('every week'),
         },
         {
           text: 'sometimes',
-          color: 'purple', // Updated color
+          color: 'purple',
           action: () => mapUIStore.activateDrawing('sometimes'),
         },
         {
           text: 'only once',
-          color: 'yellow', // Updated color
+          color: '#B2FB4C',
           action: () => mapUIStore.activateDrawing('only once'),
         },
         {
           text: 'never',
-          color: 'red', // Updated color
+          color: 'red',
           action: () => mapUIStore.activateDrawing('never'),
         },
       ],
     },
     2: {
-      title:
-        'For what purpose do you visit the places you marked on the map and with whom?',
-      description:
-        'Click on a tag and comment on how and with whom you spend your time at that location. Click "add" to continue commenting on the next tag.',
-    },
-    3: {
       title:
         'Outline the area where you would like to see recreational or cultural events.',
       description:
@@ -177,7 +171,7 @@ const spaceContent = computed(() => {
         action: () => mapUIStore.activatePolygonDrawing(),
       },
     },
-    4: {
+    3: {
       title: 'Mark the areas that restrict access to the river.',
       description:
         'Using the "Draw Restricted Access" tool, draw lines to indicate areas that create obstacles to access the river. After drawing, click on the red prohibition icon to add a comment about the obstacle. Click "add" to proceed to mapping the next restricted area.',
@@ -197,11 +191,6 @@ const belongingContent = computed(() => {
       title: 'Mark places that are important to you',
       description:
         'Select an icon and place it on the map to mark locations that are significant to you.',
-    },
-    2: {
-      title: 'Describe why these places are important',
-      description:
-        'Click on the icons you placed and add comments to explain why these locations are meaningful to you.',
     },
   }
   return contents[belongingSubwindow.value] || { title: '', description: '' }
@@ -223,11 +212,6 @@ const safetyContent = computed(() => {
       title: 'Mark safe and unsafe areas',
       description:
         'Select an icon and place it on the map to mark safe or unsafe locations.',
-    },
-    2: {
-      title: 'Describe safety concerns',
-      description:
-        'Click on the icons you placed and add comments to explain your safety concerns or positive aspects.',
     },
   }
   return contents[safetySubwindow.value] || { title: '', description: '' }

@@ -91,17 +91,17 @@ function shouldShowPlusIcon(feature) {
   const environmentSubwindow = mapUIStore.environmentSubwindow
 
   if (feature.type === 'Point') {
-    if (spaceSubwindow === 2 && !feature.iconName) {
+    if (spaceSubwindow === 1 && !feature.iconName) {
       return true
     }
     if (
-      belongingSubwindow === 2 &&
+      belongingSubwindow === 1 &&
       ['heart', 'smile', 'dislike'].includes(feature.iconName)
     ) {
       return true
     }
     if (
-      safetySubwindow === 2 &&
+      safetySubwindow === 1 &&
       ['broken', 'calm', 'lock'].includes(feature.iconName)
     ) {
       return true

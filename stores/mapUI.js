@@ -29,7 +29,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     'every day': '#0000FF', // Blue
     'every week': '#00FF00', // Green
     sometimes: '#800080', // Purple
-    'only once': '#FFFF00', // Yellow
+    'only once': '#B2FB4C', // Yellow
     never: '#FF0000', // Red
   }
 

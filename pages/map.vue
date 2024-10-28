@@ -1,15 +1,36 @@
 <template>
+  <GeneralizedHeader
+    class="z-20"
+    :left-items="leftItems"
+    logo-src="/neu-logo.svg"
+    logo-alt="Northeastern University Logo"
+    :show-icon="true"
+  />
+  <GeneralizedFooter />
   <BackgroundMap :show-all-plus-icons="false" />
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
 import { useFirestore, useCollection } from 'vuefire'
 import { collection, getDocs } from 'firebase/firestore'
 
 const mapUIStore = useMapUIStore()
 const db = useFirestore()
+
+const leftItems = ref([
+  {
+    label: 'Drawing Participation',
+    variant: 'solid',
+    color: 'black',
+  },
+  {
+    label: 'Restart Ukraine',
+    variant: 'solid',
+    color: 'black',
+  },
+])
 
 onMounted(async () => {
   const projectsCollection = collection(db, 'projects')
