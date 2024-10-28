@@ -35,17 +35,6 @@ module.exports = defineNuxtConfig({
     },
   ],
 
-  runtimeConfig: {
-    dbUser: process.env.DB_USER,
-    dbHost: process.env.DB_HOST,
-    dbName: process.env.DB_NAME,
-    dbPassword: process.env.DB_PASSWORD,
-    dbPort: process.env.DB_PORT,
-    public: {
-      MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
-    },
-  },
-
   compatibilityDate: '2024-08-15',
   plugins: [{ src: '~/plugins/vue3-openlayers.js', mode: 'client' }],
 })
