@@ -1,4 +1,7 @@
 <template>
+  <!-- Move select interaction outside of the feature loop -->
+  <ol-interaction-select :condition="clickCondition" @select="handleSelect" />
+
   <ol-feature v-for="feature in polygonFeatures" :key="feature.id">
     <ol-geom-polygon :coordinates="feature.coordinates" />
     <ol-style>
@@ -45,16 +48,31 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
+import { click } from 'ol/events/condition'
 
-const emit = defineEmits(['toggle-comment-popup'])
+const props = defineProps({
+  showAllPlusIcons: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const emit = defineEmits(['toggle-comment-popup', 'show-comment-display'])
 
 const mapUIStore = useMapUIStore()
+const clickCondition = click
 
 const polygonFeatures = computed(() =>
   mapUIStore.features.filter((feature) => feature.type === 'Polygon')
 )
 
 const visiblePolygonFeatures = computed(() => {
+  // Show all plus-icons if the flag is true
+  if (props.showAllPlusIcons) {
+    return polygonFeatures.value
+  }
+
+  // Original logic for showing plus-icons
   const spaceSubwindow = mapUIStore.spaceSubwindow
   return spaceSubwindow === 3 ? polygonFeatures.value : []
 })
@@ -70,5 +88,36 @@ function getFeatureIconPosition(feature) {
 
 function toggleCommentPopup(feature) {
   emit('toggle-comment-popup', feature)
+}
+
+function handleSelect(event) {
+  const selected = event.selected
+
+  if (selected && selected.length > 0) {
+    const olFeature = selected[0]
+    const coordinates = olFeature.getGeometry().getCoordinates()
+
+    const feature = polygonFeatures.value.find((f) => {
+      try {
+        const featureCoords = f.coordinates
+        return (
+          coordinates[0].length === featureCoords[0].length &&
+          coordinates[0].every((coord, index) => {
+            const featureCoord = featureCoords[0][index]
+            return (
+              Math.abs(coord[0] - featureCoord[0]) < 0.0000001 &&
+              Math.abs(coord[1] - featureCoord[1]) < 0.0000001
+            )
+          })
+        )
+      } catch (error) {
+        return false
+      }
+    })
+
+    if (feature) {
+      emit('show-comment-display', feature)
+    }
+  }
 }
 </script>

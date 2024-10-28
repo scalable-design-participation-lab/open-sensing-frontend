@@ -4,6 +4,7 @@
     :load-tiles-while-interacting="true"
     :controls="[]"
     style="width: 100%; height: 100vh"
+    :controls="[]"
     @click="handleMapClick"
   >
     <ol-view
@@ -11,6 +12,7 @@
       :center="[28.476908, 49.249253]"
       :zoom="17.68"
       :projection="projection"
+      :rotation="0"
     />
 
     <ol-tile-layer>
@@ -25,8 +27,12 @@
 
     <DrawingLayer
       :projection="projection"
+      :show-all-plus-icons="showAllPlusIcons"
+      :enable-click="isMapPage"
+      :is-map-page="isMapPage"
       @toggle-comment-popup="toggleCommentPopup"
       @toggle-image-upload-popup="toggleImageUploadPopup"
+      @show-comment-display="handleShowCommentDisplay"
     />
 
     <ol-overlay
@@ -55,19 +61,37 @@
         @upload="handleImageUpload"
       />
     </ol-overlay>
+
+    <!-- Add route check for CommentDisplay -->
+    <CommentDisplay
+      v-if="isMapPage"
+      v-model="showCommentDisplay"
+      :feature="selectedFeatureForDisplay"
+    />
   </ol-map>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, defineEmits, watch } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
 import { useRuntimeConfig } from '#app'
+import { useRoute } from 'vue-router'
 import DrawingLayer from './DrawingLayer/DrawingLayer.vue'
 import CommentPopup from './CommentPopup.vue'
 import ImageUploadPopup from './ImageUploadPopup.vue'
+import CommentDisplay from './CommentDisplay.vue'
+import { Control } from 'ol/control'
+
+const props = defineProps({
+  showAllPlusIcons: {
+    type: Boolean,
+    default: undefined,
+  },
+})
 
 const mapUIStore = useMapUIStore()
 const config = useRuntimeConfig()
+const route = useRoute()
 
 const projection = ref('EPSG:4326')
 const commentPopupVisible = ref(false)
@@ -75,6 +99,8 @@ const imageUploadPopupVisible = ref(false)
 const selectedFeatureId = ref(null)
 const commentPopupPosition = ref(null)
 const imageUploadPopupPosition = ref(null)
+const showCommentDisplay = ref(false)
+const selectedFeatureForDisplay = ref(null)
 
 const mapboxStyle = 'cesandoval09/clxkxw58f01tt01qj2ep8g1qr'
 const mapboxToken = config.public.MAPBOX_ACCESS_TOKEN
@@ -84,6 +110,8 @@ const mapboxUrl = computed(
 )
 const mapboxAttribution =
   '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+
+const isMapPage = computed(() => route.name === 'map')
 
 function toggleCommentPopup(feature) {
   if (commentPopupVisible.value && selectedFeatureId.value === feature.id) {
@@ -139,7 +167,6 @@ function closeImageUploadPopup() {
 }
 
 function handleImageUpload(images) {
-  console.log('Uploaded images:', images)
   mapUIStore.updateFeatureImages(selectedFeatureId.value, images)
   closeImageUploadPopup()
 }
@@ -154,4 +181,20 @@ function handleMapClick(event) {
     })
   }
 }
+
+const emit = defineEmits(['show-comment-display'])
+
+function handleShowCommentDisplay(feature) {
+  if (!isMapPage.value) return
+
+  closeCommentPopup()
+  closeImageUploadPopup()
+
+  selectedFeatureForDisplay.value = feature
+  showCommentDisplay.value = true
+}
+
+// Add watchers for debugging
+// watch(showCommentDisplay, (newVal) => {})
+// watch(selectedFeatureForDisplay, (newVal) => {})
 </script>

@@ -26,11 +26,11 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const currentUser = ref(null)
 
   const colors = {
-    'every day': '#FF0000',
-    'every week': '#00FF00',
-    sometimes: '#0000FF',
-    'only once': '#FFFF00',
-    never: '#FF00FF',
+    'every day': '#0000FF', // Blue
+    'every week': '#00FF00', // Green
+    sometimes: '#800080', // Purple
+    'only once': '#B2FB4C', // Yellow
+    never: '#FF0000', // Red
   }
 
   const currentColor = computed(() => {
@@ -60,6 +60,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   function handleDrawEnd(event) {
     const feature = event.feature
     const geometryType = feature.getGeometry().getType()
+    const timestamp = new Date().toISOString()
 
     if (geometryType === 'Point') {
       const coordinates = feature.getGeometry().getCoordinates()
@@ -73,6 +74,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
           currentEnvironmentIcon.value,
         frequency: currentFrequency.value,
         comment: '',
+        name: userData.value
+          ? {
+              firstname: userData.value.firstname,
+              lastname: userData.value.lastname,
+            }
+          : null,
+        timestamp: timestamp,
       })
     } else if (geometryType === 'LineString') {
       const coordinates = feature.getGeometry().getCoordinates()
@@ -81,6 +89,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
         type: 'LineString',
         coordinates: coordinates,
         comment: '',
+        name: userData.value
+          ? {
+              firstname: userData.value.firstname,
+              lastname: userData.value.lastname,
+            }
+          : null,
+        timestamp: timestamp,
       })
     } else if (geometryType === 'Polygon') {
       const coordinates = feature.getGeometry().getCoordinates()
@@ -89,6 +104,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
         type: 'Polygon',
         coordinates: coordinates,
         comment: '',
+        name: userData.value
+          ? {
+              firstname: userData.value.firstname,
+              lastname: userData.value.lastname,
+            }
+          : null,
+        timestamp: timestamp,
       })
     }
 
@@ -191,8 +213,10 @@ export const useMapUIStore = defineStore('mapUI', () => {
     features.push({
       id: Date.now(),
       ...feature,
-      comment: '',
-      frequency: feature.type === 'Point' ? currentFrequency.value : null,
+      comment: feature.comment || '',
+      frequency: feature.frequency || null,
+      name: feature.name || null,
+      timestamp: feature.timestamp || new Date().toISOString(),
     })
     drawEnable.value = false
   }
@@ -252,15 +276,19 @@ export const useMapUIStore = defineStore('mapUI', () => {
 
     const projectData = {
       userId: userId,
+      name: userData.value
+        ? {
+            lastname: userData.value.lastname,
+            firstname: userData.value.firstname,
+          }
+        : null,
       timestamp: timestamp,
       space: {
-        visited: {
-          everyday: [],
-          everyweek: [],
-          sometimes: [],
-          once: [],
-          never: [],
-        },
+        everyday: [],
+        everyweek: [],
+        sometimes: [],
+        once: [],
+        never: [],
         recreational: [],
         restricted: [],
       },
@@ -283,7 +311,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     features.forEach((feature) => {
       if (feature.type === 'Point' && feature.frequency) {
         const frequencyKey = getFrequencyKey(feature.frequency)
-        projectData.space.visited[frequencyKey].push({
+        projectData.space[frequencyKey].push({
           lat: feature.coordinates[1],
           lon: feature.coordinates[0],
           timestamp: feature.timestamp || timestamp,

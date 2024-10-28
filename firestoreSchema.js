@@ -14,50 +14,49 @@ const db = {
   projects: {
     projectId: {
       userId: {
+        name: { lastname: 'lovelace', firstname: 'ada' },
         timestamp: {
           space: {
-            visited: {
-              everyday: [
-                {
-                  lat: 40.7128,
-                  lon: 74.006,
-                  timestamp: '2022-01-01',
-                  comment: 'some',
-                },
-              ],
-              everyweek: [
-                {
-                  lat: 40.7128,
-                  lon: 74.006,
-                  timestamp: '2022-01-01',
-                  comment: 'some',
-                },
-              ],
-              sometimes: [
-                {
-                  lat: 40.7128,
-                  lon: 74.006,
-                  timestamp: '2022-01-01',
-                  comment: 'some',
-                },
-              ],
-              once: [
-                {
-                  lat: 40.7128,
-                  lon: 74.006,
-                  timestamp: '2022-01-01',
-                  comment: 'some',
-                },
-              ],
-              never: [
-                {
-                  lat: 40.7128,
-                  lon: 74.006,
-                  timestamp: '2022-01-01',
-                  comment: 'some',
-                },
-              ],
-            },
+            everyday: [
+              {
+                lat: 40.7128,
+                lon: 74.006,
+                timestamp: '2022-01-01',
+                comment: 'some',
+              },
+            ],
+            everyweek: [
+              {
+                lat: 40.7128,
+                lon: 74.006,
+                timestamp: '2022-01-01',
+                comment: 'some',
+              },
+            ],
+            sometimes: [
+              {
+                lat: 40.7128,
+                lon: 74.006,
+                timestamp: '2022-01-01',
+                comment: 'some',
+              },
+            ],
+            once: [
+              {
+                lat: 40.7128,
+                lon: 74.006,
+                timestamp: '2022-01-01',
+                comment: 'some',
+              },
+            ],
+            never: [
+              {
+                lat: 40.7128,
+                lon: 74.006,
+                timestamp: '2022-01-01',
+                comment: 'some',
+              },
+            ],
           },
           recreational: [
             {

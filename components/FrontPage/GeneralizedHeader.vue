@@ -23,7 +23,7 @@
       <UButton
         v-if="logoSrc"
         :class="[
-          `lg:w-12 rounded-lg flex justify-center !bg-white shadow-md hover:animate-bounce`,
+          `lg:w-12 rounded-lg flex justify-center !bg-white dark:!bg-gray-800 shadow-md hover:animate-bounce`,
           shapeClass,
         ]"
       >
@@ -32,7 +32,7 @@
       <UButton
         v-if="showIcon"
         :class="[
-          `lg:w-12 text-xl sm:text-2xl rounded-lg flex justify-center !bg-white shadow-md hover:animate-bounce`,
+          `lg:w-12 text-xl sm:text-2xl rounded-lg flex justify-center !bg-white dark:!bg-gray-800 shadow-md hover:animate-bounce`,
           shapeClass,
         ]"
       >
@@ -47,8 +47,8 @@
             :class="[
               `h-full px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
               item.primary
-                ? 'bg-white text-black hover:bg-black hover:text-white'
-                : 'bg-black text-white hover:bg-white hover:text-black',
+                ? 'bg-white dark:bg-gray-800 text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black'
+                : 'bg-black dark:bg-white text-white dark:text-black hover:bg-white hover:text-black dark:hover:bg-gray-800 dark:hover:text-white',
               shapeClass,
             ]"
             @click="navigate"
@@ -63,7 +63,9 @@
           :icon="item.icon"
           :class="[
             `h-full px-3 sm:px-4 rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-md hover:animate-pulse`,
-            item.primary ? '!bg-white text-black' : '!bg-black text-white',
+            item.primary
+              ? '!bg-white dark:!bg-gray-800 text-black dark:text-white'
+              : '!bg-black dark:!bg-white text-white dark:text-black',
             shapeClass,
           ]"
           @click="item.onClick"
@@ -78,7 +80,7 @@
           <UButton
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white shadow-md text-black hover:invert`,
+              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white dark:!bg-gray-800 shadow-md text-black dark:text-white hover:invert`,
               shapeClass,
             ]"
           >
@@ -96,7 +98,7 @@
             :color="item.color"
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white text-black hover:invert`,
+              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white dark:!bg-gray-800 text-black dark:text-white hover:invert`,
               shapeClass,
             ]"
             @click="navigate"
@@ -108,7 +110,7 @@
           v-else
           :icon="item.icon"
           :class="[
-            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white shadow-md text-black hover:invert`,
+            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white dark:!bg-gray-800 shadow-md text-black dark:text-white hover:invert`,
             shapeClass,
           ]"
           @click="item.onClick"

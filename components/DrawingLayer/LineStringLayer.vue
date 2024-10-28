@@ -1,4 +1,6 @@
 <template>
+  <ol-interaction-select :condition="clickCondition" @select="handleSelect" />
+
   <ol-feature v-for="feature in lineStringFeatures" :key="feature.id">
     <ol-geom-line-string :coordinates="feature.coordinates" />
     <ol-style>
@@ -12,7 +14,7 @@
     :position="getLineStringStartPoint(feature)"
     :offset="[0, 0]"
   >
-    <div class="prohibit-icon" @click.stop="toggleCommentPopup(feature)">
+    <div class="prohibit-icon" @click.stop="handleIconClick(feature)">
       <svg
         width="43"
         height="43"
@@ -38,10 +40,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
+import { click } from 'ol/events/condition'
 
-const emit = defineEmits(['toggle-comment-popup'])
+const props = defineProps({
+  enableClick: {
+    type: Boolean,
+    default: false,
+  },
+  isMapPage: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const emit = defineEmits(['toggle-comment-popup', 'show-comment-display'])
 
 const mapUIStore = useMapUIStore()
+const clickCondition = click
 
 const lineStringFeatures = computed(() =>
   mapUIStore.features.filter((feature) => feature.type === 'LineString')
@@ -56,6 +71,38 @@ function getLineStringStartPoint(feature) {
 
 function toggleCommentPopup(feature) {
   emit('toggle-comment-popup', feature)
+}
+
+function handleSelect(event) {
+  const selected = event.selected
+
+  if (selected && selected.length > 0) {
+    const olFeature = selected[0]
+    const coordinates = olFeature.getGeometry().getCoordinates()
+
+    const feature = lineStringFeatures.value.find((f) => {
+      const featureCoords = f.coordinates
+      return coordinates.every(
+        (coord, index) =>
+          Math.abs(coord[0] - featureCoords[index][0]) < 0.0000001 &&
+          Math.abs(coord[1] - featureCoords[index][1]) < 0.0000001
+      )
+    })
+
+    if (feature) {
+      emit('show-comment-display', feature)
+    }
+  }
+}
+
+function handleIconClick(feature) {
+  if (props.isMapPage) {
+    // In map page, show comment display
+    emit('show-comment-display', feature)
+  } else {
+    // In other pages, show comment popup
+    emit('toggle-comment-popup', feature)
+  }
 }
 </script>
 

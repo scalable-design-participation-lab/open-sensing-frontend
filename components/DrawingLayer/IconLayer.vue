@@ -14,7 +14,7 @@
       <div
         v-if="shouldShowPlusIcon(feature)"
         class="cursor-pointer text-black-500 rounded-full p-0.5 flex justify-center items-center shadow-md"
-        @click.stop.prevent="handleIconClick(feature)"
+        @click.stop.prevent="handlePlusIconClick(feature)"
       >
         <img
           src="@/assets/icons/open-icon.svg"
@@ -24,11 +24,13 @@
       </div>
     </ol-overlay>
   </template>
+  <ol-interaction-select :condition="clickCondition" @select="handleSelect" />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
+import { click } from 'ol/events/condition'
 
 const props = defineProps({
   features: {
@@ -39,30 +41,67 @@ const props = defineProps({
     type: Function,
     required: true,
   },
+  showAllPlusIcons: {
+    type: Boolean,
+    default: undefined,
+  },
 })
 
-const emit = defineEmits(['toggle-comment-popup', 'toggle-image-upload-popup'])
+const emit = defineEmits([
+  'toggle-comment-popup',
+  'toggle-image-upload-popup',
+  'show-comment-display',
+])
 
 const mapUIStore = useMapUIStore()
 
+const clickCondition = click
+
+function handleSelect(event) {
+  const selected = event.selected
+
+  if (selected && selected.length > 0) {
+    const olFeature = selected[0]
+    const coordinates = olFeature.getGeometry().getCoordinates()
+
+    const feature = props.features.find(
+      (f) =>
+        Math.abs(f.coordinates[0] - coordinates[0]) < 0.0000001 &&
+        Math.abs(f.coordinates[1] - coordinates[1]) < 0.0000001
+    )
+
+    if (feature) {
+      emit('show-comment-display', feature)
+    }
+  }
+}
+
 function shouldShowPlusIcon(feature) {
+  if (props.showAllPlusIcons === false) {
+    return false
+  }
+
+  if (props.showAllPlusIcons === true) {
+    return true
+  }
+
   const spaceSubwindow = mapUIStore.spaceSubwindow
   const belongingSubwindow = mapUIStore.belongingSubwindow
   const safetySubwindow = mapUIStore.safetySubwindow
   const environmentSubwindow = mapUIStore.environmentSubwindow
 
   if (feature.type === 'Point') {
-    if (spaceSubwindow === 2 && !feature.iconName) {
+    if (spaceSubwindow === 1 && !feature.iconName) {
       return true
     }
     if (
-      belongingSubwindow === 2 &&
+      belongingSubwindow === 1 &&
       ['heart', 'smile', 'dislike'].includes(feature.iconName)
     ) {
       return true
     }
     if (
-      safetySubwindow === 2 &&
+      safetySubwindow === 1 &&
       ['broken', 'calm', 'lock'].includes(feature.iconName)
     ) {
       return true
@@ -77,18 +116,14 @@ function shouldShowPlusIcon(feature) {
   return false
 }
 
-function handleIconClick(feature) {
-  if (
-    feature.iconName === 'heart' ||
-    feature.iconName === 'smile' ||
-    feature.iconName === 'dislike' ||
-    feature.iconName === 'broken' ||
-    feature.iconName === 'calm' ||
-    feature.iconName === 'lock'
-  ) {
-    emit('toggle-image-upload-popup', feature)
-  } else {
+function handlePlusIconClick(feature) {
+  // Toggle comment popup for space features (frequency-based points)
+  if (!feature.iconName) {
     emit('toggle-comment-popup', feature)
+  }
+  // Toggle image upload popup for themed icons (belonging, safety, environment)
+  else {
+    emit('toggle-image-upload-popup', feature)
   }
 }
 </script>
