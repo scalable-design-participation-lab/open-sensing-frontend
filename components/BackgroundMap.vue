@@ -4,7 +4,6 @@
     :load-tiles-while-interacting="true"
     :controls="[]"
     style="width: 100%; height: 100vh"
-    :controls="[]"
     @click="handleMapClick"
   >
     <ol-view
