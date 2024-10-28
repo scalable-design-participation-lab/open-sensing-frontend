@@ -1,7 +1,20 @@
 <template>
-  <UCard class="bg-black text-white">
+  <UCard class="bg-black/100 text-white">
     <div class="space-y-4">
-      <UProgress :value="progressPercentage" color="yellow" class="mb-4" />
+      <UProgress
+        :value="progressPercentage"
+        :ui="{
+          progress: {
+            base: 'block appearance-none border-none overflow-hidden',
+            bar: '[&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:transition-all [&::-webkit-progress-value]:ease-in-out [&::-moz-progress-bar]:rounded-full',
+            background:
+              '[&::-webkit-progress-value]:bg-[#B2FB4C] [&::-moz-progress-bar]:bg-[#B2FB4C]',
+            track:
+              '[&::-webkit-progress-bar]:bg-gray-700 [&::-webkit-progress-bar]:rounded-full [@supports(selector(&::-moz-progress-bar))]:bg-gray-700',
+          },
+        }"
+        class="mb-4"
+      />
       <div v-if="title || icon" class="flex items-center space-x-2">
         <UIcon v-if="icon" :name="icon" class="text-2xl text-white" />
         <h2 v-if="title" class="text-xl font-semibold text-white">
@@ -35,13 +48,18 @@
             size: 'text-sm',
           }"
           :class="[
-            'w-full mb-2',
+            'w-full mb-2 text-center flex justify-center items-center !bg-black',
             {
-              'hover:bg-red-500 hover:text-white': btn.color === 'red',
-              'hover:bg-green-500 hover:text-white': btn.color === 'green',
-              'hover:bg-blue-500 hover:text-white': btn.color === 'blue',
-              'hover:bg-yellow-500 hover:text-white': btn.color === 'yellow',
-              'hover:bg-purple-500 hover:text-white': btn.color === 'purple',
+              'border-2 border-red-500 !text-red-500 hover:!bg-white hover:!text-black':
+                btn.color === 'red',
+              'border-2 border-green-500 !text-green-500 hover:!bg-white hover:!text-black':
+                btn.color === 'green',
+              'border-2 border-blue-500 !text-blue-500 hover:!bg-white hover:!text-black':
+                btn.color === 'blue',
+              'border-2 border-[#B2FB4C] !text-[#B2FB4C] hover:!bg-white hover:!text-black':
+                btn.color === '#B2FB4C',
+              'border-2 border-purple-500 !text-purple-500 hover:!bg-white hover:!text-black':
+                btn.color === 'purple',
             },
           ]"
           @click="btn.action"
