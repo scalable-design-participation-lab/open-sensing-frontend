@@ -1,6 +1,9 @@
 {
   "name": "autonomous-sensor-module-frontend",
   "private": true,
+  "engines": {
+    "node": ">=18.17.0"
+  },
   "scripts": {
     "test": "vitest",
     "build": "node scripts/generate-service-account.js && nuxt build",
