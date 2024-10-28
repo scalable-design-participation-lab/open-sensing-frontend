@@ -1,8 +1,0 @@
-name = "drawing-participation-restart-ukraine"
-compatibility_date = "2024-08-15"
-account_id = "*"
-workers_dev = true
-
-[build]
-command = "node scripts/generate-service-account.js && NITRO_PRESET=cloudflare-pages npx nuxt build"
-upload.format = "service-worker"
