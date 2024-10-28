@@ -1,6 +1,7 @@
 const { defineNuxtConfig } = require('nuxt/config')
 
 export default defineNuxtConfig({
+  ssr: false,
   css: ['vue3-openlayers/dist/vue3-openlayers.css'],
   postcss: {
     plugins: {
