@@ -3,12 +3,6 @@ compatibility_date = "2024-08-15"
 account_id = "*"
 workers_dev = true
 
-[
-build
-]
+[build]
 command = "node scripts/generate-service-account.js && NITRO_PRESET=cloudflare-pages npx nuxt build"
-
-[
-build.upload
-]
-format = "service-worker"
+upload.format = "service-worker"
