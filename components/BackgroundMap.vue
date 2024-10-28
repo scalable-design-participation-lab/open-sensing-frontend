@@ -3,6 +3,7 @@
     :load-tiles-while-animating="true"
     :load-tiles-while-interacting="true"
     style="width: 100%; height: 100vh"
+    :controls="[]"
     @click="handleMapClick"
   >
     <ol-view
@@ -78,6 +79,7 @@ import DrawingLayer from './DrawingLayer/DrawingLayer.vue'
 import CommentPopup from './CommentPopup.vue'
 import ImageUploadPopup from './ImageUploadPopup.vue'
 import CommentDisplay from './CommentDisplay.vue'
+import { Control } from 'ol/control'
 
 const props = defineProps({
   showAllPlusIcons: {
