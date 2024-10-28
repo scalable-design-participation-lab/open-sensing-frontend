@@ -1,7 +1,7 @@
 <script>
 useSeoMeta({
-  title: 'Drawing Participation: Restart Ukraine',
-  ogTitle: 'Drawing Participation: Restart Ukraine',
+  title: 'Drawing Participation: Hurtoma',
+  ogTitle: 'Drawing Participation: Hurtoma',
   // description: '…',
   // ogDescription: '…',
   // ogImage: 'https://…',
