@@ -1,7 +1,17 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "target": "ES2018",
+    "module": "commonjs",
+    "lib": ["es2018", "dom"],
+    "strict": true,
     "esModuleInterop": true,
-    "types": ["@types/node", "@types/tailwindcss", "vue3-openlayers"]
-  }
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "outDir": "./dist"
+  },
+  "include": ["scripts/**/*"],
+  "exclude": ["node_modules"]
 }

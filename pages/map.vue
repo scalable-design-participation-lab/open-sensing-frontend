@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useMapUIStore } from '@/stores/mapUI'
-import { useFirestore, useCollection } from 'vuefire'
+import { useFirestore } from 'vuefire'
 import { collection, getDocs } from 'firebase/firestore'
 
 const mapUIStore = useMapUIStore()
@@ -36,7 +36,7 @@ onMounted(async () => {
   const projectsCollection = collection(db, 'projects')
   const querySnapshot = await getDocs(projectsCollection)
 
-  querySnapshot.forEach((doc) => {
+  for (const doc of querySnapshot.docs) {
     const projectData = doc.data()
 
     // Process space data
@@ -55,7 +55,7 @@ onMounted(async () => {
       }
     })
 
-    // Process space.recreational data
+    // Process space.recreational data (Polygons)
     if (Array.isArray(projectData.space.recreational)) {
       projectData.space.recreational.forEach((polygon) => {
         mapUIStore.addFeature({
@@ -68,7 +68,7 @@ onMounted(async () => {
       })
     }
 
-    // Process space.restricted data
+    // Process space.restricted data (LineStrings)
     if (Array.isArray(projectData.space.restricted)) {
       projectData.space.restricted.forEach((lineString) => {
         mapUIStore.addFeature({
@@ -128,6 +128,8 @@ onMounted(async () => {
         })
       }
     })
-  })
+  }
+
+  console.log('All features have been loaded')
 })
 </script>

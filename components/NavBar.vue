@@ -247,7 +247,7 @@ function prevEnvironmentSubwindow() {
 }
 
 function selectEnvironmentIcon(iconName: string) {
-  console.log('Selected environment icon:', iconName)
+  console.log('Піктограма вибраного середовища', iconName)
   mapUIStore.activateEnvironmentDrawing(iconName)
 }
 
@@ -262,11 +262,11 @@ async function saveData() {
   isSaving.value = true
   try {
     await mapUIStore.saveDataToDatabase()
-    showSuccessNotification('Data submitted successfully')
+    showSuccessNotification('Thank you for taking the survey! You can now view your results or explore maps created by other users.')
     mapUIStore.resetAllSubwindows()
   } catch (error) {
     console.error('Error submitting data to database:', error)
-    showErrorNotification('Failed to submit data')
+    showErrorNotification('Не вдалося подати дані')
   } finally {
     isSaving.value = false
   }

@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, reactive, computed } from 'vue'
-import { useFirebaseAuth } from 'vuefire'
-import { signOut } from 'firebase/auth'
+// import { useFirebaseAuth } from 'vuefire'
+// import { signOut } from 'firebase/auth'
 import { useFirestore, useCollection } from 'vuefire'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { getFirestore } from 'firebase/firestore'
 
 export const useMapUIStore = defineStore('mapUI', () => {
-  const drawEnable = ref(true)
+  const drawEnable = ref(false)
   const drawType = ref('Point')
   const currentFrequency = ref(null)
   const spaceSubwindow = ref(1)
@@ -22,7 +22,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const environmentSubwindow = ref(1)
   const showRegistration = ref(true)
   const userData = ref(null)
-  const auth = useFirebaseAuth()
+  // const auth = useFirebaseAuth()
   const currentUser = ref(null)
 
   const colors = {
@@ -252,13 +252,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
 
   function setUserData(data) {
     userData.value = data
-    currentUser.value = auth.currentUser
+    currentUser.value = data.userId
     showRegistration.value = false
   }
 
   async function logoutUser() {
     try {
-      await signOut(auth)
+      // await signOut(auth)
       currentUser.value = null
       userData.value = null
       showRegistration.value = true
