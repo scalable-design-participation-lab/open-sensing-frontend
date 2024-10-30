@@ -1,7 +1,7 @@
 <script>
 useSeoMeta({
-  title: 'Drawing Participation: Hurtoma',
-  ogTitle: 'Drawing Participation: Hurtoma',
+  title: 'Drawing Participation: Гуртомá',
+  ogTitle: 'Drawing Participation: Гуртомá',
   // description: '…',
   // ogDescription: '…',
   // ogImage: 'https://…',
