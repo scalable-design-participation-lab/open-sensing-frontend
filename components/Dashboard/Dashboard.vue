@@ -43,8 +43,8 @@
         >
           <SensorTile
             v-for="sensor in sensors"
-            :key="sensor.id"
-            :sensor="sensor"
+            :key="sensor.moduleid"
+            :sensor="formatSensorData(sensor)"
             :show-details="true"
             :custom-colors="customColors"
             :display-fields="displayFields"
@@ -58,11 +58,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSensorDetailStore } from '../../stores/sensorDetail'
 import { useDashboardStore } from '../../stores/dashboard'
-import { useDatasetStore } from '../../stores/datasets'
 import SensorTile from './SensorTile.vue'
 import OverviewContent from './OverviewContent.vue'
 import DashboardHeader from './DashboardHeader.vue'
@@ -78,12 +77,6 @@ const sensorDetailStore = useSensorDetailStore()
  * @type {import('@/stores/dashboard').DashboardStore}
  */
 const dashboardStore = useDashboardStore()
-
-/**
- * Dataset store instance
- * @type {import('@/stores/datasets').DatasetStore}
- */
-const datasetStore = useDatasetStore()
 
 /**
  * Destructured sensors from the sensor detail store
@@ -104,8 +97,11 @@ const overviewDescription = ref(
  * @returns {string} Formatted date string of the latest update
  */
 const lastUpdated = computed(() => {
-  const dates = sensors.value.map((sensor) => new Date(sensor.timestamp))
-  const latestDate = new Date(Math.max.apply(null, dates))
+  if (!sensors.value.length) return 'No data'
+  const dates = sensors.value.map((sensor) =>
+    new Date(sensor.timestamp).getTime()
+  )
+  const latestDate = new Date(Math.max(...dates))
   return latestDate.toLocaleString('en-US', {
     timeZone: 'UTC',
     year: 'numeric',
@@ -123,17 +119,18 @@ const lastUpdated = computed(() => {
  */
 const overviewStats = computed(() => [
   {
-    value: sensors.value.filter((sensor) => sensor.status === 'Active').length,
-    label: 'Active Sensors',
+    value: sensors.value.length,
+    label: 'Total Sensors',
   },
   {
     value: displayFields.value.length,
     label: 'Measured Values',
   },
   {
-    value: sensors.value.filter((sensor) => sensor.status === 'Maintenance')
-      .length,
-    label: 'Pending Issues',
+    value: sensors.value.filter(
+      (sensor) => sensor.temperature === 0 && sensor.relative_humidity === 0
+    ).length,
+    label: 'Inactive Sensors',
   },
 ])
 
@@ -188,6 +185,45 @@ const displayFields = ref([
 
 const closeDashboard = () => {
   dashboardStore.toggleDashboard()
+}
+
+interface Sensor {
+  moduleid: string
+  ecohub_location: string
+  lat: number
+  lon: number
+  temperature: number
+  relative_humidity: number
+  voc: number
+  nox: number
+  pm1: number
+  pm25: number
+  pm4: number
+  pm10: number
+  timestamp: string
+}
+
+onMounted(async () => {
+  await sensorDetailStore.loadSensors()
+})
+
+const formatSensorData = (sensor: Sensor) => {
+  return {
+    id: sensor.moduleid,
+    moduleid: sensor.moduleid,
+    location: sensor.ecohub_location,
+    temperature: sensor.temperature,
+    humidity: sensor.relative_humidity,
+    voc: sensor.voc,
+    nox: sensor.nox,
+    pm25: sensor.pm25,
+    coordinates: sensor.lon && sensor.lat ? [sensor.lon, sensor.lat] : null,
+    timestamp: sensor.timestamp,
+    status:
+      sensor.temperature === 0 && sensor.relative_humidity === 0
+        ? 'Inactive'
+        : 'Active',
+  }
 }
 
 defineOptions({

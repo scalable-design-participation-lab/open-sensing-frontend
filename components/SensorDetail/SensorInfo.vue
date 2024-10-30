@@ -10,88 +10,51 @@
  -->
 
 <template>
-  <div class="flex-1" data-testid="sensor-info-container">
-    <h2
-      class="text-xl font-bold mb-4 text-gray-800"
-      data-testid="sensor-info-title"
-    >
-      Sensor Information
-    </h2>
-    <div class="grid grid-cols-2 gap-6">
+  <div class="flex-1 bg-white rounded-lg shadow-md p-6">
+    <h3 class="text-lg font-semibold mb-4">Sensor Information</h3>
+    <div class="space-y-4">
       <div
-        v-for="(item, index) in sensorInfoItems"
-        :key="index"
-        class="bg-gray-100 rounded-lg p-4 text-center hover:shadow-md transition-shadow"
-        :data-testid="`sensor-info-item-${item.label
-          .toLowerCase()
-          .replace(' ', '-')}`"
+        v-for="item in sensorInfoItems"
+        :key="item.label"
+        class="flex justify-between items-center"
       >
-        <h3
-          class="text-xl font-bold"
-          :class="item.color"
-          :data-testid="`sensor-info-value-${item.label
-            .toLowerCase()
-            .replace(' ', '-')}`"
-        >
-          {{ item.value }}
-        </h3>
-        <p
-          class="text-sm text-gray-600 mt-2"
-          :data-testid="`sensor-info-label-${item.label
-            .toLowerCase()
-            .replace(' ', '-')}`"
-        >
-          {{ item.label }}
-        </p>
+        <span class="text-gray-600">{{ item.label }}</span>
+        <span :class="item.color">{{ item.value || 'N/A' }}</span>
       </div>
     </div>
-    <p class="mt-4 text-sm text-gray-600" data-testid="last-updated">
-      Last Updated: {{ formatDate(selectedSensor.timestamp) }}
-    </p>
-    <p class="mt-1 text-sm text-gray-600" data-testid="last-maintenance">
-      Last Maintenance: {{ formatDate(selectedSensor.lastMaintenance) }}
-    </p>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
+import type { Sensor } from '../../stores/sensorDetail'
+
+interface Props {
+  selectedSensor: Sensor | null
+}
+
+const props = defineProps<Props>()
 
 /**
- * Props for the SensorInfo component
- * @typedef {Object} SensorInfoProps
- * @property {Object} selectedSensor - The selected sensor object
+ * Gets the color for signal strength
+ * @param {number} value - The signal strength value
+ * @returns {string} The color class for the signal strength
  */
-
-/**
- * Component props
- * @type {SensorInfoProps}
- */
-const props = defineProps({
-  selectedSensor: {
-    type: Object,
-    required: true,
-  },
-})
-
-/**
- * Gets the color for the signal strength indicator
- * @param {number|string} value - The signal strength value
- * @returns {string} The CSS color class
- */
-const getSignalStrengthColor = (value) => {
-  const strength = parseInt(value)
-  if (strength <= 2) return 'text-red-500'
-  if (strength <= 3) return 'text-yellow-500'
+const getSignalStrengthColor = (value: number | null): string => {
+  if (value === null) return 'text-gray-500'
+  if (value <= 2) return 'text-red-500'
+  if (value <= 3) return 'text-yellow-500'
   return 'text-green-500'
 }
 
 /**
- * Gets the color for the air quality indicator
+ * Gets the color for air quality
  * @param {string} value - The air quality value
- * @returns {string} The CSS color class
+ * @returns {string} The color class for the air quality
  */
-const getAirQualityColor = (value) => {
+const getAirQualityColor = (value: string | null): string => {
+  if (!value) return 'text-gray-500'
+
   switch (value.toLowerCase()) {
     case 'good':
       return 'text-green-500'
@@ -107,52 +70,52 @@ const getAirQualityColor = (value) => {
 }
 
 /**
- * Gets the color for the soil moisture indicator
- * @param {string} value - The soil moisture value
- * @returns {string} The CSS color class
+ * Gets the air quality based on temperature and humidity
+ * @param {number} temperature - The temperature value
+ * @param {number} humidity - The humidity value
+ * @returns {string} The air quality status
  */
-const getSoilMoistureColor = (value) => {
-  const moisture = parseFloat(value)
-  if (moisture < 30) return 'text-red-500'
-  if (moisture < 60) return 'text-yellow-500'
-  return 'text-green-500'
+const getAirQuality = (
+  temperature: number | null,
+  humidity: number | null
+): string => {
+  if (temperature === null || humidity === null) return 'Unknown'
+  if (temperature === 0 && humidity === 0) return 'Inactive'
+  if (temperature > 30 || humidity > 80) return 'Poor'
+  if (temperature > 25 || humidity > 70) return 'Moderate'
+  return 'Good'
 }
 
-/**
- * Computed property to generate sensor information items
- * @type {import('vue').ComputedRef<Array<{label: string, value: string, color: string}>>}
- */
-const sensorInfoItems = computed(() => [
-  {
-    label: 'Signal Strength',
-    value: `${props.selectedSensor.signalStrength}/5`,
-    color: getSignalStrengthColor(props.selectedSensor.signalStrength),
-  },
-  {
-    label: 'Air Quality',
-    value: props.selectedSensor.airQuality,
-    color: getAirQualityColor(props.selectedSensor.airQuality),
-  },
-  {
-    label: 'Soil Moisture',
-    value: props.selectedSensor.soilMoisture,
-    color: getSoilMoistureColor(props.selectedSensor.soilMoisture),
-  },
-])
+const sensorInfoItems = computed(() => {
+  if (!props.selectedSensor) {
+    return [
+      { label: 'Signal Strength', value: 'N/A', color: 'text-gray-500' },
+      { label: 'Air Quality', value: 'N/A', color: 'text-gray-500' },
+      { label: 'Location', value: 'N/A', color: 'text-gray-500' },
+    ]
+  }
 
-/**
- * Formats a date string for display
- * @param {string} dateString - The date string to format
- * @returns {string} The formatted date string
- */
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timezone: 'UTC',
-  })
-}
+  const airQuality = getAirQuality(
+    props.selectedSensor.temperature,
+    props.selectedSensor.relative_humidity
+  )
+
+  return [
+    {
+      label: 'Signal Strength',
+      value: '5/5',
+      color: getSignalStrengthColor(5),
+    },
+    {
+      label: 'Air Quality',
+      value: airQuality,
+      color: getAirQualityColor(airQuality),
+    },
+    {
+      label: 'Location',
+      value: props.selectedSensor.ecohub_location,
+      color: 'text-gray-900',
+    },
+  ]
+})
 </script>

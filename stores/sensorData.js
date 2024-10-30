@@ -3,21 +3,34 @@ import { ref } from 'vue'
 
 export const useSensorDataStore = defineStore('sensorData', () => {
   const sensorData = ref({})
-  const lastFetchTime = ref(null)
+  const moduleInfo = ref(null)
+  const lastFetchTime = ref({})
   const isFetching = ref(false)
 
-  const loadSensorData = async (force = false) => {
+  const loadSensorData = async (moduleId, force = false) => {
     const cacheTime = 5400000 // 1h30m
+
     if (
       force ||
-      !sensorData.value ||
-      !lastFetchTime.value ||
-      Date.now() - lastFetchTime.value > cacheTime
+      !sensorData.value[moduleId] ||
+      !lastFetchTime.value[moduleId] ||
+      Date.now() - lastFetchTime.value[moduleId] > cacheTime
     ) {
-      if (isFetching.value) return sensorData.value
+      if (isFetching.value) return sensorData.value[moduleId]
       isFetching.value = true
+
       try {
-        const data = await $fetch('/api/sensor-data')
+        const response = await $fetch('/api/sensor-data', {
+          params: { moduleId },
+        })
+
+        if (response.error) {
+          throw new Error(response.error)
+        }
+
+        const { moduleInfo: info, sensorData: data } = response
+        moduleInfo.value = info
+
         const metrics = {
           Temperature: { name: 'temperature', label: 'Temperature (°C)' },
           'Relative Humidity': {
@@ -44,19 +57,22 @@ export const useSensorDataStore = defineStore('sensorData', () => {
             max: Math.max(...values),
           }
         })
-        sensorData.value = metricData
-        lastFetchTime.value = Date.now()
+
+        sensorData.value[moduleId] = metricData
+        lastFetchTime.value[moduleId] = Date.now()
       } catch (err) {
         console.error('Error fetching sensor data', err)
+        throw err
       } finally {
         isFetching.value = false
       }
     }
-    return sensorData.value
+    return sensorData.value[moduleId]
   }
 
   return {
     sensorData,
+    moduleInfo,
     loadSensorData,
   }
 })

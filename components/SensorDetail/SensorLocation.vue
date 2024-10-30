@@ -25,12 +25,13 @@
       data-testid="mini-map"
     >
       <ol-map
+        v-if="hasValidCoordinates"
         :load-tiles-while-animating="true"
         :load-tiles-while-interacting="true"
         style="width: 100%; height: 100%"
       >
         <ol-view
-          :center="selectedSensor.coordinates"
+          :center="sensorCoordinates"
           :zoom="15"
           :projection="projection"
         />
@@ -47,8 +48,8 @@
 
         <ol-vector-layer>
           <ol-source-vector>
-            <ol-feature>
-              <ol-geom-point :coordinates="selectedSensor.coordinates" />
+            <ol-feature v-if="hasValidCoordinates">
+              <ol-geom-point :coordinates="sensorCoordinates" />
               <ol-style>
                 <ol-style-icon
                   src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png"
@@ -64,22 +65,25 @@
         <ol-control-scale-line />
         <ol-control-full-screen />
       </ol-map>
+      <div v-else class="flex items-center justify-center h-full bg-gray-100">
+        <p class="text-gray-500">No location data available</p>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useGeographic } from 'ol/proj'
+import type { Sensor } from '../../stores/sensorDetail'
 
 useGeographic()
 
-const props = defineProps({
-  selectedSensor: {
-    type: Object,
-    required: true,
-  },
-})
+interface Props {
+  selectedSensor: Sensor
+}
+
+const props = defineProps<Props>()
 
 const projection = ref('EPSG:4326')
 
@@ -92,4 +96,23 @@ const mapboxUrl = computed(() => {
 
 const mapboxAttribution =
   '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+
+const hasValidCoordinates = computed(() => {
+  return (
+    props.selectedSensor?.lon != null &&
+    props.selectedSensor?.lat != null &&
+    !isNaN(Number(props.selectedSensor.lon)) &&
+    !isNaN(Number(props.selectedSensor.lat))
+  )
+})
+
+const sensorCoordinates = computed(() => {
+  if (!hasValidCoordinates.value) {
+    return [-71.084671875, 42.339787500000014]
+  }
+  return [
+    Number(props.selectedSensor.lon),
+    Number(props.selectedSensor.lat),
+  ] as [number, number]
+})
 </script>

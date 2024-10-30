@@ -38,12 +38,12 @@
         />
       </ol-tile-layer>
 
-      <ol-vector-layer>
+      <ol-vector-layer v-if="formattedSensors.length > 0">
         <ol-source-vector>
           <ol-feature
-            v-for="sensor in sensors"
-            :key="sensor.id"
-            :properties="{ id: sensor.id }"
+            v-for="sensor in formattedSensors"
+            :key="sensor.moduleid"
+            :properties="{ id: sensor.moduleid }"
           >
             <ol-geom-point :coordinates="sensor.coordinates" />
             <ol-style>
@@ -58,7 +58,7 @@
       </ol-vector-layer>
 
       <ol-overlay
-        v-if="showSensorInfo"
+        v-if="showSensorInfo && selectedSensorPosition"
         :position="selectedSensorPosition"
         :offset="[0, 0]"
         positioning="top-left"
@@ -69,33 +69,39 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSensorDetailStore } from '../../stores/sensorDetail'
 import { useMapStore } from '../../stores/map'
 import SensorTag from './SensorTag.vue'
 import { useGeographic } from 'ol/proj'
-import { click } from 'ol/events/condition'
+import type { Sensor } from '../../stores/sensorDetail'
 
 useGeographic()
+
+interface FormattedSensor {
+  moduleid: string
+  coordinates: [number, number]
+  status: string
+  ecohub_location: string
+}
 
 const sensorDetailStore = useSensorDetailStore()
 const mapStore = useMapStore()
 
-const { sensors, selectedSensorId, showSensorInfo } =
+const { sensors, selectedSensorId, showSensorInfo, selectedSensor } =
   storeToRefs(sensorDetailStore)
-const { mapType, mapCenter } = storeToRefs(mapStore)
+const { mapType } = storeToRefs(mapStore)
 const { updateSelectedSensor, updateClickPosition } = sensorDetailStore
-const { updateMapCenter } = mapStore
 
 const view = ref(null)
 const map = ref(null)
 const projection = ref('EPSG:4326')
 const markerPosition = ref({ x: 0, y: 0 })
-const selectedSensorPosition = ref(null)
+const selectedSensorPosition = ref<[number, number] | null>(null)
 
-const initialCenter = ref([-71.0892, 42.3398])
+const initialCenter = ref([-71.084671875, 42.339787500000014])
 const initialZoom = ref(18)
 
 const mapboxToken =
@@ -109,35 +115,76 @@ const mapboxUrl = computed(() => {
 const mapboxAttribution =
   '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
-function getIconUrl(sensor) {
-  const color =
-    sensor.status === 'Active'
-      ? 'green'
-      : sensor.status === 'Inactive'
-      ? 'red'
-      : 'yellow'
+const formattedSensors = computed(() => {
+  if (!sensors.value || !Array.isArray(sensors.value)) {
+    console.log('No valid sensors data')
+    return []
+  }
+
+  return sensors.value
+    .filter((sensor: Sensor) => {
+      const hasValidCoords =
+        sensor?.lon != null &&
+        sensor?.lat != null &&
+        !isNaN(Number(sensor.lon)) &&
+        !isNaN(Number(sensor.lat))
+
+      if (!hasValidCoords) {
+        console.log('Sensor without valid coordinates:', sensor?.moduleid)
+      }
+      return hasValidCoords
+    })
+    .map((sensor: Sensor) => {
+      const lon = Number(sensor.lon)
+      const lat = Number(sensor.lat)
+      const coordinates = [lon, lat] as [number, number]
+
+      console.log(`Formatted coordinates for ${sensor.moduleid}:`, coordinates)
+
+      return {
+        moduleid: sensor.moduleid,
+        coordinates,
+        status:
+          sensor.temperature === 0 && sensor.relative_humidity === 0
+            ? 'Inactive'
+            : 'Active',
+        ecohub_location: sensor.ecohub_location,
+      }
+    })
+})
+
+function getIconUrl(sensor: FormattedSensor) {
+  const color = sensor.status === 'Active' ? 'green' : 'red'
   return `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`
 }
 
-function updateSensorOverlay(sensorId) {
-  const sensor = sensors.value.find((s) => s.id === sensorId)
-  if (sensor) {
-    selectedSensorPosition.value = sensor.coordinates
+function updateSensorOverlay(sensorId: string) {
+  const sensor = formattedSensors.value.find((s) => s.moduleid === sensorId)
+  if (sensor?.coordinates) {
+    console.log('Updating sensor overlay position:', sensor.coordinates)
+
+    selectedSensorPosition.value = [...sensor.coordinates] as [number, number]
   }
 }
 
-function handleMapClick(event) {
+function handleMapClick(event: any) {
   const feature = event.map.forEachFeatureAtPixel(
     event.pixel,
-    (feature) => feature
+    (feature: any) => feature
   )
+
   if (feature) {
     const sensorId = feature.get('id')
     if (sensorId) {
-      updateSelectedSensor(sensorId)
+      console.log('Clicked sensor:', sensorId)
       const coordinate = feature.getGeometry().getCoordinates()
-      updateClickPosition({ x: coordinate[0], y: coordinate[1] })
-      selectedSensorPosition.value = coordinate
+
+      if (Array.isArray(coordinate) && coordinate.length === 2) {
+        console.log('Clicked coordinates:', coordinate)
+        updateSelectedSensor(sensorId)
+        updateClickPosition({ x: coordinate[0], y: coordinate[1] })
+        selectedSensorPosition.value = [...coordinate] as [number, number]
+      }
     }
   } else {
     sensorDetailStore.closeSensorInfo()
@@ -152,10 +199,12 @@ function updateSelectedSensorOverlay(event) {
 
 watch(selectedSensorId, (newId) => {
   if (newId) {
+    console.log('Selected sensor changed:', newId)
     updateSensorOverlay(newId)
     if (view.value) {
-      const sensor = sensors.value.find((s) => s.id === newId)
+      const sensor = formattedSensors.value.find((s) => s.moduleid === newId)
       if (sensor) {
+        console.log('Animating to sensor:', sensor.coordinates)
         view.value.animate({
           center: sensor.coordinates,
           zoom: 18,
@@ -166,8 +215,11 @@ watch(selectedSensorId, (newId) => {
   }
 })
 
-onMounted(() => {
+onMounted(async () => {
   console.log('MapDashboard mounted')
+  await sensorDetailStore.loadSensors()
+
+  console.log('Formatted sensors:', formattedSensors.value)
 })
 </script>
 

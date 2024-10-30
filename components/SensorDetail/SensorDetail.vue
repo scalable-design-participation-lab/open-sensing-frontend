@@ -50,7 +50,7 @@
                   v-show="selectedDatasets.includes(metricName)"
                   :key="metricName"
                   :metric="metric"
-                  :data="sensorData[metricName]"
+                  :data="chartData[metricName]"
                   :margin="margin"
                   :width="chartWidth"
                   :height="chartHeight"
@@ -201,9 +201,15 @@ const margin = { top: 20, right: 20, bottom: 30, left: 40 }
  * Computed property to check if data is loaded and chart width is set
  * @type {import('vue').ComputedRef<boolean>}
  */
-const dataLoaded = computed(
-  () => Object.keys(sensorData.value).length > 0 && chartWidth.value > 0
-)
+const dataLoaded = computed(() => {
+  if (
+    !selectedSensor.value ||
+    !sensorData.value[selectedSensor.value.moduleid]
+  ) {
+    return false
+  }
+  return chartWidth.value > 0
+})
 
 /**
  * Metrics configuration for charts
@@ -217,10 +223,7 @@ const metrics = ref({
   },
   'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
   'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
-  pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
-  'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
-  pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
-  pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
+  'PM2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
 })
 
 /**
@@ -228,37 +231,122 @@ const metrics = ref({
  * @type {import('vue').ComputedRef<Object>}
  */
 const sensorStats = computed(() => {
-  if (!selectedSensor.value) return {}
+  if (
+    !selectedSensor.value ||
+    !sensorData.value[selectedSensor.value.moduleid]
+  ) {
+    return {
+      Temperature: 'N/A',
+      'Relative Humidity': 'N/A',
+      'VOC (ppb)': 'N/A',
+      'NOx (ppb)': 'N/A',
+      'PM2.5': 'N/A',
+    }
+  }
+
+  const data = sensorData.value[selectedSensor.value.moduleid]
+  console.log('Sensor data:', data)
+
+  /**
+   * Formats a sensor value with its unit
+   * @param {number|null|undefined} value - The value to format
+   * @param {string} unit - The unit to append
+   * @returns {string} Formatted value with unit or 'N/A'
+   */
+  const formatValue = (value, unit) => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return 'N/A'
+    }
+    return `${value.toFixed(1)}${unit}`
+  }
+
   return {
-    Temperature: `${selectedSensor.value.temperature.toFixed(1)}°C`,
-    Humidity: `${selectedSensor.value.humidity.toFixed(1)}%`,
-    'VOC (ppb)': selectedSensor.value.voc,
-    'NOx (ppb)': selectedSensor.value.nox,
-    'PM2.5 (µg/m³)': selectedSensor.value.pm25,
+    Temperature: formatValue(selectedSensor.value.temperature, '°C'),
+    'Relative Humidity': formatValue(
+      selectedSensor.value.relative_humidity,
+      '%'
+    ),
+    'VOC (ppb)': formatValue(selectedSensor.value.voc, ' ppb'),
+    'NOx (ppb)': formatValue(selectedSensor.value.nox, ' ppb'),
+    'PM2.5': formatValue(selectedSensor.value.pm25, ' µg/m³'),
   }
 })
 
 /**
- * Computed property for sensor info items
- * @type {import('vue').ComputedRef<Array<{label: string, value: string, color: string}>>}
+ * Gets the air quality based on temperature and humidity
+ * @param {number} temperature - The temperature value
+ * @param {number} humidity - The humidity value
+ * @returns {string} The air quality status
  */
-const sensorInfoItems = computed(() => [
-  {
-    label: 'Signal Strength',
-    value: `${selectedSensor.value.signalStrength}/5`,
-    color: getSignalStrengthColor(selectedSensor.value.signalStrength),
-  },
-  {
-    label: 'Air Quality',
-    value: selectedSensor.value.airQuality,
-    color: getAirQualityColor(selectedSensor.value.airQuality),
-  },
-  {
-    label: 'Soil Moisture',
-    value: selectedSensor.value.soilMoisture,
-    color: getSoilMoistureColor(selectedSensor.value.soilMoisture),
-  },
-])
+const getAirQuality = (temperature, humidity) => {
+  if (temperature === null || humidity === null) return 'Unknown'
+  if (temperature === 0 && humidity === 0) return 'Inactive'
+  if (temperature > 30 || humidity > 80) return 'Poor'
+  if (temperature > 25 || humidity > 70) return 'Moderate'
+  return 'Good'
+}
+
+/**
+ * Gets the color for air quality
+ * @param {string|null} value - The air quality value
+ * @returns {string} The color class for the air quality
+ */
+const getAirQualityColor = (value) => {
+  if (!value) return 'text-gray-500'
+
+  switch (value.toLowerCase()) {
+    case 'good':
+      return 'text-green-500'
+    case 'moderate':
+      return 'text-yellow-500'
+    case 'poor':
+      return 'text-orange-500'
+    case 'very poor':
+      return 'text-red-500'
+    case 'inactive':
+      return 'text-red-500'
+    case 'unknown':
+      return 'text-gray-500'
+    default:
+      return 'text-gray-500'
+  }
+}
+
+/**
+ * Computed property for sensor info items
+ */
+const sensorInfoItems = computed(() => {
+  if (!selectedSensor.value) {
+    return [
+      { label: 'Signal Strength', value: 'N/A', color: 'text-gray-500' },
+      { label: 'Air Quality', value: 'Unknown', color: 'text-gray-500' },
+      { label: 'Location', value: 'N/A', color: 'text-gray-500' },
+    ]
+  }
+
+  const airQuality = getAirQuality(
+    selectedSensor.value.temperature,
+    selectedSensor.value.relative_humidity
+  )
+
+  return [
+    {
+      label: 'Signal Strength',
+      value: '5/5',
+      color: getSignalStrengthColor(5),
+    },
+    {
+      label: 'Air Quality',
+      value: airQuality,
+      color: getAirQualityColor(airQuality),
+    },
+    {
+      label: 'Location',
+      value: selectedSensor.value.ecohub_location || 'Unknown',
+      color: 'text-gray-900',
+    },
+  ]
+})
 
 useResizeObserver(scrollContainer, (entries) => {
   const entry = entries[0]
@@ -304,12 +392,16 @@ const resetAllCharts = () => {
   globalDateRange.value = []
   updateDataDashboardValues('dateRange', [])
 
-  Object.keys(metrics.value).forEach((metricName) => {
-    if (sensorData.value[metricName]) {
-      updateDataDashboardValues(metricName, sensorData.value[metricName])
-    }
-  })
+  if (selectedSensor.value && sensorData.value[selectedSensor.value.moduleid]) {
+    const currentData = sensorData.value[selectedSensor.value.moduleid]
+    Object.keys(metrics.value).forEach((metricName) => {
+      if (currentData[metricName]) {
+        updateDataDashboardValues(metricName, currentData[metricName])
+      }
+    })
+  }
 
+  // 触发图表重绘
   chartWidth.value = chartWidth.value + 1
 }
 
@@ -373,26 +465,6 @@ const getSignalStrengthColor = (value) => {
 }
 
 /**
- * Gets the color for air quality
- * @param {string} value - The air quality value
- * @returns {string} The color class for the air quality
- */
-const getAirQualityColor = (value) => {
-  switch (value.toLowerCase()) {
-    case 'good':
-      return 'text-green-500'
-    case 'moderate':
-      return 'text-yellow-500'
-    case 'poor':
-      return 'text-orange-500'
-    case 'very poor':
-      return 'text-red-500'
-    default:
-      return 'text-gray-500'
-  }
-}
-
-/**
  * Gets the color for soil moisture
  * @param {number|string} value - The soil moisture value
  * @returns {string} The color class for the soil moisture
@@ -406,13 +478,18 @@ const getSoilMoistureColor = (value) => {
 
 watch(
   selectedSensor,
-  async (newSensor, oldSensor) => {
-    if (newSensor && newSensor !== oldSensor) {
-      await loadSensorData()
-      resetAllCharts()
+  async (newSensor) => {
+    if (newSensor) {
+      try {
+        await sensorDataStore.loadSensorData(newSensor.moduleid)
+        console.log('Loaded sensor data:', sensorData.value[newSensor.moduleid])
+        resetAllCharts()
+      } catch (err) {
+        console.error('Error loading sensor data:', err)
+      }
     }
   },
-  { deep: true }
+  { immediate: true }
 )
 
 /**
@@ -422,4 +499,36 @@ watch(
 const initMiniMap = () => {
   console.log('Mini map initialization placeholder')
 }
+
+/**
+ * Computed property for chart data
+ * @type {import('vue').ComputedRef<Object>}
+ */
+const chartData = computed(() => {
+  if (
+    !selectedSensor.value ||
+    !sensorData.value[selectedSensor.value.moduleid]
+  ) {
+    return {}
+  }
+
+  const sensorMetrics = sensorData.value[selectedSensor.value.moduleid]
+  const result = {}
+
+  Object.keys(metrics.value).forEach((metricName) => {
+    const metricData = sensorMetrics[metricName]
+    if (metricData) {
+      result[metricName] = {
+        data: metricData.data.map((d) => ({
+          date: d.date.toISOString(),
+          value: d.value,
+        })),
+        min: metricData.min,
+        max: metricData.max,
+      }
+    }
+  })
+
+  return result
+})
 </script>
