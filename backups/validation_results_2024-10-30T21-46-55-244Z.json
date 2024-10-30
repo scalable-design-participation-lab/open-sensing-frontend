@@ -1,0 +1,454 @@
+[
+  {
+    "id": "03JTzXAOqia4lTY0Uqis",
+    "invalidCoordinates": [
+      {
+        "type": "point",
+        "path": "space.everyday[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.everyday[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.everyday[2]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.everyweek[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.everyweek[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.everyweek[2]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.sometimes[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.sometimes[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.sometimes[2]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.sometimes[3]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.never[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.never[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.never[2]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.never[3]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.never[4]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "belonging.positive[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "belonging.love[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "belonging.love[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "safety.safe[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "safety.safe[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "safety.safe[2]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "safety.safe[3]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "safety.great[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "safety.great[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[2]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[3]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[4]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[5]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.flora-fauna[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      }
+    ]
+  },
+  {
+    "id": "0okEz8J0mX3HA9M4ZnDm",
+    "invalidCoordinates": [
+      {
+        "type": "point",
+        "path": "space.sometimes[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.once[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.once[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "belonging.negative[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "belonging.love[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "safety.safe[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[2]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[3]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.pollution[4]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.flora-fauna[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.flora-fauna[1]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "environment.flora-fauna[2]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      }
+    ]
+  },
+  {
+    "id": "AKIAHk7QjaJKvm0Y6unq",
+    "invalidCoordinates": [
+      {
+        "type": "point",
+        "path": "space.everyday[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      }
+    ]
+  },
+  {
+    "id": "EPKj0IvpBXBCOwkJOqDu",
+    "invalidCoordinates": [
+      {
+        "type": "point",
+        "path": "space.everyday[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      },
+      {
+        "type": "point",
+        "path": "space.everyweek[0]",
+        "coordinates": {
+          "lon": null,
+          "lat": null
+        },
+        "reason": "Coordinates are null"
+      }
+    ]
+  }
+]

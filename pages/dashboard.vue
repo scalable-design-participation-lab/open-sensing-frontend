@@ -13,11 +13,11 @@
     />
 
     <main class="flex-grow relative overflow-hidden pt-16">
-      <MapDashboard
+      <!-- <MapDashboard
         class="absolute inset-0"
         :show-icon-layer="true"
         :show-sensor-tag="true"
-      />
+      /> -->
       <GenericFilterSidebar
         v-if="showFilter && !showDashboard"
         :is-visible="showFilter && !showDashboard"

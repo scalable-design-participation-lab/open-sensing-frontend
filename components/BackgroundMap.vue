@@ -8,10 +8,14 @@
   >
     <ol-view
       ref="view"
-      :center="[28.476908, 49.249253]"
-      :zoom="17.68"
+      :center="[3172858.2941718884, 6317486.347640147]"
+      :zoom="12.83"
       :projection="projection"
       :rotation="0"
+      :pitch="0"
+      :bearing="0"
+      :maxZoom="19"
+      :minZoom="10"
     />
 
     <ol-tile-layer>
@@ -92,7 +96,7 @@ const mapUIStore = useMapUIStore()
 const config = useRuntimeConfig()
 const route = useRoute()
 
-const projection = ref('EPSG:4326')
+const projection = ref('EPSG:3857')
 const commentPopupVisible = ref(false)
 const imageUploadPopupVisible = ref(false)
 const selectedFeatureId = ref(null)
@@ -101,11 +105,10 @@ const imageUploadPopupPosition = ref(null)
 const showCommentDisplay = ref(false)
 const selectedFeatureForDisplay = ref(null)
 
-const mapboxStyle = 'cesandoval09/clxkxw58f01tt01qj2ep8g1qr'
-const mapboxToken = config.public.MAPBOX_ACCESS_TOKEN
+const mapboxStyle = 'restartukraine/cm1ez4ahh02ii01pi36qeb4ug'
 const mapboxUrl = computed(
   () =>
-    `https://api.mapbox.com/styles/v1/${mapboxStyle}/tiles/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw`
+    `https://api.mapbox.com/styles/v1/${mapboxStyle}/tiles/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw`,
 )
 const mapboxAttribution =
   '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
