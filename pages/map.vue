@@ -26,7 +26,7 @@ const leftItems = ref([
     color: 'black',
   },
   {
-    label: 'Restart Ukraine',
+    label: 'Гуртомá',
     variant: 'solid',
     color: 'black',
   },
