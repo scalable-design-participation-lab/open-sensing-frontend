@@ -18,64 +18,42 @@
  -->
 
 <template>
-  <header
-    class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between z-50"
-  >
+  <header class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between z-50">
     <div class="h-full flex space-x-2 sm:space-x-3">
-      <UButton
-        v-if="logoSrc"
-        :class="[
-          `lg:w-12 rounded-lg flex justify-center !bg-white shadow-md hover:animate-bounce`,
-          shapeClass,
-        ]"
-      >
-        <img
-          :src="logoSrc"
-          :alt="logoAlt"
-          class="w-full h-auto"
-        />
+      <UButton v-if="logoSrc" :class="[
+        `lg:w-12 rounded-lg flex justify-center !bg-white shadow-md hover:animate-bounce`,
+        shapeClass,
+      ]">
+        <img :src="logoSrc" :alt="logoAlt" class="w-full h-auto" />
       </UButton>
-      <UButton
-        v-if="showIcon"
-        :class="[
-          `lg:w-12 text-xl sm:text-2xl rounded-lg flex justify-center !bg-white shadow-md hover:animate-bounce`,
-          shapeClass,
-        ]"
-      >
+      <UButton v-if="showIcon" :class="[
+        `lg:w-12 text-xl sm:text-2xl rounded-lg flex justify-center !bg-white shadow-md hover:animate-bounce`,
+        shapeClass,
+      ]">
         🤲
       </UButton>
       <template v-for="(item, index) in leftItems" :key="index">
         <NuxtLink v-if="item.to" v-slot="{ navigate }" :to="item.to" custom>
-          <UButton
-            :variant="item.variant"
-            :color="item.color || (item.primary ? 'black' : 'gray')"
-            :icon="item.icon"
+
+          <UButton :variant="item.variant" :color="item.color || (item.primary ? 'black' : 'gray')" :icon="item.icon"
             :class="[
               `h-full px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
               item.primary
                 ? 'bg-white text-black hover:bg-black hover:text-white'
                 : 'bg-black text-white hover:bg-white hover:text-black',
               shapeClass,
-            ]"
-            @click="navigate"
-          >
+            ]" @click="navigate">
             {{ item.label }}
           </UButton>
         </NuxtLink>
-        <UButton
-          v-else
-          :variant="item.variant"
-          :color="item.color || (item.primary ? 'black' : 'gray')"
-          :icon="item.icon"
-          :class="[
+        <UButton v-else :variant="item.variant" :color="item.color || (item.primary ? 'black' : 'gray')"
+          :icon="item.icon" :class="[
             `h-full px-3 sm:px-4 rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-md hover:animate-pulse`,
             item.primary
               ? '!bg-white text-black'
               : '!bg-black text-white',
             shapeClass,
-          ]"
-          @click="item.onClick"
-        >
+          ]" @click="item.onClick">
           {{ item.label }}
         </UButton>
       </template>
@@ -83,44 +61,25 @@
     <div class="flex space-x-2 sm:space-x-3">
       <template v-for="(item, index) in rightItems" :key="index">
         <UDropdown v-if="item.dropdown" v-bind="item.dropdown">
-          <UButton
-            :icon="item.icon"
-            :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white shadow-md text-black hover:invert`,
-              shapeClass,
-            ]"
-          >
+          <UButton :icon="item.icon" :class="[
+            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white shadow-md text-black hover:invert`,
+            shapeClass,
+          ]">
             {{ item.label }}
           </UButton>
         </UDropdown>
-        <NuxtLink
-          v-else-if="item.to"
-          v-slot="{ navigate }"
-          :to="item.to"
-          custom
-        >
-          <UButton
-            :variant="item.variant"
-            :color="item.color"
-            :icon="item.icon"
-            :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white text-black hover:invert`,
-              shapeClass,
-            ]"
-            @click="navigate"
-          >
+        <NuxtLink v-else-if="item.to" v-slot="{ navigate }" :to="item.to" custom>
+          <UButton :variant="item.variant" :color="item.color" :icon="item.icon" :class="[
+            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white text-black hover:invert`,
+            shapeClass,
+          ]" @click="navigate">
             {{ item.label }}
           </UButton>
         </NuxtLink>
-        <UButton
-          v-else
-          :icon="item.icon"
-          :class="[
-            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white shadow-md text-black hover:invert`,
-            shapeClass,
-          ]"
-          @click="item.onClick"
-        >
+        <UButton v-else :icon="item.icon" :class="[
+          `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white shadow-md text-black hover:invert`,
+          shapeClass,
+        ]" @click="item.onClick">
           {{ item.label }}
         </UButton>
       </template>

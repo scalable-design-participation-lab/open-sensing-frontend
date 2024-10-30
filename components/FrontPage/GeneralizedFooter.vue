@@ -14,9 +14,7 @@
  -->
 
 <template>
-  <footer
-    class="fixed bottom-6 left-6 right-6 flex justify-between items-end sm:flex-row flex-col z-50"
-  >
+  <footer class="fixed bottom-6 left-6 right-6 flex justify-between items-end sm:flex-row flex-col z-50">
     <div class="footer-left">
       <h2 class="text-2xl">{{ title }}</h2>
       <nav class="mt-4">
@@ -29,17 +27,11 @@
     </div>
     <div class="flex items-center gap-4 sm:mt-0 mt-4">
       <div class="flex gap-4">
-        <UButton
-          v-for="button in buttons"
-          :key="button.label"
-          color="gray"
-          :label="button.label"
-        />
+        <UButton v-for="button in buttons" :key="button.label" color="gray" :label="button.label" />
       </div>
       <button
         class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-semibold text-lg md:text-xl cursor-pointer shadow-md hover:bg-white hover:animate-spin"
-        aria-label="Help"
-      >
+        aria-label="Help">
         ?
       </button>
     </div>
