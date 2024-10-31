@@ -17,34 +17,65 @@
 
 <template>
   <header class="sensor-header border-b border-grey-100 p-4 flex items-center">
-    <UButton icon="i-heroicons-arrow-left" color="primary" variant="ghost" class="mr-2 hover:bg-gray-200"
-      data-testid="go-back-button" @click="$emit('go-back')" />
+    <UButton
+      icon="i-heroicons-arrow-left"
+      color="primary"
+      variant="ghost"
+      class="mr-2 hover:bg-gray-200"
+      data-testid="go-back-button"
+      @click="$emit('go-back')"
+    />
     <h1 class="text-2xl font-bold text-gray-800" data-testid="sensor-location">
-      {{ selectedSensor.location }}
+      {{ selectedSensor.ecohub_location }}
     </h1>
-    <UBadge :color="getStatusColor(selectedSensor.status)" class="h-5 w-5 rounded-full mx-2"
-      data-testid="sensor-status">
+    <UBadge
+      :color="getStatusColor(selectedSensor.status)"
+      class="h-5 w-5 rounded-full mx-2"
+      data-testid="sensor-status"
+    >
     </UBadge>
     <div class="flex-grow"></div>
     <div class="flex" data-testid="sensor-info">
-      <div class="battery-indicator flex items-center bg-gray-100 rounded-full px-3 py-1"
-        data-testid="battery-indicator">
-        <UIcon name="i-heroicons-battery-50" class="w-6 h-6 mr-2"
-          :class="getBatteryIconColor(selectedSensor.batteryLevel)" />
+      <div
+        class="battery-indicator flex items-center bg-gray-100 rounded-full px-3 py-1"
+        data-testid="battery-indicator"
+      >
+        <UIcon
+          name="i-heroicons-battery-50"
+          class="w-6 h-6 mr-2"
+          :class="getBatteryIconColor(selectedSensor.batteryLevel)"
+        />
         <span class="text-sm" data-testid="battery-level">
           {{ selectedSensor.batteryLevel }}%
         </span>
       </div>
     </div>
     <div class="navigation-buttons ml-4 flex" data-testid="navigation-buttons">
-      <UButton icon="i-heroicons-arrow-up" color="primary" variant="ghost"
-        class="mr-2 hover:bg-gray-200 transition-colors" data-testid="select-previous-button"
-        @click="$emit('select-previous')" />
-      <UButton icon="i-heroicons-arrow-down" color="primary" variant="ghost" class="hover:bg-gray-200 transition-colors"
-        data-testid="select-next-button" @click="$emit('select-next')" />
+      <UButton
+        icon="i-heroicons-arrow-up"
+        color="primary"
+        variant="ghost"
+        class="mr-2 hover:bg-gray-200 transition-colors"
+        data-testid="select-previous-button"
+        @click="$emit('select-previous')"
+      />
+      <UButton
+        icon="i-heroicons-arrow-down"
+        color="primary"
+        variant="ghost"
+        class="hover:bg-gray-200 transition-colors"
+        data-testid="select-next-button"
+        @click="$emit('select-next')"
+      />
     </div>
-    <UButton icon="i-heroicons-x-mark" color="gray" variant="ghost" class="ml-4 hover:bg-gray-200 transition-colors"
-      data-testid="close-button" @click="$emit('close')" />
+    <UButton
+      icon="i-heroicons-x-mark"
+      color="gray"
+      variant="ghost"
+      class="ml-4 hover:bg-gray-200 transition-colors"
+      data-testid="close-button"
+      @click="$emit('close')"
+    />
   </header>
 </template>
 

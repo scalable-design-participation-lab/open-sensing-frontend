@@ -45,17 +45,21 @@
               class="h-96 overflow-y-auto border border-gray-200 rounded-lg"
             >
               <div v-if="dataLoaded" class="p-4 space-y-6">
-                <LineChart
+                <template
                   v-for="(metric, metricName) in metrics"
-                  v-show="selectedDatasets.includes(metricName)"
                   :key="metricName"
-                  :metric="metric"
-                  :data="chartData[metricName]"
-                  :margin="margin"
-                  :width="chartWidth"
-                  :height="chartHeight"
-                  @date-range-update="updateGlobalDateRange"
-                />
+                >
+                  <div v-if="selectedDatasets.includes(metricName)">
+                    <LineChart
+                      :metric="metric"
+                      :data="chartData[metricName]"
+                      :margin="margin"
+                      :width="chartWidth"
+                      :height="chartHeight"
+                      @date-range-update="updateGlobalDateRange"
+                    />
+                  </div>
+                </template>
               </div>
               <div
                 v-else
@@ -223,7 +227,10 @@ const metrics = ref({
   },
   'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
   'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
-  'PM2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
+  pm1: { name: 'pm1', label: 'pm1 (µg/m³)' },
+  pm2_5: { name: 'pm25', label: 'pm2.5 (µg/m³)' },
+  pm4: { name: 'pm4', label: 'pm4 (µg/m³)' },
+  pm10: { name: 'pm10', label: 'pm10 (µg/m³)' },
 })
 
 /**
@@ -240,7 +247,10 @@ const sensorStats = computed(() => {
       'Relative Humidity': 'N/A',
       'VOC (ppb)': 'N/A',
       'NOx (ppb)': 'N/A',
-      'PM2.5': 'N/A',
+      pm1: 'N/A',
+      pm2_5: 'N/A',
+      pm4: 'N/A',
+      pm10: 'N/A',
     }
   }
 
@@ -268,7 +278,10 @@ const sensorStats = computed(() => {
     ),
     'VOC (ppb)': formatValue(selectedSensor.value.voc, ' ppb'),
     'NOx (ppb)': formatValue(selectedSensor.value.nox, ' ppb'),
-    'PM2.5': formatValue(selectedSensor.value.pm25, ' µg/m³'),
+    pm1: formatValue(selectedSensor.value.pm1, ' µg/m³'),
+    pm2_5: formatValue(selectedSensor.value.pm25, ' µg/m³'),
+    pm4: formatValue(selectedSensor.value.pm4, ' µg/m³'),
+    pm10: formatValue(selectedSensor.value.pm10, ' µg/m³'),
   }
 })
 
@@ -401,7 +414,6 @@ const resetAllCharts = () => {
     })
   }
 
-  // 触发图表重绘
   chartWidth.value = chartWidth.value + 1
 }
 
@@ -496,9 +508,7 @@ watch(
  * Initializes the mini map
  * This is a placeholder function that can be overridden by parent components
  */
-const initMiniMap = () => {
-  console.log('Mini map initialization placeholder')
-}
+const initMiniMap = () => {}
 
 /**
  * Computed property for chart data

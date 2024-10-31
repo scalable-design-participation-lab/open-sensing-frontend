@@ -80,12 +80,10 @@ let brush: d3.BrushBehavior<unknown>
 
 const createLineChart = () => {
   if (!props.data?.data || !Array.isArray(props.data.data)) {
-    console.log('Invalid or missing data')
     return
   }
 
   if (props.width <= 0 || props.data.data.length === 0) {
-    console.log('Invalid dimensions or empty data')
     return
   }
 
@@ -113,7 +111,6 @@ const createLineChart = () => {
       }))
 
     if (data.length === 0) {
-      console.log('No valid data points after parsing')
       return
     }
 
@@ -146,8 +143,35 @@ const createLineChart = () => {
       .attr('dx', '-.8em')
       .attr('dy', '.15em')
       .attr('transform', 'rotate(-45)')
+      .style('font-size', '10px')
 
-    svg.append('g').attr('class', 'y-axis').call(yAxis)
+    svg
+      .append('text')
+      .attr('class', 'x-axis-label')
+      .attr('x', width / 2)
+      .attr('y', height + props.margin.bottom + 10)
+      .style('text-anchor', 'middle')
+      .style('font-size', '11px')
+      .style('font-weight', '500')
+      .text('Time')
+
+    svg
+      .append('g')
+      .attr('class', 'y-axis')
+      .call(yAxis)
+      .selectAll('text')
+      .style('font-size', '10px')
+
+    svg
+      .append('text')
+      .attr('class', 'y-axis-label')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', -props.margin.left + 12)
+      .attr('x', -height / 2)
+      .style('text-anchor', 'middle')
+      .style('font-size', '11px')
+      .style('font-weight', '500')
+      .text(props.metric.label || '')
 
     line = d3
       .line<DataPoint>()
@@ -215,7 +239,6 @@ watch(
   () => props.data,
   (newData) => {
     if (newData?.data) {
-      console.log('Chart data updated:', newData)
       createLineChart()
     }
   },
@@ -269,10 +292,26 @@ onUnmounted(() => {
 .x-axis text,
 .y-axis text {
   font-size: 10px;
+  fill: #666;
 }
 
 .x-axis-label,
 .y-axis-label {
-  fill: #666;
+  fill: #333;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.x-axis path,
+.y-axis path,
+.x-axis line,
+.y-axis line {
+  stroke: #ddd;
+}
+
+.x-axis .tick line,
+.y-axis .tick line {
+  stroke: #ddd;
+  stroke-width: 0.5;
 }
 </style>

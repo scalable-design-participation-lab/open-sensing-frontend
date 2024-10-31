@@ -39,10 +39,10 @@ export const useSensorDataStore = defineStore('sensorData', () => {
           },
           'VOC (ppb)': { name: 'voc', label: 'VOC (ppb)' },
           'NOx (ppb)': { name: 'nox', label: 'NOx (ppb)' },
-          pm1: { name: 'pm1', label: 'PM1 (µg/m³)' },
-          'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
-          pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
-          pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
+          pm1: { name: 'pm1', label: 'pm1 (µg/m³)' },
+          pm2_5: { name: 'pm25', label: 'pm2.5 (µg/m³)' },
+          pm4: { name: 'pm4', label: 'pm4 (µg/m³)' },
+          pm10: { name: 'pm10', label: 'pm10 (µg/m³)' },
         }
 
         const metricData = {}
@@ -61,7 +61,7 @@ export const useSensorDataStore = defineStore('sensorData', () => {
         sensorData.value[moduleId] = metricData
         lastFetchTime.value[moduleId] = Date.now()
       } catch (err) {
-        console.error('Error fetching sensor data', err)
+        console.error('Error in loadSensorData:', err)
         throw err
       } finally {
         isFetching.value = false
