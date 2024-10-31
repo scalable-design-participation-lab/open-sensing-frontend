@@ -6,6 +6,13 @@
     style="width: 100%; height: 100vh"
     @click="handleMapClick"
   >
+    <ol-zoom-control
+      class="custom-zoom-control"
+      zoomInLabel="➕"
+      zoomOutLabel="➖"
+      :duration="250"
+    />
+
     <ol-view
       ref="view"
       :center="[3172858.2941718884, 6317486.347640147]"
@@ -200,3 +207,33 @@ function handleShowCommentDisplay(feature) {
 // watch(showCommentDisplay, (newVal) => {})
 // watch(selectedFeatureForDisplay, (newVal) => {})
 </script>
+
+<style>
+.ol-zoom {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  left: 20px !important;
+  bottom: unset !important;
+  background: transparent !important;
+  border-radius: 4px !important;
+  z-index: 1500 !important;
+  box-shadow: none !important;
+}
+
+/* Customize zoom buttons */
+.ol-zoom .ol-zoom-in,
+.ol-zoom .ol-zoom-out {
+  background-color: transparent !important;
+  border: none !important;
+  margin: 1px !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  color: #374151 !important;
+  font-size: 20px !important;
+}
+</style>
