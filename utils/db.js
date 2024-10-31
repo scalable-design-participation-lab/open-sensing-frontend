@@ -1,6 +1,6 @@
-import knex from 'knex'
-import knexfile from '../knexfile.js'
+// import knex from 'knex'
+// import knexfile from '../knexfile.js'
 
-const db = knex(knexfile)
+// const db = knex(knexfile)
 
-export default db
+// export default db
