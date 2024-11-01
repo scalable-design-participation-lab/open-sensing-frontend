@@ -1,7 +1,24 @@
 <template>
   <template v-for="feature in features" :key="feature.id">
-    <ol-feature>
-      <ol-geom-point :coordinates="feature.coordinates" />
+    <ol-vector-layer>
+      <ol-source-vector>
+        <ol-feature>
+          <ol-geom-point :coordinates="feature.coordinates" />
+          <ol-style>
+            <ol-style-icon
+              :src="getIconForFeature(feature)"
+              :scale="1"
+              :anchor="[0.5, 0.5]"
+            />
+          </ol-style>
+        </ol-feature>
+      </ol-source-vector>
+    </ol-vector-layer>
+
+    <ol-interaction-select
+      :condition="clickCondition"
+      @select="(event) => handleSelect(event, feature)"
+    >
       <ol-style>
         <ol-style-icon
           :src="getIconForFeature(feature)"
@@ -9,22 +26,27 @@
           :anchor="[0.5, 0.5]"
         />
       </ol-style>
-    </ol-feature>
-    <ol-overlay :position="feature.coordinates" :offset="[0, 0]">
+    </ol-interaction-select>
+
+    <ol-overlay
+      :position="feature.coordinates"
+      :offset="[0, 0]"
+      :stopEvent="false"
+      :positioning="'top-left'"
+    >
       <div
         v-if="shouldShowPlusIcon(feature)"
-        class="cursor-pointer text-black-500 rounded-full p-0.5 flex justify-center items-center shadow-md"
+        class="plus-icon-container"
         @click.stop.prevent="handlePlusIconClick(feature)"
       >
         <img
           src="@/assets/icons/open-icon.svg"
           alt="Open Icon"
-          class="w-6 h-6"
+          class="plus-icon"
         />
       </div>
     </ol-overlay>
   </template>
-  <ol-interaction-select :condition="clickCondition" @select="handleSelect" />
 </template>
 
 <script setup lang="ts">
@@ -57,9 +79,8 @@ const mapUIStore = useMapUIStore()
 
 const clickCondition = click
 
-function handleSelect(event) {
+function handleSelect(event, feature) {
   const selected = event.selected
-
   if (selected && selected.length > 0) {
     const olFeature = selected[0]
     const coordinates = olFeature.getGeometry().getCoordinates()
@@ -67,7 +88,7 @@ function handleSelect(event) {
     const feature = props.features.find(
       (f) =>
         Math.abs(f.coordinates[0] - coordinates[0]) < 0.0000001 &&
-        Math.abs(f.coordinates[1] - coordinates[1]) < 0.0000001
+        Math.abs(f.coordinates[1] - coordinates[1]) < 0.0000001,
     )
 
     if (feature) {
@@ -127,3 +148,23 @@ function handlePlusIconClick(feature) {
   }
 }
 </script>
+
+<style scoped>
+.plus-icon-container {
+  cursor: pointer;
+  background: white;
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  position: relative;
+}
+
+.plus-icon {
+  width: 24px;
+  height: 24px;
+}
+</style>
