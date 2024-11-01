@@ -48,7 +48,6 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
           pm10: Number(sensor.pm10) || 0,
         }))
 
-        // 打印传感器数据
         console.log('=== All Sensors Data ===')
         sensors.value.forEach((sensor, index) => {
           console.log(`\nSensor ${index + 1}:`)
