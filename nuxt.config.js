@@ -10,7 +10,7 @@ module.exports = defineNuxtConfig({
   },
   extends: ['@nuxt/ui-pro'],
 
-  modules: ['@pinia/nuxt', '@nuxt/ui', '@nuxthub/core'],
+  modules: ['@pinia/nuxt', '@nuxt/ui'],
 
   components: [
     {

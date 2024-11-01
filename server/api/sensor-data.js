@@ -1,15 +1,22 @@
 import { defineEventHandler, getQuery } from 'h3'
-import { usePostgres } from '../../utils/postgres'
+import db from '../../utils/db'
 
+/**
+ * API endpoint for retrieving sensor data by moduleId
+ *
+ * @async
+ * @function
+ * @param {Object} event - The H3 event object
+ * @returns {Promise<Object>} Sensor data and location information
+ */
 export default defineEventHandler(async (event) => {
   try {
-    const sql = usePostgres()
     const query = getQuery(event)
     const moduleId = query.moduleId
 
     // If no moduleId is provided, return all sensors basic info
     if (!moduleId) {
-      const allSensors = await sql`
+      const allSensorsQuery = await db.raw(`
         SELECT DISTINCT 
           m.moduleid,
           m.ecohub_location,
@@ -41,27 +48,30 @@ export default defineEventHandler(async (event) => {
           ORDER BY moduleid, timestamp DESC
         ) s ON m.moduleid = s.moduleid
         ORDER BY m.moduleid
-      `
+      `)
 
-      // Ensure connection is closed
-      event.waitUntil(sql.end())
-      return allSensors
+      return allSensorsQuery.rows
     }
 
-    // Get module location info
-    const moduleInfo = await sql`
+    // First get the module location info
+    const locationQuery = await db.raw(
+      `
       SELECT moduleid, ecohub_location, lat, lon
       FROM modules
-      WHERE moduleid = ${moduleId}
-    `
+      WHERE moduleid = ?
+    `,
+      [moduleId]
+    )
 
-    if (!moduleInfo?.[0]) {
-      await sql.end()
+    const moduleInfo = locationQuery.rows[0]
+
+    if (!moduleInfo) {
       return { error: 'Module not found' }
     }
 
-    // Get sensor data
-    const sensorData = await sql`
+    // Then get the sensor data
+    const result = await db.raw(
+      `
       SELECT 
         timestamp,
         temperature,
@@ -73,20 +83,19 @@ export default defineEventHandler(async (event) => {
         pm4,
         pm10
       FROM sen55
-      WHERE moduleid = ${moduleId}
+      WHERE moduleid = ?
       ORDER BY timestamp DESC
-    `
-
-    console.log(
-      `Query executed. Returned ${sensorData.length} rows for module ${moduleId}`
+    `,
+      [moduleId]
     )
 
-    // Ensure connection is closed
-    event.waitUntil(sql.end())
+    console.log(
+      `Query executed. Returned ${result.rows.length} rows for module ${moduleId}`
+    )
 
     return {
-      moduleInfo: moduleInfo[0],
-      sensorData,
+      moduleInfo,
+      sensorData: result.rows,
     }
   } catch (err) {
     console.error('Error executing query', err)

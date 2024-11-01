@@ -34,7 +34,6 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
     try {
       const response = await $fetch('/api/sensor-data')
       if (Array.isArray(response)) {
-        // 确保所有必需的字段都存在，并为null的坐标设置默认值
         sensors.value = response.map((sensor) => ({
           ...sensor,
           lat: sensor.lat || null,
