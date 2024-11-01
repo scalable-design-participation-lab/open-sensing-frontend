@@ -59,7 +59,7 @@ const mapUIStore = useMapUIStore()
 const clickCondition = click
 
 const lineStringFeatures = computed(() =>
-  mapUIStore.features.filter((feature) => feature.type === 'LineString')
+  mapUIStore.features.filter((feature) => feature.type === 'LineString'),
 )
 
 function getLineStringStartPoint(feature) {
@@ -85,7 +85,7 @@ function handleSelect(event) {
       return coordinates.every(
         (coord, index) =>
           Math.abs(coord[0] - featureCoords[index][0]) < 0.0000001 &&
-          Math.abs(coord[1] - featureCoords[index][1]) < 0.0000001
+          Math.abs(coord[1] - featureCoords[index][1]) < 0.0000001,
       )
     })
 

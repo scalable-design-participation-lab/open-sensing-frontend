@@ -63,7 +63,7 @@ const mapUIStore = useMapUIStore()
 const clickCondition = click
 
 const polygonFeatures = computed(() =>
-  mapUIStore.features.filter((feature) => feature.type === 'Polygon')
+  mapUIStore.features.filter((feature) => feature.type === 'Polygon'),
 )
 
 const visiblePolygonFeatures = computed(() => {
@@ -74,7 +74,7 @@ const visiblePolygonFeatures = computed(() => {
 
   // Original logic for showing plus-icons
   const spaceSubwindow = mapUIStore.spaceSubwindow
-  return spaceSubwindow === 3 ? polygonFeatures.value : []
+  return spaceSubwindow === 2 ? polygonFeatures.value : []
 })
 
 function getFeatureIconPosition(feature) {
