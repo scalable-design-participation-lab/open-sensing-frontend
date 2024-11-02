@@ -141,7 +141,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextSpaceSubwindow() {
-    if (spaceSubwindow.value < 4) {
+    if (spaceSubwindow.value < 3) {
       spaceSubwindow.value++
       resetOtherSubwindows('space')
       console.log('Current space subwindow:', spaceSubwindow.value)
@@ -156,7 +156,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextBelongingSubwindow() {
-    if (belongingSubwindow.value < 2) {
+    if (belongingSubwindow.value < 1) {
       belongingSubwindow.value++
       resetOtherSubwindows('belonging')
     }
@@ -170,7 +170,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextSafetySubwindow() {
-    if (safetySubwindow.value < 2) {
+    if (safetySubwindow.value < 1) {
       safetySubwindow.value++
       resetOtherSubwindows('safety')
     }
@@ -184,7 +184,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextEnvironmentSubwindow() {
-    if (environmentSubwindow.value < 2) {
+    if (environmentSubwindow.value < 1) {
       environmentSubwindow.value++
       resetOtherSubwindows('environment')
     }

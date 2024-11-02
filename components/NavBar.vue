@@ -73,7 +73,6 @@
       </UAccordion>
 
       <UButton
-        v-if="showSubmitButton"
         class="mt-4 w-full"
         color="primary"
         :loading="isSaving"
@@ -108,7 +107,11 @@ const safetySubwindow = computed(() => mapUIStore.safetySubwindow)
 const environmentSubwindow = computed(() => mapUIStore.environmentSubwindow)
 
 const menuItems = [
-  { icon: 'i-heroicons-map-pin-20-solid', label: 'Середовище' },
+  {
+    icon: 'i-heroicons-map-pin-20-solid',
+    label: 'Середовище',
+    defaultOpen: true,
+  },
   { icon: 'i-heroicons-home-20-solid', label: 'Приналежність' },
   { icon: 'i-heroicons-exclamation-triangle-20-solid', label: 'Безпека' },
   { icon: 'i-heroicons-sun-20-solid', label: 'Екологія' },
@@ -314,7 +317,7 @@ async function saveData() {
     showSuccessNotification(
       'Thank you for taking the survey! You can now view your results or explore maps created by other users.',
     )
-    mapUIStore.resetAllSubwindows()
+    // mapUIStore.resetAllSubwindows()
   } catch (error) {
     console.error('Error submitting data to database:', error)
     showErrorNotification('Не вдалося подати дані')
