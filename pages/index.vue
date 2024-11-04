@@ -2,7 +2,10 @@
 import { ref, computed } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
 
+// Map store
 const mapUIStore = useMapUIStore()
+const { setMapType } = mapUIStore
+const currentMapType = ref('satellite')
 
 const leftItems = ref([
   {
@@ -14,6 +17,46 @@ const leftItems = ref([
     label: 'Гуртомá',
     variant: 'solid',
     color: 'black',
+  },
+])
+
+const mapItems = [
+  [
+    {
+      label: 'Light',
+      icon: 'i-heroicons-sun-20-solid',
+      click: () => setMapType('light'),
+    },
+    {
+      label: 'Satellite',
+      icon: 'i-heroicons-globe-americas-20-solid',
+      click: () => setMapType('satellite'),
+    },
+  ],
+]
+
+const rightItems = ref([
+  {
+    label: computed(() =>
+      currentMapType.value === 'light'
+        ? 'Satellite Map'
+        : 'Vector Map'
+    ),
+    icon: computed(() =>
+      currentMapType.value === 'light'
+        ? 'i-heroicons:globe-americas-20-solid'
+        : 'i-heroicons:map'
+    ),
+    onClick: () => {
+      currentMapType.value = currentMapType.value === 'light' ? 'satellite' : 'light';
+      setMapType(currentMapType.value);
+    },
+  },
+  {
+    label: 'Download',
+    icon: 'i-heroicons-arrow-down-tray-20-solid',
+    color: 'gray',
+    onClick: () => (showDownloadPopup.value = true),
   },
 ])
 
@@ -30,6 +73,7 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
     <GeneralizedHeader
       class="z-20"
       :left-items="leftItems"
+      :right-items="rightItems"
       logo-src="/neu-logo.svg"
       logo-alt="Northeastern University Logo"
       :show-icon="true"

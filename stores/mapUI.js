@@ -33,6 +33,11 @@ export const useMapUIStore = defineStore('mapUI', () => {
     never: '#FF0000', // Red
   }
 
+  const mapType = ref('light')
+  const setMapType = (type) => {
+    mapType.value = type
+  }
+
   const currentColor = computed(() => {
     if (drawType.value === 'Point') {
       return colors[currentFrequency.value] || '#000000'
@@ -76,9 +81,9 @@ export const useMapUIStore = defineStore('mapUI', () => {
         comment: '',
         name: userData.value
           ? {
-              firstname: userData.value.firstname,
-              lastname: userData.value.lastname,
-            }
+            firstname: userData.value.firstname,
+            lastname: userData.value.lastname,
+          }
           : null,
         timestamp: timestamp,
       })
@@ -91,9 +96,9 @@ export const useMapUIStore = defineStore('mapUI', () => {
         comment: '',
         name: userData.value
           ? {
-              firstname: userData.value.firstname,
-              lastname: userData.value.lastname,
-            }
+            firstname: userData.value.firstname,
+            lastname: userData.value.lastname,
+          }
           : null,
         timestamp: timestamp,
       })
@@ -106,9 +111,9 @@ export const useMapUIStore = defineStore('mapUI', () => {
         comment: '',
         name: userData.value
           ? {
-              firstname: userData.value.firstname,
-              lastname: userData.value.lastname,
-            }
+            firstname: userData.value.firstname,
+            lastname: userData.value.lastname,
+          }
           : null,
         timestamp: timestamp,
       })
@@ -184,7 +189,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextEnvironmentSubwindow() {
-    if (environmentSubwindow.value < 2·) {
+    if (environmentSubwindow.value < 2) {
       environmentSubwindow.value++
       resetOtherSubwindows('environment')
     }
@@ -278,9 +283,9 @@ export const useMapUIStore = defineStore('mapUI', () => {
       userId: userId,
       name: userData.value
         ? {
-            lastname: userData.value.lastname,
-            firstname: userData.value.firstname,
-          }
+          lastname: userData.value.lastname,
+          firstname: userData.value.firstname,
+        }
         : null,
       timestamp: timestamp,
       space: {
@@ -470,5 +475,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     logoutUser,
     saveDataToDatabase,
     resetAllSubwindows,
+    mapType,
+    setMapType,
   }
 })
