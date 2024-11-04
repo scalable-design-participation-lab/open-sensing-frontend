@@ -184,7 +184,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextEnvironmentSubwindow() {
-    if (environmentSubwindow.value < 2·) {
+    if (environmentSubwindow.value < 2) {
       environmentSubwindow.value++
       resetOtherSubwindows('environment')
     }
@@ -427,6 +427,11 @@ export const useMapUIStore = defineStore('mapUI', () => {
     environmentSubwindow.value = 1
   }
 
+  function getComment(pointId) {
+    const feature = features.find((f) => f.id === pointId)
+    return feature?.comment || ''
+  }
+
   return {
     drawEnable,
     drawType,
@@ -470,5 +475,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
     logoutUser,
     saveDataToDatabase,
     resetAllSubwindows,
+    getComment,
   }
 })
