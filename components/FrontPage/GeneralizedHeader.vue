@@ -27,7 +27,7 @@
           shapeClass,
         ]"
       >
-        <img :src="logoSrc" :alt="logoAlt" class="w-full h-auto" />
+        <img :src="logoSrc" :alt="logoAlt" class="w-full h-auto dark:!invert" />
       </UButton>
       <UButton
         v-if="showIcon"
@@ -75,12 +75,6 @@
       </template>
     </div>
     <div class="flex space-x-2 sm:space-x-3">
-      <UColorModeButton
-        :class="[
-          `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white dark:!bg-gray-800 shadow-md text-black dark:text-white hover:invert`,
-          shapeClass,
-        ]"
-      />
       <template v-for="(item, index) in rightItems" :key="index">
         <UDropdown v-if="item.dropdown" v-bind="item.dropdown">
           <UButton
@@ -124,6 +118,21 @@
           {{ item.label }}
         </UButton>
       </template>
+      <!-- Dark Mode Toggle -->
+      <UColorModeButton
+        :class="[
+          `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-white dark:!bg-gray-800 shadow-md text-black dark:text-white hover:invert`,
+          shapeClass,
+        ]"
+      />
+        <!-- Menu -->
+        <UButton
+          :class="[
+            `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xl !bg-white dark:!bg-gray-800 shadow-md text-black dark:text-white hover:invert`,
+            shapeClass,
+          ]"
+        >•••
+        </UButton>
     </div>
   </header>
 </template>
