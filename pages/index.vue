@@ -38,12 +38,12 @@ const mapItems = [
 const rightItems = ref([
   {
     label: computed(() =>
-      currentMapType.value === 'light'
+      currentMapType.value === 'satellite'
         ? 'Satellite Map'
         : 'Vector Map'
     ),
     icon: computed(() =>
-      currentMapType.value === 'light'
+      currentMapType.value === 'satellite'
         ? 'i-heroicons:globe-americas-20-solid'
         : 'i-heroicons:map'
     ),

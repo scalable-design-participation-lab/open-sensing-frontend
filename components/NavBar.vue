@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed right-6 top-20 w-80 z-40 bg-white dark:bg-gray-800 rounded-lg overflow-hidden"
+    class="fixed right-6 top-24 w-96 lg:w-80 z-40"
   >
     <UCard>
       <UAccordion
