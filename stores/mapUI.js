@@ -184,7 +184,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextEnvironmentSubwindow() {
-    if (environmentSubwindow.value < 1) {
+    if (environmentSubwindow.value < 2·) {
       environmentSubwindow.value++
       resetOtherSubwindows('environment')
     }

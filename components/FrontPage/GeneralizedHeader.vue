@@ -75,6 +75,12 @@
       </template>
     </div>
     <div class="flex space-x-2 sm:space-x-3">
+      <UColorModeButton
+        :class="[
+          `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white dark:!bg-gray-800 shadow-md text-black dark:text-white hover:invert`,
+          shapeClass,
+        ]"
+      />
       <template v-for="(item, index) in rightItems" :key="index">
         <UDropdown v-if="item.dropdown" v-bind="item.dropdown">
           <UButton
