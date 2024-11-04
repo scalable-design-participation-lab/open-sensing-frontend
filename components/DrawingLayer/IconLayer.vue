@@ -16,6 +16,7 @@
     </ol-vector-layer>
 
     <ol-interaction-select
+      v-if="enableClick"
       :condition="clickCondition"
       @select="(event) => handleSelect(event, feature)"
     >
@@ -66,6 +67,14 @@ const props = defineProps({
   showAllPlusIcons: {
     type: Boolean,
     default: undefined,
+  },
+  enableClick: {
+    type: Boolean,
+    default: false,
+  },
+  isMapPage: {
+    type: Boolean,
+    default: false,
   },
 })
 

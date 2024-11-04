@@ -1,5 +1,4 @@
 <template>
-  <!-- 选择交互 -->
   <ol-interaction-select
     v-if="enableClick"
     :condition="clickCondition"
