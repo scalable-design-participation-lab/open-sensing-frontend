@@ -432,6 +432,11 @@ export const useMapUIStore = defineStore('mapUI', () => {
     environmentSubwindow.value = 1
   }
 
+  function getComment(pointId) {
+    const feature = features.find((f) => f.id === pointId)
+    return feature?.comment || ''
+  }
+
   return {
     drawEnable,
     drawType,
@@ -475,6 +480,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     logoutUser,
     saveDataToDatabase,
     resetAllSubwindows,
+    getComment,
     mapType,
     setMapType,
   }

@@ -25,6 +25,8 @@
         :features="pointFeatures"
         :get-icon-for-feature="getIconForFeature"
         :show-all-plus-icons="showAllPlusIcons"
+        :enable-click="enableClick"
+        :is-map-page="isMapPage"
         @toggle-comment-popup="toggleCommentPopup"
         @toggle-image-upload-popup="toggleImageUploadPopup"
         @show-comment-display="handleShowCommentDisplay"
@@ -32,6 +34,8 @@
 
       <PolygonLayer
         :show-all-plus-icons="showAllPlusIcons"
+        :enable-click="enableClick"
+        :is-map-page="isMapPage"
         @toggle-comment-popup="toggleCommentPopup"
         @show-comment-display="handleShowCommentDisplay"
       />
@@ -98,7 +102,7 @@ const drawType = computed(() => mapUIStore.drawType)
 const currentColor = computed(() => mapUIStore.currentColor)
 
 const pointFeatures = computed(() =>
-  mapUIStore.features.filter((feature) => feature.type === 'Point')
+  mapUIStore.features.filter((feature) => feature.type === 'Point'),
 )
 
 function handleDrawStart(event) {

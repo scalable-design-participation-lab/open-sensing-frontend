@@ -11,7 +11,11 @@
     </ol-source-vector>
   </ol-vector-layer>
 
-  <ol-interaction-select :condition="clickCondition" @select="handleSelect">
+  <ol-interaction-select
+    v-if="enableClick"
+    :condition="clickCondition"
+    @select="handleSelect"
+  >
     <ol-style>
       <ol-style-stroke color="black" :width="2" :line-dash="[10, 10]" />
       <ol-style-fill :color="[0, 0, 0, 0]" />
@@ -59,6 +63,14 @@ import { click } from 'ol/events/condition'
 
 const props = defineProps({
   showAllPlusIcons: {
+    type: Boolean,
+    default: false,
+  },
+  enableClick: {
+    type: Boolean,
+    default: false,
+  },
+  isMapPage: {
     type: Boolean,
     default: false,
   },
