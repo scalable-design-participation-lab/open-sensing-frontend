@@ -33,6 +33,11 @@ export const useMapUIStore = defineStore('mapUI', () => {
     never: '#FF0000', // Red
   }
 
+  const mapType = ref('light')
+  const setMapType = (type) => {
+    mapType.value = type
+  }
+
   const currentColor = computed(() => {
     if (drawType.value === 'Point') {
       return colors[currentFrequency.value] || '#000000'
@@ -483,6 +488,8 @@ export const useMapUIStore = defineStore('mapUI', () => {
     saveDataToDatabase,
     resetAllSubwindows,
     getComment,
+    mapType,
+    setMapType,
     deleteFeature,
   }
 })
