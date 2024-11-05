@@ -47,6 +47,24 @@
         />
       </div>
     </ol-overlay>
+
+    <ol-overlay
+      :position="feature.coordinates"
+      :offset="[-30, -30]"
+      :stopEvent="false"
+      :positioning="'top-left'"
+    >
+      <div
+        class="delete-icon-container"
+        @click.stop.prevent="handleDeleteClick(feature)"
+      >
+        <img
+          src="@/assets/icons/delete.svg"
+          alt="Delete Icon"
+          class="delete-icon"
+        />
+      </div>
+    </ol-overlay>
   </template>
 </template>
 
@@ -156,6 +174,13 @@ function handlePlusIconClick(feature) {
     emit('toggle-image-upload-popup', feature)
   }
 }
+
+function handleDeleteClick(feature) {
+  // Add confirmation dialog
+  if (confirm('Are you sure you want to delete this point?')) {
+    mapUIStore.deleteFeature(feature.id)
+  }
+}
 </script>
 
 <style scoped>
@@ -175,5 +200,26 @@ function handlePlusIconClick(feature) {
 .plus-icon {
   width: 24px;
   height: 24px;
+}
+
+.delete-icon-container {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.delete-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.delete-icon-container:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
 }
 </style>

@@ -432,6 +432,13 @@ export const useMapUIStore = defineStore('mapUI', () => {
     return feature?.comment || ''
   }
 
+  function deleteFeature(featureId) {
+    const index = features.findIndex((f) => f.id === featureId)
+    if (index !== -1) {
+      features.splice(index, 1)
+    }
+  }
+
   return {
     drawEnable,
     drawType,
@@ -476,5 +483,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
     saveDataToDatabase,
     resetAllSubwindows,
     getComment,
+    deleteFeature,
   }
 })

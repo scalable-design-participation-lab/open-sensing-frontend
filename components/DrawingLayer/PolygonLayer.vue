@@ -54,6 +54,23 @@
       </svg>
     </div>
   </ol-overlay>
+
+  <ol-overlay
+    v-for="feature in visiblePolygonFeatures"
+    :key="`delete-${feature.id}`"
+    :position="getFeatureIconPosition(feature)"
+    :offset="[30, 0]"
+    :stopEvent="false"
+    :positioning="'center-center'"
+  >
+    <div class="delete-icon-container" @click.stop="handleDeleteClick(feature)">
+      <img
+        src="@/assets/icons/delete.svg"
+        alt="Delete Icon"
+        class="delete-icon"
+      />
+    </div>
+  </ol-overlay>
 </template>
 
 <script setup lang="ts">
@@ -136,6 +153,12 @@ function handleSelect(event) {
     }
   }
 }
+
+function handleDeleteClick(feature) {
+  if (confirm('Are you sure you want to delete this polygon?')) {
+    mapUIStore.deleteFeature(feature.id)
+  }
+}
 </script>
 
 <style scoped>
@@ -152,6 +175,46 @@ function handleSelect(event) {
 }
 
 .polygon-plus-icon:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+.polygon-delete-icon {
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.delete-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.delete-icon:hover {
+  transform: scale(1.1);
+}
+
+.delete-icon-container {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.delete-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.delete-icon-container:hover {
   transform: scale(1.1);
   transition: transform 0.2s ease;
 }
