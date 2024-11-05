@@ -116,7 +116,7 @@ const selectedFeatureForDisplay = ref(null)
 const mapboxToken = 'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
 const mapboxStyle = 'restartukraine/cm1ez4ahh02ii01pi36qeb4ug'
 const mapboxUrl = computed(() => {
-  const style = mapType.value === 'satellite' ? 'mapbox/satellite-v9' : mapboxStyle
+  const style = mapType.value === 'light' ? mapboxStyle : 'mapbox/satellite-v9'
   return `https://api.mapbox.com/styles/v1/${style}/tiles/{z}/{x}/{y}@2x?access_token=${mapboxToken}`
 })
 

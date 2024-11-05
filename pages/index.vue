@@ -5,7 +5,7 @@ import { useMapUIStore } from '../stores/mapUI'
 // Map store
 const mapUIStore = useMapUIStore()
 const { setMapType } = mapUIStore
-const currentMapType = ref('satellite')
+const currentMapType = ref('light')
 
 const leftItems = ref([
   {
@@ -25,38 +25,37 @@ const mapItems = [
     {
       label: 'Light',
       icon: 'i-heroicons-sun-20-solid',
-      click: () => setMapType('light'),
+      click: () => setMapType('satellite'),
     },
     {
       label: 'Satellite',
       icon: 'i-heroicons-globe-americas-20-solid',
-      click: () => setMapType('satellite'),
+      click: () => setMapType('light'),
     },
   ],
 ]
 
 const rightItems = ref([
-  {
-    label: computed(() =>
-      currentMapType.value === 'satellite'
-        ? 'Satellite Map'
-        : 'Vector Map'
-    ),
+{
+    icon: 'i-heroicons-arrow-down-tray-20-solid',
+    color: 'gray',
+    onClick: () => (showDownloadPopup.value = true),
+  },  
+{
+    // label: computed(() =>
+    //   currentMapType.value === 'satellite'
+    //     ? 'Satellite Map'
+    //     : 'Vector Map'
+    // ),
     icon: computed(() =>
-      currentMapType.value === 'satellite'
-        ? 'i-heroicons:globe-americas-20-solid'
-        : 'i-heroicons:map'
+      currentMapType.value === 'light'
+        ? 'i-heroicons:map'
+        : 'i-heroicons:globe-americas-20-solid'
     ),
     onClick: () => {
       currentMapType.value = currentMapType.value === 'light' ? 'satellite' : 'light';
       setMapType(currentMapType.value);
     },
-  },
-  {
-    label: 'Download',
-    icon: 'i-heroicons-arrow-down-tray-20-solid',
-    color: 'gray',
-    onClick: () => (showDownloadPopup.value = true),
   },
 ])
 

@@ -23,7 +23,7 @@
       <UButton
         v-if="logoSrc"
         :class="[
-          `lg:w-12 !rounded-lg flex justify-center !bg-gray-100 dark:!bg-gray-900 shadow-md hover:animate-spin`,
+          `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-100 dark:!bg-gray-900 shadow-md hover:animate-spin`,
           shapeClass,
         ]"
       >
@@ -32,7 +32,7 @@
       <UButton
         v-if="showIcon"
         :class="[
-          `lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-100 dark:!bg-gray-900 shadow-md hover:animate-spin`,
+          `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-100 dark:!bg-gray-900 shadow-md hover:animate-spin`,
           shapeClass,
         ]"
       >
