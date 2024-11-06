@@ -93,7 +93,7 @@
           icon="i-heroicons-arrow-left-20-solid"
           color="white"
           variant="solid"
-          class="rounded-full p-2 hover:!bg-gray-50 dark:hover:!bg-slate-800"
+          class="rounded-full p-2 hover:bg-gray-300 dark:hover:bg-slate-600"
           :disabled="currentSubwindow === 1"
           @click="$emit('prev')"
         />
@@ -101,7 +101,7 @@
           icon="i-heroicons-arrow-right-20-solid"
           color="white"
           variant="solid"
-          class="rounded-full p-2 hover:!bg-gray-50 dark:hover:!bg-slate-800"
+          class="rounded-full p-2  hover:bg-gray-300 dark:hover:bg-slate-600"
           :disabled="currentSubwindow === maxSubwindow"
           @click="$emit('next')"
         />

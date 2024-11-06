@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed right-6 top-24 w-96 lg:w-80 z-40 shadow-xl"
+    class="fixed right-6 top-24 w-80 lg:w-80 z-40 shadow-xl"
   >
     <UCard class="dark:bg-slate-950">
       <UAccordion
@@ -72,7 +72,7 @@
         </template>
       </UAccordion>
       <UButton
-        class="mt-2 py-3 px-6 rounded-full flex place-self-end hover:bg-slate-700 dark:hover:bg-gray-200"
+        class="mt-2 py-3 px-6 rounded-full flex place-self-end hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
         color="black"
         :loading="isSaving"
         :disabled="isSaving"

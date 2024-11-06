@@ -124,7 +124,7 @@
         <!-- Menu -->
         <UButton
           :class="[
-            `h-full px-2 md:px-2 lg:px-3 text-lg !bg-gray-50 dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
+            `h-full px-2 md:px-2 lg:px-3 text-lg !bg-gray-50 dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white`,
             shapeClass,
           ]"
         >•••

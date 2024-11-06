@@ -84,11 +84,11 @@
         />
       </UFormGroup>
 
-      <div class="flex justify-center mt-6 mb-4">
+      <div class="flex justify-center">
         <UButton
           type="submit"
           color="black"
-          class="mt-2 px-6 py-3 rounded-full"
+          class="my-2 px-6 py-3 rounded-fullrounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
         >
           перейти до карти
         </UButton>
