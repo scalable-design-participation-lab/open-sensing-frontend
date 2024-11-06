@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed right-6 top-24 w-80 lg:w-80 z-40 shadow-xl"
+    class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl"
   >
     <UCard class="dark:bg-slate-950">
       <UAccordion
@@ -22,6 +22,7 @@
             :button-group="spaceContent.buttonGroup"
             @prev="mapUIStore.prevSpaceSubwindow()"
             @next="mapUIStore.nextSpaceSubwindow()"
+            class="!text-xl"
           >
           </SubWindow>
           <SubWindow

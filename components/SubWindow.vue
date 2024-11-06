@@ -16,12 +16,12 @@
         class="mb-4"
       />
       <div v-if="title || icon">
-        <UIcon v-if="icon" :name="icon" class="text-2xl" />
-        <h2 v-if="title" class="text-lg font-semibold leading-tight">
+        <UIcon v-if="icon" :name="icon" />
+        <h2 v-if="title" class="text-md md:text-lg font-semibold !leading-tight">
           {{ title }}
         </h2>
       </div>
-      <p v-if="paragraph" class="text-sm leading-tight pb-2">
+      <p v-if="paragraph" class="text-xs md:text-sm !leading-tight pb-2">
         {{ paragraph }}
       </p>
 
