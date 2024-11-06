@@ -125,14 +125,6 @@
           shapeClass,
         ]"
       />
-        <!-- Menu -->
-        <UButton
-          :class="[
-            `h-full px-2 md:px-2 lg:px-3 text-lg !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
-            shapeClass,
-          ]"
-        >•••
-        </UButton>
     </div>
   </header>
 </template>

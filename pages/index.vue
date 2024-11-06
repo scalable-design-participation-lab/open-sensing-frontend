@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
+import MenuPopup from '~/components/MenuPopup.vue'
 
 // Map store
 const mapUIStore = useMapUIStore()
@@ -36,29 +37,47 @@ const mapItems = [
 ]
 
 const rightItems = ref([
-{
-  icon: 'i-heroicons-arrow-down-tray-20-solid',
+  {
+    icon: 'i-heroicons-arrow-down-tray-20-solid',
     onClick: () => (showDownloadPopup.value = true),
-  },  
-{
-    // label: computed(() =>
-    //   currentMapType.value === 'satellite'
-    //     ? 'Satellite Map'
-    //     : 'Vector Map'
-    // ),
+  },
+  {
     icon: computed(() =>
       currentMapType.value === 'light'
         ? 'i-heroicons:map'
-        : 'i-heroicons:globe-americas-20-solid'
+        : 'i-heroicons:globe-americas-20-solid',
     ),
     onClick: () => {
-      currentMapType.value = currentMapType.value === 'light' ? 'satellite' : 'light';
-      setMapType(currentMapType.value);
+      currentMapType.value =
+        currentMapType.value === 'light' ? 'satellite' : 'light'
+      setMapType(currentMapType.value)
     },
+  },
+  {
+    icon: 'i-heroicons-ellipsis-horizontal-20-solid',
+    onClick: () => (showMenuPopup.value = true),
   },
 ])
 
 const isMapBlurred = computed(() => mapUIStore.showRegistration)
+
+const showMenuPopup = ref(false)
+const showAboutPopup = ref(false)
+const showDownloadPopup = ref(false)
+
+const handleMenuSelect = (action: string) => {
+  switch (action) {
+    case 'about':
+      showAboutPopup.value = true
+      break
+    case 'help':
+      // Add help logic
+      break
+    case 'settings':
+      // Add settings logic
+      break
+  }
+}
 </script>
 
 <template>
@@ -87,9 +106,15 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
       @click.self="mapUIStore.showRegistration = true"
     ></div>
     <Teleport to="body">
-      <MenuModal v-if="showDownloadPopup" :filter-sections="downloadFilterSections"
-        @close="showDownloadPopup = false" @download="handleDownloadData" />
+      <MenuModal
+        v-if="showDownloadPopup"
+        :filter-sections="downloadFilterSections"
+        @close="showDownloadPopup = false"
+        @download="handleDownloadData"
+      />
     </Teleport>
+    <MenuPopup v-model="showMenuPopup" @select="handleMenuSelect" />
+    <AboutPopup v-model="showAboutPopup" />
   </div>
 </template>
 <style scoped>
