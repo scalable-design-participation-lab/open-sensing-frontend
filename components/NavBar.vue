@@ -1,13 +1,13 @@
 <template>
   <div
-    class="fixed right-6 top-24 w-96 lg:w-80 z-40"
+    class="fixed right-6 top-24 w-96 lg:w-80 z-40 shadow-xl"
   >
     <UCard>
       <UAccordion
-        color="black"
+        color="white"
         variant="solid"
         :items="menuItems"
-        class="space-y-2"
+        class="space-y-1"
       >
         <template #item="{ item }">
           <SubWindow
@@ -71,10 +71,9 @@
           </SubWindow>
         </template>
       </UAccordion>
-
       <UButton
-        class="mt-4 w-full"
-        color="primary"
+        class="mt-2 py-3 px-6 rounded-full flex place-self-end"
+        color="black"
         :loading="isSaving"
         :disabled="isSaving"
         @click="saveData"

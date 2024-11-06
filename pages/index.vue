@@ -37,8 +37,7 @@ const mapItems = [
 
 const rightItems = ref([
 {
-    icon: 'i-heroicons-arrow-down-tray-20-solid',
-    color: 'gray',
+  icon: 'i-heroicons-arrow-down-tray-20-solid',
     onClick: () => (showDownloadPopup.value = true),
   },  
 {

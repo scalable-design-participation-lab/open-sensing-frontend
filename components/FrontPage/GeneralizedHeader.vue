@@ -80,7 +80,7 @@
           <UButton
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
+              `h-full px-3 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
               shapeClass,
             ]"
           >
@@ -98,7 +98,7 @@
             :color="item.color"
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 text-black dark:text-white hover:invert`,
+              `h-full px-1 md:px-2 lg:px-3 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 text-black dark:text-white hover:invert`,
               shapeClass,
             ]"
             @click="navigate"
@@ -110,7 +110,7 @@
           v-else
           :icon="item.icon"
           :class="[
-            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
+            `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
             shapeClass,
           ]"
           @click="item.onClick"
@@ -128,7 +128,7 @@
         <!-- Menu -->
         <UButton
           :class="[
-            `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xl !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
+            `h-full px-2 md:px-2 lg:px-3 text-lg !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
             shapeClass,
           ]"
         >•••
