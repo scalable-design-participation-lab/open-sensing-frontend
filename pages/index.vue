@@ -5,7 +5,7 @@ import { useMapUIStore } from '../stores/mapUI'
 // Map store
 const mapUIStore = useMapUIStore()
 const { setMapType } = mapUIStore
-const currentMapType = ref('satellite')
+const currentMapType = ref('light')
 
 const leftItems = ref([
   {
@@ -25,38 +25,36 @@ const mapItems = [
     {
       label: 'Light',
       icon: 'i-heroicons-sun-20-solid',
-      click: () => setMapType('light'),
+      click: () => setMapType('satellite'),
     },
     {
       label: 'Satellite',
       icon: 'i-heroicons-globe-americas-20-solid',
-      click: () => setMapType('satellite'),
+      click: () => setMapType('light'),
     },
   ],
 ]
 
 const rightItems = ref([
-  {
-    label: computed(() =>
-      currentMapType.value === 'light'
-        ? 'Satellite Map'
-        : 'Vector Map'
-    ),
+{
+  icon: 'i-heroicons-arrow-down-tray-20-solid',
+    onClick: () => (showDownloadPopup.value = true),
+  },  
+{
+    // label: computed(() =>
+    //   currentMapType.value === 'satellite'
+    //     ? 'Satellite Map'
+    //     : 'Vector Map'
+    // ),
     icon: computed(() =>
       currentMapType.value === 'light'
-        ? 'i-heroicons:globe-americas-20-solid'
-        : 'i-heroicons:map'
+        ? 'i-heroicons:map'
+        : 'i-heroicons:globe-americas-20-solid'
     ),
     onClick: () => {
       currentMapType.value = currentMapType.value === 'light' ? 'satellite' : 'light';
       setMapType(currentMapType.value);
     },
-  },
-  {
-    label: 'Download',
-    icon: 'i-heroicons-arrow-down-tray-20-solid',
-    color: 'gray',
-    onClick: () => (showDownloadPopup.value = true),
   },
 ])
 
@@ -65,7 +63,7 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
 
 <template>
   <div class="relative">
-    <NavBar class="z-30" />
+    <SideBar class="z-30" />
     <BackgroundMap
       :class="{ 'filter blur-md': isMapBlurred }"
       :show-all-plus-icons="true"
@@ -79,7 +77,7 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
       :show-icon="true"
     />
     <GeneralizedFooter class="z-20" />
-    <RegistrationPopup
+    <RegistrationModal
       :is-visible="mapUIStore.showRegistration"
       @close="mapUIStore.showRegistration = false"
     />
@@ -88,6 +86,10 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
       class="absolute inset-0 bg-black bg-opacity-50 z-40"
       @click.self="mapUIStore.showRegistration = true"
     ></div>
+    <Teleport to="body">
+      <MenuModal v-if="showDownloadPopup" :filter-sections="downloadFilterSections"
+        @close="showDownloadPopup = false" @download="handleDownloadData" />
+    </Teleport>
   </div>
 </template>
 <style scoped>

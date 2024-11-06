@@ -1,13 +1,13 @@
 <template>
   <div
-    class="fixed right-6 top-20 w-80 z-40 bg-white dark:bg-gray-800 rounded-lg overflow-hidden"
+    class="fixed right-6 top-24 w-96 lg:w-80 z-40 shadow-xl"
   >
     <UCard>
       <UAccordion
-        color="black"
+        color="white"
         variant="solid"
         :items="menuItems"
-        class="space-y-2"
+        class="space-y-1"
       >
         <template #item="{ item }">
           <SubWindow
@@ -71,10 +71,9 @@
           </SubWindow>
         </template>
       </UAccordion>
-
       <UButton
-        class="mt-4 w-full"
-        color="primary"
+        class="mt-2 py-3 px-6 rounded-full flex place-self-end"
+        color="black"
         :loading="isSaving"
         :disabled="isSaving"
         @click="saveData"
@@ -136,7 +135,7 @@ const spaceContent = computed(() => {
         'Спочатку оберіть частоту відвідування, а після позначте на мапі ту чи іншу локацію (до десяти).',
       buttonGroup: [
         {
-          text: 'every day',
+          text: 'щоденно',
           color: 'blue',
           action: () => mapUIStore.activateDrawing('every day'),
         },
@@ -152,7 +151,7 @@ const spaceContent = computed(() => {
         },
         {
           text: 'лише раз',
-          color: '#B2FB4C',
+          color: 'yellow',
           action: () => mapUIStore.activateDrawing('only once'),
         },
         {
@@ -221,7 +220,7 @@ const safetyContent = computed(() => {
 })
 
 const safetyIconGrid = computed(() => ({
-  title: 'Select an icon:',
+  title: 'Виберіть іконку:',
   icons: [
     { name: 'broken', src: brokenIcon },
     { name: 'calm', src: calmIcon },
@@ -249,13 +248,13 @@ const environmentContent = computed(() => {
 })
 
 const pollutionIconGrid = computed(() => ({
-  title: 'Виберіть піктограму забруднення:',
+  title: 'Виберіть іконку:',
   icons: [{ name: 'pollution', src: pollutionIcon }],
   onSelect: selectEnvironmentIcon,
 }))
 
 const leafIconGrid = computed(() => ({
-  title: 'Виберіть іконку листка:',
+  title: 'Виберіть іконку:',
   icons: [{ name: 'leaf', src: leafIcon }],
   onSelect: selectEnvironmentIcon,
 }))
