@@ -63,7 +63,7 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
 
 <template>
   <div class="relative">
-    <NavBar class="z-30" />
+    <SideBar class="z-30" />
     <BackgroundMap
       :class="{ 'filter blur-md': isMapBlurred }"
       :show-all-plus-icons="true"
