@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
 import MenuPopup from '~/components/MenuPopup.vue'
 import DownloadUkrainePopup from '~/components/DownloadUkrainePopup.vue'
+import OnboardingModal from '~/components/OnboardingModal.vue'
+import RegistrationModal from '~/components/RegistrationModal.vue'
 
 // Map store
 const mapUIStore = useMapUIStore()
@@ -65,6 +67,8 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
 const showMenuPopup = ref(false)
 const showAboutPopup = ref(false)
 const showDownloadPopup = ref(false)
+const showOnboarding = ref(true)
+const showRegistration = ref(false)
 
 const handleMenuSelect = (action: string) => {
   switch (action) {
@@ -126,6 +130,15 @@ const convertToCSV = (data: any) => {
   // Implement CSV conversion logic here
   return 'data,in,csv,format'
 }
+
+const handleShowRegistration = () => {
+  showOnboarding.value = false
+  showRegistration.value = true
+}
+
+const handleCloseRegistration = () => {
+  showRegistration.value = false
+}
 </script>
 
 <template>
@@ -144,9 +157,13 @@ const convertToCSV = (data: any) => {
       :show-icon="true"
     />
     <GeneralizedFooter class="z-20" />
+    <OnboardingModal
+      :is-visible="showOnboarding"
+      @show-registration="handleShowRegistration"
+    />
     <RegistrationModal
-      :is-visible="mapUIStore.showRegistration"
-      @close="mapUIStore.showRegistration = false"
+      :is-visible="showRegistration"
+      @close="handleCloseRegistration"
     />
     <div
       v-if="isMapBlurred"

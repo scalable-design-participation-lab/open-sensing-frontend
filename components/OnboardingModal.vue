@@ -1,212 +1,85 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="registration-card max-w-[90vw] w-[500px] max-h-[90vh] overflow-y-auto z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
+    class="onboarding-card max-w-[90vw] w-[500px] max-h-[90vh] overflow-y-auto z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl"
   >
     <template #header>
       <h3 class="text-xl md:text-2xl font-semibold text-center">
-        реєстрація
+        Ласкаво просимо до Гуртомá
       </h3>
     </template>
 
-    <p class="mb-4 px-6 leading-tight">
-      Щоб взяти участь у Гуртомá, дайте відповіді на наступні запитання.
-    </p>
+    <div class="space-y-4 px-6">
+      <p class="leading-relaxed">
+        Гуртомá - це інтерактивна платформа для спільного картографування та
+        обміну досвідом про нашу річку.
+      </p>
 
-    <UForm
-      :state="formState"
-      class="space-y-3 md:space-y-4 px-4 md:px-6"
-      @submit="onSubmit"
-    >
-      <UFormGroup label="Прізвище" name="lastname">
-        <UInput
-          v-model="formState.lastname"
-          placeholder="Введіть своє прізвище"
-          color="yellow"
-          variant="outline"
-          size="md"
-          class="rounded-full"
-        />
-      </UFormGroup>
-      <UFormGroup label="Ім'я" name="firstname">
-        <UInput
-          v-model="formState.firstname"
-          placeholder="Введіть своє ім'я"
-          color="yellow"
-          variant="outline"
-          size="md"
-          class="rounded-full"
-        />
-      </UFormGroup>
-      <UFormGroup label="Вік" name="age">
-        <UInput
-          v-model="formState.age"
-          type="number"
-          placeholder="Введіть свій вік"
-          color="yellow"
-          variant="outline"
-          size="md"
-          class="rounded-full"
-        />
-      </UFormGroup>
-      <UFormGroup label="Стать" name="gender">
-        <USelect
-          v-model="formState.gender"
-          :options="genderOptions"
-          placeholder="Виберіть свою стать"
-          color="yellow"
-          variant="outline"
-          size="md"
-          class="rounded-full"
-        />
-      </UFormGroup>
-      <UFormGroup label="Education Level" name="educationLevel">
-        <USelect
-          v-model="formState.educationLevel"
-          :options="educationOptions"
-          placeholder="Виберіть рівень освіти"
-          color="yellow"
-          variant="outline"
-          size="md"
-          class="rounded-full"
-        />
-      </UFormGroup>
-      <UFormGroup label="Мешканець з" name="residentSince">
-        <USelect
-          v-model="formState.residentSince"
-          :options="residentOptions"
-          placeholder="Як довго ви тут живете?"
-          color="yellow"
-          variant="outline"
-          size="md"
-          class="rounded-full"
-        />
-      </UFormGroup>
-      <UFormGroup label="Житель Біля річки З" name="residentNearRiverSince">
-        <UInput
-          v-model="formState.residentNearRiverSince"
-          placeholder="Enter year (e.g. 2022)"
-          color="yellow"
-          variant="outline"
-          size="md"
-        />
-      </UFormGroup>
+      <div class="space-y-3">
+        <div class="flex items-start space-x-3">
+          <UIcon
+            name="i-heroicons-map"
+            class="flex-shrink-0 w-6 h-6 text-yellow-500"
+          />
+          <p>
+            Досліджуйте карту та діліться своїми спогадами про місця біля річки
+          </p>
+        </div>
 
-      <div class="flex justify-center mt-6 mb-4">
-        <UButton
-          type="submit"
-          color="black"
-          class="mt-2 px-6 py-2 rounded-full"
-        >
-          перейти до карти
-        </UButton>
+        <div class="flex items-start space-x-3">
+          <UIcon
+            name="i-heroicons-chat-bubble-left-right"
+            class="flex-shrink-0 w-6 h-6 text-yellow-500"
+          />
+          <p>
+            Беріть участь у дискусіях та обмінюйтесь історіями з іншими
+            учасниками
+          </p>
+        </div>
+
+        <div class="flex items-start space-x-3">
+          <UIcon
+            name="i-heroicons-camera"
+            class="flex-shrink-0 w-6 h-6 text-yellow-500"
+          />
+          <p>
+            Завантажуйте фотографії та відео, щоб поділитися своїм баченням
+            річки
+          </p>
+        </div>
       </div>
-    </UForm>
+    </div>
+
+    <div class="flex justify-center mt-8 mb-4 px-6">
+      <UButton
+        color="black"
+        class="px-6 py-2 rounded-full"
+        @click="handleSignup"
+      >
+        Розпочати реєстрацію
+      </UButton>
+    </div>
 
     <template #footer>
-      <p class="text-xs text-gray-500 px-4 py-3 md:px-6 leading-tight">
-        Беручи участь в цьому опитуванні, ви даєте згоду на збір та використання
-        ваших відповідей в дослідницьких цілях. Ваші персональні дані залишаться
-        конфіденційними і не будуть передані третім особам без вашої згоди, за
-        винятком випадків, передбачених законодавством. Однак будь-які надані
-        вами медіафайли та коментарі будуть опубліковані. Участь у дослідженні є
-        добровільною, і ви можете відмовитися від неї в будь-який час.
+      <p class="text-xs text-gray-500 px-6 py-3 leading-tight">
+        Приєднуйтесь до нашої спільноти та допоможіть створити спільну історію
+        нашої річки.
       </p>
     </template>
   </UCard>
 </template>
 
-<script setup>
-import { ref, reactive } from 'vue'
-import { useMapUIStore } from '../stores/mapUI'
-import { getAuth, signInAnonymously } from 'firebase/auth'
-import { useFirestore } from 'vuefire'
-import { collection, addDoc } from 'firebase/firestore'
-
-const auth = getAuth()
+<script setup lang="ts">
 const props = defineProps({
-  isVisible: Boolean,
+  isVisible: {
+    type: Boolean,
+    required: true,
+  },
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['showRegistration'])
 
-const mapUIStore = useMapUIStore()
-const db = useFirestore()
-
-const formState = reactive({
-  lastname: '',
-  firstname: '',
-  age: '',
-  gender: '',
-  educationLevel: '',
-  residentSince: '',
-  residentNearRiverSince: '',
-})
-
-const genderOptions = [
-  { label: 'Чоловік', value: 'male' },
-  { label: 'Жінка', value: 'female' },
-  { label: 'інші', value: 'other' },
-]
-
-const educationOptions = [
-  { label: 'Вища школа', value: 'high_school' },
-  { label: 'College', value: 'college' },
-  { label: 'коледж', value: 'university' },
-  { label: 'Аспірантура', value: 'postgraduate' },
-]
-
-const residentOptions = [
-  { label: 'Менше 1 року', value: 'less_than_1_year' },
-  { label: '1-5 років', value: '1_5_years' },
-  { label: '5-10 років', value: '5_10_years' },
-  { label: 'Більше 10 років', value: 'more_than_10_years' },
-]
-
-const onSubmit = async () => {
-  try {
-    const userCredential = await signInAnonymously(auth)
-    const user = userCredential.user
-
-    console.log('Anonymous authentication successful:', {
-      uid: user.uid,
-      isAnonymous: user.isAnonymous,
-      creationTime: user.metadata.creationTime,
-    })
-
-    const usersCollection = collection(db, 'users')
-    const docRef = await addDoc(usersCollection, {
-      uid: user.uid,
-      name: {
-        lastname: formState.lastname,
-        firstname: formState.firstname,
-      },
-      age: parseInt(formState.age),
-      gender: formState.gender,
-      'education level': formState.educationLevel,
-      'resident since': formState.residentSince,
-      'resident near river since': formState.residentNearRiverSince,
-      createdAt: new Date(),
-      isAnonymous: true,
-    })
-
-    console.log('User data saved to Firestore:', {
-      docId: docRef.id,
-      uid: user.uid,
-      name: `${formState.firstname} ${formState.lastname}`,
-    })
-
-    mapUIStore.setUserData({
-      ...formState,
-      uid: user.uid,
-    })
-    emit('close')
-  } catch (error) {
-    console.error('Authentication error:', {
-      code: error.code,
-      message: error.message,
-      stack: error.stack,
-    })
-  }
+const handleSignup = () => {
+  emit('showRegistration')
 }
 </script>
