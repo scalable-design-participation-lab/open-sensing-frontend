@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
-import MenuPopup from '~/components/MenuPopup.vue'
 import DownloadUkrainePopup from '~/components/DownloadUkrainePopup.vue'
 import OnboardingModal from '~/components/OnboardingModal.vue'
 import RegistrationModal from '~/components/RegistrationModal.vue'
@@ -56,10 +55,6 @@ const rightItems = ref([
       setMapType(currentMapType.value)
     },
   },
-  {
-    icon: 'i-heroicons-ellipsis-horizontal-20-solid',
-    onClick: () => (showMenuPopup.value = true),
-  },
 ])
 
 const isMapBlurred = computed(() => mapUIStore.showRegistration)
@@ -69,20 +64,6 @@ const showAboutPopup = ref(false)
 const showDownloadPopup = ref(false)
 const showOnboarding = ref(true)
 const showRegistration = ref(false)
-
-const handleMenuSelect = (action: string) => {
-  switch (action) {
-    case 'about':
-      showAboutPopup.value = true
-      break
-    case 'help':
-      // Add help logic
-      break
-    case 'settings':
-      // Add settings logic
-      break
-  }
-}
 
 const handleDownload = async (options: {
   dataType: string
@@ -176,8 +157,6 @@ const handleCloseRegistration = () => {
         @download="handleDownload"
       />
     </Teleport>
-    <MenuPopup v-model="showMenuPopup" @select="handleMenuSelect" />
-    <AboutPopup v-model="showAboutPopup" />
   </div>
 </template>
 <style scoped>
