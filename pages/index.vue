@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
 import MenuPopup from '~/components/MenuPopup.vue'
+import DownloadUkrainePopup from '~/components/DownloadUkrainePopup.vue'
 
 // Map store
 const mapUIStore = useMapUIStore()
@@ -78,6 +79,53 @@ const handleMenuSelect = (action: string) => {
       break
   }
 }
+
+const handleDownload = async (options: {
+  dataType: string
+  dateRange: [Date | null, Date | null]
+  region: string[]
+  format: string
+}) => {
+  try {
+    const { dataType, dateRange, region, format } = options
+
+    // Here you would implement the actual API call or data processing
+    console.log('Downloading data with options:', {
+      dataType,
+      dateRange,
+      region,
+      format,
+    })
+
+    // Example download implementation
+    const data = {
+      // Your data here
+    }
+
+    // Create and trigger download
+    const blob = new Blob(
+      [format === 'json' ? JSON.stringify(data) : convertToCSV(data)],
+      { type: format === 'json' ? 'application/json' : 'text/csv' },
+    )
+
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `ukraine-data.${format}`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Download failed:', error)
+  }
+}
+
+// Add this helper function for CSV conversion
+const convertToCSV = (data: any) => {
+  // Implement CSV conversion logic here
+  return 'data,in,csv,format'
+}
 </script>
 
 <template>
@@ -106,11 +154,9 @@ const handleMenuSelect = (action: string) => {
       @click.self="mapUIStore.showRegistration = true"
     ></div>
     <Teleport to="body">
-      <MenuModal
-        v-if="showDownloadPopup"
-        :filter-sections="downloadFilterSections"
-        @close="showDownloadPopup = false"
-        @download="handleDownloadData"
+      <DownloadUkrainePopup
+        v-model="showDownloadPopup"
+        @download="handleDownload"
       />
     </Teleport>
     <MenuPopup v-model="showMenuPopup" @select="handleMenuSelect" />
