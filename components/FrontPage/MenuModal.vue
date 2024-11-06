@@ -85,7 +85,7 @@
       <UFormGroup label="Житель Біля річки З" name="residentNearRiverSince">
         <UInput
           v-model="formState.residentNearRiverSince"
-          placeholder="Enter year (e.g. 2022)"
+          placeholder="Введіть рік (наприклад, 2022)"
           color="yellow"
           variant="outline"
           size="md"
