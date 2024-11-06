@@ -23,9 +23,6 @@ export default defineNuxtConfig({
       appId: process.env.FIREBASE_APP_ID,
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
     },
-    // admin: {
-    //   serviceAccount: './service-account.json'
-    // }
   },
 
   components: [

@@ -77,7 +77,7 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
       :show-icon="true"
     />
     <GeneralizedFooter class="z-20" />
-    <RegistrationPopup
+    <RegistrationModal
       :is-visible="mapUIStore.showRegistration"
       @close="mapUIStore.showRegistration = false"
     />
@@ -86,6 +86,10 @@ const isMapBlurred = computed(() => mapUIStore.showRegistration)
       class="absolute inset-0 bg-black bg-opacity-50 z-40"
       @click.self="mapUIStore.showRegistration = true"
     ></div>
+    <Teleport to="body">
+      <MenuModal v-if="showDownloadPopup" :filter-sections="downloadFilterSections"
+        @close="showDownloadPopup = false" @download="handleDownloadData" />
+    </Teleport>
   </div>
 </template>
 <style scoped>

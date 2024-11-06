@@ -54,8 +54,8 @@
                 btn.color === 'green',
               'border-2 border-blue-500':
                 btn.color === 'blue',
-              'border-2 border-lime-400':
-                btn.color === 'purple',
+              'border-2 border-yellow-500':
+                btn.color === 'yellow',
               'border-2 border-purple-500':
                 btn.color === 'purple',
             },
@@ -67,20 +67,20 @@
       </div>
 
       <div v-if="iconGrid" class="mt-4">
-        <p class="text-sm text-gray-300 mb-2">{{ iconGrid.title }}</p>
+        <p class="text-sm text-gray-400 mb-2">{{ iconGrid.title }}</p>
         <UCard class="bg-white p-2">
           <div class="grid grid-cols-3 gap-3">
             <UButton
               v-for="icon in iconGrid.icons"
               :key="icon.name"
               variant="ghost"
-              class="p-1 flex items-center justify-center"
+              class="p-1"
               @click="iconGrid.onSelect(icon.name)"
             >
               <img
                 :src="icon.src"
                 :alt="icon.name"
-                class="w-full h-full object-contain"
+                class="w-full h-full"
               />
             </UButton>
           </div>

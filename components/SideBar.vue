@@ -135,7 +135,7 @@ const spaceContent = computed(() => {
         'Спочатку оберіть частоту відвідування, а після позначте на мапі ту чи іншу локацію (до десяти).',
       buttonGroup: [
         {
-          text: 'every day',
+          text: 'щоденно',
           color: 'blue',
           action: () => mapUIStore.activateDrawing('every day'),
         },
@@ -151,7 +151,7 @@ const spaceContent = computed(() => {
         },
         {
           text: 'лише раз',
-          color: '#B2FB4C',
+          color: 'yellow',
           action: () => mapUIStore.activateDrawing('only once'),
         },
         {
@@ -220,7 +220,7 @@ const safetyContent = computed(() => {
 })
 
 const safetyIconGrid = computed(() => ({
-  title: 'Select an icon:',
+  title: 'Виберіть іконку:',
   icons: [
     { name: 'broken', src: brokenIcon },
     { name: 'calm', src: calmIcon },
@@ -248,13 +248,13 @@ const environmentContent = computed(() => {
 })
 
 const pollutionIconGrid = computed(() => ({
-  title: 'Виберіть піктограму забруднення:',
+  title: 'Виберіть іконку:',
   icons: [{ name: 'pollution', src: pollutionIcon }],
   onSelect: selectEnvironmentIcon,
 }))
 
 const leafIconGrid = computed(() => ({
-  title: 'Виберіть іконку листка:',
+  title: 'Виберіть іконку:',
   icons: [{ name: 'leaf', src: leafIcon }],
   onSelect: selectEnvironmentIcon,
 }))
