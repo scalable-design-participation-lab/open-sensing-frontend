@@ -33,6 +33,11 @@ export const useMapUIStore = defineStore('mapUI', () => {
     never: '#FF0000', // Red
   }
 
+  const mapType = ref('light')
+  const setMapType = (type) => {
+    mapType.value = type
+  }
+
   const currentColor = computed(() => {
     if (drawType.value === 'Point') {
       return colors[currentFrequency.value] || '#000000'
@@ -141,7 +146,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextSpaceSubwindow() {
-    if (spaceSubwindow.value < 4) {
+    if (spaceSubwindow.value < 3) {
       spaceSubwindow.value++
       resetOtherSubwindows('space')
       console.log('Current space subwindow:', spaceSubwindow.value)
@@ -156,7 +161,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextBelongingSubwindow() {
-    if (belongingSubwindow.value < 2) {
+    if (belongingSubwindow.value < 1) {
       belongingSubwindow.value++
       resetOtherSubwindows('belonging')
     }
@@ -170,7 +175,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextSafetySubwindow() {
-    if (safetySubwindow.value < 2) {
+    if (safetySubwindow.value < 1) {
       safetySubwindow.value++
       resetOtherSubwindows('safety')
     }
@@ -427,6 +432,18 @@ export const useMapUIStore = defineStore('mapUI', () => {
     environmentSubwindow.value = 1
   }
 
+  function getComment(pointId) {
+    const feature = features.find((f) => f.id === pointId)
+    return feature?.comment || ''
+  }
+
+  function deleteFeature(featureId) {
+    const index = features.findIndex((f) => f.id === featureId)
+    if (index !== -1) {
+      features.splice(index, 1)
+    }
+  }
+
   return {
     drawEnable,
     drawType,
@@ -470,5 +487,9 @@ export const useMapUIStore = defineStore('mapUI', () => {
     logoutUser,
     saveDataToDatabase,
     resetAllSubwindows,
+    getComment,
+    mapType,
+    setMapType,
+    deleteFeature,
   }
 })

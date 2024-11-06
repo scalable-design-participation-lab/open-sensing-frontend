@@ -127,7 +127,7 @@ watch(
       selectedFilters.value[section.name] = section.props.modelValue
     })
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 /**

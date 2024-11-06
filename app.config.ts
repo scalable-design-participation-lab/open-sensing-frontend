@@ -7,7 +7,7 @@ export default defineAppConfig({
     },
     variables: {
       dark: {
-        background: 'var(--color-gray-950)',
+        background: 'var(--color-slate-950)',
       },
       header: {
         height: '5rem',
@@ -25,8 +25,8 @@ export default defineAppConfig({
       wrapper: 'lg:mb-0 lg:border-0',
       popover: {
         links: {
-          active: 'dark:bg-gray-950/50',
-          inactive: 'dark:hover:bg-gray-950/50',
+          active: 'dark:bg-slate-950',
+          inactive: 'dark:hover:bg-slate-950',
         },
       },
     },

@@ -129,12 +129,12 @@ const closeModal = () => {
 watch(
   () => props.modelValue,
   (newValue) => {},
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(
   () => props.feature,
-  (newValue) => {}
+  (newValue) => {},
 )
 
 // Add computed property for position

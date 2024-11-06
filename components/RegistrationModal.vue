@@ -1,15 +1,13 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="registration-card max-w-[90vw] w-[500px] max-h-[90vh] overflow-y-auto z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-4 border-red-500 rounded-3xl bg-white shadow-xl scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
+    class="registration-card max-w-[90vw] w-[500px] max-h-[90vh] overflow-y-auto z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:bg-slate-950"
   >
     <template #header>
-      <h3 class="text-xl md:text-2xl font-bold text-center mb-2 md:mb-4">
-        реєстрація
-      </h3>
+      <h3 class="text-xl md:text-2xl font-semibold text-center">реєстрація</h3>
     </template>
 
-    <p class="mb-4 text-sm md:text-base px-4">
+    <p class="mb-4 px-6 leading-tight">
       Щоб взяти участь у Гуртомá, дайте відповіді на наступні запитання.
     </p>
 
@@ -22,20 +20,18 @@
         <UInput
           v-model="formState.lastname"
           placeholder="Введіть своє прізвище"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Ім'я" name="firstname">
         <UInput
           v-model="formState.firstname"
           placeholder="Введіть своє ім'я"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Вік" name="age">
@@ -43,10 +39,9 @@
           v-model="formState.age"
           type="number"
           placeholder="Введіть свій вік"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Стать" name="gender">
@@ -54,10 +49,9 @@
           v-model="formState.gender"
           :options="genderOptions"
           placeholder="Виберіть свою стать"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Education Level" name="educationLevel">
@@ -65,10 +59,9 @@
           v-model="formState.educationLevel"
           :options="educationOptions"
           placeholder="Виберіть рівень освіти"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Мешканець з" name="residentSince">
@@ -76,27 +69,26 @@
           v-model="formState.residentSince"
           :options="residentOptions"
           placeholder="Як довго ви тут живете?"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Житель Біля річки З" name="residentNearRiverSince">
         <UInput
           v-model="formState.residentNearRiverSince"
           placeholder="Введіть рік (наприклад, 2022)"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
 
-      <div class="flex justify-center mt-6 mb-4">
+      <div class="flex justify-center">
         <UButton
           type="submit"
-          class="rounded-full bg-sky-400 hover:bg-sky-500 text-white px-6 py-2 text-base"
+          color="black"
+          class="my-2 px-6 py-3 rounded-fullrounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
         >
           перейти до карти
         </UButton>
@@ -104,7 +96,7 @@
     </UForm>
 
     <template #footer>
-      <p class="text-xs text-gray-500 px-4 md:px-6 py-3 text-justify">
+      <p class="text-xs text-slate-400 px-4 py-3 md:px-6 leading-tight">
         Беручи участь в цьому опитуванні, ви даєте згоду на збір та використання
         ваших відповідей в дослідницьких цілях. Ваші персональні дані залишаться
         конфіденційними і не будуть передані третім особам без вашої згоди, за

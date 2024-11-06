@@ -1,28 +1,39 @@
 <template>
-  <!-- Move select interaction outside of the feature loop -->
-  <ol-interaction-select :condition="clickCondition" @select="handleSelect" />
+  <ol-vector-layer>
+    <ol-source-vector>
+      <ol-feature v-for="feature in polygonFeatures" :key="feature.id">
+        <ol-geom-polygon :coordinates="feature.coordinates" />
+        <ol-style>
+          <ol-style-stroke color="black" :width="2" :line-dash="[10, 10]" />
+          <ol-style-fill :color="[0, 0, 0, 0]" />
+        </ol-style>
+      </ol-feature>
+    </ol-source-vector>
+  </ol-vector-layer>
 
-  <ol-feature v-for="feature in polygonFeatures" :key="feature.id">
-    <ol-geom-polygon :coordinates="feature.coordinates" />
+  <ol-interaction-select
+    v-if="enableClick"
+    :condition="clickCondition"
+    @select="handleSelect"
+  >
     <ol-style>
       <ol-style-stroke color="black" :width="2" :line-dash="[10, 10]" />
       <ol-style-fill :color="[0, 0, 0, 0]" />
     </ol-style>
-  </ol-feature>
+  </ol-interaction-select>
 
   <ol-overlay
     v-for="feature in visiblePolygonFeatures"
     :key="`overlay-${feature.id}`"
     :position="getFeatureIconPosition(feature)"
     :offset="[0, 0]"
+    :stopEvent="false"
+    :positioning="'center-center'"
   >
-    <div
-      class="cursor-pointer text-black-500 rounded-full p-0.5 flex justify-center items-center shadow-md"
-      @click.stop="toggleCommentPopup(feature)"
-    >
+    <div class="polygon-plus-icon" @click.stop="toggleCommentPopup(feature)">
       <svg
-        width="18"
-        height="18"
+        width="24"
+        height="24"
         viewBox="0 0 18 18"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -43,6 +54,23 @@
       </svg>
     </div>
   </ol-overlay>
+
+  <ol-overlay
+    v-for="feature in visiblePolygonFeatures"
+    :key="`delete-${feature.id}`"
+    :position="getFeatureIconPosition(feature)"
+    :offset="[30, 0]"
+    :stopEvent="false"
+    :positioning="'center-center'"
+  >
+    <div class="delete-icon-container" @click.stop="handleDeleteClick(feature)">
+      <img
+        src="@/assets/icons/delete.svg"
+        alt="Delete Icon"
+        class="delete-icon"
+      />
+    </div>
+  </ol-overlay>
 </template>
 
 <script setup lang="ts">
@@ -55,27 +83,33 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  enableClick: {
+    type: Boolean,
+    default: false,
+  },
+  isMapPage: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['toggle-comment-popup', 'show-comment-display'])
 
 const mapUIStore = useMapUIStore()
-const clickCondition = click
 
 const polygonFeatures = computed(() =>
-  mapUIStore.features.filter((feature) => feature.type === 'Polygon')
+  mapUIStore.features.filter((feature) => feature.type === 'Polygon'),
 )
 
 const visiblePolygonFeatures = computed(() => {
-  // Show all plus-icons if the flag is true
   if (props.showAllPlusIcons) {
     return polygonFeatures.value
   }
-
-  // Original logic for showing plus-icons
   const spaceSubwindow = mapUIStore.spaceSubwindow
-  return spaceSubwindow === 3 ? polygonFeatures.value : []
+  return spaceSubwindow === 2 ? polygonFeatures.value : []
 })
+
+const clickCondition = click
 
 function getFeatureIconPosition(feature) {
   const coordinates = feature.coordinates[0]
@@ -92,7 +126,6 @@ function toggleCommentPopup(feature) {
 
 function handleSelect(event) {
   const selected = event.selected
-
   if (selected && selected.length > 0) {
     const olFeature = selected[0]
     const coordinates = olFeature.getGeometry().getCoordinates()
@@ -120,4 +153,69 @@ function handleSelect(event) {
     }
   }
 }
+
+function handleDeleteClick(feature) {
+  if (confirm('Are you sure you want to delete this polygon?')) {
+    mapUIStore.deleteFeature(feature.id)
+  }
+}
 </script>
+
+<style scoped>
+.polygon-plus-icon {
+  cursor: pointer;
+  background: white;
+  border-radius: 50%;
+  padding: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.polygon-plus-icon:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+.polygon-delete-icon {
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.delete-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.delete-icon:hover {
+  transform: scale(1.1);
+}
+
+.delete-icon-container {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.delete-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.delete-icon-container:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+</style>

@@ -6,6 +6,13 @@
     style="width: 100%; height: 100vh"
     @click="handleMapClick"
   >
+    <ol-zoom-control
+      class="custom-zoom-control"
+      zoomInLabel="➕"
+      zoomOutLabel="➖"
+      :duration="250"
+    />
+
     <ol-view
       ref="view"
       :center="[3172858.2941718884, 6317486.347640147]"
@@ -93,6 +100,7 @@ const props = defineProps({
 })
 
 const mapUIStore = useMapUIStore()
+const { mapType } = storeToRefs(mapUIStore)
 const config = useRuntimeConfig()
 const route = useRoute()
 
@@ -105,11 +113,13 @@ const imageUploadPopupPosition = ref(null)
 const showCommentDisplay = ref(false)
 const selectedFeatureForDisplay = ref(null)
 
+const mapboxToken = 'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
 const mapboxStyle = 'restartukraine/cm1ez4ahh02ii01pi36qeb4ug'
-const mapboxUrl = computed(
-  () =>
-    `https://api.mapbox.com/styles/v1/${mapboxStyle}/tiles/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw`,
-)
+const mapboxUrl = computed(() => {
+  const style = mapType.value === 'light' ? mapboxStyle : 'mapbox/satellite-v9'
+  return `https://api.mapbox.com/styles/v1/${style}/tiles/{z}/{x}/{y}@2x?access_token=${mapboxToken}`
+})
+
 const mapboxAttribution =
   '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
@@ -200,3 +210,33 @@ function handleShowCommentDisplay(feature) {
 // watch(showCommentDisplay, (newVal) => {})
 // watch(selectedFeatureForDisplay, (newVal) => {})
 </script>
+
+<style>
+.ol-zoom {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  left: 20px !important;
+  bottom: unset !important;
+  background: transparent !important;
+  border-radius: 4px !important;
+  z-index: 1500 !important;
+  box-shadow: none !important;
+}
+
+/* Customize zoom buttons */
+.ol-zoom .ol-zoom-in,
+.ol-zoom .ol-zoom-out {
+  background-color: transparent !important;
+  border: none !important;
+  margin: 1px !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  color: #374151 !important;
+  font-size: 20px !important;
+}
+</style>

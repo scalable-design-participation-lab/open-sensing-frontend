@@ -1,5 +1,5 @@
 <template>
-  <UCard class="bg-black/100 text-white">
+  <UCard class="dark:bg-slate-950">
     <div class="space-y-4">
       <UProgress
         :value="progressPercentage"
@@ -8,20 +8,20 @@
             base: 'block appearance-none border-none overflow-hidden',
             bar: '[&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:transition-all [&::-webkit-progress-value]:ease-in-out [&::-moz-progress-bar]:rounded-full',
             background:
-              '[&::-webkit-progress-value]:bg-[#B2FB4C] [&::-moz-progress-bar]:bg-[#B2FB4C]',
+              '[&::-webkit-progress-value]:bg-lime-400 [&::-moz-progress-bar]:bg-lime-400',
             track:
-              '[&::-webkit-progress-bar]:bg-gray-700 [&::-webkit-progress-bar]:rounded-full [@supports(selector(&::-moz-progress-bar))]:bg-gray-700',
+              '[&::-webkit-progress-bar]:bg-gray-200 [&::-webkit-progress-bar]:rounded-full [@supports(selector(&::-moz-progress-bar))]:bg-gray-700',
           },
         }"
         class="mb-4"
       />
-      <div v-if="title || icon" class="flex items-center space-x-2">
-        <UIcon v-if="icon" :name="icon" class="text-2xl text-white" />
-        <h2 v-if="title" class="text-xl font-semibold text-white">
+      <div v-if="title || icon">
+        <UIcon v-if="icon" :name="icon" />
+        <h2 v-if="title" class="text-md md:text-lg font-semibold !leading-tight">
           {{ title }}
         </h2>
       </div>
-      <p v-if="paragraph" class="text-sm text-gray-300">
+      <p v-if="paragraph" class="text-xs md:text-sm !leading-tight pb-2">
         {{ paragraph }}
       </p>
 
@@ -42,23 +42,21 @@
           variant="outline"
           :ui="{
             rounded: 'rounded-full',
-            base: 'transition-all duration-300 ease-in-out transform hover:scale-105',
-            padding: { sm: 'px-3 py-1.5', md: 'px-4 py-2', lg: 'px-5 py-2.5' },
-            font: { weight: 'font-medium' },
-            size: 'text-sm',
+            base: 'transition-all duration-300 ease-in-out hover:scale-105',
+            padding: { sm: 'py-1.5', md: 'py-2', lg: 'py-2.5' },
           }"
           :class="[
-            'w-full mb-2 text-center flex justify-center items-center !bg-black',
+            'w-full justify-center hover:!bg-gray-50 dark:hover:!bg-slate-800 ',
             {
-              'border-2 border-red-500 !text-red-500 hover:!bg-white hover:!text-black':
+              'border-2 border-red-500':
                 btn.color === 'red',
-              'border-2 border-green-500 !text-green-500 hover:!bg-white hover:!text-black':
+              'border-2 border-green-500':
                 btn.color === 'green',
-              'border-2 border-blue-500 !text-blue-500 hover:!bg-white hover:!text-black':
+              'border-2 border-blue-500':
                 btn.color === 'blue',
-              'border-2 border-[#B2FB4C] !text-[#B2FB4C] hover:!bg-white hover:!text-black':
-                btn.color === '#B2FB4C',
-              'border-2 border-purple-500 !text-purple-500 hover:!bg-white hover:!text-black':
+              'border-2 border-yellow-500':
+                btn.color === 'yellow',
+              'border-2 border-purple-500':
                 btn.color === 'purple',
             },
           ]"
@@ -68,21 +66,20 @@
         </UButton>
       </div>
 
-      <div v-if="iconGrid" class="mt-4">
-        <p class="text-sm text-gray-300 mb-2">{{ iconGrid.title }}</p>
-        <UCard class="bg-white p-2">
+      <div v-if="iconGrid">
+        <p class="text-sm text-gray-400 mb-2">{{ iconGrid.title }}</p>
+        <UCard>
           <div class="grid grid-cols-3 gap-3">
             <UButton
               v-for="icon in iconGrid.icons"
               :key="icon.name"
               variant="ghost"
-              class="p-1 flex items-center justify-center"
               @click="iconGrid.onSelect(icon.name)"
             >
               <img
                 :src="icon.src"
                 :alt="icon.name"
-                class="w-full h-full object-contain"
+                class="w-full h-full dark:!invert"
               />
             </UButton>
           </div>
@@ -91,11 +88,12 @@
 
       <slot></slot>
 
-      <div class="flex justify-between mt-4">
+      <div class="flex justify-between">
         <UButton
           icon="i-heroicons-arrow-left-20-solid"
           color="white"
           variant="solid"
+          class="rounded-full p-2 hover:bg-gray-300 dark:hover:bg-slate-600"
           :disabled="currentSubwindow === 1"
           @click="$emit('prev')"
         />
@@ -103,6 +101,7 @@
           icon="i-heroicons-arrow-right-20-solid"
           color="white"
           variant="solid"
+          class="rounded-full p-2  hover:bg-gray-300 dark:hover:bg-slate-600"
           :disabled="currentSubwindow === maxSubwindow"
           @click="$emit('next')"
         />

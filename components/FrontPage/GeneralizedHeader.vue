@@ -18,111 +18,149 @@
  -->
 
 <template>
-  <header class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between">
-    <div class="h-full flex space-x-2 sm:space-x-3">
-      <UButton
-        v-if="logoSrc"
-        :class="[
-          `lg:w-12 rounded-lg flex justify-center !bg-white dark:!bg-gray-800 shadow-md hover:animate-bounce`,
-          shapeClass,
-        ]"
-      >
-        <img :src="logoSrc" :alt="logoAlt" class="w-full h-auto" />
-      </UButton>
-      <UButton
-        v-if="showIcon"
-        :class="[
-          `lg:w-12 text-xl sm:text-2xl rounded-lg flex justify-center !bg-white dark:!bg-gray-800 shadow-md hover:animate-bounce`,
-          shapeClass,
-        ]"
-      >
-        🤲
-      </UButton>
-      <template v-for="(item, index) in leftItems" :key="index">
-        <NuxtLink v-if="item.to" v-slot="{ navigate }" :to="item.to" custom>
+  <div>
+    <header
+      class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between"
+    >
+      <!-- items left -->
+      <div class="h-full flex space-x-2 sm:space-x-3">
+        <UButton
+          v-if="logoSrc"
+          :class="[
+            `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:animate-spin`,
+            shapeClass,
+          ]"
+        >
+          <img
+            :src="logoSrc"
+            :alt="logoAlt"
+            class="w-full h-auto dark:!invert"
+          />
+        </UButton>
+        <UButton
+          v-if="showIcon"
+          :class="[
+            `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:animate-spin`,
+            shapeClass,
+          ]"
+        >
+          🤲
+        </UButton>
+        <template v-for="(item, index) in leftItems" :key="index">
+          <NuxtLink v-if="item.to" v-slot="{ navigate }" :to="item.to" custom>
+            <UButton
+              :variant="item.variant"
+              :color="item.color || (item.primary ? 'black' : 'gray')"
+              :icon="item.icon"
+              :class="[
+                `h-full px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
+                shapeClass,
+              ]"
+              @click="navigate"
+            >
+              {{ item.label }}
+            </UButton>
+          </NuxtLink>
           <UButton
+            v-else
             :variant="item.variant"
             :color="item.color || (item.primary ? 'black' : 'gray')"
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
-              item.primary
-                ? 'bg-white dark:bg-gray-800 text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black'
-                : 'bg-black dark:bg-white text-white dark:text-black hover:bg-white hover:text-black dark:hover:bg-gray-800 dark:hover:text-white',
+              `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg hover:animate-bounce text-black dark:text-white !bg-gray-50 dark:!bg-slate-950`,
               shapeClass,
             ]"
-            @click="navigate"
+            @click="item.onClick"
           >
             {{ item.label }}
           </UButton>
-        </NuxtLink>
-        <UButton
-          v-else
-          :variant="item.variant"
-          :color="item.color || (item.primary ? 'black' : 'gray')"
-          :icon="item.icon"
-          :class="[
-            `h-full px-3 sm:px-4 rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-md hover:animate-pulse`,
-            item.primary
-              ? '!bg-white dark:!bg-gray-800 text-black dark:text-white'
-              : '!bg-black dark:!bg-white text-white dark:text-black',
-            shapeClass,
-          ]"
-          @click="item.onClick"
-        >
-          {{ item.label }}
-        </UButton>
-      </template>
-    </div>
-    <div class="flex space-x-2 sm:space-x-3">
-      <template v-for="(item, index) in rightItems" :key="index">
-        <UDropdown v-if="item.dropdown" v-bind="item.dropdown">
+        </template>
+      </div>
+      <!-- items right -->
+      <div class="flex space-x-2 sm:space-x-3">
+        <template v-for="(item, index) in rightItems" :key="index">
+          <UDropdown v-if="item.dropdown" v-bind="item.dropdown">
+            <UButton
+              :icon="item.icon"
+              :class="[
+                `h-full px-3 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-50 dark:!bg-slate-950 shadow-lg text-black dark:text-white hover:invert`,
+                shapeClass,
+              ]"
+            >
+              {{ item.label }}
+            </UButton>
+          </UDropdown>
+          <NuxtLink
+            v-else-if="item.to"
+            v-slot="{ navigate }"
+            :to="item.to"
+            custom
+          >
+            <UButton
+              :variant="item.variant"
+              :color="item.color"
+              :icon="item.icon"
+              :class="[
+                `h-full px-1 md:px-2 lg:px-3 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-50 dark:!bg-slate-950 text-black dark:text-white hover:invert`,
+                shapeClass,
+              ]"
+              @click="navigate"
+            >
+              {{ item.label }}
+            </UButton>
+          </NuxtLink>
           <UButton
+            v-else
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white dark:!bg-gray-800 shadow-md text-black dark:text-white hover:invert`,
+              `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
               shapeClass,
             ]"
+            @click="item.onClick"
           >
             {{ item.label }}
           </UButton>
-        </UDropdown>
-        <NuxtLink
-          v-else-if="item.to"
-          v-slot="{ navigate }"
-          :to="item.to"
-          custom
-        >
-          <UButton
-            :variant="item.variant"
-            :color="item.color"
-            :icon="item.icon"
-            :class="[
-              `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white dark:!bg-gray-800 text-black dark:text-white hover:invert`,
-              shapeClass,
-            ]"
-            @click="navigate"
-          >
-            {{ item.label }}
-          </UButton>
-        </NuxtLink>
-        <UButton
-          v-else
-          :icon="item.icon"
+        </template>
+        <!-- Dark Mode Toggle -->
+        <UColorModeButton
           :class="[
-            `h-full px-3 sm:px-4 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-white dark:!bg-gray-800 shadow-md text-black dark:text-white hover:invert`,
+            `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-gray-50 dark:!bg-slate-950 shadow-lg  dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
             shapeClass,
           ]"
-          @click="item.onClick"
-        >
-          {{ item.label }}
-        </UButton>
-      </template>
-    </div>
-  </header>
+        />
+        <!-- Menu -->
+        <UButton
+          :class="[
+            `h-full px-2 md:px-2 lg:px-3 text-lg !bg-gray-50 dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white`,
+            shapeClass,
+          ]"
+          @click="showMenuPopup = true"
+          icon="i-heroicons-ellipsis-horizontal-20-solid"
+        />
+      </div>
+    </header>
+
+    <!-- Add popups -->
+    <MenuPopup v-model="showMenuPopup" @select="handleMenuSelect" />
+  </div>
 </template>
-<script setup>
-import { computed } from 'vue'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+// Add new refs for popups
+const showMenuPopup = ref(false)
+
+// Add menu select handler
+const handleMenuSelect = (action: string) => {
+  switch (action) {
+    case 'help':
+      // Add help logic
+      break
+    case 'settings':
+      // Add settings logic
+      break
+  }
+}
 
 /**
  * Props for the GeneralizedHeader component

@@ -1,38 +1,84 @@
 <template>
-  <div class="fixed right-6 top-6 w-80 z-40 bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-    <UCard>
-      <UAccordion color="black" variant="solid" :items="menuItems" class="space-y-2">
+  <div
+    class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl"
+  >
+    <UCard class="dark:bg-slate-950">
+      <UAccordion
+        color="white"
+        variant="solid"
+        :items="menuItems"
+        class="space-y-1"
+      >
         <template #item="{ item }">
-          <SubWindow v-if="item.label === 'Середовище'" :current-subwindow="spaceSubwindow" :max-subwindow="3"
-            :progress-percentage="spaceProgressPercentage" :title="spaceContent.title" :icon="spaceContent.icon"
-            :paragraph="spaceContent.description" :button="spaceContent.button" :button-group="spaceContent.buttonGroup"
-            @prev="mapUIStore.prevSpaceSubwindow()" @next="mapUIStore.nextSpaceSubwindow()">
+          <SubWindow
+            v-if="item.label === 'Середовище'"
+            :current-subwindow="spaceSubwindow"
+            :max-subwindow="3"
+            :progress-percentage="spaceProgressPercentage"
+            :title="spaceContent.title"
+            :icon="spaceContent.icon"
+            :paragraph="spaceContent.description"
+            :button="spaceContent.button"
+            :button-group="spaceContent.buttonGroup"
+            @prev="mapUIStore.prevSpaceSubwindow()"
+            @next="mapUIStore.nextSpaceSubwindow()"
+            class="!text-xl"
+          >
           </SubWindow>
-          <SubWindow v-if="item.label === 'Приналежність'" :current-subwindow="belongingSubwindow" :max-subwindow="1"
-            :progress-percentage="belongingProgressPercentage" :title="belongingContent.title"
-            :icon="belongingContent.icon" :paragraph="belongingContent.description"
-            :icon-grid="belongingSubwindow === 1 ? belongingIconGrid : null" @prev="prevBelongingSubwindow"
-            @next="nextBelongingSubwindow">
+          <SubWindow
+            v-if="item.label === 'Приналежність'"
+            :current-subwindow="belongingSubwindow"
+            :max-subwindow="1"
+            :progress-percentage="belongingProgressPercentage"
+            :title="belongingContent.title"
+            :icon="belongingContent.icon"
+            :paragraph="belongingContent.description"
+            :icon-grid="belongingSubwindow === 1 ? belongingIconGrid : null"
+            @prev="prevBelongingSubwindow"
+            @next="nextBelongingSubwindow"
+          >
           </SubWindow>
-          <SubWindow v-if="item.label === 'Безпека'" :current-subwindow="safetySubwindow" :max-subwindow="1"
-            :progress-percentage="safetyProgressPercentage" :title="safetyContent.title" :icon="safetyContent.icon"
-            :paragraph="safetyContent.description" :icon-grid="safetySubwindow === 1 ? safetyIconGrid : null"
-            @prev="prevSafetySubwindow" @next="nextSafetySubwindow">
+          <SubWindow
+            v-if="item.label === 'Безпека'"
+            :current-subwindow="safetySubwindow"
+            :max-subwindow="1"
+            :progress-percentage="safetyProgressPercentage"
+            :title="safetyContent.title"
+            :icon="safetyContent.icon"
+            :paragraph="safetyContent.description"
+            :icon-grid="safetySubwindow === 1 ? safetyIconGrid : null"
+            @prev="prevSafetySubwindow"
+            @next="nextSafetySubwindow"
+          >
           </SubWindow>
-          <SubWindow v-if="item.label === 'Екологія'" :current-subwindow="environmentSubwindow" :max-subwindow="2"
-            :progress-percentage="environmentProgressPercentage" :title="environmentContent.title"
-            :icon="environmentContent.icon" :paragraph="environmentContent.description" :icon-grid="environmentSubwindow === 1
-              ? pollutionIconGrid
-              : environmentSubwindow === 2
-                ? leafIconGrid
-                : null
-              " @prev="prevEnvironmentSubwindow" @next="nextEnvironmentSubwindow">
+          <SubWindow
+            v-if="item.label === 'Екологія'"
+            :current-subwindow="environmentSubwindow"
+            :max-subwindow="2"
+            :progress-percentage="environmentProgressPercentage"
+            :title="environmentContent.title"
+            :icon="environmentContent.icon"
+            :paragraph="environmentContent.description"
+            :icon-grid="
+              environmentSubwindow === 1
+                ? pollutionIconGrid
+                : environmentSubwindow === 2
+                  ? leafIconGrid
+                  : null
+            "
+            @prev="prevEnvironmentSubwindow"
+            @next="nextEnvironmentSubwindow"
+          >
           </SubWindow>
         </template>
       </UAccordion>
-
-      <UButton v-if="showSubmitButton" class="mt-4 w-full" color="primary" :loading="isSaving" :disabled="isSaving"
-        @click="saveData">
+      <UButton
+        class="mt-2 py-3 px-6 rounded-full flex place-self-end hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+        color="black"
+        :loading="isSaving"
+        :disabled="isSaving"
+        @click="saveData"
+      >
         {{ isSaving ? 'подаючи...' : 'завершити' }}
       </UButton>
     </UCard>
@@ -61,7 +107,11 @@ const safetySubwindow = computed(() => mapUIStore.safetySubwindow)
 const environmentSubwindow = computed(() => mapUIStore.environmentSubwindow)
 
 const menuItems = [
-  { icon: 'i-heroicons-map-pin-20-solid', label: 'Середовище' },
+  {
+    icon: 'i-heroicons-map-pin-20-solid',
+    label: 'Середовище',
+    defaultOpen: true,
+  },
   { icon: 'i-heroicons-home-20-solid', label: 'Приналежність' },
   { icon: 'i-heroicons-exclamation-triangle-20-solid', label: 'Безпека' },
   { icon: 'i-heroicons-sun-20-solid', label: 'Екологія' },
@@ -69,25 +119,24 @@ const menuItems = [
 
 const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 3) * 100)
 const belongingProgressPercentage = computed(
-  () => (belongingSubwindow.value / 1) * 100
+  () => (belongingSubwindow.value / 1) * 100,
 )
 const safetyProgressPercentage = computed(
-  () => (safetySubwindow.value / 1) * 100
+  () => (safetySubwindow.value / 1) * 100,
 )
 const environmentProgressPercentage = computed(
-  () => (environmentSubwindow.value / 2) * 100
+  () => (environmentSubwindow.value / 2) * 100,
 )
 
 const spaceContent = computed(() => {
   const contents = {
     1: {
-      title:
-        'Позначте на мапі місця, які ви відвідували навколо р. Тяжилівка',
+      title: 'Позначте на мапі місця, які ви відвідували навколо р. Тяжилівка',
       description:
         'Спочатку оберіть частоту відвідування, а після позначте на мапі ту чи іншу локацію (до десяти).',
       buttonGroup: [
         {
-          text: 'every day',
+          text: 'щоденно',
           color: 'blue',
           action: () => mapUIStore.activateDrawing('every day'),
         },
@@ -103,7 +152,7 @@ const spaceContent = computed(() => {
         },
         {
           text: 'лише раз',
-          color: '#B2FB4C',
+          color: 'yellow',
           action: () => mapUIStore.activateDrawing('only once'),
         },
         {
@@ -114,8 +163,7 @@ const spaceContent = computed(() => {
       ],
     },
     2: {
-      title:
-        'Позначте на мапі місця, у яких хочеться проводити дозвілля',
+      title: 'Позначте на мапі місця, у яких хочеться проводити дозвілля',
       description:
         'Торкніться екрана та оберіть ділянки, де в майбутньому бажаєте проводити час. Далі тисніть на + і залишайте коментар, які саме активності вбачаєте: ярмарок, барбекю, вигул собак тощо.',
       button: {
@@ -141,7 +189,8 @@ const spaceContent = computed(() => {
 const belongingContent = computed(() => {
   const contents = {
     1: {
-      title: 'Позначте на мапі конкретні місця навколо р. Тяжилівка й висловіть свою думку',
+      title:
+        'Позначте на мапі конкретні місця навколо р. Тяжилівка й висловіть свою думку',
       description:
         'За допомогою іконок нижче поділіться, які ділянки не подобаються, подобаються або сповнені спогадів. Далі тисніть + і залишайте коментар, а також за бажанням зображення.',
     },
@@ -162,7 +211,8 @@ const belongingIconGrid = computed(() => ({
 const safetyContent = computed(() => {
   const contents = {
     1: {
-      title: 'Позначте на мапі місця навколо р. Тяжилівка, де ви почуваєтесь безпечно або навпаки',
+      title:
+        'Позначте на мапі місця навколо р. Тяжилівка, де ви почуваєтесь безпечно або навпаки',
       description:
         'За допомогою іконок нижче вкажіть ділянки, які викликають у вас відчуття безпеки, небезпеки або спокою.',
     },
@@ -171,7 +221,7 @@ const safetyContent = computed(() => {
 })
 
 const safetyIconGrid = computed(() => ({
-  title: 'Select an icon:',
+  title: 'Виберіть іконку:',
   icons: [
     { name: 'broken', src: brokenIcon },
     { name: 'calm', src: calmIcon },
@@ -183,12 +233,14 @@ const safetyIconGrid = computed(() => ({
 const environmentContent = computed(() => {
   const contents = {
     1: {
-      title: 'Позначте на мапі місця навколо р. Тяжилівка, де ви помічали сміття',
+      title:
+        'Позначте на мапі місця навколо р. Тяжилівка, де ви помічали сміття',
       description:
         'За допомогою іконки нижче поділіться, які ділянки засміченні. Далі тисніть + і залишайте коментар.',
     },
     2: {
-      title: 'Позначте на мапі місця навколо р. Тяжилівка, де ви зустрічали незвичайні рослини або тварин',
+      title:
+        'Позначте на мапі місця навколо р. Тяжилівка, де ви зустрічали незвичайні рослини або тварин',
       description:
         'За допомогою іконки нижче відмітьте, де бачили цікавих тварин, комах, дерева тощо. Далі тисніть + і залишайте коментар.',
     },
@@ -197,13 +249,13 @@ const environmentContent = computed(() => {
 })
 
 const pollutionIconGrid = computed(() => ({
-  title: 'Виберіть піктограму забруднення:',
+  title: 'Виберіть іконку:',
   icons: [{ name: 'pollution', src: pollutionIcon }],
   onSelect: selectEnvironmentIcon,
 }))
 
 const leafIconGrid = computed(() => ({
-  title: 'Виберіть іконку листка:',
+  title: 'Виберіть іконку:',
   icons: [{ name: 'leaf', src: leafIcon }],
   onSelect: selectEnvironmentIcon,
 }))
@@ -262,8 +314,10 @@ async function saveData() {
   isSaving.value = true
   try {
     await mapUIStore.saveDataToDatabase()
-    showSuccessNotification('Thank you for taking the survey! You can now view your results or explore maps created by other users.')
-    mapUIStore.resetAllSubwindows()
+    showSuccessNotification(
+      'Thank you for taking the survey! You can now view your results or explore maps created by other users.',
+    )
+    // mapUIStore.resetAllSubwindows()
   } catch (error) {
     console.error('Error submitting data to database:', error)
     showErrorNotification('Не вдалося подати дані')
