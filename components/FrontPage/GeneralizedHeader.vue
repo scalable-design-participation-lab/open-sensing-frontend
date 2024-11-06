@@ -135,14 +135,13 @@
             shapeClass,
           ]"
           @click="showMenuPopup = true"
-          >•••
-        </UButton>
+          icon="i-heroicons-ellipsis-horizontal-20-solid"
+        />
       </div>
     </header>
 
     <!-- Add popups -->
     <MenuPopup v-model="showMenuPopup" @select="handleMenuSelect" />
-    <AboutPopup v-model="showAboutPopup" />
   </div>
 </template>
 <script setup lang="ts">
@@ -150,14 +149,10 @@ import { ref, computed } from 'vue'
 
 // Add new refs for popups
 const showMenuPopup = ref(false)
-const showAboutPopup = ref(false)
 
 // Add menu select handler
 const handleMenuSelect = (action: string) => {
   switch (action) {
-    case 'about':
-      showAboutPopup.value = true
-      break
     case 'help':
       // Add help logic
       break
