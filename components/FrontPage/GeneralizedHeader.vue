@@ -19,11 +19,12 @@
 
 <template>
   <header class="h-10 lg:h-12 fixed top-6 left-6 right-6 flex justify-between">
+    <!-- items left -->
     <div class="h-full flex space-x-2 sm:space-x-3">
       <UButton
         v-if="logoSrc"
         :class="[
-          `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-100 dark:!bg-gray-900 shadow-md hover:animate-spin`,
+          `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:animate-spin`,
           shapeClass,
         ]"
       >
@@ -32,7 +33,7 @@
       <UButton
         v-if="showIcon"
         :class="[
-          `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-100 dark:!bg-gray-900 shadow-md hover:animate-spin`,
+          `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:animate-spin`,
           shapeClass,
         ]"
       >
@@ -46,9 +47,6 @@
             :icon="item.icon"
             :class="[
               `h-full px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
-              item.primary
-                ? 'bg-gray-100 dark:bg-gray-900 text-black dark:text-white hover:bg-gray-900 hover:text-white dark:hover:bg-gray-100 dark:hover:text-black'
-                : 'bg-gray-900 dark:bg-gray-100 text-white dark:text-black hover:bg-gray-100 hover:text-black dark:hover:bg-gray-900 dark:hover:text-white',
               shapeClass,
             ]"
             @click="navigate"
@@ -62,10 +60,7 @@
           :color="item.color || (item.primary ? 'black' : 'gray')"
           :icon="item.icon"
           :class="[
-            `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-md hover:animate-bounce`,
-            item.primary
-              ? '!bg-gray-900 dark:!bg-gray-100 text-white dark:text-black'
-              : '!bg-gray-100 dark:!bg-gray-900 text-black dark:text-white',
+            `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg hover:animate-bounce text-black dark:text-white !bg-gray-50 dark:!bg-slate-950`,
             shapeClass,
           ]"
           @click="item.onClick"
@@ -74,13 +69,14 @@
         </UButton>
       </template>
     </div>
+    <!-- items right -->
     <div class="flex space-x-2 sm:space-x-3">
       <template v-for="(item, index) in rightItems" :key="index">
         <UDropdown v-if="item.dropdown" v-bind="item.dropdown">
           <UButton
             :icon="item.icon"
             :class="[
-              `h-full px-3 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
+              `h-full px-3 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-50 dark:!bg-slate-950 shadow-lg text-black dark:text-white hover:invert`,
               shapeClass,
             ]"
           >
@@ -98,7 +94,7 @@
             :color="item.color"
             :icon="item.icon"
             :class="[
-              `h-full px-1 md:px-2 lg:px-3 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 text-black dark:text-white hover:invert`,
+              `h-full px-1 md:px-2 lg:px-3 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-50 dark:!bg-slate-950 text-black dark:text-white hover:invert`,
               shapeClass,
             ]"
             @click="navigate"
@@ -110,7 +106,7 @@
           v-else
           :icon="item.icon"
           :class="[
-            `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-100 dark:!bg-gray-900 shadow-md text-black dark:text-white hover:invert`,
+            `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
             shapeClass,
           ]"
           @click="item.onClick"
@@ -121,10 +117,18 @@
       <!-- Dark Mode Toggle -->
       <UColorModeButton
         :class="[
-          `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-gray-100 dark:!bg-gray-900 shadow-md hover:invert`,
+          `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-gray-50 dark:!bg-slate-950 shadow-lg  dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
           shapeClass,
         ]"
       />
+        <!-- Menu -->
+        <UButton
+          :class="[
+            `h-full px-2 md:px-2 lg:px-3 text-lg !bg-gray-50 dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
+            shapeClass,
+          ]"
+        >•••
+        </UButton>
     </div>
   </header>
 </template>

@@ -2,7 +2,7 @@
   <div
     class="fixed right-6 top-24 w-96 lg:w-80 z-40 shadow-xl"
   >
-    <UCard>
+    <UCard class="dark:bg-slate-950">
       <UAccordion
         color="white"
         variant="solid"
@@ -72,7 +72,7 @@
         </template>
       </UAccordion>
       <UButton
-        class="mt-2 py-3 px-6 rounded-full flex place-self-end"
+        class="mt-2 py-3 px-6 rounded-full flex place-self-end hover:bg-slate-700 dark:hover:bg-gray-200"
         color="black"
         :loading="isSaving"
         :disabled="isSaving"

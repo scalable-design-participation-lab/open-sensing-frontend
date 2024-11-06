@@ -1,7 +1,7 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="registration-card max-w-[90vw] w-[500px] max-h-[90vh] overflow-y-auto z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
+    class="registration-card max-w-[90vw] w-[500px] max-h-[90vh] overflow-y-auto z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:bg-slate-950"
   >
     <template #header>
       <h3 class="text-xl md:text-2xl font-semibold text-center">реєстрація</h3>
@@ -20,20 +20,18 @@
         <UInput
           v-model="formState.lastname"
           placeholder="Введіть своє прізвище"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Ім'я" name="firstname">
         <UInput
           v-model="formState.firstname"
           placeholder="Введіть своє ім'я"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Вік" name="age">
@@ -41,10 +39,9 @@
           v-model="formState.age"
           type="number"
           placeholder="Введіть свій вік"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Стать" name="gender">
@@ -52,10 +49,9 @@
           v-model="formState.gender"
           :options="genderOptions"
           placeholder="Виберіть свою стать"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Education Level" name="educationLevel">
@@ -63,10 +59,9 @@
           v-model="formState.educationLevel"
           :options="educationOptions"
           placeholder="Виберіть рівень освіти"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Мешканець з" name="residentSince">
@@ -74,17 +69,16 @@
           v-model="formState.residentSince"
           :options="residentOptions"
           placeholder="Як довго ви тут живете?"
-          color="yellow"
+          color="blue"
           variant="outline"
           size="md"
-          class="rounded-full"
         />
       </UFormGroup>
       <UFormGroup label="Житель Біля річки З" name="residentNearRiverSince">
         <UInput
           v-model="formState.residentNearRiverSince"
-          placeholder="Enter year (e.g. 2022)"
-          color="yellow"
+          placeholder="Введіть рік (наприклад, 2022)"
+          color="blue"
           variant="outline"
           size="md"
         />
@@ -94,7 +88,7 @@
         <UButton
           type="submit"
           color="black"
-          class="mt-2 px-6 py-2 rounded-full"
+          class="mt-2 px-6 py-3 rounded-full"
         >
           перейти до карти
         </UButton>
@@ -102,7 +96,7 @@
     </UForm>
 
     <template #footer>
-      <p class="text-xs text-gray-500 px-4 py-3 md:px-6 leading-tight">
+      <p class="text-xs text-slate-400 px-4 py-3 md:px-6 leading-tight">
         Беручи участь в цьому опитуванні, ви даєте згоду на збір та використання
         ваших відповідей в дослідницьких цілях. Ваші персональні дані залишаться
         конфіденційними і не будуть передані третім особам без вашої згоди, за

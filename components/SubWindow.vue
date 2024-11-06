@@ -1,5 +1,5 @@
 <template>
-  <UCard class="">
+  <UCard class="dark:bg-slate-950">
     <div class="space-y-4">
       <UProgress
         :value="progressPercentage"
@@ -46,7 +46,7 @@
             padding: { sm: 'py-1.5', md: 'py-2', lg: 'py-2.5' },
           }"
           :class="[
-            'w-full justify-center',
+            'w-full justify-center hover:!bg-gray-50 dark:hover:!bg-slate-800 ',
             {
               'border-2 border-red-500':
                 btn.color === 'red',
@@ -66,21 +66,20 @@
         </UButton>
       </div>
 
-      <div v-if="iconGrid" class="mt-4">
+      <div v-if="iconGrid">
         <p class="text-sm text-gray-400 mb-2">{{ iconGrid.title }}</p>
-        <UCard class="bg-white p-2">
+        <UCard>
           <div class="grid grid-cols-3 gap-3">
             <UButton
               v-for="icon in iconGrid.icons"
               :key="icon.name"
               variant="ghost"
-              class="p-1"
               @click="iconGrid.onSelect(icon.name)"
             >
               <img
                 :src="icon.src"
                 :alt="icon.name"
-                class="w-full h-full"
+                class="w-full h-full dark:!invert"
               />
             </UButton>
           </div>
@@ -89,11 +88,12 @@
 
       <slot></slot>
 
-      <div class="flex justify-between mt-4">
+      <div class="flex justify-between">
         <UButton
           icon="i-heroicons-arrow-left-20-solid"
           color="white"
           variant="solid"
+          class="rounded-full p-2 hover:!bg-gray-50 dark:hover:!bg-slate-800"
           :disabled="currentSubwindow === 1"
           @click="$emit('prev')"
         />
@@ -101,6 +101,7 @@
           icon="i-heroicons-arrow-right-20-solid"
           color="white"
           variant="solid"
+          class="rounded-full p-2 hover:!bg-gray-50 dark:hover:!bg-slate-800"
           :disabled="currentSubwindow === maxSubwindow"
           @click="$emit('next')"
         />
