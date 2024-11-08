@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl"
-  >
+  <div class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl">
     <UCard class="dark:bg-slate-950">
       <UAccordion
         color="white"
@@ -13,13 +11,14 @@
           <SubWindow
             v-if="item.label === 'Середовище'"
             :current-subwindow="spaceSubwindow"
-            :max-subwindow="3"
+            :max-subwindow="4"
             :progress-percentage="spaceProgressPercentage"
             :title="spaceContent.title"
             :icon="spaceContent.icon"
             :paragraph="spaceContent.description"
             :button="spaceContent.button"
             :button-group="spaceContent.buttonGroup"
+            :icon-grid="spaceSubwindow === 4 ? prohibitIconGrid : null"
             @prev="mapUIStore.prevSpaceSubwindow()"
             @next="mapUIStore.nextSpaceSubwindow()"
             class="!text-xl"
@@ -98,6 +97,7 @@ import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
+import prohibitIcon from '@/assets/icons/prohibit.svg'
 
 const mapUIStore = useMapUIStore()
 
@@ -117,7 +117,7 @@ const menuItems = [
   { icon: 'i-heroicons-sun-20-solid', label: 'Екологія' },
 ]
 
-const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 3) * 100)
+const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)
 const belongingProgressPercentage = computed(
   () => (belongingSubwindow.value / 1) * 100,
 )
@@ -181,6 +181,11 @@ const spaceContent = computed(() => {
         color: 'red',
         action: () => mapUIStore.activateLineStringDrawing(),
       },
+    },
+    4: {
+      title: 'Позначте на мапі місця, які ви хотіли б заборонити',
+      description:
+        'За допомогою іконки нижче позначте місця, які на вашу думку потрібно заборонити.',
     },
   }
   return contents[spaceSubwindow.value] || { title: '', description: '' }
@@ -260,6 +265,12 @@ const leafIconGrid = computed(() => ({
   onSelect: selectEnvironmentIcon,
 }))
 
+const prohibitIconGrid = computed(() => ({
+  title: 'Виберіть іконку:',
+  icons: [{ name: 'prohibit', src: prohibitIcon }],
+  onSelect: selectProhibitIcon,
+}))
+
 const showSubmitButton = computed(() => {
   return environmentSubwindow.value === 2
 })
@@ -299,8 +310,13 @@ function prevEnvironmentSubwindow() {
 }
 
 function selectEnvironmentIcon(iconName: string) {
-  console.log('Піктограма вибраного середовища', iconName)
+  console.log('Піктограма вибраного средовища', iconName)
   mapUIStore.activateEnvironmentDrawing(iconName)
+}
+
+function selectProhibitIcon() {
+  console.log('Selected prohibit icon')
+  mapUIStore.activateProhibitDrawing()
 }
 
 const isSaving = ref(false)

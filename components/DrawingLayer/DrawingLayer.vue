@@ -69,6 +69,7 @@ import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
+import prohibitIcon from '@/assets/icons/prohibit.svg'
 
 const props = defineProps({
   projection: {
@@ -137,6 +138,9 @@ function handleShowCommentDisplay(feature) {
 }
 
 function getIconForFeature(feature) {
+  if (feature.isProhibit) {
+    return prohibitIcon
+  }
   if (feature.iconName) {
     switch (feature.iconName) {
       case 'pollution':
