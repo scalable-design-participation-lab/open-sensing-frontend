@@ -80,6 +80,7 @@
       >
         {{ isSaving ? 'подаючи...' : 'завершити' }}
       </UButton>
+      <ThankYouModal v-model="showThankYouModal" />
     </UCard>
   </div>
 </template>
@@ -89,6 +90,7 @@ import { computed, ref } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
 import SubWindow from './SubWindow.vue'
 import { useRouter } from 'vue-router'
+import ThankYouModal from './ThankYouModal.vue'
 
 import dislikeIcon from '@/assets/icons/dislike.svg'
 import heartIcon from '@/assets/icons/heart.svg'
@@ -131,7 +133,7 @@ const environmentProgressPercentage = computed(
 )
 
 const spaceContent = computed(() => {
-  const contents = {
+  const contents: Record<number, any> = {
     1: {
       title: 'Позначте на мапі місця, які ви відвідували навколо р. Тяжилівка',
       description:
@@ -199,7 +201,7 @@ const spaceContent = computed(() => {
 })
 
 const belongingContent = computed(() => {
-  const contents = {
+  const contents: Record<number, any> = {
     1: {
       title:
         'Позначте на мапі конкретні місця навколо р. Тяжилівка й висловіть свою думку',
@@ -233,7 +235,7 @@ const belongingIconGrid = computed(() => ({
 }))
 
 const safetyContent = computed(() => {
-  const contents = {
+  const contents: Record<number, any> = {
     1: {
       title:
         'Позначте на мапі місця навколо р. Тяжилівка, де ви почуваєтесь безпечно або навпаки',
@@ -267,7 +269,7 @@ const safetyIconGrid = computed(() => ({
 }))
 
 const environmentContent = computed(() => {
-  const contents = {
+  const contents: Record<number, any> = {
     1: {
       title:
         'Позначте на мапі місця навколо р. Тяжилівка, де ви помічали сміття',
@@ -290,7 +292,7 @@ const pollutionIconGrid = computed(() => ({
     {
       name: 'pollution',
       src: pollutionIcon,
-      tooltip: 'Місця із забрудненням',
+      tooltip: 'Місця з забрудненням',
     },
   ],
   onSelect: selectEnvironmentIcon,
@@ -374,18 +376,13 @@ const notificationColor = ref('green')
 const notificationTitle = ref('')
 const notificationText = ref('')
 const notificationId = ref('save-notification')
+const showThankYouModal = ref(false)
 
 async function saveData() {
   isSaving.value = true
   try {
     await mapUIStore.saveDataToDatabase()
-    // Redirect to map page after successful save
-    router.push({
-      name: 'map',
-      query: {
-        showIntro: 'true', // Add query parameter to trigger intro modal
-      },
-    })
+    showThankYouModal.value = true
   } catch (error) {
     console.error('Error submitting data to database:', error)
     showErrorNotification('Не вдалося подати дані')
