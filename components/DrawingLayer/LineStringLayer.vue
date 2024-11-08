@@ -21,6 +21,7 @@
   </ol-interaction-select>
 
   <ol-overlay
+    v-if="!isMapPage"
     v-for="feature in lineStringFeatures"
     :key="`plus-${feature.id}`"
     :position="getLineStringStartPoint(feature)"
@@ -38,6 +39,7 @@
   </ol-overlay>
 
   <ol-overlay
+    v-if="showDeleteButton"
     v-for="feature in lineStringFeatures"
     :key="`delete-${feature.id}`"
     :position="getLineStringEndPoint(feature)"
@@ -68,6 +70,10 @@ const props = defineProps({
   isMapPage: {
     type: Boolean,
     default: false,
+  },
+  showDeleteButton: {
+    type: Boolean,
+    default: true,
   },
 })
 

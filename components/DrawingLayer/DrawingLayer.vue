@@ -27,6 +27,7 @@
         :show-all-plus-icons="showAllPlusIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @toggle-image-upload-popup="toggleImageUploadPopup"
         @show-comment-display="handleShowCommentDisplay"
@@ -36,12 +37,14 @@
         :show-all-plus-icons="showAllPlusIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @show-comment-display="handleShowCommentDisplay"
       />
       <LineStringLayer
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @show-comment-display="handleShowCommentDisplay"
       />
@@ -87,6 +90,10 @@ const props = defineProps({
   isMapPage: {
     type: Boolean,
     default: false,
+  },
+  showDeleteButton: {
+    type: Boolean,
+    default: true,
   },
 })
 

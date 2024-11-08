@@ -40,6 +40,7 @@
       :show-all-plus-icons="showAllPlusIcons"
       :enable-click="isMapPage"
       :is-map-page="isMapPage"
+      :show-delete-button="!isMapPage"
       @toggle-comment-popup="toggleCommentPopup"
       @toggle-image-upload-popup="toggleImageUploadPopup"
       @show-comment-display="handleShowCommentDisplay"
@@ -113,7 +114,8 @@ const imageUploadPopupPosition = ref(null)
 const showCommentDisplay = ref(false)
 const selectedFeatureForDisplay = ref(null)
 
-const mapboxToken = 'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
+const mapboxToken =
+  'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
 const mapboxStyle = 'restartukraine/cm1ez4ahh02ii01pi36qeb4ug'
 const mapboxUrl = computed(() => {
   const style = mapType.value === 'light' ? mapboxStyle : 'mapbox/satellite-v9'
