@@ -2,18 +2,32 @@
   <UModal v-model="isOpen" :ui="{ width: 'sm:max-w-lg' }">
     <UCard>
       <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold">Download Ukraine Data</h3>
-          <UButton
+        <div class="flex place-content-center">
+          <h3 class="text-xl font-semibold">Завантаження відкритих даних</h3>
+          <!-- <UButton
             color="gray"
             variant="ghost"
             icon="i-heroicons-x-mark-20-solid"
             @click="closeModal"
-          />
+          /> -->
         </div>
       </template>
 
-      <div class="space-y-6 px-1">
+      <p class="text-center leading-tight">
+        Ми працюємо над тим, щоб дані, створені за допомогою цієї програми, були відкрито доступними для громадськості. Перевірте незабаром.
+      </p>
+
+      <div class="flex justify-center my-8 mb-4">
+        <UButton
+          color="black"
+          class="px-6 py-2 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+          @click="closeModal"
+        >
+        Поверніться до карти
+        </UButton>
+      </div>
+
+      <!-- <div class="space-y-6 px-1">
         <div class="space-y-2">
           <label class="font-medium text-gray-700">Select Data Type:</label>
           <USelect
@@ -52,16 +66,16 @@
             </template>
             Download
           </UButton>
-        </div>
-      </div>
+        </div> 
+      </div> -->
     </UCard>
   </UModal>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { getFirestore, collection, getDocs } from 'firebase/firestore'
-import { useFirebaseApp } from 'vuefire'
+// import { getFirestore, collection, getDocs } from 'firebase/firestore'
+// import { useFirebaseApp } from 'vuefire'
 
 const props = defineProps({
   modelValue: {
@@ -77,26 +91,26 @@ const isOpen = computed({
   set: (value) => emit('update:modelValue', value),
 })
 
-const selectedDataType = ref('')
-const fileFormat = ref('json')
-const isLoading = ref(false)
+// const selectedDataType = ref('')
+// const fileFormat = ref('json')
+// const isLoading = ref(false)
 
-const dataTypes = [
-  { label: 'All Data', value: 'all' },
-  { label: 'Space Data', value: 'space' },
-  { label: 'Belonging Data', value: 'belonging' },
-  { label: 'Safety Data', value: 'safety' },
-  { label: 'Environment Data', value: 'environment' },
-]
+// const dataTypes = [
+//   { label: 'All Data', value: 'all' },
+//   { label: 'Space Data', value: 'space' },
+//   { label: 'Belonging Data', value: 'belonging' },
+//   { label: 'Safety Data', value: 'safety' },
+//   { label: 'Environment Data', value: 'environment' },
+// ]
 
-const fileFormats = [
-  { label: 'JSON', value: 'json' },
-  { label: 'CSV', value: 'csv' },
-]
+// const fileFormats = [
+//   { label: 'JSON', value: 'json' },
+//   { label: 'CSV', value: 'csv' },
+// ]
 
-const isFormValid = computed(() => {
-  return selectedDataType.value && fileFormat.value
-})
+// const isFormValid = computed(() => {
+//   return selectedDataType.value && fileFormat.value
+// })
 
 const closeModal = () => {
   isOpen.value = false

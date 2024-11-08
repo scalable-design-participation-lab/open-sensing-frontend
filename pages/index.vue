@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
-import DownloadUkrainePopup from '~/components/DownloadUkrainePopup.vue'
+import DownloadModalHurtoma from '~/components/DownloadModalHurtoma.vue'
 import OnboardingModal from '~/components/OnboardingModal.vue'
 import RegistrationModal from '~/components/RegistrationModal.vue'
 
@@ -152,7 +152,7 @@ const handleCloseRegistration = () => {
       @click.self="mapUIStore.showRegistration = true"
     ></div>
     <Teleport to="body">
-      <DownloadUkrainePopup
+      <DownloadModalHurtoma
         v-model="showDownloadPopup"
         @download="handleDownload"
       />
