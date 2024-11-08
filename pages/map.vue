@@ -12,17 +12,34 @@
       <BackgroundMap :show-all-plus-icons="false" />
     </div>
     <GeneralizedFooter class="footer-fixed" />
+
+    <MapIntroModal v-model="showIntroModal" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import MapIntroModal from '~/components/MapIntroModal.vue'
 import { useMapUIStore } from '@/stores/mapUI'
 import { useFirestore } from 'vuefire'
 import { collection, getDocs } from 'firebase/firestore'
 
 const mapUIStore = useMapUIStore()
 const db = useFirestore()
+const route = useRoute()
+const showIntroModal = ref(false)
+
+// Watch for route changes and query parameters
+watch(
+  () => route.query.showIntro,
+  (newValue) => {
+    if (newValue === 'true') {
+      showIntroModal.value = true
+    }
+  },
+  { immediate: true },
+)
 
 const leftItems = ref([
   {

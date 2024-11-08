@@ -88,6 +88,7 @@
 import { computed, ref } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
 import SubWindow from './SubWindow.vue'
+import { useRouter } from 'vue-router'
 
 import dislikeIcon from '@/assets/icons/dislike.svg'
 import heartIcon from '@/assets/icons/heart.svg'
@@ -100,6 +101,7 @@ import leafIcon from '@/assets/icons/leaf.svg'
 import prohibitIcon from '@/assets/icons/prohibit.svg'
 
 const mapUIStore = useMapUIStore()
+const router = useRouter()
 
 const spaceSubwindow = computed(() => mapUIStore.spaceSubwindow)
 const belongingSubwindow = computed(() => mapUIStore.belongingSubwindow)
@@ -133,7 +135,7 @@ const spaceContent = computed(() => {
     1: {
       title: 'Позначте на мапі місця, які ви відвідували навколо р. Тяжилівка',
       description:
-        'Спочатку оберіть частоту відвідування, а після позначте на мапі ту чи іншу локацію (до десяти).',
+        'Спочатку оберіть част��ту відвідування, а після позначте на мапі ту чи іншу локацію (до десяти).',
       buttonGroup: [
         {
           text: 'щоденно',
@@ -165,7 +167,7 @@ const spaceContent = computed(() => {
     2: {
       title: 'Позначте на мапі місця, у яких хочеться проводити дозвілля',
       description:
-        'Торкніться екрана та оберіть ділянки, де в майбутньому бажаєте проводити час. Далі тисніть на + і залишайте коментар, які саме активності вбачаєте: ярмарок, барбекю, вигул собак тощо.',
+        'Торкніться екрана та оберіть ділянки, де в майбутньому бажаєте проводити час. Далі тисніть на + і залишайте коментар, які саме активності вбачаєте: ярмаро��, барбекю, вигул собак тощо.',
       button: {
         text: 'додати',
         color: 'primary',
@@ -330,10 +332,13 @@ async function saveData() {
   isSaving.value = true
   try {
     await mapUIStore.saveDataToDatabase()
-    showSuccessNotification(
-      'Thank you for taking the survey! You can now view your results or explore maps created by other users.',
-    )
-    // mapUIStore.resetAllSubwindows()
+    // Redirect to map page after successful save
+    router.push({
+      name: 'map',
+      query: {
+        showIntro: 'true', // Add query parameter to trigger intro modal
+      },
+    })
   } catch (error) {
     console.error('Error submitting data to database:', error)
     showErrorNotification('Не вдалося подати дані')
