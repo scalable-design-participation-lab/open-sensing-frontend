@@ -1,6 +1,6 @@
 <template>
   <UCard class="dark:bg-slate-950">
-    <div class="space-y-4">
+    <div class="space-y-3">
       <UProgress
         :value="progressPercentage"
         :ui="{
@@ -13,7 +13,6 @@
               '[&::-webkit-progress-bar]:bg-gray-200 [&::-webkit-progress-bar]:rounded-full [@supports(selector(&::-moz-progress-bar))]:bg-gray-700',
           },
         }"
-        class="mb-4"
       />
       <div v-if="title || icon">
         <UIcon v-if="icon" :name="icon" />
