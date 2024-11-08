@@ -135,31 +135,36 @@ const spaceContent = computed(() => {
     1: {
       title: 'Позначте на мапі місця, які ви відвідували навколо р. Тяжилівка',
       description:
-        'Спочатку оберіть част��ту відвідування, а після позначте на мапі ту чи іншу локацію (до десяти).',
+        'Спочатку оберіть частоту відвідування, а після позначте на мапі ту чи іншу локацію (до десяти).',
       buttonGroup: [
         {
           text: 'щоденно',
           color: 'blue',
+          tooltip: 'Місця, які ви відвідуєте кожного дня',
           action: () => mapUIStore.activateDrawing('every day'),
         },
         {
           text: 'щотижня',
           color: 'green',
+          tooltip: 'Місця, які ви відвідуєте щотижня',
           action: () => mapUIStore.activateDrawing('every week'),
         },
         {
           text: 'інколи',
           color: 'purple',
+          tooltip: 'Місця, які ви відвідуєте час від часу',
           action: () => mapUIStore.activateDrawing('sometimes'),
         },
         {
           text: 'лише раз',
           color: 'yellow',
+          tooltip: 'Місця, які ви відвідали тільки один раз',
           action: () => mapUIStore.activateDrawing('only once'),
         },
         {
           text: 'ніколи',
           color: 'red',
+          tooltip: 'Місця, які ви ніколи не відвідували',
           action: () => mapUIStore.activateDrawing('never'),
         },
       ],
@@ -167,7 +172,7 @@ const spaceContent = computed(() => {
     2: {
       title: 'Позначте на мапі місця, у яких хочеться проводити дозвілля',
       description:
-        'Торкніться екрана та оберіть ділянки, де в майбутньому бажаєте проводити час. Далі тисніть на + і залишайте коментар, які саме активності вбачаєте: ярмаро��, барбекю, вигул собак тощо.',
+        'Торкніться екрана та оберіть ділянки, де в майбутньому бажаєте проводити час. Далі тисніть на + і залишайте коментар, які саме активності вбачаєте: ярмаро, барбекю, вигул собак тощо.',
       button: {
         text: 'додати',
         color: 'primary',
@@ -208,9 +213,21 @@ const belongingContent = computed(() => {
 const belongingIconGrid = computed(() => ({
   title: 'Виберіть іконку:',
   icons: [
-    { name: 'dislike', src: dislikeIcon },
-    { name: 'heart', src: heartIcon },
-    { name: 'smile', src: smileIcon },
+    {
+      name: 'dislike',
+      src: dislikeIcon,
+      tooltip: 'Місця, які вам не подобаються',
+    },
+    {
+      name: 'heart',
+      src: heartIcon,
+      tooltip: 'Місця, які викликають спогади',
+    },
+    {
+      name: 'smile',
+      src: smileIcon,
+      tooltip: 'Місця, які вам подобаються',
+    },
   ],
   onSelect: selectBelongingIcon,
 }))
@@ -230,9 +247,21 @@ const safetyContent = computed(() => {
 const safetyIconGrid = computed(() => ({
   title: 'Виберіть іконку:',
   icons: [
-    { name: 'broken', src: brokenIcon },
-    { name: 'calm', src: calmIcon },
-    { name: 'lock', src: lockIcon },
+    {
+      name: 'broken',
+      src: brokenIcon,
+      tooltip: 'Небезпечні місця',
+    },
+    {
+      name: 'calm',
+      src: calmIcon,
+      tooltip: 'Спокійні місця',
+    },
+    {
+      name: 'lock',
+      src: lockIcon,
+      tooltip: 'Безпечні місця',
+    },
   ],
   onSelect: selectSafetyIcon,
 }))
@@ -257,19 +286,37 @@ const environmentContent = computed(() => {
 
 const pollutionIconGrid = computed(() => ({
   title: 'Виберіть іконку:',
-  icons: [{ name: 'pollution', src: pollutionIcon }],
+  icons: [
+    {
+      name: 'pollution',
+      src: pollutionIcon,
+      tooltip: 'Місця із забрудненням',
+    },
+  ],
   onSelect: selectEnvironmentIcon,
 }))
 
 const leafIconGrid = computed(() => ({
   title: 'Виберіть іконку:',
-  icons: [{ name: 'leaf', src: leafIcon }],
+  icons: [
+    {
+      name: 'leaf',
+      src: leafIcon,
+      tooltip: 'Місця з цікавою флорою та фауною',
+    },
+  ],
   onSelect: selectEnvironmentIcon,
 }))
 
 const prohibitIconGrid = computed(() => ({
   title: 'Виберіть іконку:',
-  icons: [{ name: 'prohibit', src: prohibitIcon }],
+  icons: [
+    {
+      name: 'prohibit',
+      src: prohibitIcon,
+      tooltip: 'Місця, які потрібно заборонити',
+    },
+  ],
   onSelect: selectProhibitIcon,
 }))
 
