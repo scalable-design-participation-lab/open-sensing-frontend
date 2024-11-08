@@ -56,6 +56,7 @@
   </ol-overlay>
 
   <ol-overlay
+    v-if="showDeleteButton"
     v-for="feature in visiblePolygonFeatures"
     :key="`delete-${feature.id}`"
     :position="getFeatureIconPosition(feature)"
@@ -90,6 +91,10 @@ const props = defineProps({
   isMapPage: {
     type: Boolean,
     default: false,
+  },
+  showDeleteButton: {
+    type: Boolean,
+    default: true,
   },
 })
 

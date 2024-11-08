@@ -27,6 +27,7 @@
         :show-all-plus-icons="showAllPlusIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @toggle-image-upload-popup="toggleImageUploadPopup"
         @show-comment-display="handleShowCommentDisplay"
@@ -36,12 +37,14 @@
         :show-all-plus-icons="showAllPlusIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @show-comment-display="handleShowCommentDisplay"
       />
       <LineStringLayer
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @show-comment-display="handleShowCommentDisplay"
       />
@@ -69,6 +72,7 @@ import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
+import prohibitIcon from '@/assets/icons/prohibit.svg'
 
 const props = defineProps({
   projection: {
@@ -86,6 +90,10 @@ const props = defineProps({
   isMapPage: {
     type: Boolean,
     default: false,
+  },
+  showDeleteButton: {
+    type: Boolean,
+    default: true,
   },
 })
 
@@ -137,6 +145,9 @@ function handleShowCommentDisplay(feature) {
 }
 
 function getIconForFeature(feature) {
+  if (feature.isProhibit) {
+    return prohibitIcon
+  }
   if (feature.iconName) {
     switch (feature.iconName) {
       case 'pollution':

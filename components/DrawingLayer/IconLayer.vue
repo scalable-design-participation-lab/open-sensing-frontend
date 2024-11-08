@@ -49,6 +49,7 @@
     </ol-overlay>
 
     <ol-overlay
+      v-if="showDeleteButton"
       :position="feature.coordinates"
       :offset="[-30, -30]"
       :stopEvent="false"
@@ -93,6 +94,10 @@ const props = defineProps({
   isMapPage: {
     type: Boolean,
     default: false,
+  },
+  showDeleteButton: {
+    type: Boolean,
+    default: true,
   },
 })
 

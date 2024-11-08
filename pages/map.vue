@@ -1,23 +1,45 @@
 <template>
-  <GeneralizedHeader
-    class="z-20"
-    :left-items="leftItems"
-    logo-src="/neu-logo.svg"
-    logo-alt="Northeastern University Logo"
-    :show-icon="true"
-  />
-  <GeneralizedFooter />
-  <BackgroundMap :show-all-plus-icons="false" />
+  <div class="map-container">
+    <GeneralizedHeader
+      class="header-fixed"
+      :left-items="leftItems"
+      :right-items="rightItems"
+      logo-src="/neu-logo.svg"
+      logo-alt="Northeastern University Logo"
+      :show-icon="true"
+    />
+    <div class="map-wrapper">
+      <BackgroundMap :show-all-plus-icons="false" />
+    </div>
+    <GeneralizedFooter class="footer-fixed" />
+
+    <MapIntroModal v-model="showIntroModal" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import MapIntroModal from '~/components/MapIntroModal.vue'
 import { useMapUIStore } from '@/stores/mapUI'
 import { useFirestore } from 'vuefire'
 import { collection, getDocs } from 'firebase/firestore'
 
 const mapUIStore = useMapUIStore()
 const db = useFirestore()
+const route = useRoute()
+const showIntroModal = ref(false)
+
+// Watch for route changes and query parameters
+watch(
+  () => route.query.showIntro,
+  (newValue) => {
+    if (newValue === 'true') {
+      showIntroModal.value = true
+    }
+  },
+  { immediate: true },
+)
 
 const leftItems = ref([
   {
@@ -29,6 +51,23 @@ const leftItems = ref([
     label: 'Гуртомá',
     variant: 'solid',
     color: 'black',
+  },
+])
+
+// Add right items for map controls
+const currentMapType = ref('light')
+const rightItems = ref([
+  {
+    icon: computed(() =>
+      currentMapType.value === 'light'
+        ? 'i-heroicons:map'
+        : 'i-heroicons:globe-americas-20-solid',
+    ),
+    onClick: () => {
+      currentMapType.value =
+        currentMapType.value === 'light' ? 'satellite' : 'light'
+      mapUIStore.setMapType(currentMapType.value)
+    },
   },
 ])
 
@@ -133,3 +172,38 @@ onMounted(async () => {
   console.log('All features have been loaded')
 })
 </script>
+
+<style scoped>
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.footer-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.map-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+</style>
