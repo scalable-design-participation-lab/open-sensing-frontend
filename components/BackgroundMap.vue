@@ -82,7 +82,6 @@
       v-if="showCommentDisplay"
       :position="getFeaturePosition(selectedFeatureForDisplay)"
       :offset="[30, -20]"
-      :stopEvent="false"
     >
       <CommentDisplay
         :model-value="showCommentDisplay"
