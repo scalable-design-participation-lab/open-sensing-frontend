@@ -15,20 +15,6 @@
       </ol-source-vector>
     </ol-vector-layer>
 
-    <ol-interaction-select
-      v-if="enableClick"
-      :condition="clickCondition"
-      @select="(event) => handleSelect(event, feature)"
-    >
-      <ol-style>
-        <ol-style-icon
-          :src="getIconForFeature(feature)"
-          :scale="1"
-          :anchor="[0.5, 0.5]"
-        />
-      </ol-style>
-    </ol-interaction-select>
-
     <ol-overlay
       :position="feature.coordinates"
       :offset="[0, 0]"
@@ -66,6 +52,24 @@
         />
       </div>
     </ol-overlay>
+
+    <ol-overlay
+      v-if="showCommentIcons"
+      :position="feature.coordinates"
+      :offset="[20, -20]"
+      :stopEvent="false"
+      :positioning="'center-center'"
+    >
+      <div
+        class="comment-display-icon"
+        @click.stop.prevent="handleCommentIconClick(feature, $event)"
+      >
+        <UIcon
+          name="i-heroicons-chat-bubble-left-ellipsis"
+          class="text-lg text-gray-600 hover:text-gray-800"
+        />
+      </div>
+    </ol-overlay>
   </template>
 </template>
 
@@ -96,6 +100,10 @@ const props = defineProps({
     default: false,
   },
   showDeleteButton: {
+    type: Boolean,
+    default: true,
+  },
+  showCommentIcons: {
     type: Boolean,
     default: true,
   },
@@ -186,6 +194,11 @@ function handleDeleteClick(feature) {
     mapUIStore.deleteFeature(feature.id)
   }
 }
+
+function handleCommentIconClick(feature, event) {
+  const iconPosition = [event.clientX, event.clientY]
+  emit('show-comment-display', { feature, position: iconPosition })
+}
 </script>
 
 <style scoped>
@@ -226,5 +239,36 @@ function handleDeleteClick(feature) {
 .delete-icon-container:hover {
   transform: scale(1.1);
   transition: transform 0.2s ease;
+}
+
+.comment-icon-container {
+  cursor: pointer;
+  background: white;
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  position: relative;
+}
+
+.comment-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.comment-display-icon {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.comment-display-icon:hover {
+  transform: scale(1.1);
 }
 </style>

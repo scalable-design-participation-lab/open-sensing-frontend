@@ -25,6 +25,7 @@
         :features="pointFeatures"
         :get-icon-for-feature="getIconForFeature"
         :show-all-plus-icons="showAllPlusIcons"
+        :show-comment-icons="showCommentIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
         :show-delete-button="showDeleteButton"
@@ -35,6 +36,7 @@
 
       <PolygonLayer
         :show-all-plus-icons="showAllPlusIcons"
+        :show-comment-icons="showCommentIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
         :show-delete-button="showDeleteButton"
@@ -42,6 +44,7 @@
         @show-comment-display="handleShowCommentDisplay"
       />
       <LineStringLayer
+        :show-comment-icons="showCommentIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
         :show-delete-button="showDeleteButton"
@@ -95,6 +98,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showCommentIcons: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits([
@@ -140,8 +147,8 @@ function toggleImageUploadPopup(feature) {
   emit('toggle-image-upload-popup', feature)
 }
 
-function handleShowCommentDisplay(feature) {
-  emit('show-comment-display', feature)
+function handleShowCommentDisplay(data) {
+  emit('show-comment-display', data)
 }
 
 function getIconForFeature(feature) {

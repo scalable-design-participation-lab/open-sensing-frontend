@@ -9,7 +9,10 @@
       :show-icon="true"
     />
     <div class="map-wrapper">
-      <BackgroundMap :show-all-plus-icons="false" />
+      <BackgroundMap
+        :show-all-plus-icons="false"
+        @show-comment-display="handleShowCommentDisplay"
+      />
     </div>
     <GeneralizedFooter class="footer-fixed" />
 
@@ -171,6 +174,24 @@ onMounted(async () => {
 
   console.log('All features have been loaded')
 })
+
+const showCommentDisplay = ref(false)
+const selectedFeature = ref(null)
+const activeFeatureId = ref(null)
+
+function handleShowCommentDisplay({ feature }) {
+  // If clicking the same feature's comment icon, close the popup
+  if (activeFeatureId.value === feature.id && showCommentDisplay.value) {
+    showCommentDisplay.value = false
+    activeFeatureId.value = null
+    selectedFeature.value = null
+    return
+  }
+
+  selectedFeature.value = feature
+  activeFeatureId.value = feature.id
+  showCommentDisplay.value = true
+}
 </script>
 
 <style scoped>

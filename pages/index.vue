@@ -123,6 +123,7 @@ const handleCloseRegistration = () => {
     <BackgroundMap
       :class="{ 'filter blur-md': isMapBlurred }"
       :show-all-plus-icons="true"
+      :show-comment-icons="false"
     />
     <GeneralizedHeader
       class="z-20"
