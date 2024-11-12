@@ -1,28 +1,26 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="w-56 bg-black rounded-lg shadow-lg flex flex-col h-33"
+    class="dark:bg-slate-950 shadow-lg flex flex-col"
   >
     <UTextarea
       v-model="localComment"
-      placeholder="Напишіть коментар"
+      placeholder="напишіть коментар"
       class="flex-grow text-sm resize-none"
       @input="handleInput"
     />
-    <div class="flex justify-between mt-2">
+    <div class="flex justify-between mt-4">
       <UButton
-        color="gray"
-        size="sm"
+        color="black"
         variant="ghost"
-        class="w-[48%] rounded-full flex justify-center"
+        class="rounded-full flex justify-center"
         @click="closePopup"
       >
         Закрити
       </UButton>
       <UButton
-        color="primary"
-        size="sm"
-        class="w-[48%] rounded-full flex justify-center"
+        color="black"
+        class="px-5 py-2 rounded-full flex justify-center hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
         @click="addComment"
       >
         {{ existingComment ? 'Оновити' : 'Додати' }}

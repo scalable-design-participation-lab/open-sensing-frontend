@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <h3 class="text-xl font-semibold">Menu</h3>
           <UButton
-            color="gray"
+            color="black"
             variant="ghost"
             icon="i-heroicons-x-mark-20-solid"
             @click="closeModal"

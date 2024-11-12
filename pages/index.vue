@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
-import DownloadModalHurtoma from '~/components/DownloadModalHurtoma.vue'
-import OnboardingModal from '~/components/OnboardingModal.vue'
-import RegistrationModal from '~/components/RegistrationModal.vue'
 
 // Map store
 const mapUIStore = useMapUIStore()
@@ -59,8 +56,6 @@ const rightItems = ref([
 
 const isMapBlurred = computed(() => mapUIStore.showRegistration)
 
-const showMenuPopup = ref(false)
-const showAboutPopup = ref(false)
 const showDownloadPopup = ref(false)
 const showOnboarding = ref(true)
 const showRegistration = ref(false)

@@ -18,10 +18,9 @@
             :paragraph="spaceContent.description"
             :button="spaceContent.button"
             :button-group="spaceContent.buttonGroup"
-            :icon-grid="spaceSubwindow === 4 ? prohibitIconGrid : null"
+            :icon-grid="spaceSubwindow === 4 ? TrashIconGrid : null"
             @prev="mapUIStore.prevSpaceSubwindow()"
             @next="mapUIStore.nextSpaceSubwindow()"
-            class="!text-xl"
           >
           </SubWindow>
           <SubWindow
@@ -98,9 +97,9 @@ import smileIcon from '@/assets/icons/smile.svg'
 import brokenIcon from '@/assets/icons/broken.svg'
 import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
+import trashIcon from '@/assets/icons/trash.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
-import prohibitIcon from '@/assets/icons/prohibit.svg'
 
 const mapUIStore = useMapUIStore()
 const router = useRouter()
@@ -112,13 +111,12 @@ const environmentSubwindow = computed(() => mapUIStore.environmentSubwindow)
 
 const menuItems = [
   {
-    icon: 'i-heroicons-map-pin-20-solid',
     label: 'Середовище',
     defaultOpen: true,
   },
-  { icon: 'i-heroicons-home-20-solid', label: 'Приналежність' },
-  { icon: 'i-heroicons-exclamation-triangle-20-solid', label: 'Безпека' },
-  { icon: 'i-heroicons-sun-20-solid', label: 'Екологія' },
+  { label: 'Приналежність' },
+  { label: 'Безпека' },
+  { label: 'Екологія' },
 ]
 
 const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)
@@ -142,31 +140,26 @@ const spaceContent = computed(() => {
         {
           text: 'щодня',
           color: 'blue',
-          tooltip: 'Місця, які ви відвідуєте кожного дня',
           action: () => mapUIStore.activateDrawing('every day'),
         },
         {
           text: 'щотижня',
           color: 'green',
-          tooltip: 'Місця, які ви відвідуєте щотижня',
           action: () => mapUIStore.activateDrawing('every week'),
         },
         {
           text: 'інколи',
           color: 'purple',
-          tooltip: 'Місця, які ви відвідуєте час від часу',
           action: () => mapUIStore.activateDrawing('sometimes'),
         },
         {
           text: 'лише раз',
           color: 'yellow',
-          tooltip: 'Місця, які ви відвідали тільки один раз',
           action: () => mapUIStore.activateDrawing('only once'),
         },
         {
           text: 'ніколи',
           color: 'red',
-          tooltip: 'Місця, які ви ніколи не відвідували',
           action: () => mapUIStore.activateDrawing('never'),
         },
       ],
@@ -217,17 +210,17 @@ const belongingIconGrid = computed(() => ({
     {
       name: 'dislike',
       src: dislikeIcon,
-      tooltip: 'Місця, які вам не подобаються',
+      tooltip: 'місця, які не подобаються',
     },
     {
       name: 'heart',
       src: heartIcon,
-      tooltip: 'Місця, які викликають спогади',
+      tooltip: 'місця, які подобаються',
     },
     {
       name: 'smile',
       src: smileIcon,
-      tooltip: 'Місця, які вам подобаються',
+      tooltip: 'місця, де вам спокійно',
     },
   ],
   onSelect: selectBelongingIcon,
@@ -250,17 +243,17 @@ const safetyIconGrid = computed(() => ({
     {
       name: 'broken',
       src: brokenIcon,
-      tooltip: 'Небезпечні місця',
+      tooltip: 'місця, де вам безпечно',
     },
     {
       name: 'calm',
       src: calmIcon,
-      tooltip: 'Спокійні місця',
+      tooltip: 'місця, де вам спокійно',
     },
     {
       name: 'lock',
       src: lockIcon,
-      tooltip: 'Безпечні місця',
+      tooltip: 'місця, де вам небезпечно',
     },
   ],
   onSelect: selectSafetyIcon,
@@ -285,39 +278,30 @@ const environmentContent = computed(() => {
 })
 
 const pollutionIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
+    {
+      name: 'trash',
+      src: trashIcon,
+      tooltip: 'місця навколо річки, де є сміття',
+    },
     {
       name: 'pollution',
       src: pollutionIcon,
-      tooltip: 'Місця з забрудненням',
+      tooltip: 'місця скиду брудної води і відходів у річку',
     },
   ],
-  onSelect: selectEnvironmentIcon,
+  onSelect: selectPollutionIcon,
 }))
 
 const leafIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
     {
       name: 'leaf',
       src: leafIcon,
-      tooltip: 'Місця з цікавою флорою та фауною',
+      tooltip: 'місця з цікавими тваринами і рослинами',
     },
   ],
   onSelect: selectEnvironmentIcon,
-}))
-
-const prohibitIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
-  icons: [
-    {
-      name: 'prohibit',
-      src: prohibitIcon,
-      tooltip: 'Місця, які потрібно заборонити',
-    },
-  ],
-  onSelect: selectProhibitIcon,
 }))
 
 const showSubmitButton = computed(() => {
@@ -359,13 +343,13 @@ function prevEnvironmentSubwindow() {
 }
 
 function selectEnvironmentIcon(iconName: string) {
-  console.log('Піктограма вибраного средовища', iconName)
+  console.log('Selected icon:', iconName)
   mapUIStore.activateEnvironmentDrawing(iconName)
 }
 
-function selectProhibitIcon() {
-  console.log('Selected prohibit icon')
-  mapUIStore.activateProhibitDrawing()
+function selectPollutionIcon(iconName: string) {
+  console.log('Selected icon:', iconName)
+  mapUIStore.activateTrashDrawing()
 }
 
 const isSaving = ref(false)

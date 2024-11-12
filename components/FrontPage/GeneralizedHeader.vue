@@ -27,7 +27,7 @@
         <UButton
           v-if="logoSrc"
           :class="[
-            `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:animate-spin`,
+            `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg`,
             shapeClass,
           ]"
         >
@@ -40,7 +40,7 @@
         <UButton
           v-if="showIcon"
           :class="[
-            `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:animate-spin`,
+            `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg`,
             shapeClass,
           ]"
         >
@@ -67,7 +67,7 @@
             :color="item.color || (item.primary ? 'black' : 'gray')"
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg hover:animate-bounce text-black dark:text-white !bg-gray-50 dark:!bg-slate-950`,
+              `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg text-black dark:text-white !bg-gray-50 dark:!bg-slate-950`,
               shapeClass,
             ]"
             @click="item.onClick"
@@ -134,21 +134,21 @@
             `h-full px-2 md:px-2 lg:px-3 text-lg !bg-gray-50 dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white`,
             shapeClass,
           ]"
-          @click="showMenuPopup = true"
+          @click="showMenuModal = true"
           icon="i-heroicons-ellipsis-horizontal-20-solid"
         />
       </div>
     </header>
 
     <!-- Add popups -->
-    <MenuPopup v-model="showMenuPopup" @select="handleMenuSelect" />
+    <MenuModal v-model="showMenuModal" @select="handleMenuSelect" />
   </div>
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-// Add new refs for popups
-const showMenuPopup = ref(false)
+// Add new refs for modals
+const showMenuModal = ref(false)
 
 // Add menu select handler
 const handleMenuSelect = (action: string) => {
