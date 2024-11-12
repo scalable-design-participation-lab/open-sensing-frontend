@@ -10,16 +10,6 @@
     </ol-source-vector>
   </ol-vector-layer>
 
-  <ol-interaction-select
-    v-if="enableClick"
-    :condition="clickCondition"
-    @select="handleSelect"
-  >
-    <ol-style>
-      <ol-style-stroke color="red" :width="2" :line-dash="[6, 6]" />
-    </ol-style>
-  </ol-interaction-select>
-
   <ol-overlay
     v-if="!isMapPage"
     v-for="feature in lineStringFeatures"
@@ -52,6 +42,25 @@
         src="@/assets/icons/delete.svg"
         alt="Delete Icon"
         class="delete-icon-img"
+      />
+    </div>
+  </ol-overlay>
+
+  <ol-overlay
+    v-for="feature in lineStringFeatures"
+    :key="`comment-${feature.id}`"
+    :position="getLineStringEndPoint(feature)"
+    :offset="[20, -20]"
+    :stopEvent="false"
+    :positioning="'top-right'"
+  >
+    <div
+      class="comment-display-icon"
+      @click.stop.prevent="(event) => handleCommentIconClick(feature, event)"
+    >
+      <UIcon
+        name="i-heroicons-chat-bubble-left-ellipsis"
+        class="text-lg text-gray-600 hover:text-gray-800"
       />
     </div>
   </ol-overlay>
@@ -100,27 +109,6 @@ function getLineStringEndPoint(feature) {
   return [0, 0]
 }
 
-function handleSelect(event) {
-  const selected = event.selected
-  if (selected && selected.length > 0) {
-    const olFeature = selected[0]
-    const coordinates = olFeature.getGeometry().getCoordinates()
-
-    const feature = lineStringFeatures.value.find((f) => {
-      const featureCoords = f.coordinates
-      return coordinates.every(
-        (coord, index) =>
-          Math.abs(coord[0] - featureCoords[index][0]) < 0.0000001 &&
-          Math.abs(coord[1] - featureCoords[index][1]) < 0.0000001,
-      )
-    })
-
-    if (feature) {
-      emit('show-comment-display', feature)
-    }
-  }
-}
-
 function handleIconClick(feature) {
   if (props.isMapPage) {
     emit('show-comment-display', feature)
@@ -133,6 +121,15 @@ function handleDeleteClick(feature) {
   if (confirm('Are you sure you want to delete this line?')) {
     mapUIStore.deleteFeature(feature.id)
   }
+}
+
+function handleCommentIconClick(feature, event) {
+  if (!event) return
+  const coordinates = [event.clientX, event.clientY]
+  emit('show-comment-display', {
+    feature,
+    position: coordinates,
+  })
 }
 </script>
 
@@ -186,5 +183,18 @@ function handleDeleteClick(feature) {
 .plus-icon-container:hover {
   transform: scale(1.1);
   transition: transform 0.2s ease;
+}
+
+.comment-display-icon {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.comment-display-icon:hover {
+  transform: scale(1.1);
 }
 </style>

@@ -1,43 +1,41 @@
 <template>
-  <ol-overlay v-if="isOpen" :position="getDisplayPosition" :offset="[30, 0]">
-    <UCard class="min-w-[200px] max-w-[300px] shadow-lg">
-      <template #header>
-        <div class="space-y-1">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-medium">
-              {{ getFeatureTitle(feature) }}
-            </h3>
-            <UButton
-              icon="i-heroicons-x-mark"
-              color="gray"
-              variant="ghost"
-              size="xs"
-              @click="closeModal"
-            />
-          </div>
-
-          <div v-if="feature?.name" class="text-xs text-gray-500">
-            Added by: {{ feature.name.firstname }} {{ feature.name.lastname }}
-          </div>
-        </div>
-      </template>
-
-      <div class="p-2 space-y-2">
-        <div class="space-y-1">
-          <p v-if="feature?.comment?.length > 0" class="text-sm text-gray-700">
-            {{ feature.comment }}
-          </p>
-          <p v-else class="text-sm text-gray-500 italic">
-            No comment available for this location
-          </p>
+  <UCard v-if="isOpen" class="min-w-[200px] max-w-[300px] shadow-lg">
+    <template #header>
+      <div class="space-y-1">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-medium">
+            {{ getFeatureTitle(feature) }}
+          </h3>
+          <UButton
+            icon="i-heroicons-x-mark"
+            color="gray"
+            variant="ghost"
+            size="xs"
+            @click="closeModal"
+          />
         </div>
 
-        <div v-if="feature?.timestamp" class="text-xs text-gray-500">
-          Added on: {{ formatDate(feature.timestamp) }}
+        <div v-if="feature?.name" class="text-xs text-gray-500">
+          Added by: {{ feature.name.firstname }} {{ feature.name.lastname }}
         </div>
       </div>
-    </UCard>
-  </ol-overlay>
+    </template>
+
+    <div class="p-2 space-y-2">
+      <div class="space-y-1">
+        <p v-if="feature?.comment?.length > 0" class="text-sm text-gray-700">
+          {{ feature.comment }}
+        </p>
+        <p v-else class="text-sm text-gray-500 italic">
+          No comment available for this location
+        </p>
+      </div>
+
+      <div v-if="feature?.timestamp" class="text-xs text-gray-500">
+        Added on: {{ formatDate(feature.timestamp) }}
+      </div>
+    </div>
+  </UCard>
 </template>
 
 <script setup lang="ts">
@@ -69,6 +67,24 @@ const emit = defineEmits(['update:modelValue'])
 const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value),
+})
+
+const getOverlayPosition = computed(() => {
+  if (!props.feature) return [0, 0]
+
+  switch (props.feature.type) {
+    case 'Point':
+      return props.feature.coordinates
+    case 'Polygon':
+      const coords = props.feature.coordinates[0]
+      const sumX = coords.reduce((sum, coord) => sum + coord[0], 0)
+      const sumY = coords.reduce((sum, coord) => sum + coord[1], 0)
+      return [sumX / coords.length, sumY / coords.length]
+    case 'LineString':
+      return props.feature.coordinates[props.feature.coordinates.length - 1]
+    default:
+      return [0, 0]
+  }
 })
 
 function formatDate(timestamp: string): string {
@@ -121,42 +137,9 @@ function getFeatureTitle(feature: Feature | null) {
   return 'Location Details'
 }
 
-const closeModal = () => {
-  isOpen.value = false
+function closeModal() {
+  emit('update:modelValue', false)
 }
-
-// Add watchers for debugging
-watch(
-  () => props.modelValue,
-  (newValue) => {},
-  { immediate: true },
-)
-
-watch(
-  () => props.feature,
-  (newValue) => {},
-)
-
-// Add computed property for position
-const getDisplayPosition = computed(() => {
-  if (!props.feature) return [0, 0]
-
-  switch (props.feature.type) {
-    case 'Point':
-      return props.feature.coordinates
-    case 'Polygon':
-      // Calculate center of polygon
-      const polygonCoords = props.feature.coordinates[0] as number[][]
-      const sumX = polygonCoords.reduce((sum, coord) => sum + coord[0], 0)
-      const sumY = polygonCoords.reduce((sum, coord) => sum + coord[1], 0)
-      return [sumX / polygonCoords.length, sumY / polygonCoords.length]
-    case 'LineString':
-      // Use the start point (where the prohibit icon is)
-      return props.feature.coordinates[0]
-    default:
-      return [0, 0]
-  }
-})
 </script>
 
 <style scoped>
