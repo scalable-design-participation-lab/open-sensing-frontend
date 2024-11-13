@@ -15,7 +15,10 @@
           />
         </div>
 
-        <div v-if="feature?.name" class="text-xs text-gray-500">
+        <div
+          v-if="feature?.name?.firstname && feature?.name?.lastname"
+          class="text-xs text-gray-500"
+        >
           Added by: {{ feature.name.firstname }} {{ feature.name.lastname }}
         </div>
       </div>
@@ -55,6 +58,7 @@ interface Feature {
   frequency?: string
   name?: Name
   timestamp?: string
+  isProhibit?: boolean
 }
 
 const props = defineProps<{
@@ -99,6 +103,10 @@ function formatDate(timestamp: string): string {
 function getFeatureTitle(feature: Feature | null) {
   if (!feature) return 'Location Details'
 
+  if (feature.isProhibit) {
+    return 'Prohibited Area'
+  }
+
   if (feature.iconName) {
     // Convert iconName to display name
     const iconDisplayNames = {
@@ -117,6 +125,7 @@ function getFeatureTitle(feature: Feature | null) {
       love: 'Loved Place',
       smile: 'Happy Place',
       positive: 'Positive',
+      trash: 'Trash',
     }
     return iconDisplayNames[feature.iconName] || 'Location'
   } else if (feature.frequency) {

@@ -85,9 +85,28 @@ onMounted(async () => {
   for (const doc of querySnapshot.docs) {
     const projectData = doc.data()
 
-    // Process space data
+    // Process space data including prohibit points
+    if (Array.isArray(projectData.space.prohibit)) {
+      projectData.space.prohibit.forEach((point) => {
+        mapUIStore.addFeature({
+          type: 'Point',
+          coordinates: [point.lon, point.lat],
+          isProhibit: true,
+          comment: point.comment,
+          name: projectData.name,
+          timestamp: point.timestamp,
+        })
+      })
+    }
+
+    // Process other space data (excluding prohibit)
     Object.keys(projectData.space).forEach((frequency) => {
-      if (Array.isArray(projectData.space[frequency])) {
+      if (
+        Array.isArray(projectData.space[frequency]) &&
+        frequency !== 'prohibit' &&
+        frequency !== 'recreational' &&
+        frequency !== 'restricted'
+      ) {
         projectData.space[frequency].forEach((point) => {
           mapUIStore.addFeature({
             type: 'Point',
