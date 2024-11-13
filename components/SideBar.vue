@@ -101,7 +101,6 @@ import trashIcon from '@/assets/icons/trash.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
 import prohibitIcon from '@/assets/icons/prohibit.svg'
-import trashIcon from '@/assets/icons/trash.svg'
 
 const mapUIStore = useMapUIStore()
 const router = useRouter()
@@ -280,30 +279,44 @@ const environmentContent = computed(() => {
 })
 
 const pollutionIconGrid = computed(() => ({
+  title: 'Виберіть іконку:',
   icons: [
-    {
+  {
       name: 'trash',
       src: trashIcon,
-      tooltip: 'місця навколо річки, де є сміття',
+      tooltip: 'Місця зі сміттям',
     },
     {
       name: 'pollution',
       src: pollutionIcon,
-      tooltip: 'місця скиду брудної води і відходів у річку',
+      tooltip: 'Місця з забрудненням',
     },
   ],
-  onSelect: selectPollutionIcon,
+  onSelect: selectEnvironmentIcon,
 }))
 
 const leafIconGrid = computed(() => ({
+  title: 'Виберіть іконку:',
   icons: [
     {
       name: 'leaf',
       src: leafIcon,
-      tooltip: 'місця з цікавими тваринами і рослинами',
+      tooltip: 'Місця з цікавою флорою та фауною',
     },
   ],
   onSelect: selectEnvironmentIcon,
+}))
+
+const prohibitIconGrid = computed(() => ({
+  title: 'Виберіть іконку:',
+  icons: [
+    {
+      name: 'prohibit',
+      src: prohibitIcon,
+      tooltip: 'Місця, які потрібно заборонити',
+    },
+  ],
+  onSelect: selectProhibitIcon,
 }))
 
 const showSubmitButton = computed(() => {
