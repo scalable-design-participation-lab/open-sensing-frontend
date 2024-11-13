@@ -100,6 +100,8 @@ import lockIcon from '@/assets/icons/lock.svg'
 import trashIcon from '@/assets/icons/trash.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
+import prohibitIcon from '@/assets/icons/prohibit.svg'
+import trashIcon from '@/assets/icons/trash.svg'
 
 const mapUIStore = useMapUIStore()
 const router = useRouter()

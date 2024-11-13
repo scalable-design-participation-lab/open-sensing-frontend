@@ -76,6 +76,7 @@ import lockIcon from '@/assets/icons/lock.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
 import prohibitIcon from '@/assets/icons/prohibit.svg'
+import trashIcon from '@/assets/icons/trash.svg'
 
 const props = defineProps({
   projection: {
@@ -180,6 +181,8 @@ function getIconForFeature(feature) {
       case 'smile':
       case 'positive':
         return smileIcon
+      case 'trash':
+        return trashIcon
       default:
         return getIconForPoint(feature)
     }

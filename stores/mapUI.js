@@ -330,6 +330,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
       environment: {
         pollution: [],
         'flora-fauna': [],
+        trash: [],
       },
     }
 
@@ -440,6 +441,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   function getEnvironmentKey(iconName) {
     const environmentMap = {
       pollution: 'pollution',
+      trash: 'trash',
       leaf: 'flora-fauna',
     }
     return environmentMap[iconName]
