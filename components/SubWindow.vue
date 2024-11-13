@@ -1,6 +1,6 @@
 <template>
   <UCard class="dark:bg-slate-950">
-    <div class="space-y-4">
+    <div class="space-y-3">
       <UProgress
         :value="progressPercentage"
         :ui="{
@@ -13,11 +13,13 @@
               '[&::-webkit-progress-bar]:bg-gray-200 [&::-webkit-progress-bar]:rounded-full [@supports(selector(&::-moz-progress-bar))]:bg-gray-700',
           },
         }"
-        class="mb-4"
       />
       <div v-if="title || icon">
         <UIcon v-if="icon" :name="icon" />
-        <h2 v-if="title" class="text-md md:text-lg font-semibold !leading-tight">
+        <h2
+          v-if="title"
+          class="text-md md:text-lg font-semibold !leading-tight"
+        >
           {{ title }}
         </h2>
       </div>
@@ -34,54 +36,56 @@
         {{ button.text }}
       </UButton>
 
-      <div v-if="buttonGroup" class="space-y-2">
-        <UButton
+      <div v-if="buttonGroup" class="flex flex-col space-y-2">
+        <UTooltip
           v-for="btn in buttonGroup"
           :key="btn.text"
-          :color="btn.color"
-          variant="outline"
-          :ui="{
-            rounded: 'rounded-full',
-            base: 'transition-all duration-300 ease-in-out hover:scale-105',
-            padding: { sm: 'py-1.5', md: 'py-2', lg: 'py-2.5' },
-          }"
-          :class="[
-            'w-full justify-center hover:!bg-gray-50 dark:hover:!bg-slate-800 ',
-            {
-              'border-2 border-red-500':
-                btn.color === 'red',
-              'border-2 border-green-500':
-                btn.color === 'green',
-              'border-2 border-blue-500':
-                btn.color === 'blue',
-              'border-2 border-yellow-500':
-                btn.color === 'yellow',
-              'border-2 border-purple-500':
-                btn.color === 'purple',
-            },
-          ]"
-          @click="btn.action"
+          :text="btn.tooltip"
+          :disabled="!showTooltip"
         >
-          {{ btn.text }}
-        </UButton>
+          <UButton
+            :color="btn.color"
+            variant="outline"
+            :ui="{
+              rounded: 'rounded-full',
+              base: 'transition-all duration-300 ease-in-out hover:scale-105',
+              padding: { sm: 'py-1.5', md: 'py-2', lg: 'py-2.5' },
+            }"
+            :class="[
+              'w-full justify-center hover:!bg-gray-50 dark:hover:!bg-slate-800',
+              {
+                'border-2 border-red-500': btn.color === 'red',
+                'border-2 border-green-500': btn.color === 'green',
+                'border-2 border-blue-500': btn.color === 'blue',
+                'border-2 border-yellow-500': btn.color === 'yellow',
+                'border-2 border-purple-500': btn.color === 'purple',
+              },
+            ]"
+            @click="btn.action"
+          >
+            {{ btn.text }}
+          </UButton>
+        </UTooltip>
       </div>
 
       <div v-if="iconGrid">
         <p class="text-sm text-gray-400 mb-2">{{ iconGrid.title }}</p>
         <UCard>
           <div class="grid grid-cols-3 gap-3">
-            <UButton
+            <UTooltip
               v-for="icon in iconGrid.icons"
               :key="icon.name"
-              variant="ghost"
-              @click="iconGrid.onSelect(icon.name)"
+              :text="icon.tooltip"
+              :disabled="!showTooltip"
             >
-              <img
-                :src="icon.src"
-                :alt="icon.name"
-                class="w-full h-full dark:!invert"
-              />
-            </UButton>
+              <UButton variant="ghost" @click="iconGrid.onSelect(icon.name)">
+                <img
+                  :src="icon.src"
+                  :alt="icon.name"
+                  class="w-auto h-10/12 dark:!invert"
+                />
+              </UButton>
+            </UTooltip>
           </div>
         </UCard>
       </div>
@@ -101,7 +105,7 @@
           icon="i-heroicons-arrow-right-20-solid"
           color="white"
           variant="solid"
-          class="rounded-full p-2  hover:bg-gray-300 dark:hover:bg-slate-600"
+          class="rounded-full p-2 hover:bg-gray-300 dark:hover:bg-slate-600"
           :disabled="currentSubwindow === maxSubwindow"
           @click="$emit('next')"
         />
@@ -114,12 +118,14 @@
 interface Button {
   text: string
   color: string
+  tooltip?: string
   action: () => void
 }
 
 interface IconGridItem {
   name: string
   src: string
+  tooltip?: string
 }
 
 interface IconGrid {
@@ -164,6 +170,10 @@ defineProps({
   iconGrid: {
     type: Object as () => IconGrid,
     default: null,
+  },
+  showTooltip: {
+    type: Boolean,
+    default: true,
   },
 })
 

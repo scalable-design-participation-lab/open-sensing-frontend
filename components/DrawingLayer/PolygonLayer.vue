@@ -11,17 +11,6 @@
     </ol-source-vector>
   </ol-vector-layer>
 
-  <ol-interaction-select
-    v-if="enableClick"
-    :condition="clickCondition"
-    @select="handleSelect"
-  >
-    <ol-style>
-      <ol-style-stroke color="black" :width="2" :line-dash="[10, 10]" />
-      <ol-style-fill :color="[0, 0, 0, 0]" />
-    </ol-style>
-  </ol-interaction-select>
-
   <ol-overlay
     v-for="feature in visiblePolygonFeatures"
     :key="`overlay-${feature.id}`"
@@ -56,6 +45,7 @@
   </ol-overlay>
 
   <ol-overlay
+    v-if="showDeleteButton"
     v-for="feature in visiblePolygonFeatures"
     :key="`delete-${feature.id}`"
     :position="getFeatureIconPosition(feature)"
@@ -68,6 +58,25 @@
         src="@/assets/icons/delete.svg"
         alt="Delete Icon"
         class="delete-icon"
+      />
+    </div>
+  </ol-overlay>
+
+  <ol-overlay
+    v-for="feature in polygonFeatures"
+    :key="`comment-${feature.id}`"
+    :position="getFeatureIconPosition(feature)"
+    :offset="[30, 0]"
+    :stopEvent="false"
+    :positioning="'center-center'"
+  >
+    <div
+      class="comment-display-icon"
+      @click.stop.prevent="(event) => handleCommentIconClick(feature, event)"
+    >
+      <UIcon
+        name="i-heroicons-chat-bubble-left-ellipsis"
+        class="text-lg text-gray-600 hover:text-gray-800"
       />
     </div>
   </ol-overlay>
@@ -90,6 +99,10 @@ const props = defineProps({
   isMapPage: {
     type: Boolean,
     default: false,
+  },
+  showDeleteButton: {
+    type: Boolean,
+    default: true,
   },
 })
 
@@ -159,6 +172,15 @@ function handleDeleteClick(feature) {
     mapUIStore.deleteFeature(feature.id)
   }
 }
+
+function handleCommentIconClick(feature, event) {
+  if (!event) return
+  const coordinates = [event.clientX, event.clientY]
+  emit('show-comment-display', {
+    feature,
+    position: coordinates,
+  })
+}
 </script>
 
 <style scoped>
@@ -217,5 +239,18 @@ function handleDeleteClick(feature) {
 .delete-icon-container:hover {
   transform: scale(1.1);
   transition: transform 0.2s ease;
+}
+
+.comment-display-icon {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.comment-display-icon:hover {
+  transform: scale(1.1);
 }
 </style>

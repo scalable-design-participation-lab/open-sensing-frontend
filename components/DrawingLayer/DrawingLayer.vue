@@ -25,8 +25,10 @@
         :features="pointFeatures"
         :get-icon-for-feature="getIconForFeature"
         :show-all-plus-icons="showAllPlusIcons"
+        :show-comment-icons="showCommentIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @toggle-image-upload-popup="toggleImageUploadPopup"
         @show-comment-display="handleShowCommentDisplay"
@@ -34,14 +36,18 @@
 
       <PolygonLayer
         :show-all-plus-icons="showAllPlusIcons"
+        :show-comment-icons="showCommentIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @show-comment-display="handleShowCommentDisplay"
       />
       <LineStringLayer
+        :show-comment-icons="showCommentIcons"
         :enable-click="enableClick"
         :is-map-page="isMapPage"
+        :show-delete-button="showDeleteButton"
         @toggle-comment-popup="toggleCommentPopup"
         @show-comment-display="handleShowCommentDisplay"
       />
@@ -69,6 +75,8 @@ import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
+import prohibitIcon from '@/assets/icons/prohibit.svg'
+import trashIcon from '@/assets/icons/trash.svg'
 
 const props = defineProps({
   projection: {
@@ -86,6 +94,14 @@ const props = defineProps({
   isMapPage: {
     type: Boolean,
     default: false,
+  },
+  showDeleteButton: {
+    type: Boolean,
+    default: true,
+  },
+  showCommentIcons: {
+    type: Boolean,
+    default: true,
   },
 })
 
@@ -132,11 +148,14 @@ function toggleImageUploadPopup(feature) {
   emit('toggle-image-upload-popup', feature)
 }
 
-function handleShowCommentDisplay(feature) {
-  emit('show-comment-display', feature)
+function handleShowCommentDisplay(data) {
+  emit('show-comment-display', data)
 }
 
 function getIconForFeature(feature) {
+  if (feature.isProhibit) {
+    return prohibitIcon
+  }
   if (feature.iconName) {
     switch (feature.iconName) {
       case 'pollution':
@@ -162,6 +181,8 @@ function getIconForFeature(feature) {
       case 'smile':
       case 'positive':
         return smileIcon
+      case 'trash':
+        return trashIcon
       default:
         return getIconForPoint(feature)
     }

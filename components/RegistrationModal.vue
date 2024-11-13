@@ -8,7 +8,7 @@
     </template>
 
     <p class="mb-4 px-6 leading-tight">
-      Щоб взяти участь у Гуртомá, дайте відповіді на наступні запитання.
+      Щоб взяти участь у Гуртома́, дайте відповіді на запитання
     </p>
 
     <UForm
@@ -48,36 +48,37 @@
         <USelect
           v-model="formState.gender"
           :options="genderOptions"
-          placeholder="Виберіть свою стать"
+          placeholder="Оберіть свою стать"
           color="blue"
           variant="outline"
           size="md"
         />
       </UFormGroup>
-      <UFormGroup label="Education Level" name="educationLevel">
+      <UFormGroup label="Рівень освіти" name="educationLevel">
         <USelect
           v-model="formState.educationLevel"
           :options="educationOptions"
-          placeholder="Виберіть рівень освіти"
+          placeholder="Оберіть свій рівень освіти"
           color="blue"
           variant="outline"
           size="md"
         />
       </UFormGroup>
-      <UFormGroup label="Мешканець з" name="residentSince">
+      <UFormGroup label="Скільки ви мешкаєте у Вінниці" name="residentSince">
         <USelect
           v-model="formState.residentSince"
-          :options="residentOptions"
-          placeholder="Як довго ви тут живете?"
+          :options="residentCityOptions"
+          placeholder="Оберіть, скільки проживаєте у місті"
           color="blue"
           variant="outline"
           size="md"
         />
       </UFormGroup>
-      <UFormGroup label="Житель Біля річки З" name="residentNearRiverSince">
-        <UInput
-          v-model="formState.residentNearRiverSince"
-          placeholder="Введіть рік (наприклад, 2022)"
+      <UFormGroup label="Ви живете біля річки Тяжилівка" name="residentNearRiverSince">
+        <USelect
+          v-model="formState.residentProximity"
+          :options="residentRiverOptions"
+          placeholder="Оберіть, чи живете ви біля річки Тяжилівка"
           color="blue"
           variant="outline"
           size="md"
@@ -88,7 +89,7 @@
         <UButton
           type="submit"
           color="black"
-          class="my-2 px-6 py-3 rounded-fullrounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+          class="my-2 px-6 py-3 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
         >
           перейти до карти
         </UButton>
@@ -131,28 +132,33 @@ const formState = reactive({
   age: '',
   gender: '',
   educationLevel: '',
-  residentSince: '',
-  residentNearRiverSince: '',
+  residentCity: '',
+  residentRiver: '',
 })
 
 const genderOptions = [
   { label: 'Чоловік', value: 'male' },
   { label: 'Жінка', value: 'female' },
-  { label: 'інші', value: 'other' },
+  { label: 'Інше', value: 'other' },
 ]
 
 const educationOptions = [
-  { label: 'Вища школа', value: 'high_school' },
-  { label: 'College', value: 'college' },
-  { label: 'коледж', value: 'university' },
-  { label: 'Аспірантура', value: 'postgraduate' },
+  { label: 'Середня', value: 'average' },
+  { label: 'Неповна вища', value: 'incomplete_higher' },
+  { label: 'Вища', value: 'higher' },
 ]
 
-const residentOptions = [
-  { label: 'Менше 1 року', value: 'less_than_1_year' },
+const residentCityOptions = [
+  { label: 'Менш як 1 рік', value: 'less_than_1_year' },
   { label: '1-5 років', value: '1_5_years' },
   { label: '5-10 років', value: '5_10_years' },
-  { label: 'Більше 10 років', value: 'more_than_10_years' },
+  { label: 'Понад 10 років', value: 'more_than_10_years' },
+]
+
+const residentRiverOptions = [
+  { label: 'Так', value: 'yes' },
+  { label: 'Ні', value: 'no' },
+  { label: 'Вперше чую про неї', value: 'unfamiliar' },
 ]
 
 const onSubmit = async () => {
@@ -176,8 +182,8 @@ const onSubmit = async () => {
       age: parseInt(formState.age),
       gender: formState.gender,
       'education level': formState.educationLevel,
-      'resident since': formState.residentSince,
-      'resident near river since': formState.residentNearRiverSince,
+      'city resident': formState.residentCity,
+      'river resident': formState.residentRiver,
       createdAt: new Date(),
       isAnonymous: true,
     })

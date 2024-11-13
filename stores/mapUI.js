@@ -24,6 +24,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const userData = ref(null)
   // const auth = useFirebaseAuth()
   const currentUser = ref(null)
+  const isProhibitDrawing = ref(false)
 
   const colors = {
     'every day': '#0000FF', // Blue
@@ -69,24 +70,43 @@ export const useMapUIStore = defineStore('mapUI', () => {
 
     if (geometryType === 'Point') {
       const coordinates = feature.getGeometry().getCoordinates()
-      features.push({
-        id: Date.now(),
-        type: 'Point',
-        coordinates: coordinates,
-        iconName:
-          currentBelongingIcon.value ||
-          currentSafetyIcon.value ||
-          currentEnvironmentIcon.value,
-        frequency: currentFrequency.value,
-        comment: '',
-        name: userData.value
-          ? {
-              firstname: userData.value.firstname,
-              lastname: userData.value.lastname,
-            }
-          : null,
-        timestamp: timestamp,
-      })
+
+      if (isProhibitDrawing.value) {
+        features.push({
+          id: Date.now(),
+          type: 'Point',
+          coordinates: coordinates,
+          isProhibit: true,
+          comment: '',
+          name: userData.value
+            ? {
+                firstname: userData.value.firstname,
+                lastname: userData.value.lastname,
+              }
+            : null,
+          timestamp: timestamp,
+        })
+        isProhibitDrawing.value = false
+      } else {
+        features.push({
+          id: Date.now(),
+          type: 'Point',
+          coordinates: coordinates,
+          iconName:
+            currentBelongingIcon.value ||
+            currentSafetyIcon.value ||
+            currentEnvironmentIcon.value,
+          frequency: currentFrequency.value,
+          comment: '',
+          name: userData.value
+            ? {
+                firstname: userData.value.firstname,
+                lastname: userData.value.lastname,
+              }
+            : null,
+          timestamp: timestamp,
+        })
+      }
     } else if (geometryType === 'LineString') {
       const coordinates = feature.getGeometry().getCoordinates()
       features.push({
@@ -146,7 +166,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   }
 
   function nextSpaceSubwindow() {
-    if (spaceSubwindow.value < 3) {
+    if (spaceSubwindow.value < 4) {
       spaceSubwindow.value++
       resetOtherSubwindows('space')
       console.log('Current space subwindow:', spaceSubwindow.value)
@@ -310,6 +330,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
       environment: {
         pollution: [],
         'flora-fauna': [],
+        trash: [],
       },
     }
 
@@ -420,6 +441,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   function getEnvironmentKey(iconName) {
     const environmentMap = {
       pollution: 'pollution',
+      trash: 'trash',
       leaf: 'flora-fauna',
     }
     return environmentMap[iconName]
@@ -442,6 +464,12 @@ export const useMapUIStore = defineStore('mapUI', () => {
     if (index !== -1) {
       features.splice(index, 1)
     }
+  }
+
+  function activateProhibitDrawing() {
+    drawType.value = 'Point'
+    drawEnable.value = true
+    isProhibitDrawing.value = true
   }
 
   return {
@@ -491,5 +519,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     mapType,
     setMapType,
     deleteFeature,
+    isProhibitDrawing,
+    activateProhibitDrawing,
   }
 })

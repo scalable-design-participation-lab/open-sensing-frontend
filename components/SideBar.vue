@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl"
-  >
+  <div class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl overflow-auto">
     <UCard class="dark:bg-slate-950">
       <UAccordion
         color="white"
@@ -13,16 +11,16 @@
           <SubWindow
             v-if="item.label === 'Середовище'"
             :current-subwindow="spaceSubwindow"
-            :max-subwindow="3"
+            :max-subwindow="4"
             :progress-percentage="spaceProgressPercentage"
             :title="spaceContent.title"
             :icon="spaceContent.icon"
             :paragraph="spaceContent.description"
             :button="spaceContent.button"
             :button-group="spaceContent.buttonGroup"
+            :icon-grid="spaceSubwindow === 4 ? TrashIconGrid : null"
             @prev="mapUIStore.prevSpaceSubwindow()"
             @next="mapUIStore.nextSpaceSubwindow()"
-            class="!text-xl"
           >
           </SubWindow>
           <SubWindow
@@ -81,6 +79,7 @@
       >
         {{ isSaving ? 'подаючи...' : 'завершити' }}
       </UButton>
+      <ThankYouModal v-model="showThankYouModal" />
     </UCard>
   </div>
 </template>
@@ -89,6 +88,8 @@
 import { computed, ref } from 'vue'
 import { useMapUIStore } from '../stores/mapUI'
 import SubWindow from './SubWindow.vue'
+import { useRouter } from 'vue-router'
+import ThankYouModal from './ThankYouModal.vue'
 
 import dislikeIcon from '@/assets/icons/dislike.svg'
 import heartIcon from '@/assets/icons/heart.svg'
@@ -96,10 +97,13 @@ import smileIcon from '@/assets/icons/smile.svg'
 import brokenIcon from '@/assets/icons/broken.svg'
 import calmIcon from '@/assets/icons/calm.svg'
 import lockIcon from '@/assets/icons/lock.svg'
+import trashIcon from '@/assets/icons/trash.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
+import prohibitIcon from '@/assets/icons/prohibit.svg'
 
 const mapUIStore = useMapUIStore()
+const router = useRouter()
 
 const spaceSubwindow = computed(() => mapUIStore.spaceSubwindow)
 const belongingSubwindow = computed(() => mapUIStore.belongingSubwindow)
@@ -108,16 +112,15 @@ const environmentSubwindow = computed(() => mapUIStore.environmentSubwindow)
 
 const menuItems = [
   {
-    icon: 'i-heroicons-map-pin-20-solid',
     label: 'Середовище',
     defaultOpen: true,
   },
-  { icon: 'i-heroicons-home-20-solid', label: 'Приналежність' },
-  { icon: 'i-heroicons-exclamation-triangle-20-solid', label: 'Безпека' },
-  { icon: 'i-heroicons-sun-20-solid', label: 'Екологія' },
+  { label: 'Приналежність' },
+  { label: 'Безпека' },
+  { label: 'Екологія' },
 ]
 
-const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 3) * 100)
+const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)
 const belongingProgressPercentage = computed(
   () => (belongingSubwindow.value / 1) * 100,
 )
@@ -129,14 +132,14 @@ const environmentProgressPercentage = computed(
 )
 
 const spaceContent = computed(() => {
-  const contents = {
+  const contents: Record<number, any> = {
     1: {
-      title: 'Позначте на мапі місця, які ви відвідували навколо р. Тяжилівка',
+      title: 'Позначте місця, які ви відвідували навколо р. Тяжилівка',
       description:
-        'Спочатку оберіть частоту відвідування, а після позначте на мапі ту чи іншу локацію (до десяти).',
+        'Виберіть частоту відвідування за допомогою кнопки нижче, а потім позначте відповідні місця на мапі. За потреби натисніть на іконку «Плюс», щоб додати коментарі.',
       buttonGroup: [
         {
-          text: 'щоденно',
+          text: 'щодня',
           color: 'blue',
           action: () => mapUIStore.activateDrawing('every day'),
         },
@@ -163,9 +166,9 @@ const spaceContent = computed(() => {
       ],
     },
     2: {
-      title: 'Позначте на мапі місця, у яких хочеться проводити дозвілля',
+      title: 'Позначте місця для дозвілля навколо р. Тяжилівка',
       description:
-        'Торкніться екрана та оберіть ділянки, де в майбутньому бажаєте проводити час. Далі тисніть на + і залишайте коментар, які саме активності вбачаєте: ярмарок, барбекю, вигул собак тощо.',
+        'Торкніться екрана та оберіть ділянки, де в майбутньому бажаєте проводити час. Далі тисніть на + і залишайте коментар, які саме активності вбачаєте: ярмаро, барбекю, вигул собак тощо.',
       button: {
         text: 'додати',
         color: 'primary',
@@ -173,76 +176,103 @@ const spaceContent = computed(() => {
       },
     },
     3: {
-      title: 'Позначте на мапі шляхи, які ведуть до р. Тяжилівка',
+      title: 'Позначте дороги, які ведуть до р. Тяжилівка',
       description:
-        'Оберіть кнопку нижче і зазначте дорогу, яку ви обираєте, щоб добратися до річки.',
+        'Щоб зручніше позначити місця, наблизьте мапу за допомогою масштабування та натисніть «Додати». Далі у кілька натискань відмітьте всі відомі вам дороги до річки, і після цього переходьте до розділу «Приналежність».',
       button: {
         text: 'додати',
         color: 'red',
         action: () => mapUIStore.activateLineStringDrawing(),
       },
     },
+    4: {
+      title: 'Позначте на мапі місця, які ви хотіли б заборонити',
+      description:
+        'За допомогою іконки нижче позначте місця, які на вашу думку потрібно заборонити.',
+    },
   }
   return contents[spaceSubwindow.value] || { title: '', description: '' }
 })
 
 const belongingContent = computed(() => {
-  const contents = {
+  const contents: Record<number, any> = {
     1: {
       title:
-        'Позначте на мапі конкретні місця навколо р. Тяжилівка й висловіть свою думку',
+        'Поділіться думкою про місця навколо р. Тяжилівка',
       description:
-        'За допомогою іконок нижче поділіться, які ділянки не подобаються, подобаються або сповнені спогадів. Далі тисніть + і залишайте коментар, а також за бажанням зображення.',
+        'Оберіть іконку (навівши на неї, побачити підказку) та позначте на мапі місця, які вам подобаються, не подобаються або які викликають відчуття спокою. Додайте коментар із поясненням, і після цього переходьте до розділу «Безпека».',
     },
   }
   return contents[belongingSubwindow.value] || { title: '', description: '' }
 })
 
 const belongingIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
-    { name: 'dislike', src: dislikeIcon },
-    { name: 'heart', src: heartIcon },
-    { name: 'smile', src: smileIcon },
+    {
+      name: 'dislike',
+      src: dislikeIcon,
+      tooltip: 'місця, які не подобаються',
+    },
+    {
+      name: 'heart',
+      src: heartIcon,
+      tooltip: 'місця, які подобаються',
+    },
+    {
+      name: 'smile',
+      src: smileIcon,
+      tooltip: 'місця, де вам спокійно',
+    },
   ],
   onSelect: selectBelongingIcon,
 }))
 
 const safetyContent = computed(() => {
-  const contents = {
+  const contents: Record<number, any> = {
     1: {
       title:
-        'Позначте на мапі місця навколо р. Тяжилівка, де ви почуваєтесь безпечно або навпаки',
+        'Поділіться думкою про рівень безпеки навколо р. Тяжилівка',
       description:
-        'За допомогою іконок нижче вкажіть ділянки, які викликають у вас відчуття безпеки, небезпеки або спокою.',
+        'Оберіть іконку (навівши на неї, побачити підказку) та позначте на мапі місця, де вам безпечно, небезпечно або спокійно. Додайте коментар із поясненням, і після цього переходьте до розділу «Екологія».',
     },
   }
   return contents[safetySubwindow.value] || { title: '', description: '' }
 })
 
 const safetyIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
-    { name: 'broken', src: brokenIcon },
-    { name: 'calm', src: calmIcon },
-    { name: 'lock', src: lockIcon },
+    {
+      name: 'broken',
+      src: brokenIcon,
+      tooltip: 'місця, де вам безпечно',
+    },
+    {
+      name: 'calm',
+      src: calmIcon,
+      tooltip: 'місця, де вам спокійно',
+    },
+    {
+      name: 'lock',
+      src: lockIcon,
+      tooltip: 'місця, де вам небезпечно',
+    },
   ],
   onSelect: selectSafetyIcon,
 }))
 
 const environmentContent = computed(() => {
-  const contents = {
+  const contents: Record<number, any> = {
     1: {
       title:
-        'Позначте на мапі місця навколо р. Тяжилівка, де ви помічали сміття',
+        'Поділіться думкою про рівень засміченості навколо р. Тяжилівка',
       description:
-        'За допомогою іконки нижче поділіться, які ділянки засміченні. Далі тисніть + і залишайте коментар.',
+        'Оберіть іконку (навівши на неї, побачити підказку) та позначте на мапі місця, де ви помічали сміття. Додайте коментар із поясненням, і після цього натисніть стрілку «Вправо».',
     },
     2: {
       title:
-        'Позначте на мапі місця навколо р. Тяжилівка, де ви зустрічали незвичайні рослини або тварин',
+        'Поділіться думкою про рослини та тварин навколо р. Тяжилівка',
       description:
-        'За допомогою іконки нижче відмітьте, де бачили цікавих тварин, комах, дерева тощо. Далі тисніть + і залишайте коментар.',
+        'Оберіть іконку (навівши на неї, побачити підказку) та позначте на мапі місця, де ви зустрічали незвичні рослини та тварин. Додайте коментар із поясненням, і після цього натисніть «Завершити».',
     },
   }
   return contents[environmentSubwindow.value] || { title: '', description: '' }
@@ -250,14 +280,43 @@ const environmentContent = computed(() => {
 
 const pollutionIconGrid = computed(() => ({
   title: 'Виберіть іконку:',
-  icons: [{ name: 'pollution', src: pollutionIcon }],
+  icons: [
+  {
+      name: 'trash',
+      src: trashIcon,
+      tooltip: 'Місця зі сміттям',
+    },
+    {
+      name: 'pollution',
+      src: pollutionIcon,
+      tooltip: 'Місця з забрудненням',
+    },
+  ],
   onSelect: selectEnvironmentIcon,
 }))
 
 const leafIconGrid = computed(() => ({
   title: 'Виберіть іконку:',
-  icons: [{ name: 'leaf', src: leafIcon }],
+  icons: [
+    {
+      name: 'leaf',
+      src: leafIcon,
+      tooltip: 'Місця з цікавою флорою та фауною',
+    },
+  ],
   onSelect: selectEnvironmentIcon,
+}))
+
+const prohibitIconGrid = computed(() => ({
+  title: 'Виберіть іконку:',
+  icons: [
+    {
+      name: 'prohibit',
+      src: prohibitIcon,
+      tooltip: 'Місця, які потрібно заборонити',
+    },
+  ],
+  onSelect: selectProhibitIcon,
 }))
 
 const showSubmitButton = computed(() => {
@@ -299,8 +358,13 @@ function prevEnvironmentSubwindow() {
 }
 
 function selectEnvironmentIcon(iconName: string) {
-  console.log('Піктограма вибраного середовища', iconName)
+  console.log('Selected icon:', iconName)
   mapUIStore.activateEnvironmentDrawing(iconName)
+}
+
+function selectPollutionIcon(iconName: string) {
+  console.log('Selected icon:', iconName)
+  mapUIStore.activateTrashDrawing()
 }
 
 const isSaving = ref(false)
@@ -309,15 +373,13 @@ const notificationColor = ref('green')
 const notificationTitle = ref('')
 const notificationText = ref('')
 const notificationId = ref('save-notification')
+const showThankYouModal = ref(false)
 
 async function saveData() {
   isSaving.value = true
   try {
     await mapUIStore.saveDataToDatabase()
-    showSuccessNotification(
-      'Thank you for taking the survey! You can now view your results or explore maps created by other users.',
-    )
-    // mapUIStore.resetAllSubwindows()
+    showThankYouModal.value = true
   } catch (error) {
     console.error('Error submitting data to database:', error)
     showErrorNotification('Не вдалося подати дані')

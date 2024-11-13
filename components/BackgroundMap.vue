@@ -35,15 +35,21 @@
       />
     </ol-tile-layer>
 
-    <DrawingLayer
-      :projection="projection"
-      :show-all-plus-icons="showAllPlusIcons"
-      :enable-click="isMapPage"
-      :is-map-page="isMapPage"
-      @toggle-comment-popup="toggleCommentPopup"
-      @toggle-image-upload-popup="toggleImageUploadPopup"
-      @show-comment-display="handleShowCommentDisplay"
-    />
+    <ol-layer-vector>
+      <ol-source-vector>
+        <DrawingLayer
+          :projection="projection"
+          :show-all-plus-icons="showAllPlusIcons"
+          :show-comment-icons="showCommentIcons"
+          :enable-click="isMapPage"
+          :is-map-page="isMapPage"
+          :show-delete-button="!isMapPage"
+          @toggle-comment-popup="toggleCommentPopup"
+          @toggle-image-upload-popup="toggleImageUploadPopup"
+          @show-comment-display="handleShowCommentDisplay"
+        />
+      </ol-source-vector>
+    </ol-layer-vector>
 
     <ol-overlay
       v-if="commentPopupVisible"
@@ -72,12 +78,17 @@
       />
     </ol-overlay>
 
-    <!-- Add route check for CommentDisplay -->
-    <CommentDisplay
-      v-if="isMapPage"
-      v-model="showCommentDisplay"
-      :feature="selectedFeatureForDisplay"
-    />
+    <ol-overlay
+      v-if="showCommentDisplay"
+      :position="getFeaturePosition(selectedFeatureForDisplay)"
+      :offset="[30, -20]"
+    >
+      <CommentDisplay
+        :model-value="showCommentDisplay"
+        :feature="selectedFeatureForDisplay"
+        @update:model-value="updateShowCommentDisplay"
+      />
+    </ol-overlay>
   </ol-map>
 </template>
 
@@ -95,7 +106,19 @@ import { Control } from 'ol/control'
 const props = defineProps({
   showAllPlusIcons: {
     type: Boolean,
-    default: undefined,
+    default: false,
+  },
+  showCommentIcons: {
+    type: Boolean,
+    default: true,
+  },
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+  selectedFeature: {
+    type: Object,
+    default: null,
   },
 })
 
@@ -113,7 +136,8 @@ const imageUploadPopupPosition = ref(null)
 const showCommentDisplay = ref(false)
 const selectedFeatureForDisplay = ref(null)
 
-const mapboxToken = 'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
+const mapboxToken =
+  'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
 const mapboxStyle = 'restartukraine/cm1ez4ahh02ii01pi36qeb4ug'
 const mapboxUrl = computed(() => {
   const style = mapType.value === 'light' ? mapboxStyle : 'mapbox/satellite-v9'
@@ -156,6 +180,8 @@ function openImageUploadPopup(feature) {
 }
 
 function getFeaturePosition(feature) {
+  if (!feature) return [0, 0]
+
   if (feature.type === 'Point') {
     return feature.coordinates
   } else if (feature.type === 'Polygon') {
@@ -163,9 +189,10 @@ function getFeaturePosition(feature) {
     const sumX = coordinates.reduce((sum, coord) => sum + coord[0], 0)
     const sumY = coordinates.reduce((sum, coord) => sum + coord[1], 0)
     return [sumX / coordinates.length, sumY / coordinates.length]
-  } else {
-    return feature.coordinates[0]
+  } else if (feature.type === 'LineString') {
+    return feature.coordinates[feature.coordinates.length - 1]
   }
+  return [0, 0]
 }
 
 function closeCommentPopup() {
@@ -194,21 +221,34 @@ function handleMapClick(event) {
   }
 }
 
-const emit = defineEmits(['show-comment-display'])
+const emit = defineEmits([
+  'show-comment-display',
+  'update:modelValue',
+  'update:selectedFeature',
+])
 
-function handleShowCommentDisplay(feature) {
+function updateShowCommentDisplay(value: boolean) {
+  showCommentDisplay.value = value
+}
+
+function handleShowCommentDisplay(data) {
   if (!isMapPage.value) return
 
   closeCommentPopup()
   closeImageUploadPopup()
 
-  selectedFeatureForDisplay.value = feature
+  if (
+    selectedFeatureForDisplay.value?.id === data.feature.id &&
+    showCommentDisplay.value
+  ) {
+    showCommentDisplay.value = false
+    selectedFeatureForDisplay.value = null
+    return
+  }
+
+  selectedFeatureForDisplay.value = data.feature
   showCommentDisplay.value = true
 }
-
-// Add watchers for debugging
-// watch(showCommentDisplay, (newVal) => {})
-// watch(selectedFeatureForDisplay, (newVal) => {})
 </script>
 
 <style>
