@@ -1,7 +1,7 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="comment-popup dark:bg-slate-950 shadow-lg flex flex-col"
+    class="dark:bg-slate-950 shadow-lg flex flex-col"
   >
     <UTextarea
       v-model="localComment"
@@ -93,16 +93,3 @@ function closePopup() {
   emit('close')
 }
 </script>
-
-<style scoped>
-.comment-popup {
-  position: relative;
-  z-index: 1000;
-  min-width: 200px;
-  background: white;
-}
-
-.u-textarea {
-  min-height: 100px;
-}
-</style>
