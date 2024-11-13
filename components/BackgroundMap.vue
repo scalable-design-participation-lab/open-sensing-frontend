@@ -1,5 +1,6 @@
 <template>
   <ol-map
+    ref="mapInstance"
     :load-tiles-while-animating="true"
     :load-tiles-while-interacting="true"
     :controls="[]"
@@ -54,7 +55,7 @@
     <ol-overlay
       v-if="commentPopupVisible"
       :position="commentPopupPosition"
-      :offset="[30, 20]"
+      :offset="commentPopupOffset"
     >
       <CommentPopup
         :is-visible="commentPopupVisible"
@@ -65,23 +66,9 @@
     </ol-overlay>
 
     <ol-overlay
-      v-if="imageUploadPopupVisible"
-      :position="imageUploadPopupPosition"
-      :offset="[30, 20]"
-    >
-      <ImageUploadPopup
-        :is-visible="imageUploadPopupVisible"
-        :feature-id="selectedFeatureId"
-        class="z-30"
-        @close="closeImageUploadPopup"
-        @upload="handleImageUpload"
-      />
-    </ol-overlay>
-
-    <ol-overlay
       v-if="showCommentDisplay"
-      :position="getFeaturePosition(selectedFeatureForDisplay)"
-      :offset="[30, -20]"
+      :position="commentDisplayPosition"
+      :offset="commentDisplayOffset"
     >
       <CommentDisplay
         :model-value="showCommentDisplay"
@@ -99,9 +86,8 @@ import { useRuntimeConfig } from '#app'
 import { useRoute } from 'vue-router'
 import DrawingLayer from './DrawingLayer/DrawingLayer.vue'
 import CommentPopup from './CommentPopup.vue'
-import ImageUploadPopup from './ImageUploadPopup.vue'
 import CommentDisplay from './CommentDisplay.vue'
-import { Control } from 'ol/control'
+import { Coordinate } from 'ol/coordinate'
 
 const props = defineProps({
   showAllPlusIcons: {
@@ -129,12 +115,12 @@ const route = useRoute()
 
 const projection = ref('EPSG:3857')
 const commentPopupVisible = ref(false)
-const imageUploadPopupVisible = ref(false)
 const selectedFeatureId = ref(null)
 const commentPopupPosition = ref(null)
-const imageUploadPopupPosition = ref(null)
 const showCommentDisplay = ref(false)
 const selectedFeatureForDisplay = ref(null)
+const commentPopupOffset = ref([0, 0])
+const commentDisplayOffset = ref([0, 0])
 
 const mapboxToken =
   'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
@@ -150,6 +136,7 @@ const mapboxAttribution =
 const isMapPage = computed(() => route.name === 'map')
 
 function toggleCommentPopup(feature) {
+  console.log('Toggle comment popup:', feature)
   if (commentPopupVisible.value && selectedFeatureId.value === feature.id) {
     closeCommentPopup()
   } else {
@@ -158,25 +145,20 @@ function toggleCommentPopup(feature) {
 }
 
 function toggleImageUploadPopup(feature) {
-  if (imageUploadPopupVisible.value && selectedFeatureId.value === feature.id) {
-    closeImageUploadPopup()
+  console.log('Toggle comment popup:', feature)
+  if (commentPopupVisible.value && selectedFeatureId.value === feature.id) {
+    closeCommentPopup()
   } else {
-    openImageUploadPopup(feature)
+    openCommentPopup(feature)
   }
 }
 
 function openCommentPopup(feature) {
   selectedFeatureId.value = feature.id
   commentPopupVisible.value = true
-  imageUploadPopupVisible.value = false
-  commentPopupPosition.value = getFeaturePosition(feature)
-}
-
-function openImageUploadPopup(feature) {
-  selectedFeatureId.value = feature.id
-  imageUploadPopupVisible.value = true
-  commentPopupVisible.value = false
-  imageUploadPopupPosition.value = getFeaturePosition(feature)
+  const { position, offset } = calculatePopupPosition(feature)
+  commentPopupPosition.value = position
+  commentPopupOffset.value = offset
 }
 
 function getFeaturePosition(feature) {
@@ -198,16 +180,6 @@ function getFeaturePosition(feature) {
 function closeCommentPopup() {
   commentPopupVisible.value = false
   selectedFeatureId.value = null
-}
-
-function closeImageUploadPopup() {
-  imageUploadPopupVisible.value = false
-  selectedFeatureId.value = null
-}
-
-function handleImageUpload(images) {
-  mapUIStore.updateFeatureImages(selectedFeatureId.value, images)
-  closeImageUploadPopup()
 }
 
 function handleMapClick(event) {
@@ -235,7 +207,6 @@ function handleShowCommentDisplay(data) {
   if (!isMapPage.value) return
 
   closeCommentPopup()
-  closeImageUploadPopup()
 
   if (
     selectedFeatureForDisplay.value?.id === data.feature.id &&
@@ -248,6 +219,55 @@ function handleShowCommentDisplay(data) {
 
   selectedFeatureForDisplay.value = data.feature
   showCommentDisplay.value = true
+  const { position, offset } = calculatePopupPosition(data.feature)
+  commentDisplayPosition.value = position
+  commentDisplayOffset.value = offset
+}
+
+const mapInstance = ref(null)
+
+function calculatePopupPosition(feature: any): {
+  position: Coordinate
+  offset: number[]
+} {
+  const map = mapInstance.value?.map
+  if (!map) {
+    return { position: getFeaturePosition(feature), offset: [0, 0] }
+  }
+
+  const featurePosition = getFeaturePosition(feature)
+  const pixel = map.getPixelFromCoordinate(featurePosition)
+
+  if (!pixel) {
+    return { position: featurePosition, offset: [0, 0] }
+  }
+
+  const mapSize = map.getSize()
+  const [width, height] = mapSize || [0, 0]
+
+  // Calculate relative position in viewport
+  const isInUpperHalf = pixel[1] < height / 2
+  const isInLeftHalf = pixel[0] < width / 2
+
+  // Calculate offset based on position
+  let offset: number[] = [0, 0]
+
+  if (isInUpperHalf) {
+    offset[1] = 20 // Show below icon
+  } else {
+    offset[1] = -200 // Show above icon, adjusted for popup height
+  }
+
+  if (isInLeftHalf) {
+    offset[0] = 30 // Show on right side
+  } else {
+    offset[0] = -230 // Show on left side, adjusted for popup width
+  }
+
+  return {
+    position: featurePosition,
+    offset,
+  }
 }
 </script>
 

@@ -130,14 +130,12 @@ function handleDrawEnd(event) {
 }
 
 const getDrawColor = computed(() => {
-  if (drawType.value === 'Point') {
-    return currentColor.value
-  } else if (drawType.value === 'Polygon') {
-    return 'black'
-  } else if (drawType.value === 'LineString') {
-    return 'red'
+  const colorMap = {
+    Point: currentColor.value,
+    Polygon: 'black',
+    LineString: 'red',
   }
-  return 'black'
+  return colorMap[drawType.value] || 'black'
 })
 
 function toggleCommentPopup(feature) {
@@ -153,60 +151,55 @@ function handleShowCommentDisplay(data) {
 }
 
 function getIconForFeature(feature) {
-  if (feature.isProhibit) {
-    return prohibitIcon
+  // Map feature types to icons
+  const featureTypeMap = {
+    isProhibit: prohibitIcon,
   }
-  if (feature.iconName) {
-    switch (feature.iconName) {
-      case 'pollution':
-        return pollutionIcon
-      case 'leaf':
-      case 'flora-fauna':
-        return leafIcon
-      case 'lock':
-      case 'great':
-        return lockIcon
-      case 'calm':
-      case 'safe':
-        return calmIcon
-      case 'broken':
-      case 'unsafe':
-        return brokenIcon
-      case 'dislike':
-      case 'negative':
-        return dislikeIcon
-      case 'heart':
-      case 'love':
-        return heartIcon
-      case 'smile':
-      case 'positive':
-        return smileIcon
-      case 'trash':
-        return trashIcon
-      default:
-        return getIconForPoint(feature)
-    }
-  }
-  return getIconForPoint(feature)
-}
 
-function getIconForPoint(feature) {
-  switch (feature.frequency) {
-    case 'every day':
-    case 'everyday':
-      return blueIcon
-    case 'every week':
-    case 'everyweek':
-      return greenIcon
-    case 'sometimes':
-      return purpleIcon
-    case 'only once':
-    case 'once':
-      return yellowIcon
-    case 'never':
-      return redIcon
-    default:
-      return redIcon
+  if (
+    featureTypeMap[Object.keys(feature).find((key) => feature[key] === true)]
+  ) {
+    return featureTypeMap[
+      Object.keys(feature).find((key) => feature[key] === true)
+    ]
   }
+
+  // Map icon names to icons
+  const iconMap = {
+    pollution: pollutionIcon,
+    leaf: leafIcon,
+    'flora-fauna': leafIcon,
+    lock: lockIcon,
+    great: lockIcon,
+    calm: calmIcon,
+    safe: calmIcon,
+    broken: brokenIcon,
+    unsafe: brokenIcon,
+    dislike: dislikeIcon,
+    negative: dislikeIcon,
+    heart: heartIcon,
+    love: heartIcon,
+    smile: smileIcon,
+    positive: smileIcon,
+    trash: trashIcon,
+  }
+
+  if (feature.iconName && iconMap[feature.iconName]) {
+    return iconMap[feature.iconName]
+  }
+
+  // Map frequencies to icons
+  const frequencyMap = {
+    'every day': blueIcon,
+    everyday: blueIcon,
+    'every week': greenIcon,
+    everyweek: greenIcon,
+    sometimes: purpleIcon,
+    'only once': yellowIcon,
+    once: yellowIcon,
+    never: redIcon,
+  }
+
+  return frequencyMap[feature.frequency] || redIcon
 }
 </script>

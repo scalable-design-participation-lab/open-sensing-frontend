@@ -178,14 +178,9 @@ function shouldShowPlusIcon(feature) {
 }
 
 function handlePlusIconClick(feature) {
-  // Toggle comment popup for space features (frequency-based points)
-  if (!feature.iconName) {
-    emit('toggle-comment-popup', feature)
-  }
-  // Toggle image upload popup for themed icons (belonging, safety, environment)
-  else {
-    emit('toggle-image-upload-popup', feature)
-  }
+  console.log('Plus icon clicked:', feature)
+  // Always use comment popup regardless of feature type
+  emit('toggle-comment-popup', feature)
 }
 
 function handleDeleteClick(feature) {
