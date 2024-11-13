@@ -11,7 +11,11 @@
     <div class="map-wrapper">
       <BackgroundMap
         :show-all-plus-icons="false"
+        :show-comment-icons="true"
+        :model-value="showCommentDisplay"
+        :selected-feature="selectedFeature"
         @show-comment-display="handleShowCommentDisplay"
+        @update:model-value="updateShowCommentDisplay"
       />
     </div>
     <GeneralizedFooter class="footer-fixed" />
@@ -180,6 +184,8 @@ const selectedFeature = ref(null)
 const activeFeatureId = ref(null)
 
 function handleShowCommentDisplay({ feature }) {
+  console.log('Handling comment display:', feature) // Debug log
+
   // If clicking the same feature's comment icon, close the popup
   if (activeFeatureId.value === feature.id && showCommentDisplay.value) {
     showCommentDisplay.value = false
@@ -188,9 +194,18 @@ function handleShowCommentDisplay({ feature }) {
     return
   }
 
+  // Open new comment display
   selectedFeature.value = feature
   activeFeatureId.value = feature.id
   showCommentDisplay.value = true
+}
+
+function updateShowCommentDisplay(value: boolean) {
+  showCommentDisplay.value = value
+  if (!value) {
+    selectedFeature.value = null
+    activeFeatureId.value = null
+  }
 }
 </script>
 
