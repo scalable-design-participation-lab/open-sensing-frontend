@@ -1,14 +1,13 @@
 <template>
-  <UCard v-if="isOpen" class="min-w-[200px] max-w-[300px] shadow-lg">
+  <UCard v-if="isOpen" class="min-w-[200px] max-w-[300px] shadow-lg text-black dark:text-white">
     <template #header>
-      <div class="space-y-1">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-medium">
             {{ getFeatureTitle(feature) }}
           </h3>
           <UButton
             icon="i-heroicons-x-mark"
-            color="gray"
+            color="black"
             variant="ghost"
             size="xs"
             @click="closeModal"
@@ -16,13 +15,14 @@
         </div>
 
         <div v-if="feature?.name" class="text-xs text-gray-500">
-          Added by: {{ feature.name.firstname }} {{ feature.name.lastname }}
+          by {{ feature.name.firstname }} {{ feature.name.lastname }}
         </div>
-      </div>
+        <div v-if="feature?.timestamp" class="text-xs text-gray-500">
+          on {{ formatDate(feature.timestamp) }}
+        </div>
     </template>
 
-    <div class="p-2 space-y-2">
-      <div class="space-y-1">
+      <div>
         <p v-if="feature?.comment?.length > 0" class="text-sm text-gray-700">
           {{ feature.comment }}
         </p>
@@ -30,11 +30,6 @@
           No comment available for this location
         </p>
       </div>
-
-      <div v-if="feature?.timestamp" class="text-xs text-gray-500">
-        Added on: {{ formatDate(feature.timestamp) }}
-      </div>
-    </div>
   </UCard>
 </template>
 
