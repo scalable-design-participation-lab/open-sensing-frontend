@@ -1,6 +1,5 @@
 <template>
-  <div class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl overflow-auto">
-    <UCard class="dark:bg-slate-950">
+    <UCard class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl dark:bg-slate-950 overflow-y-scroll">
       <UAccordion
         color="white"
         variant="solid"
@@ -81,7 +80,6 @@
       </UButton>
       <ThankYouModal v-model="showThankYouModal" />
     </UCard>
-  </div>
 </template>
 
 <script setup lang="ts">
