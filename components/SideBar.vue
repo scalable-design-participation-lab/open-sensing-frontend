@@ -18,7 +18,7 @@
             :paragraph="spaceContent.description"
             :button="spaceContent.button"
             :button-group="spaceContent.buttonGroup"
-            :icon-grid="spaceSubwindow === 4 ? TrashIconGrid : null"
+            :icon-grid="spaceSubwindow === 4 ? prohibitIconGrid : null"
             @prev="mapUIStore.prevSpaceSubwindow()"
             @next="mapUIStore.nextSpaceSubwindow()"
           >
@@ -362,9 +362,9 @@ function selectEnvironmentIcon(iconName: string) {
   mapUIStore.activateEnvironmentDrawing(iconName)
 }
 
-function selectPollutionIcon(iconName: string) {
-  console.log('Selected icon:', iconName)
-  mapUIStore.activateTrashDrawing()
+function selectProhibitIcon() {
+  console.log('Selected prohibit icon')
+  mapUIStore.activateProhibitDrawing()
 }
 
 const isSaving = ref(false)
