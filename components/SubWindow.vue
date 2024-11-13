@@ -82,7 +82,7 @@
                 <img
                   :src="icon.src"
                   :alt="icon.name"
-                  class="w-auto h-10/12 dark:!invert"
+                  class="w-auto h-8 dark:!invert"
                 />
               </UButton>
             </UTooltip>
