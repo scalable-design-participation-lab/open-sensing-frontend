@@ -101,6 +101,7 @@ import lockIcon from '@/assets/icons/lock.svg'
 import pollutionIcon from '@/assets/icons/pollution.svg'
 import leafIcon from '@/assets/icons/leaf.svg'
 import prohibitIcon from '@/assets/icons/prohibit.svg'
+import trashIcon from '@/assets/icons/trash.svg'
 
 const mapUIStore = useMapUIStore()
 const router = useRouter()
@@ -166,7 +167,7 @@ const spaceContent = computed(() => {
         {
           text: 'ніколи',
           color: 'red',
-          tooltip: 'Місця, які ви ніколи не відвідували',
+          tooltip: 'Місця, які ви ніколи не вівідували',
           action: () => mapUIStore.activateDrawing('never'),
         },
       ],
@@ -293,6 +294,11 @@ const pollutionIconGrid = computed(() => ({
       name: 'pollution',
       src: pollutionIcon,
       tooltip: 'Місця з забрудненням',
+    },
+    {
+      name: 'trash',
+      src: trashIcon,
+      tooltip: 'Місця зі сміттям',
     },
   ],
   onSelect: selectEnvironmentIcon,
