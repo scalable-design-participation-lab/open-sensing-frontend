@@ -38,7 +38,7 @@
           />
         </div>
         <button
-          class="w-12 h-12 rounded-full bg-white dark:bg-slate-950 flex items-center justify-center font-semibold text-lg md:text-xl cursor-pointer shadow-md hover:bg-slate-400 hover:text-white dark:hover:bg-slate-700"
+          class="w-12 h-12 rounded-full bg-white dark:bg-slate-950 flex items-center justify-center font-semibold text-lg md:text-xl cursor-pointer shadow-md hover:bg-slate-950 hover:text-white dark:hover:bg-slate-700"
           aria-label="Help"
           @click="showAboutPopup = true"
         >
