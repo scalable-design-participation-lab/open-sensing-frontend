@@ -1,33 +1,19 @@
 <template>
-  <UModal v-model="isOpen" :ui="{ width: 'sm:max-w-md' }">
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold">Menu</h3>
-          <UButton
-            color="black"
-            variant="ghost"
-            icon="i-heroicons-x-mark-20-solid"
-            @click="closeModal"
-          />
-        </div>
-      </template>
-
-      <div class="space-y-2">
+  <UModal v-model="isOpen" :ui="{ width: 'w-96' }">
+      <div class="space-y-3 p-6">
         <UButton
           v-for="(item, index) in menuItems"
           :key="index"
           block
-          color="gray"
-          variant="soft"
+          color="white"
+          variant="solid"
           :icon="item.icon"
-          class="justify-start text-lg"
+          class="dark:bg-slate-950 dark:text-white text-lg font-semibold rounded-full py-3"
           @click="handleItemClick(item)"
         >
           {{ item.label }}
         </UButton>
       </div>
-    </UCard>
   </UModal>
 </template>
 
@@ -51,17 +37,15 @@ const isOpen = computed({
 const menuItems = [
   {
     label: 'About',
-    icon: 'i-heroicons-information-circle-20-solid',
     action: 'about',
+    link: '/about',
   },
   {
     label: 'Help',
-    icon: 'i-heroicons-question-mark-circle-20-solid',
     action: 'help',
   },
   {
     label: 'Settings',
-    icon: 'i-heroicons-cog-6-tooth-20-solid',
     action: 'settings',
   },
 ]
