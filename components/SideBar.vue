@@ -1,6 +1,5 @@
 <template>
-  <div class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl overflow-auto">
-    <UCard class="dark:bg-slate-950">
+    <UCard class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl dark:bg-slate-950 overflow-y-scroll">
       <UAccordion
         color="white"
         variant="solid"
@@ -18,7 +17,7 @@
             :paragraph="spaceContent.description"
             :button="spaceContent.button"
             :button-group="spaceContent.buttonGroup"
-            :icon-grid="spaceSubwindow === 4 ? TrashIconGrid : null"
+            :icon-grid="spaceSubwindow === 4 ? prohibitIconGrid : null"
             @prev="mapUIStore.prevSpaceSubwindow()"
             @next="mapUIStore.nextSpaceSubwindow()"
           >
@@ -81,7 +80,6 @@
       </UButton>
       <ThankYouModal v-model="showThankYouModal" />
     </UCard>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -362,9 +360,9 @@ function selectEnvironmentIcon(iconName: string) {
   mapUIStore.activateEnvironmentDrawing(iconName)
 }
 
-function selectPollutionIcon(iconName: string) {
-  console.log('Selected icon:', iconName)
-  mapUIStore.activateTrashDrawing()
+function selectProhibitIcon() {
+  console.log('Selected prohibit icon')
+  mapUIStore.activateProhibitDrawing()
 }
 
 const isSaving = ref(false)
