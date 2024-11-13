@@ -277,7 +277,6 @@ const environmentContent = computed(() => {
 })
 
 const pollutionIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
   {
       name: 'trash',
@@ -294,7 +293,6 @@ const pollutionIconGrid = computed(() => ({
 }))
 
 const leafIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
     {
       name: 'leaf',
@@ -306,7 +304,6 @@ const leafIconGrid = computed(() => ({
 }))
 
 const prohibitIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
     {
       name: 'prohibit',
