@@ -1,24 +1,31 @@
 <template>
   <UModal v-model="isOpen" :ui="{ width: 'w-96' }">
-      <div class="space-y-3 p-6">
-        <UButton
-          v-for="(item, index) in menuItems"
-          :key="index"
-          block
-          color="white"
-          variant="solid"
-          :icon="item.icon"
-          class="dark:bg-slate-950 dark:text-white text-lg font-semibold rounded-full py-3"
-          @click="handleItemClick(item)"
-        >
-          {{ item.label }}
-        </UButton>
-      </div>
+    <div class="space-y-3 p-6">
+      <UButton
+        v-for="(item, index) in menuItems"
+        :key="index"
+        block
+        color="white"
+        variant="solid"
+        :icon="item.icon"
+        class="dark:bg-slate-950 dark:text-white text-lg font-semibold rounded-full py-3"
+        @click="handleItemClick(item)"
+      >
+        {{ item.label }}
+      </UButton>
+    </div>
   </UModal>
+
+  <AboutPopup v-model="showAboutPopup" />
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import AboutPopup from './AboutPopup.vue'
+
+const router = useRouter()
+const showAboutPopup = ref(false)
 
 const props = defineProps({
   modelValue: {
@@ -45,8 +52,8 @@ const menuItems = [
     action: 'help',
   },
   {
-    label: 'Settings',
-    action: 'settings',
+    label: 'Home',
+    action: 'home',
   },
 ]
 
@@ -55,7 +62,20 @@ const closeModal = () => {
 }
 
 const handleItemClick = (item) => {
-  emit('select', item.action)
   closeModal()
+
+  switch (item.action) {
+    case 'about':
+      router.push('/about')
+      break
+    case 'help':
+      showAboutPopup.value = true
+      break
+    case 'home':
+      router.push('/')
+      break
+  }
+
+  emit('select', item.action)
 }
 </script>

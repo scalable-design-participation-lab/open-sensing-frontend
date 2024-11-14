@@ -151,6 +151,11 @@ function handleShowCommentDisplay(data) {
 }
 
 function getIconForFeature(feature) {
+  // First check if it's a prohibit point
+  if (feature.isProhibit) {
+    return prohibitIcon
+  }
+
   // Map feature types to icons
   const featureTypeMap = {
     isProhibit: prohibitIcon,
