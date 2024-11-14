@@ -1,8 +1,8 @@
 <template>
-  <UCard v-if="isOpen" class="min-w-[200px] max-w-[300px] shadow-lg text-black dark:text-white">
+  <UCard v-if="isOpen" class="min-w-48 max-w-72 shadow-lg text-black dark:text-white">
     <template #header>
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-medium">
+          <h3 class="font-medium">
             {{ getFeatureTitle(feature) }}
           </h3>
           <UButton
@@ -14,20 +14,25 @@
           />
         </div>
 
-        <div v-if="feature?.name" class="text-xs text-gray-500">
-          by {{ feature.name.firstname }} {{ feature.name.lastname }}
-        </div>
-        <div v-if="feature?.timestamp" class="text-xs text-gray-500">
-          on {{ formatDate(feature.timestamp) }}
+        <div class="text-xs text-gray-500 dark:text-gray-300">
+          <span v-if="feature?.name">
+            {{ feature.name.firstname }} {{ feature.name.lastname }}
+          </span>
+          <span v-if="feature?.name && feature?.timestamp">
+          • 
+          </span>
+          <span v-if="feature?.timestamp">
+            {{ formatDate(feature.timestamp) }}
+            </span>
         </div>
     </template>
 
       <div>
-        <p v-if="feature?.comment?.length > 0" class="text-sm text-gray-700">
+        <p v-if="feature?.comment?.length > 0" class="text-sm">
           {{ feature.comment }}
         </p>
-        <p v-else class="text-sm text-gray-500 italic">
-          No comment available for this location
+        <p v-else class="text-sm text-gray-700 dark:text-white italic">
+          No comment available for this location.
         </p>
       </div>
   </UCard>
