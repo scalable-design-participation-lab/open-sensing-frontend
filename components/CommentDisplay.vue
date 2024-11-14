@@ -15,16 +15,17 @@
         </div>
 
         <div class="text-xs text-gray-500 dark:text-gray-300">
-          <span v-if="feature?.name">
+          <span v-if="feature?.name?.firstname && feature?.name?.lastname">
             {{ feature.name.firstname }} {{ feature.name.lastname }}
           </span>
-          <span v-if="feature?.name && feature?.timestamp">
+          <span v-if="feature?.name?.firstname && feature?.name?.lastname && feature?.timestamp">
           • 
           </span>
           <span v-if="feature?.timestamp">
             {{ formatDate(feature.timestamp) }}
             </span>
         </div>
+
     </template>
 
       <div>
