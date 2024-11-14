@@ -43,17 +43,20 @@ const isOpen = computed({
 
 const menuItems = [
   {
+    label: 'Home',
+    action: 'home',
+  },
+  {
     label: 'About',
     action: 'about',
-    link: '/about',
   },
   {
     label: 'Help',
     action: 'help',
   },
   {
-    label: 'Home',
-    action: 'home',
+    label: 'Results',
+    action: 'results',
   },
 ]
 
@@ -64,15 +67,28 @@ const closeModal = () => {
 const handleItemClick = (item) => {
   closeModal()
 
+  const isOnMapPage = router.currentRoute.value.path === '/map'
+
   switch (item.action) {
+    case 'home':
+      if (isOnMapPage) {
+        router.push('/').then(() => window.location.reload())
+      } else {
+        router.push('/')
+      }
+      break
     case 'about':
-      router.push('/about')
+      if (isOnMapPage) {
+        router.push('/about').then(() => window.location.reload())
+      } else {
+        router.push('/about')
+      }
       break
     case 'help':
       showAboutPopup.value = true
       break
-    case 'home':
-      router.push('/')
+    case 'results':
+      router.push('/map')
       break
   }
 
