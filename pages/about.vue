@@ -10,6 +10,7 @@
       :show-avatar="true"
       avatar-src="https://avatars.githubusercontent.com/u/739984?v=4"
       avatar-alt="User Avatar"
+      class="z-50"
     />
 
     <UContainer class="flex-grow">
