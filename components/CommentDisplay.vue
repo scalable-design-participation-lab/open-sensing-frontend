@@ -1,40 +1,41 @@
 <template>
-  <UCard v-if="isOpen" class="min-w-[200px] max-w-[300px] shadow-lg">
+  <UCard v-if="isOpen" class="min-w-48 max-w-72 shadow-lg text-black dark:text-white">
     <template #header>
-      <div class="space-y-1">
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-medium">
+          <h3 class="font-medium">
             {{ getFeatureTitle(feature) }}
           </h3>
           <UButton
             icon="i-heroicons-x-mark"
-            color="gray"
+            color="black"
             variant="ghost"
             size="xs"
             @click="closeModal"
           />
         </div>
 
-        <div v-if="feature?.name" class="text-xs text-gray-500">
-          Added by: {{ feature.name.firstname }} {{ feature.name.lastname }}
+        <div class="text-xs text-gray-500 dark:text-gray-300">
+          <span v-if="feature?.name?.firstname && feature?.name?.lastname">
+            {{ feature.name.firstname }} {{ feature.name.lastname }}
+          </span>
+          <span v-if="feature?.name?.firstname && feature?.name?.lastname && feature?.timestamp">
+          • 
+          </span>
+          <span v-if="feature?.timestamp">
+            {{ formatDate(feature.timestamp) }}
+            </span>
         </div>
-      </div>
+
     </template>
 
-    <div class="p-2 space-y-2">
-      <div class="space-y-1">
-        <p v-if="feature?.comment?.length > 0" class="text-sm text-gray-700">
+      <div>
+        <p v-if="feature?.comment?.length > 0" class="text-sm">
           {{ feature.comment }}
         </p>
-        <p v-else class="text-sm text-gray-500 italic">
-          No comment available for this location
+        <p v-else class="text-sm text-gray-700 dark:text-white italic">
+          No comment available for this location.
         </p>
       </div>
-
-      <div v-if="feature?.timestamp" class="text-xs text-gray-500">
-        Added on: {{ formatDate(feature.timestamp) }}
-      </div>
-    </div>
   </UCard>
 </template>
 
@@ -55,6 +56,7 @@ interface Feature {
   frequency?: string
   name?: Name
   timestamp?: string
+  isProhibit?: boolean
 }
 
 const props = defineProps<{
@@ -99,6 +101,10 @@ function formatDate(timestamp: string): string {
 function getFeatureTitle(feature: Feature | null) {
   if (!feature) return 'Location Details'
 
+  if (feature.isProhibit) {
+    return 'Prohibited Area'
+  }
+
   if (feature.iconName) {
     // Convert iconName to display name
     const iconDisplayNames = {
@@ -117,6 +123,7 @@ function getFeatureTitle(feature: Feature | null) {
       love: 'Loved Place',
       smile: 'Happy Place',
       positive: 'Positive',
+      trash: 'Trash',
     }
     return iconDisplayNames[feature.iconName] || 'Location'
   } else if (feature.frequency) {

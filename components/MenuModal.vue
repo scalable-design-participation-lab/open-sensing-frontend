@@ -1,38 +1,31 @@
 <template>
-  <UModal v-model="isOpen" :ui="{ width: 'sm:max-w-md' }">
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold">Menu</h3>
-          <UButton
-            color="black"
-            variant="ghost"
-            icon="i-heroicons-x-mark-20-solid"
-            @click="closeModal"
-          />
-        </div>
-      </template>
-
-      <div class="space-y-2">
-        <UButton
-          v-for="(item, index) in menuItems"
-          :key="index"
-          block
-          color="gray"
-          variant="soft"
-          :icon="item.icon"
-          class="justify-start text-lg"
-          @click="handleItemClick(item)"
-        >
-          {{ item.label }}
-        </UButton>
-      </div>
-    </UCard>
+  <UModal v-model="isOpen" :ui="{ width: 'w-96' }">
+    <div class="space-y-3 p-6">
+      <UButton
+        v-for="(item, index) in menuItems"
+        :key="index"
+        block
+        color="white"
+        variant="solid"
+        :icon="item.icon"
+        class="dark:bg-slate-950 dark:text-white text-lg font-semibold rounded-full py-3"
+        @click="handleItemClick(item)"
+      >
+        {{ item.label }}
+      </UButton>
+    </div>
   </UModal>
+
+  <AboutPopup v-model="showAboutPopup" />
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import AboutPopup from './AboutPopup.vue'
+
+const router = useRouter()
+const showAboutPopup = ref(false)
 
 const props = defineProps({
   modelValue: {
@@ -50,19 +43,20 @@ const isOpen = computed({
 
 const menuItems = [
   {
+    label: 'Home',
+    action: 'home',
+  },
+  {
     label: 'About',
-    icon: 'i-heroicons-information-circle-20-solid',
     action: 'about',
   },
   {
     label: 'Help',
-    icon: 'i-heroicons-question-mark-circle-20-solid',
     action: 'help',
   },
   {
-    label: 'Settings',
-    icon: 'i-heroicons-cog-6-tooth-20-solid',
-    action: 'settings',
+    label: 'Results',
+    action: 'results',
   },
 ]
 
@@ -71,7 +65,33 @@ const closeModal = () => {
 }
 
 const handleItemClick = (item) => {
-  emit('select', item.action)
   closeModal()
+
+  const isOnMapPage = router.currentRoute.value.path === '/map'
+
+  switch (item.action) {
+    case 'home':
+      if (isOnMapPage) {
+        router.push('/').then(() => window.location.reload())
+      } else {
+        router.push('/')
+      }
+      break
+    case 'about':
+      if (isOnMapPage) {
+        router.push('/about').then(() => window.location.reload())
+      } else {
+        router.push('/about')
+      }
+      break
+    case 'help':
+      showAboutPopup.value = true
+      break
+    case 'results':
+      router.push('/map')
+      break
+  }
+
+  emit('select', item.action)
 }
 </script>

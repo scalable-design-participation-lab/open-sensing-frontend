@@ -93,9 +93,3 @@ function closePopup() {
   emit('close')
 }
 </script>
-
-<style scoped>
-.u-textarea {
-  min-height: 100px;
-}
-</style>

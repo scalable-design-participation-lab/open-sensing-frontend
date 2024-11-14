@@ -57,6 +57,14 @@ const db = {
                 comment: 'some',
               },
             ],
+            prohibit: [
+              {
+                lat: 40.7128,
+                lon: 74.006,
+                timestamp: '2022-01-01',
+                comment: 'some',
+              },
+            ],
           },
           recreational: [
             {

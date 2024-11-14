@@ -1,5 +1,10 @@
 <template>
-    <UCard class="fixed right-6 top-24 w-96 md:w-80 z-40 shadow-xl dark:bg-slate-950 overflow-y-scroll">
+  <UCard 
+    class="fixed right-6 top-24 w-96 md:w-80 max-h-[calc(100vh-11rem)] z-40 shadow-xl dark:bg-slate-950 flex flex-col overflow-hidden"
+  >
+    <div 
+      class="flex-1 overflow-y-scroll max-h-[calc(100vh-13rem)] px-1"
+    >
       <UAccordion
         color="white"
         variant="solid"
@@ -69,8 +74,9 @@
           </SubWindow>
         </template>
       </UAccordion>
+      
       <UButton
-        class="mt-2 py-3 px-6 rounded-full flex place-self-end hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+        class="my-2 py-3 px-6 rounded-full flex place-self-end hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
         color="black"
         :loading="isSaving"
         :disabled="isSaving"
@@ -79,8 +85,28 @@
         {{ isSaving ? 'подаючи...' : 'завершити' }}
       </UButton>
       <ThankYouModal v-model="showThankYouModal" />
-    </UCard>
+    </div>
+  </UCard>
 </template>
+
+<style scoped>
+/* WebKit scrollbar styling for Mac and Chrome */
+.overflow-y-scroll::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 6px;
+}
+
+.overflow-y-scroll::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(156, 163, 175, 0.5);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.overflow-y-scroll::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+</style>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
@@ -277,7 +303,6 @@ const environmentContent = computed(() => {
 })
 
 const pollutionIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
   {
       name: 'trash',
@@ -294,7 +319,6 @@ const pollutionIconGrid = computed(() => ({
 }))
 
 const leafIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
     {
       name: 'leaf',
@@ -306,7 +330,6 @@ const leafIconGrid = computed(() => ({
 }))
 
 const prohibitIconGrid = computed(() => ({
-  title: 'Виберіть іконку:',
   icons: [
     {
       name: 'prohibit',

@@ -11,7 +11,11 @@
     <div class="map-wrapper">
       <BackgroundMap
         :show-all-plus-icons="false"
+        :show-comment-icons="true"
+        :model-value="showCommentDisplay"
+        :selected-feature="selectedFeature"
         @show-comment-display="handleShowCommentDisplay"
+        @update:model-value="updateShowCommentDisplay"
       />
     </div>
     <GeneralizedFooter class="footer-fixed" />
@@ -81,9 +85,28 @@ onMounted(async () => {
   for (const doc of querySnapshot.docs) {
     const projectData = doc.data()
 
-    // Process space data
+    // Process space data including prohibit points
+    if (Array.isArray(projectData.space.prohibit)) {
+      projectData.space.prohibit.forEach((point) => {
+        mapUIStore.addFeature({
+          type: 'Point',
+          coordinates: [point.lon, point.lat],
+          isProhibit: true,
+          comment: point.comment,
+          name: projectData.name,
+          timestamp: point.timestamp,
+        })
+      })
+    }
+
+    // Process other space data (excluding prohibit)
     Object.keys(projectData.space).forEach((frequency) => {
-      if (Array.isArray(projectData.space[frequency])) {
+      if (
+        Array.isArray(projectData.space[frequency]) &&
+        frequency !== 'prohibit' &&
+        frequency !== 'recreational' &&
+        frequency !== 'restricted'
+      ) {
         projectData.space[frequency].forEach((point) => {
           mapUIStore.addFeature({
             type: 'Point',
@@ -180,6 +203,8 @@ const selectedFeature = ref(null)
 const activeFeatureId = ref(null)
 
 function handleShowCommentDisplay({ feature }) {
+  console.log('Handling comment display:', feature) // Debug log
+
   // If clicking the same feature's comment icon, close the popup
   if (activeFeatureId.value === feature.id && showCommentDisplay.value) {
     showCommentDisplay.value = false
@@ -188,9 +213,18 @@ function handleShowCommentDisplay({ feature }) {
     return
   }
 
+  // Open new comment display
   selectedFeature.value = feature
   activeFeatureId.value = feature.id
   showCommentDisplay.value = true
+}
+
+function updateShowCommentDisplay(value: boolean) {
+  showCommentDisplay.value = value
+  if (!value) {
+    selectedFeature.value = null
+    activeFeatureId.value = null
+  }
 }
 </script>
 

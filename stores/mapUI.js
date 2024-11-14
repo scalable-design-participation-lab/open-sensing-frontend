@@ -316,6 +316,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
         never: [],
         recreational: [],
         restricted: [],
+        prohibit: [],
       },
       belonging: {
         negative: [],
@@ -352,6 +353,14 @@ export const useMapUIStore = defineStore('mapUI', () => {
       } else if (feature.type === 'LineString') {
         projectData.space.restricted.push({
           geometry: JSON.stringify(feature.coordinates),
+          timestamp: feature.timestamp || timestamp,
+          comment: feature.comment || '',
+        })
+      }
+      if (feature.type === 'Point' && feature.isProhibit) {
+        projectData.space.prohibit.push({
+          lat: feature.coordinates[1],
+          lon: feature.coordinates[0],
           timestamp: feature.timestamp || timestamp,
           comment: feature.comment || '',
         })

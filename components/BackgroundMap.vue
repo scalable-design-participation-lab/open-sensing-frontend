@@ -1,5 +1,6 @@
 <template>
   <ol-map
+    ref="mapInstance"
     :load-tiles-while-animating="true"
     :load-tiles-while-interacting="true"
     :controls="[]"
@@ -54,7 +55,7 @@
     <ol-overlay
       v-if="commentPopupVisible"
       :position="commentPopupPosition"
-      :offset="[30, 20]"
+      :offset="commentPopupOffset"
     >
       <CommentPopup
         :is-visible="commentPopupVisible"
@@ -65,23 +66,10 @@
     </ol-overlay>
 
     <ol-overlay
-      v-if="imageUploadPopupVisible"
-      :position="imageUploadPopupPosition"
-      :offset="[30, 20]"
-    >
-      <ImageUploadPopup
-        :is-visible="imageUploadPopupVisible"
-        :feature-id="selectedFeatureId"
-        class="z-30"
-        @close="closeImageUploadPopup"
-        @upload="handleImageUpload"
-      />
-    </ol-overlay>
-
-    <ol-overlay
       v-if="showCommentDisplay"
-      :position="getFeaturePosition(selectedFeatureForDisplay)"
-      :offset="[30, -20]"
+      :position="commentDisplayPosition"
+      :offset="commentDisplayOffset"
+      :positioning="'center-center'"
     >
       <CommentDisplay
         :model-value="showCommentDisplay"
@@ -99,9 +87,8 @@ import { useRuntimeConfig } from '#app'
 import { useRoute } from 'vue-router'
 import DrawingLayer from './DrawingLayer/DrawingLayer.vue'
 import CommentPopup from './CommentPopup.vue'
-import ImageUploadPopup from './ImageUploadPopup.vue'
 import CommentDisplay from './CommentDisplay.vue'
-import { Control } from 'ol/control'
+import { Coordinate } from 'ol/coordinate'
 
 const props = defineProps({
   showAllPlusIcons: {
@@ -129,12 +116,13 @@ const route = useRoute()
 
 const projection = ref('EPSG:3857')
 const commentPopupVisible = ref(false)
-const imageUploadPopupVisible = ref(false)
 const selectedFeatureId = ref(null)
 const commentPopupPosition = ref(null)
-const imageUploadPopupPosition = ref(null)
+const commentDisplayPosition = ref<[number, number] | null>(null)
+const commentDisplayOffset = ref<[number, number]>([0, 0])
 const showCommentDisplay = ref(false)
 const selectedFeatureForDisplay = ref(null)
+const commentPopupOffset = ref([0, 0])
 
 const mapboxToken =
   'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
@@ -150,6 +138,7 @@ const mapboxAttribution =
 const isMapPage = computed(() => route.name === 'map')
 
 function toggleCommentPopup(feature) {
+  console.log('Toggle comment popup:', feature)
   if (commentPopupVisible.value && selectedFeatureId.value === feature.id) {
     closeCommentPopup()
   } else {
@@ -158,25 +147,20 @@ function toggleCommentPopup(feature) {
 }
 
 function toggleImageUploadPopup(feature) {
-  if (imageUploadPopupVisible.value && selectedFeatureId.value === feature.id) {
-    closeImageUploadPopup()
+  console.log('Toggle comment popup:', feature)
+  if (commentPopupVisible.value && selectedFeatureId.value === feature.id) {
+    closeCommentPopup()
   } else {
-    openImageUploadPopup(feature)
+    openCommentPopup(feature)
   }
 }
 
 function openCommentPopup(feature) {
   selectedFeatureId.value = feature.id
   commentPopupVisible.value = true
-  imageUploadPopupVisible.value = false
-  commentPopupPosition.value = getFeaturePosition(feature)
-}
-
-function openImageUploadPopup(feature) {
-  selectedFeatureId.value = feature.id
-  imageUploadPopupVisible.value = true
-  commentPopupVisible.value = false
-  imageUploadPopupPosition.value = getFeaturePosition(feature)
+  const { position, offset } = calculatePopupPosition(feature)
+  commentPopupPosition.value = position
+  commentPopupOffset.value = offset
 }
 
 function getFeaturePosition(feature) {
@@ -200,16 +184,6 @@ function closeCommentPopup() {
   selectedFeatureId.value = null
 }
 
-function closeImageUploadPopup() {
-  imageUploadPopupVisible.value = false
-  selectedFeatureId.value = null
-}
-
-function handleImageUpload(images) {
-  mapUIStore.updateFeatureImages(selectedFeatureId.value, images)
-  closeImageUploadPopup()
-}
-
 function handleMapClick(event) {
   if (mapUIStore.drawEnable && mapUIStore.drawType === 'Point') {
     const coordinate = event.coordinate
@@ -223,19 +197,19 @@ function handleMapClick(event) {
 
 const emit = defineEmits([
   'show-comment-display',
-  'update:modelValue',
+  'update:model-value',
   'update:selectedFeature',
 ])
 
-function updateShowCommentDisplay(value: boolean) {
+function updateShowCommentDisplay(value) {
   showCommentDisplay.value = value
+  emit('update:model-value', value)
 }
 
 function handleShowCommentDisplay(data) {
   if (!isMapPage.value) return
 
   closeCommentPopup()
-  closeImageUploadPopup()
 
   if (
     selectedFeatureForDisplay.value?.id === data.feature.id &&
@@ -243,11 +217,89 @@ function handleShowCommentDisplay(data) {
   ) {
     showCommentDisplay.value = false
     selectedFeatureForDisplay.value = null
+    emit('update:model-value', false)
     return
   }
 
   selectedFeatureForDisplay.value = data.feature
   showCommentDisplay.value = true
+
+  // Calculate position and offset
+  const { position, offset } = calculatePopupPosition(data.feature)
+  commentDisplayPosition.value = position
+  commentDisplayOffset.value = offset
+
+  emit('update:model-value', true)
+  emit('update:selectedFeature', data.feature)
+}
+
+const mapInstance = ref(null)
+
+const popupOffsets = computed(() => {
+  if (isMapPage.value) {
+    return {
+      above: -150,
+      below: 100,
+      left: -150,
+      right: 170,
+    }
+  }
+  return {
+    above: -200,
+    below: 20,
+    left: -230,
+    right: 30,
+  }
+})
+
+function calculatePopupPosition(feature: any): {
+  position: [number, number]
+  offset: [number, number]
+} {
+  const map = mapInstance.value?.map
+  if (!map) {
+    return {
+      position: getFeaturePosition(feature),
+      offset: [0, 0],
+    }
+  }
+
+  const featurePosition = getFeaturePosition(feature)
+  const pixel = map.getPixelFromCoordinate(featurePosition)
+
+  if (!pixel) {
+    return {
+      position: featurePosition,
+      offset: [0, 0],
+    }
+  }
+
+  const mapSize = map.getSize()
+  const [width, height] = mapSize || [0, 0]
+
+  // Calculate relative position in viewport
+  const isInUpperHalf = pixel[1] < height / 2
+  const isInLeftHalf = pixel[0] < width / 2
+
+  // Calculate offset based on position using the computed offsets
+  let offset: [number, number] = [0, 0]
+
+  if (isInUpperHalf) {
+    offset[1] = popupOffsets.value.below // Show below icon
+  } else {
+    offset[1] = popupOffsets.value.above // Show above icon
+  }
+
+  if (isInLeftHalf) {
+    offset[0] = popupOffsets.value.right // Show on right side
+  } else {
+    offset[0] = popupOffsets.value.left // Show on left side
+  }
+
+  return {
+    position: featurePosition,
+    offset,
+  }
 }
 </script>
 
