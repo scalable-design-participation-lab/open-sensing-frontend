@@ -86,6 +86,7 @@ interface FormattedSensor {
   coordinates: [number, number]
   status: string
   ecohub_location: string
+  temperature: number
 }
 
 const sensorDetailStore = useSensorDetailStore()
@@ -140,8 +141,6 @@ const formattedSensors = computed(() => {
       const lat = Number(sensor.lat)
       const coordinates = [lon, lat] as [number, number]
 
-      console.log(`Formatted coordinates for ${sensor.moduleid}:`, coordinates)
-
       return {
         moduleid: sensor.moduleid,
         coordinates,
@@ -150,12 +149,29 @@ const formattedSensors = computed(() => {
             ? 'Inactive'
             : 'Active',
         ecohub_location: sensor.ecohub_location,
+        temperature: sensor.temperature,
       }
     })
 })
 
 function getIconUrl(sensor: FormattedSensor) {
-  const color = sensor.status === 'Active' ? 'green' : 'red'
+  if (sensor.status === 'Inactive') {
+    return 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png'
+  }
+
+  const temp = sensor.temperature
+  let color = 'blue'
+
+  if (temp < 10) {
+    color = 'blue'
+  } else if (temp >= 10 && temp < 20) {
+    color = 'green'
+  } else if (temp >= 20 && temp < 30) {
+    color = 'yellow'
+  } else if (temp >= 30) {
+    color = 'red'
+  }
+
   return `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`
 }
 
