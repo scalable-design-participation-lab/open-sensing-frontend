@@ -185,7 +185,7 @@ function handlePlusIconClick(feature) {
 
 function handleDeleteClick(feature) {
   // Add confirmation dialog
-  if (confirm('Are you sure you want to delete this point?')) {
+  if (confirm('Ви впевнені, що хочете видалити цю відмітку?')) {
     mapUIStore.deleteFeature(feature.id)
   }
 }
