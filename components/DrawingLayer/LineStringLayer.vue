@@ -118,7 +118,7 @@ function handleIconClick(feature) {
 }
 
 function handleDeleteClick(feature) {
-  if (confirm('Are you sure you want to delete this line?')) {
+  if (confirm('Ви впевнені, що хочете видалити цю відмітку?')) {
     mapUIStore.deleteFeature(feature.id)
   }
 }

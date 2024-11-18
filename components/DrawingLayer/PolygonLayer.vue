@@ -168,7 +168,7 @@ function handleSelect(event) {
 }
 
 function handleDeleteClick(feature) {
-  if (confirm('Are you sure you want to delete this polygon?')) {
+  if (confirm('Ви впевнені, що хочете видалити цю відмітку?')) {
     mapUIStore.deleteFeature(feature.id)
   }
 }

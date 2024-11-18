@@ -43,19 +43,19 @@ const isOpen = computed({
 
 const menuItems = [
   {
-    label: 'Home',
+    label: 'Карта',
     action: 'home',
   },
   {
-    label: 'About',
+    label: 'Про проєкт',
     action: 'about',
   },
   {
-    label: 'Help',
+    label: 'Допомога',
     action: 'help',
   },
   {
-    label: 'Results',
+    label: 'Результати',
     action: 'results',
   },
 ]
