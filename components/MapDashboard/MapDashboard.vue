@@ -78,6 +78,7 @@ import SensorTag from './SensorTag.vue'
 import { useGeographic } from 'ol/proj'
 import type { Sensor } from '../../stores/sensorDetail'
 import * as turf from '@turf/turf'
+import * as d3 from 'd3'
 
 useGeographic()
 
@@ -160,19 +161,43 @@ function getIconUrl(sensor: FormattedSensor) {
   }
 
   const temp = sensor.temperature
-  let color = 'blue'
 
-  if (temp < 10) {
-    color = 'blue'
-  } else if (temp >= 10 && temp < 20) {
-    color = 'green'
-  } else if (temp >= 20 && temp < 30) {
-    color = 'yellow'
-  } else if (temp >= 30) {
-    color = 'red'
-  }
+  // Create a color interpolator for temperature range -20 to 30 degrees
+  const tempScale = d3
+    .scaleLinear()
+    .domain([-20, 30]) // temperature range
+    .range([0, 1]) // map to 0-1 interval
 
-  return `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`
+  // Create gradient colors using interpolateRgbBasis
+  const colorInterpolator = d3.interpolateRgbBasis([
+    'blue', // cold
+    'green', // medium
+    'red', // hot
+  ])
+
+  const normalizedTemp = tempScale(temp)
+  const color = colorInterpolator(normalizedTemp)
+
+  const availableColors = ['blue', 'green', 'red']
+  const rgbColor = d3.rgb(color)
+
+  let closestColor = availableColors[0]
+  let minDistance = Infinity
+
+  availableColors.forEach((availableColor) => {
+    const targetRgb = d3.rgb(availableColor)
+    const distance = Math.sqrt(
+      Math.pow(rgbColor.r - targetRgb.r, 2) +
+        Math.pow(rgbColor.g - targetRgb.g, 2) +
+        Math.pow(rgbColor.b - targetRgb.b, 2)
+    )
+    if (distance < minDistance) {
+      minDistance = distance
+      closestColor = availableColor
+    }
+  })
+
+  return `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${closestColor}.png`
 }
 
 function updateSensorOverlay(sensorId: string) {
