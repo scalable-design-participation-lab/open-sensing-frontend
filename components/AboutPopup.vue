@@ -4,7 +4,7 @@
       <!-- Header -->
       <template #header>
         <div class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold">About This Project</h3>
+          <h3 class="text-xl font-semibold">Про проєкт</h3>
           <UButton
             color="gray"
             variant="ghost"
@@ -17,26 +17,22 @@
       <!-- Content -->
       <div class="space-y-4">
         <p>
-          This is a participatory mapping project that aims to understand how
-          people use and experience urban spaces.
+          «Гуртомá» — проєкт зі спільного створення мапи завдяки містянам, який дозволяє дослідити питання використання й ставлення до навколишнього простору.
         </p>
 
         <div class="space-y-2">
-          <h4 class="font-medium">Key Features:</h4>
+          <h4 class="font-medium">Ключові особливості:</h4>
           <ul class="list-disc list-inside space-y-1 pl-4">
-            <li>Draw and mark locations you frequently visit</li>
-            <li>Share your experiences about safety and belonging</li>
-            <li>Contribute to environmental observations</li>
-            <li>View collective community input</li>
+            <li>Малюйте та позначайте місця, які ви відвідуєте та використовуєте для певної мети</li>
+            <li>Діліться своїм досвідом про відчуття безпеки та єдності</li>
+            <li>Робіть внесок у захист довкілля</li>
+            <li>Знайомтесь з думкою спільноти</li>
           </ul>
         </div>
 
         <div class="space-y-2">
-          <h4 class="font-medium">How to Participate:</h4>
           <p>
-            Use the tools on the left sidebar to mark locations and share your
-            experiences. Your input helps create a better understanding of our
-            community spaces.
+            Як долучитися: Використовуйте інструменти на лівій панелі збоку, щоб позначати місця та ділитися своїм досвідом. Ваш внесок дозволить краще зрозуміти, в якому стані міський простір та як його покращити.
           </p>
         </div>
       </div>

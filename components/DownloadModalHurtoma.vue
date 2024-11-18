@@ -3,7 +3,7 @@
     <UCard>
       <template #header>
         <div class="flex place-content-center">
-          <h3 class="text-xl font-semibold">Завантаження відкритих даних</h3>
+          <h3 class="text-xl font-semibold">Доступ до відкритих даних</h3>
           <!-- <UButton
             color="gray"
             variant="ghost"
@@ -14,7 +14,7 @@
       </template>
 
       <p class="text-center leading-tight">
-        Ми працюємо над тим, щоб дані, створені за допомогою цієї програми, були відкрито доступними для громадськості. Перевірте незабаром.
+        Ми працюємо над тим, щоб дані, створені на платформі, стали відкритими та доступними для всіх. Повертайтеся незабаром, щоб перевірити оновлення.
       </p>
 
       <div class="flex justify-center my-8 mb-4">
@@ -23,7 +23,7 @@
           class="px-6 py-2 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
           @click="closeModal"
         >
-        Поверніться до карти
+        Повернутися до карти
         </UButton>
       </div>
 
