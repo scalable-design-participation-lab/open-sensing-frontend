@@ -77,6 +77,7 @@ import { useMapStore } from '../../stores/map'
 import SensorTag from './SensorTag.vue'
 import { useGeographic } from 'ol/proj'
 import type { Sensor } from '../../stores/sensorDetail'
+import * as turf from '@turf/turf'
 
 useGeographic()
 
@@ -212,6 +213,63 @@ watch(selectedSensorId, (newId) => {
         })
       }
     }
+  }
+})
+
+const calculateMapBounds = computed(() => {
+  if (!formattedSensors.value || formattedSensors.value.length === 0) {
+    return {
+      center: initialCenter.value,
+      zoom: initialZoom.value,
+    }
+  }
+
+  try {
+    // Create a FeatureCollection from sensor points
+    const features = formattedSensors.value.map((sensor) => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: sensor.coordinates,
+      },
+    }))
+
+    const collection = turf.featureCollection(features)
+
+    // Calculate the bounding box
+    const bbox = turf.bbox(collection)
+
+    // Calculate center point
+    const center = [
+      (bbox[0] + bbox[2]) / 2, // longitude
+      (bbox[1] + bbox[3]) / 2, // latitude
+    ]
+
+    // Adjust zoom based on bounding box size
+    let zoom = 18
+
+    return {
+      center,
+      zoom,
+    }
+  } catch (error) {
+    console.error('Error calculating map bounds:', error)
+    return {
+      center: initialCenter.value,
+      zoom: initialZoom.value,
+    }
+  }
+})
+
+// Update the view when sensors are loaded
+watch(formattedSensors, (newSensors) => {
+  if (newSensors.length > 0 && view.value) {
+    const { center, zoom } = calculateMapBounds.value
+    view.value.animate({
+      center,
+      zoom,
+      duration: 1000,
+    })
   }
 })
 
