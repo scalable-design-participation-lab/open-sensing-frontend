@@ -529,10 +529,19 @@ const chartData = computed(() => {
     const metricData = sensorMetrics[metricName]
     if (metricData) {
       result[metricName] = {
-        data: metricData.data.map((d) => ({
-          date: d.date.toISOString(),
-          value: d.value,
-        })),
+        data: metricData.data.map((d) => {
+          let dateStr
+          if (typeof d.date === 'string' && /^\d+$/.test(d.date)) {
+            dateStr = new Date(parseInt(d.date)).toISOString()
+          } else {
+            dateStr = typeof d.date === 'string' ? d.date : d.date.toISOString()
+          }
+
+          return {
+            date: dateStr,
+            value: Number(d.value),
+          }
+        }),
         min: metricData.min,
         max: metricData.max,
       }

@@ -91,6 +91,53 @@ const createLineChart = () => {
     const chartDiv = d3.select(`#${chartId.value}`)
     chartDiv.selectAll('*').remove()
 
+    const data = props.data.data
+      .filter((d) => {
+        const isValid =
+          d &&
+          d.date &&
+          d.value !== undefined &&
+          d.value !== null &&
+          !isNaN(Number(d.value))
+        return isValid
+      })
+      .map((d) => {
+        let parsedDate
+        try {
+          if (typeof d.date === 'string') {
+            if (/^\d+$/.test(d.date)) {
+              parsedDate = new Date(parseInt(d.date))
+            } else {
+              parsedDate = new Date(d.date)
+            }
+
+            if (
+              isNaN(parsedDate.getTime()) ||
+              parsedDate.getFullYear() < 2000
+            ) {
+              return null
+            }
+          } else if (typeof d.date === 'number') {
+            parsedDate = new Date(d.date)
+          } else {
+            parsedDate = d.date
+          }
+
+          return {
+            date: parsedDate,
+            value: Number(d.value),
+          }
+        } catch (error) {
+          return null
+        }
+      })
+      .filter((d) => d !== null)
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+
+    if (data.length === 0) {
+      return
+    }
+
     const width = props.width - props.margin.left - props.margin.right
     const height = props.height - props.margin.top - props.margin.bottom
 
@@ -102,22 +149,10 @@ const createLineChart = () => {
       .append('g')
       .attr('transform', `translate(${props.margin.left},${props.margin.top})`)
 
-    const parseDate = d3.isoParse
-    const data = props.data.data
-      .filter((d) => d && d.date && !isNaN(d.value))
-      .map((d) => ({
-        date: parseDate(d.date) || new Date(),
-        value: Number(d.value) || 0,
-      }))
-
-    if (data.length === 0) {
-      return
-    }
-
-    const xDomain = d3.extent(data, (d) => d.date) as [Date, Date]
+    const xDomain = d3.extent(data, (d) => new Date(d.date)) as [Date, Date]
     const yDomain = [
-      props.data.min ?? d3.min(data, (d) => d.value) ?? 0,
-      props.data.max ?? d3.max(data, (d) => d.value) ?? 100,
+      Math.min(...data.map((d) => d.value)),
+      Math.max(...data.map((d) => d.value)),
     ]
 
     x = d3.scaleTime().range([0, width]).domain(xDomain)
