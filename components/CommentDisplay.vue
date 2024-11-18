@@ -33,7 +33,7 @@
           {{ feature.comment }}
         </p>
         <p v-else class="text-sm text-gray-700 dark:text-white italic">
-          No comment available for this location.
+          Ще ніхто не залишив коментарів для цієї локації.
         </p>
       </div>
   </UCard>

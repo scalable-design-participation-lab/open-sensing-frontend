@@ -19,7 +19,7 @@
       <UFormGroup label="Прізвище" name="lastname">
         <UInput
           v-model="formState.lastname"
-          placeholder="Введіть своє прізвище"
+          placeholder="Вкажіть своє ім'я"
           color="blue"
           variant="outline"
           size="md"
@@ -38,7 +38,7 @@
         <UInput
           v-model="formState.age"
           type="number"
-          placeholder="Введіть свій вік"
+          placeholder="Вкажіть свій вік"
           color="blue"
           variant="outline"
           size="md"
@@ -65,10 +65,9 @@
         />
       </UFormGroup>
       <UFormGroup label="Скільки ви мешкаєте у Вінниці" name="residentSince">
-        <USelect
+        <UInput
           v-model="formState.residentSince"
-          :options="residentCityOptions"
-          placeholder="Оберіть, скільки проживаєте у місті"
+          placeholder="Вкажіть свій вік"
           color="blue"
           variant="outline"
           size="md"
