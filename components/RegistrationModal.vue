@@ -67,7 +67,7 @@
       <UFormGroup label="Скільки ви мешкаєте у Вінниці" name="residentSince">
         <UInput
           v-model="formState.residentSince"
-          placeholder="Вкажіть свій вік"
+          placeholder="Напишіть, скільки років ви проживаєте у місті"
           color="blue"
           variant="outline"
           size="md"
