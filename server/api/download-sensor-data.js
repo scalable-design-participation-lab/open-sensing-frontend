@@ -61,32 +61,58 @@ export default defineEventHandler(async (event) => {
     console.log('Connecting to database for download...')
     const client = await pool.connect()
 
-    let query = 'SELECT timestamp'
-    const selectedDatasets = Object.keys(body.datasets).filter(
-      (key) => body.datasets[key]
-    )
+    // Build the query
+    let query = 'SELECT s.timestamp'
+    const selectedDatasets = Object.entries(body.datasets)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([key]) => key)
 
-    if (selectedDatasets.length === 0) {
-      selectedDatasets.push('temperature')
+    // Map frontend field names to database field names
+    const fieldMapping = {
+      temperature: 'temperature',
+      relative_humidity: 'relative_humidity',
+      voc: 'voc',
+      nox: 'nox',
+      pm1: 'pm1',
+      pm25: 'pm25',
+      pm4: 'pm4',
+      pm10: 'pm10',
     }
 
+    // Add selected fields to query
     selectedDatasets.forEach((dataset) => {
-      query += `, ${dataset}`
+      const dbField = fieldMapping[dataset]
+      if (dbField) {
+        query += `, s.${dbField}`
+      }
     })
-    query += ' FROM sen55 WHERE timestamp BETWEEN $1 AND $2'
+
+    // Add location join and filter if locations are selected
+    query += ' FROM sen55 s JOIN modules m ON s.moduleid = m.moduleid'
+    query += ' WHERE s.timestamp BETWEEN $1 AND $2'
+
+    const queryParams = [body.dateRange.start, body.dateRange.end]
+
+    // Add location filter if locations are selected
+    const selectedLocations = Object.entries(body.location)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([location]) => location)
+
+    if (selectedLocations.length > 0) {
+      query += ` AND m.ecohub_location = ANY($3)`
+      queryParams.push(selectedLocations)
+    }
+
+    query += ' ORDER BY s.timestamp DESC'
 
     console.log('Executing query:', query)
-    console.log('Query parameters:', [body.dateRange.start, body.dateRange.end])
+    console.log('Query parameters:', queryParams)
 
-    const result = await client.query(query, [
-      body.dateRange.start,
-      body.dateRange.end,
-    ])
+    const result = await client.query(query, queryParams)
     client.release()
     console.log(`Query executed. Returned ${result.rows.length} rows.`)
 
     if (body.format === 'csv') {
-      // Convert JSON to CSV
       const csv = parse(result.rows)
       return csv
     } else {
@@ -94,41 +120,13 @@ export default defineEventHandler(async (event) => {
     }
   } catch (err) {
     console.error('Error executing query for download', err)
-
-    try {
-      const client = await pool.connect()
-      const fallbackQuery =
-        'SELECT timestamp, temperature FROM sen55 WHERE timestamp BETWEEN $1 AND $2'
-      console.log('Executing fallback query:', fallbackQuery)
-      const result = await client.query(fallbackQuery, [
-        body.dateRange.start,
-        body.dateRange.end,
-      ])
-      client.release()
-      console.log(
-        `Fallback query executed. Returned ${result.rows.length} rows.`
-      )
-
-      if (body.format === 'csv') {
-        // Convert JSON to CSV
-        const csv = parse(result.rows)
-        return csv
-      } else {
-        return result.rows
-      }
-    } catch (fallbackErr) {
-      console.error('Error executing fallback query', fallbackErr)
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Internal server error',
-        data: {
-          message: 'Failed to retrieve data, even with fallback query.',
-          stack:
-            process.env.NODE_ENV === 'development'
-              ? fallbackErr.stack
-              : undefined,
-        },
-      })
-    }
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Internal server error',
+      data: {
+        message: 'Failed to retrieve data',
+        details: err.message,
+      },
+    })
   }
 })

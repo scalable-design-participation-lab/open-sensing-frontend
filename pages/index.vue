@@ -157,11 +157,13 @@ const downloadFilterSections = computed(() => [
     icon: 'i-heroicons-map-pin',
     component: 'GenericCheckboxGroup',
     props: {
-      items: Object.keys(existingHubs.value).map((hub) => ({
-        label: hub,
-        value: hub,
+      items: availableLocations.value.map((location) => ({
+        label: location,
+        value: location,
       })),
-      modelValue: existingHubs.value,
+      modelValue: Object.fromEntries(
+        availableLocations.value.map((location) => [location, true])
+      ),
     },
   },
   {
@@ -170,11 +172,26 @@ const downloadFilterSections = computed(() => [
     icon: 'i-heroicons-chart-bar',
     component: 'GenericCheckboxGroup',
     props: {
-      items: Object.keys(existingDatasets.value).map((dataset) => ({
-        label: dataset,
-        value: dataset,
-      })),
-      modelValue: existingDatasets.value,
+      items: [
+        { label: 'Temperature', value: 'temperature' },
+        { label: 'Relative Humidity', value: 'relative_humidity' },
+        { label: 'VOC', value: 'voc' },
+        { label: 'NOx', value: 'nox' },
+        { label: 'PM1', value: 'pm1' },
+        { label: 'PM2.5', value: 'pm25' },
+        { label: 'PM4', value: 'pm4' },
+        { label: 'PM10', value: 'pm10' },
+      ],
+      modelValue: {
+        temperature: true,
+        relative_humidity: true,
+        voc: true,
+        nox: true,
+        pm1: true,
+        pm25: true,
+        pm4: true,
+        pm10: true,
+      },
     },
   },
   {
