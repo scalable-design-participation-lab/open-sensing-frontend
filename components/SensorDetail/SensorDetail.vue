@@ -11,39 +11,53 @@
       data-testid="sensor-detail-modal"
       @click="closeSensorDetail"
     >
-      <div
-        class="h-[80vh] bg-white rounded-lg overflow-hidden w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
+      <UCard
+        class="h-[80vh] w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
         data-testid="sensor-detail-content"
         @click.stop
       >
-        <SensorHeader
-          :selected-sensor="selectedSensor"
-          @close="closeSensorDetail"
-          @go-back="goBackToDashboard"
-          @select-previous="selectPreviousSensor"
-          @select-next="selectNextSensor"
-        />
+        <!-- Header -->
+        <template #header>
+          <SensorHeader
+            :selected-sensor="selectedSensor"
+            @close="closeSensorDetail"
+            @go-back="goBackToDashboard"
+            @select-previous="selectPreviousSensor"
+            @select-next="selectNextSensor"
+          />
+        </template>
+
+        <!-- Body -->
         <div class="p-6">
           <SensorStats
             :sensor-stats="sensorStats"
             @show-stat-details="showStatDetails"
           />
+
           <div class="flex flex-col md:flex-row gap-6 mt-8">
-            <SensorInfo
-              :selected-sensor="selectedSensor"
-              :sensor-info-items="sensorInfoItems"
-            />
-            <SensorLocation
-              :selected-sensor="selectedSensor"
-              @init-map="initMiniMap"
-            />
+            <UCard class="flex-1">
+              <SensorInfo
+                :selected-sensor="selectedSensor"
+                :sensor-info-items="sensorInfoItems"
+              />
+            </UCard>
+
+            <UCard class="flex-1">
+              <SensorLocation
+                :selected-sensor="selectedSensor"
+                @init-map="initMiniMap"
+              />
+            </UCard>
           </div>
-          <div class="mt-8">
-            <h2 class="text-xl font-bold mb-4 text-gray-800">Sensor Data</h2>
-            <div
-              ref="scrollContainer"
-              class="h-96 overflow-y-auto border border-gray-200 rounded-lg"
-            >
+
+          <UCard class="mt-8">
+            <template #header>
+              <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                Sensor Data
+              </h2>
+            </template>
+
+            <div ref="scrollContainer" class="h-96 overflow-y-auto">
               <div v-if="dataLoaded" class="p-4 space-y-6">
                 <template
                   v-for="(metric, metricName) in metrics"
@@ -69,27 +83,27 @@
                 <p>Loading data...</p>
               </div>
             </div>
-            <div
-              class="flex justify-between items-center py-4 border-t border-gray-200 mt-6"
-            >
-              <UButton
-                color="primary"
-                class="hover:bg-blue-600 transition-colors"
-                data-testid="reset-charts-button"
-                @click="resetAllCharts"
-              >
-                Reset All Charts
-              </UButton>
-              <div
-                v-if="globalDateRange.length === 2"
-                class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"
-              >
-                {{ formatDateRange(globalDateRange) }}
+
+            <template #footer>
+              <div class="flex justify-between items-center py-2">
+                <UButton
+                  class="hover:bg-blue-600 transition-colors"
+                  data-testid="reset-charts-button"
+                  @click="resetAllCharts"
+                >
+                  Reset All Charts
+                </UButton>
+                <div
+                  v-if="globalDateRange.length === 2"
+                  class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"
+                >
+                  {{ formatDateRange(globalDateRange) }}
+                </div>
               </div>
-            </div>
-          </div>
+            </template>
+          </UCard>
         </div>
-      </div>
+      </UCard>
     </div>
   </transition>
 </template>

@@ -10,19 +10,26 @@
  -->
 
 <template>
-  <div class="flex-1 bg-white rounded-lg shadow-md p-6">
-    <h3 class="text-lg font-semibold mb-4">Sensor Information</h3>
+  <UCard class="flex-1">
+    <template #header>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        Sensor Information
+      </h3>
+    </template>
+
     <div class="space-y-4">
       <div
         v-for="item in sensorInfoItems"
         :key="item.label"
         class="flex justify-between items-center"
       >
-        <span class="text-gray-600">{{ item.label }}</span>
-        <span :class="item.color">{{ item.value || 'N/A' }}</span>
+        <span class="text-gray-600 dark:text-gray-300">{{ item.label }}</span>
+        <span :class="[item.color, 'dark:text-white']">
+          {{ item.value || 'N/A' }}
+        </span>
       </div>
     </div>
-  </div>
+  </UCard>
 </template>
 
 <script setup lang="ts">

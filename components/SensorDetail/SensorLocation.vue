@@ -11,17 +11,20 @@
  -->
 
 <template>
-  <div class="sensor-location flex-1">
-    <h2
-      class="text-xl font-bold mb-4 text-gray-800"
-      data-testid="location-header"
-    >
-      Location
-    </h2>
+  <UCard class="flex-1">
+    <template #header>
+      <h2
+        class="text-xl font-bold text-gray-800 dark:text-white"
+        data-testid="location-header"
+      >
+        Location
+      </h2>
+    </template>
+
     <div
       id="mini-map"
       ref="miniMap"
-      class="w-full h-72 rounded-lg overflow-hidden shadow-md"
+      class="w-full h-72 rounded-lg overflow-hidden"
       data-testid="mini-map"
     >
       <ol-map
@@ -65,11 +68,16 @@
         <ol-control-scale-line />
         <ol-control-full-screen />
       </ol-map>
-      <div v-else class="flex items-center justify-center h-full bg-gray-100">
-        <p class="text-gray-500">No location data available</p>
+      <div
+        v-else
+        class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800"
+      >
+        <p class="text-gray-500 dark:text-gray-400">
+          No location data available
+        </p>
       </div>
     </div>
-  </div>
+  </UCard>
 </template>
 
 <script setup lang="ts">

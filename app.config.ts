@@ -21,6 +21,11 @@ export default defineAppConfig({
       chevron: 'i-ph-caret-down',
       hash: 'i-ph-hash-duotone',
     },
+    button: {
+      default: {
+        color: 'blue',
+      },
+    },
     header: {
       wrapper: 'lg:mb-0 lg:border-0',
       popover: {

@@ -3,37 +3,60 @@
     Loading...
   </div>
   <div v-else class="flex flex-col min-h-screen">
-    <GeneralizedHeader class="z-20" :left-items="leftItems" :right-items="rightItems" logo-src="/neu-logo.svg"
-      logo-alt="Northeastern University Logo" :show-icon="true" />
+    <GeneralizedHeader
+      class="z-20"
+      :left-items="leftItems"
+      :right-items="rightItems"
+      logo-src="/neu-logo.svg"
+      logo-alt="Northeastern University Logo"
+      :show-icon="true"
+    />
 
     <main class="flex-grow relative overflow-hidden pt-16">
       <MapDashboard class="absolute inset-0" />
-      <GenericFilterSidebar v-if="showFilter && !showDashboard" :is-visible="showFilter && !showDashboard"
-        title="Filters" :filter-sections="filterSections"
+      <GenericFilterSidebar
+        v-if="showFilter && !showDashboard"
+        :is-visible="showFilter && !showDashboard"
+        title="Filters"
+        :filter-sections="filterSections"
         class="fixed top-[calc(4rem+6vh)] right-5 z-[1001] w-[calc(100%-2.5rem)] sm:w-[240px] md:w-[300px] lg:w-[360px] h-[calc(100vh-8rem-8vh)] max-h-[800px] overflow-auto"
-        @close="closeFilter" @reset="resetAllFilters" @filter-change="handleFilterChange" />
-      <Dashboard v-if="showDashboard"
-        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[90%] h-[calc(100vh-8rem-4vh)] overflow-hidden bg-transparent" />
+        @close="closeFilter"
+        @reset="resetAllFilters"
+        @filter-change="handleFilterChange"
+      />
+      <Dashboard
+        v-if="showDashboard"
+        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[90%] h-[calc(100vh-8rem-4vh)] overflow-hidden bg-transparent"
+      />
       <div class="absolute left-5 top-1/2 transform -translate-y-1/2 z-20">
         <GenericToolbar :tools="sensorTools" @tool-click="handleToolClick" />
       </div>
-      <SensorDetail v-if="showSensorDetail"
-        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[50%] h-[calc(100vh-8rem-4vh)] overflow-hidden" />
+      <SensorDetail
+        v-if="showSensorDetail"
+        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[50%] h-[calc(100vh-8rem-4vh)] overflow-hidden"
+      />
 
-      <div v-if="showDashboard || showSensorDetail" class="fixed inset-0 bg-black bg-opacity-50 z-10"
-        @click="closeOverlay"></div>
+      <div
+        v-if="showDashboard || showSensorDetail"
+        class="fixed inset-0 bg-black bg-opacity-50 z-10"
+        @click="closeOverlay"
+      ></div>
     </main>
     <GeneralizedFooter class="z-20" />
     <Teleport to="body">
-      <DownloadPopup v-if="showDownloadPopup" :filter-sections="downloadFilterSections"
-        @close="showDownloadPopup = false" @download="handleDownloadData" />
+      <DownloadPopup
+        v-if="showDownloadPopup"
+        :filter-sections="downloadFilterSections"
+        @close="showDownloadPopup = false"
+        @download="handleDownloadData"
+      />
     </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useFilterStore } from '@/stores/filter'
@@ -78,8 +101,8 @@ const showDownloadPopup = ref(false)
 const selectedDownloadFilters = ref({})
 
 // Routing
-const router = useRouter();
-const goHome = () => router.push('/');
+const router = useRouter()
+const goHome = () => router.push('/')
 
 function updateDateRange(newRange) {
   selected.value = newRange
@@ -288,9 +311,7 @@ const mapItems = [
 const rightItems = ref([
   {
     label: computed(() =>
-      currentMapType.value === 'light'
-        ? 'Satellite Map'
-        : 'Vector Map'
+      currentMapType.value === 'light' ? 'Satellite Map' : 'Vector Map'
     ),
     icon: computed(() =>
       currentMapType.value === 'light'
@@ -298,8 +319,9 @@ const rightItems = ref([
         : 'i-heroicons:map'
     ),
     onClick: () => {
-      currentMapType.value = currentMapType.value === 'light' ? 'satellite' : 'light';
-      setMapType(currentMapType.value);
+      currentMapType.value =
+        currentMapType.value === 'light' ? 'satellite' : 'light'
+      setMapType(currentMapType.value)
     },
   },
   {
@@ -307,9 +329,6 @@ const rightItems = ref([
     icon: 'i-heroicons-arrow-down-tray-20-solid',
     color: 'gray',
     onClick: () => (showDownloadPopup.value = true),
-  },
-  {
-    label: '•••',
   },
 ])
 
