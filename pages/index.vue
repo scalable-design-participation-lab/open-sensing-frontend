@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useDashboardStore } from '@/stores/dashboard'
@@ -85,7 +85,7 @@ const currentMapType = ref('satellite')
 
 // Sensor Detail store
 const sensorDetailStore = useSensorDetailStore()
-const { showSensorDetail } = storeToRefs(sensorDetailStore)
+const { showSensorDetail, availableLocations } = storeToRefs(sensorDetailStore)
 
 // Dataset store
 const datasetStore = useDatasetStore()
@@ -117,11 +117,13 @@ const filterSections = computed(() => [
     icon: 'i-heroicons-map-pin',
     component: 'GenericCheckboxGroup',
     props: {
-      items: Object.keys(existingHubs.value).map((hub) => ({
-        label: hub,
-        value: hub,
+      items: availableLocations.value.map((location) => ({
+        label: location,
+        value: location,
       })),
-      modelValue: existingHubs.value,
+      modelValue: Object.fromEntries(
+        availableLocations.value.map((location) => [location, true])
+      ),
     },
   },
   {
@@ -191,6 +193,11 @@ const handleFilterChange = (filterData) => {
   switch (name) {
     case 'location':
       updateExistingHubs(value)
+      const selectedLocations = Object.entries(value)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([location]) => location)
+
+      sensorDetailStore.updateFilteredLocations(selectedLocations)
       break
     case 'datasets':
       updateExistingDatasets(value)
@@ -214,7 +221,14 @@ const handleDownloadFilterChange = (filterData) => {
 const resetAllFilters = () => {
   const resetValue = (obj) =>
     Object.fromEntries(Object.keys(obj).map((key) => [key, true]))
-  updateExistingHubs(resetValue(existingHubs.value))
+
+  const resetLocations = Object.fromEntries(
+    availableLocations.value.map((location) => [location, true])
+  )
+  updateExistingHubs(resetLocations)
+
+  sensorDetailStore.updateFilteredLocations(availableLocations.value)
+
   updateExistingDatasets(resetValue(existingDatasets.value))
   updateDataDashboardValues('dateRange', [])
   updateDateRangeUpdate(new Date())
@@ -351,6 +365,10 @@ watch(showFilter, (newValue) => {
   if (newValue && showDashboard.value) {
     toggleDashboard()
   }
+})
+
+onMounted(async () => {
+  await sensorDetailStore.loadSensors()
 })
 </script>
 

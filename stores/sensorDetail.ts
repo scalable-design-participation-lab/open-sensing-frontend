@@ -48,6 +48,14 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
           pm10: Number(sensor.pm10) || 0,
         }))
 
+        filteredLocations.value = Array.from(
+          new Set(
+            sensors.value
+              .filter((sensor) => sensor.ecohub_location)
+              .map((sensor) => sensor.ecohub_location)
+          )
+        )
+
         console.log('=== All Sensors Data ===')
         sensors.value.forEach((sensor, index) => {
           console.log(`\nSensor ${index + 1}:`)
@@ -79,10 +87,12 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
       } else {
         console.error('Unexpected response format:', response)
         sensors.value = []
+        filteredLocations.value = []
       }
     } catch (err) {
       console.error('Error loading sensors:', err)
       sensors.value = []
+      filteredLocations.value = []
     } finally {
       isLoading.value = false
     }
@@ -139,6 +149,35 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
     clickPosition.value = position
   }
 
+  const availableLocations = computed(() => {
+    const locations = new Set<string>()
+    sensors.value.forEach((sensor) => {
+      if (sensor.ecohub_location) {
+        locations.add(sensor.ecohub_location)
+      }
+    })
+    return Array.from(locations)
+  })
+
+  const filteredLocations = ref<string[]>([])
+
+  const initialFilteredLocations = computed(() => {
+    return availableLocations.value
+  })
+
+  const updateFilteredLocations = (locations: string[]) => {
+    filteredLocations.value = locations
+  }
+
+  const filteredSensors = computed(() => {
+    if (filteredLocations.value.length === 0) {
+      return []
+    }
+    return sensors.value.filter((sensor) =>
+      filteredLocations.value.includes(sensor.ecohub_location)
+    )
+  })
+
   return {
     showSensorInfo,
     showSensorDetail,
@@ -154,5 +193,10 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
     selectPreviousSensor,
     loadSensors,
     isLoading,
+    availableLocations,
+    filteredLocations,
+    filteredSensors,
+    updateFilteredLocations,
+    initialFilteredLocations,
   }
 })

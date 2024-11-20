@@ -119,12 +119,15 @@ const mapboxAttribution =
   '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
 const formattedSensors = computed(() => {
-  if (!sensors.value || !Array.isArray(sensors.value)) {
+  if (
+    !sensorDetailStore.filteredSensors ||
+    !Array.isArray(sensorDetailStore.filteredSensors)
+  ) {
     console.log('No valid sensors data')
     return []
   }
 
-  return sensors.value
+  return sensorDetailStore.filteredSensors
     .filter((sensor: Sensor) => {
       const hasValidCoords =
         sensor?.lon != null &&
