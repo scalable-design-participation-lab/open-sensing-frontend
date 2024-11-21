@@ -124,11 +124,31 @@ const showCommentDisplay = ref(false)
 const selectedFeatureForDisplay = ref(null)
 const commentPopupOffset = ref([0, 0])
 
-const mapboxToken =
-  'pk.eyJ1IjoicmVzdGFydHVrcmFpbmUiLCJhIjoiY2x2dzhtNGxrMXJ6YzJrbXN2bzI0b2dqeiJ9.NTvV_wUcFRF9WA6C-rthgw'
-const mapboxStyle = 'restartukraine/cm1ez4ahh02ii01pi36qeb4ug'
+const colorMode = useColorMode()
+const isDark = computed({
+  get () {
+    return colorMode.value === 'dark'
+  },
+  set () {
+    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  }
+})
+
+const mapboxToken = config.public.mapboxToken
+const mapboxStyleLight = 'restartukraine/cm3p0s3gw00yd01seasye5jdw'
+const mapboxStyleDark = 'restartukraine/cm3p4jqnj009y01s79ngdah4r'
+
 const mapboxUrl = computed(() => {
-  const style = mapType.value === 'light' ? mapboxStyle : 'mapbox/satellite-v9'
+  let style
+  if (mapType.value === 'light' && isDark.value) {
+    style = mapboxStyleDark
+  }
+  else if (mapType.value === 'light' && !isDark.value) {
+    style = mapboxStyleLight
+  }
+  else {
+    style = 'mapbox/satellite-v9'
+  }
   return `https://api.mapbox.com/styles/v1/${style}/tiles/{z}/{x}/{y}@2x?access_token=${mapboxToken}`
 })
 

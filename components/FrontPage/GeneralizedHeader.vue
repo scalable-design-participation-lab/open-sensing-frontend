@@ -127,6 +127,7 @@
             `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-gray-50 hover:!bg-slate-950 hover:!text-white dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
             shapeClass,
           ]"
+          @click="isDark = !isDark"
         />
         <!-- Menu -->
         <UButton

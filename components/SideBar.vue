@@ -245,7 +245,7 @@ const belongingIconGrid = computed(() => ({
     {
       name: 'smile',
       src: smileIcon,
-      tooltip: 'місця, де вам спокійно',
+      tooltip: 'Спогади',
     },
   ],
   onSelect: selectBelongingIcon,
