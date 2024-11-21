@@ -49,8 +49,8 @@
             <ol-style>
               <ol-style-icon
                 :src="getIconUrl(sensor)"
-                :scale="0.5"
-                :anchor="[0.5, 1]"
+                :scale="0.06"
+                :anchor="[0.5, 0.9]"
               />
             </ol-style>
           </ol-feature>
@@ -79,6 +79,7 @@ import { useGeographic } from 'ol/proj'
 import type { Sensor } from '../../stores/sensorDetail'
 import * as turf from '@turf/turf'
 import * as d3 from 'd3'
+import type { View } from 'ol'
 
 useGeographic()
 
@@ -98,7 +99,7 @@ const { sensors, selectedSensorId, showSensorInfo, selectedSensor } =
 const { mapType } = storeToRefs(mapStore)
 const { updateSelectedSensor, updateClickPosition } = sensorDetailStore
 
-const view = ref(null)
+const view = ref<View | null>(null)
 const map = ref(null)
 const projection = ref('EPSG:4326')
 const markerPosition = ref({ x: 0, y: 0 })
@@ -158,9 +159,34 @@ const formattedSensors = computed(() => {
     })
 })
 
+function createColoredLocationIcon(color: string) {
+  const svgContent = `<?xml version="1.0" encoding="utf-8"?>
+    <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z" 
+        stroke="#000000" 
+        stroke-width="1" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="${color}" 
+        fill-opacity="1"/>
+      <circle 
+        cx="12" 
+        cy="10" 
+        r="2.5" 
+        fill="white"  
+        stroke="#000000" 
+        stroke-width="1"/>
+    </svg>`
+
+  return (
+    'data:image/svg+xml;base64,' +
+    btoa(unescape(encodeURIComponent(svgContent)))
+  )
+}
+
 function getIconUrl(sensor: FormattedSensor) {
   if (sensor.status === 'Inactive') {
-    return 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png'
+    return createColoredLocationIcon('#D3D3D3') // Light grey fill for inactive sensors
   }
 
   const temp = sensor.temperature
@@ -173,34 +199,16 @@ function getIconUrl(sensor: FormattedSensor) {
 
   // Create gradient colors using interpolateRgbBasis
   const colorInterpolator = d3.interpolateRgbBasis([
-    'blue', // cold
-    'green', // medium
-    'red', // hot
+    '#0000FF', // blue for cold
+    '#00FF00', // green for medium
+    '#FF0000', // red for hot
   ])
 
   const normalizedTemp = tempScale(temp)
-  const color = colorInterpolator(normalizedTemp)
+  const color =
+    d3.color(colorInterpolator(normalizedTemp))?.formatHex() || '#808080'
 
-  const availableColors = ['blue', 'green', 'red']
-  const rgbColor = d3.rgb(color)
-
-  let closestColor = availableColors[0]
-  let minDistance = Infinity
-
-  availableColors.forEach((availableColor) => {
-    const targetRgb = d3.rgb(availableColor)
-    const distance = Math.sqrt(
-      Math.pow(rgbColor.r - targetRgb.r, 2) +
-        Math.pow(rgbColor.g - targetRgb.g, 2) +
-        Math.pow(rgbColor.b - targetRgb.b, 2)
-    )
-    if (distance < minDistance) {
-      minDistance = distance
-      closestColor = availableColor
-    }
-  })
-
-  return `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${closestColor}.png`
+  return createColoredLocationIcon(color)
 }
 
 function updateSensorOverlay(sensorId: string) {
@@ -269,9 +277,9 @@ const calculateMapBounds = computed(() => {
   }
 
   try {
-    // Create a FeatureCollection from sensor points
     const features = formattedSensors.value.map((sensor) => ({
       type: 'Feature',
+      properties: {},
       geometry: {
         type: 'Point',
         coordinates: sensor.coordinates,
@@ -279,22 +287,13 @@ const calculateMapBounds = computed(() => {
     }))
 
     const collection = turf.featureCollection(features)
-
-    // Calculate the bounding box
     const bbox = turf.bbox(collection)
 
-    // Calculate center point
-    const center = [
-      (bbox[0] + bbox[2]) / 2, // longitude
-      (bbox[1] + bbox[3]) / 2, // latitude
-    ]
-
-    // Adjust zoom based on bounding box size
-    let zoom = 18
+    const center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]
 
     return {
       center,
-      zoom,
+      zoom: 18,
     }
   } catch (error) {
     console.error('Error calculating map bounds:', error)
