@@ -134,7 +134,6 @@ const isDark = computed({
   }
 })
 
-console.log(config.mapboxToken)
 const mapboxToken = config.public.mapboxToken
 const mapboxStyleLight = 'restartukraine/cm3p0s3gw00yd01seasye5jdw'
 const mapboxStyleDark = 'restartukraine/cm3p4jqnj009y01s79ngdah4r'
