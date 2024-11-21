@@ -25,6 +25,12 @@ export default defineNuxtConfig({
     },
   },
 
+  runtimeConfig: {
+    public: {
+      mapboxToken: process.env.MAPBOX_ACCESS_TOKEN,
+    },
+  },
+
   components: [
     {
       path: '~/components',
