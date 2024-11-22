@@ -129,8 +129,8 @@ const handleCloseRegistration = () => {
       class="z-20"
       :left-items="leftItems"
       :right-items="rightItems"
-      logo-src="/neu-logo.svg"
-      logo-alt="Northeastern University Logo"
+      logo-src="/restart-agency.svg"
+      logo-alt="Restart Agency Logo"
       :show-icon="true"
     />
     <GeneralizedFooter class="z-20" />

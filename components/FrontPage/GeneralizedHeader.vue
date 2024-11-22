@@ -25,26 +25,31 @@
       <!-- items left -->
       <div class="h-full flex space-x-2 sm:space-x-3">
         <UButton
-          v-if="logoSrc"
+          v-if="showIcon"
           :class="[
-            `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg`,
+            `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:scale-105`,
             shapeClass,
           ]"
+          alt="Scalable Design Participation Lab Logo"
+          to="https://www.northeastern.edu/" 
+          target="_blank"
+        >
+          🤲
+        </UButton>
+        <UButton
+          v-if="logoSrc"
+          :class="[
+            `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:scale-105`,
+            shapeClass,
+          ]"
+          :to="logoLink" 
+          target="_blank"
         >
           <img
             :src="logoSrc"
             :alt="logoAlt"
-            class="w-full h-auto dark:!invert"
+            class="w-6 h-auto"
           />
-        </UButton>
-        <UButton
-          v-if="showIcon"
-          :class="[
-            `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg`,
-            shapeClass,
-          ]"
-        >
-          🤲
         </UButton>
         <template v-for="(item, index) in leftItems" :key="index">
           <NuxtLink v-if="item.to" v-slot="{ navigate }" :to="item.to" custom>
@@ -67,7 +72,7 @@
             :color="item.color || (item.primary ? 'black' : 'gray')"
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg text-black dark:text-white !bg-gray-50 dark:!bg-slate-950`,
+              `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg text-black dark:text-white !bg-gray-50 dark:!bg-slate-950 hover:scale-105`,
               shapeClass,
             ]"
             @click="item.onClick"
@@ -169,6 +174,7 @@ const handleMenuSelect = (action: string) => {
  * @property {Array<{label: string, to?: string, onClick?: Function, variant?: string, color?: string, icon?: string, primary?: boolean}>} leftItems - Items for the left side of the header
  * @property {Array<{label: string, to?: string, onClick?: Function, variant?: string, color?: string, icon?: string, dropdown?: Object}>} rightItems - Items for the right side of the header
  * @property {string} [logoSrc] - Source URL for the logo image
+ * @property {string} [logoLink] - Link URL for the logo image
  * @property {string} [logoAlt='Logo'] - Alt text for the logo image
  * @property {boolean} [showIcon=true] - Whether to show the icon
  * @property {'rounded' | 'rectangular'} [shape='rounded'] - Shape of the buttons and logo
@@ -186,6 +192,10 @@ const props = defineProps({
   rightItems: {
     type: Array,
     default: () => [],
+  },
+  logoLink: {
+    type: String,
+    default: '',
   },
   logoSrc: {
     type: String,
