@@ -2,7 +2,8 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "types": ["@types/node"]
+    "types": ["@types/node"],
+    "strict": true
   },
   "include": [
     // ... 其他包含的文件

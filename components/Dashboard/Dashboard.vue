@@ -103,7 +103,7 @@ const lastUpdated = computed(() => {
   )
   const latestDate = new Date(Math.max(...dates))
   return latestDate.toLocaleString('en-US', {
-    timeZone: 'UTC',
+    timeZone: 'America/New_York',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -138,7 +138,7 @@ const overviewStats = computed(() => [
  * Opens the detail view for a specific sensor
  * @param {string} sensorId - The ID of the sensor to display details for
  */
-const openSensorDetail = (sensorId) => {
+const openSensorDetail = (sensorId: string): void => {
   sensorDetailStore.updateSelectedSensor(sensorId)
   sensorDetailStore.toggleSensorDetail()
 }
@@ -203,11 +203,25 @@ interface Sensor {
   timestamp: string
 }
 
+interface FormattedSensor {
+  id: string
+  moduleid: string
+  location: string
+  temperature: number
+  humidity: number
+  voc: number
+  nox: number
+  pm25: number
+  coordinates: [number, number] | null
+  timestamp: string
+  status: 'Active' | 'Inactive'
+}
+
 onMounted(async () => {
   await sensorDetailStore.loadSensors()
 })
 
-const formatSensorData = (sensor: Sensor) => {
+const formatSensorData = (sensor: Sensor): FormattedSensor => {
   return {
     id: sensor.moduleid,
     moduleid: sensor.moduleid,
@@ -218,7 +232,9 @@ const formatSensorData = (sensor: Sensor) => {
     nox: sensor.nox,
     pm25: sensor.pm25,
     coordinates: sensor.lon && sensor.lat ? [sensor.lon, sensor.lat] : null,
-    timestamp: sensor.timestamp,
+    timestamp: new Date(sensor.timestamp).toLocaleString('en-US', {
+      timeZone: 'America/New_York',
+    }),
     status:
       sensor.temperature === 0 && sensor.relative_humidity === 0
         ? 'Inactive'
