@@ -17,6 +17,15 @@
 
 <template>
   <div :id="chartId" class="relative" data-testid="chart-container">
+    <UButton
+      data-testid="reset-button"
+      class="reset-button"
+      icon="i-heroicons-arrow-path"
+      @click="resetChart"
+      v-show="false"
+    >
+      Reset Chart
+    </UButton>
     <div class="tooltip" />
   </div>
 </template>
