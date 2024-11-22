@@ -2,190 +2,399 @@
   <div v-if="isLoading" class="flex justify-center items-center h-screen">
     Loading...
   </div>
-  <div v-else class="flex overflow-hidden flex-col bg-white dark:bg-gray-900">
+  <div v-else class="flex flex-col min-h-screen">
     <GeneralizedHeader
-      :left-items="headerLinks"
-      :right-items="[{ label: '→ Draw', to: '/draw' }]"
-      :show-color-mode-button="true"
-      :show-avatar="true"
-      avatar-src="https://avatars.githubusercontent.com/u/739984?v=4"
-      avatar-alt="User Avatar"
+      class="z-20"
+      :left-items="leftItems"
+      :right-items="rightItems"
+      logo-src="/neu-logo.svg"
+      logo-alt="Northeastern University Logo"
+      :show-icon="true"
     />
 
-    <UContainer class="flex-grow">
-      <HeroSection
-        title="Drawing Together"
-        description="Collaborate in real-time with your team on creative projects. Experience a new way of visual communication and idea sharing."
-        :links="[
-          {
-            label: 'Start Drawing',
-            icon: 'i-heroicons-pencil',
-            to: '/draw',
-            color: 'primary',
-          },
-        ]"
-        :headline-button="{
-          label: 'See what\'s new in our latest release',
-          to: '/releases',
-          icon: 'i-heroicons-arrow-right',
-        }"
-        image-src="/northeastern.jpg"
-        image-alt="Illustration of Drawing Together"
+    <main class="flex-grow relative overflow-hidden pt-16">
+      <MapDashboard class="absolute inset-0" />
+      <GenericFilterSidebar
+        v-if="showFilter && !showDashboard"
+        :is-visible="showFilter && !showDashboard"
+        title="Filters"
+        :filter-sections="filterSections"
+        class="fixed top-[calc(4rem+6vh)] right-5 z-[1001] w-[calc(100%-2.5rem)] sm:w-[240px] md:w-[300px] lg:w-[360px] h-[calc(100vh-8rem-8vh)] max-h-[800px] overflow-auto"
+        @close="closeFilter"
+        @reset="resetAllFilters"
+        @filter-change="handleFilterChange"
+      />
+      <Dashboard
+        v-if="showDashboard"
+        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[90%] h-[calc(100vh-8rem-4vh)] overflow-hidden bg-transparent"
+      />
+      <div class="absolute left-5 top-1/2 transform -translate-y-1/2 z-20">
+        <GenericToolbar :tools="sensorTools" @tool-click="handleToolClick" />
+      </div>
+      <SensorDetail
+        v-if="showSensorDetail"
+        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[50%] h-[calc(100vh-8rem-4vh)] overflow-hidden"
       />
 
-      <UPage>
-        <UPageBody prose>
-          <Headline
-            title="Why are we doing this?"
-            type="paragraph"
-            :content="whyContent"
-          />
-
-          <Headline
-            title="This is a Secondary Headline"
-            type="diagram"
-            :content="tabItems"
-          />
-          <p>{{ secondaryContent }}</p>
-
-          <Headline
-            title="This is Another Secondary Headline"
-            type="chart"
-            content="Chart placeholder"
-          />
-          <p>{{ tertiaryContent }}</p>
-
-          <Reference :items="accordionItems" />
-        </UPageBody>
-      </UPage>
-
-      <UDivider class="my-10" />
-
-      <MoreInThisSeries :items="moreSeriesItems" :cols="3" />
-    </UContainer>
-
-    <GeneralizedFooter
-      title="Drawing Participation"
-      :links="[
-        { to: '#about', label: 'About' },
-        { to: '#support', label: 'Support' },
-        { to: '#more', label: 'More' },
-        { to: '#evenmore', label: 'Even More' },
-      ]"
-      :buttons="[{ label: 'Logo 1' }, { label: 'Logo 2' }]"
-    />
+      <div
+        v-if="showDashboard || showSensorDetail"
+        class="fixed inset-0 bg-black bg-opacity-50 z-10"
+        @click="closeOverlay"
+      ></div>
+    </main>
+    <GeneralizedFooter class="z-20" />
+    <Teleport to="body">
+      <DownloadPopup
+        v-if="showDownloadPopup"
+        :filter-sections="downloadFilterSections"
+        @close="showDownloadPopup = false"
+        @download="handleDownloadData"
+      />
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useDashboardStore } from '@/stores/dashboard'
+import { useFilterStore } from '@/stores/filter'
+import { useMapStore } from '@/stores/map'
+import { useSensorDetailStore } from '@/stores/sensorDetail'
+import { useDatasetStore } from '@/stores/datasets'
+import { useSensorDataStore } from '@/stores/sensorData'
+import { sub } from 'date-fns'
 
-const isLoading = ref(true)
-const headerLinks = ref([
-  { label: 'Drawing Together', to: '/', primary: true },
-  { label: 'Project Name', to: '/project' },
-  { label: 'Learn', to: '/learn' },
+// Dashboard store
+const dashboardStore = useDashboardStore()
+const { showDashboard, dataDashboardValues, dateRangeUpdate } =
+  storeToRefs(dashboardStore)
+const { toggleDashboard, updateDataDashboardValues, updateDateRangeUpdate } =
+  dashboardStore
+
+// Filter store
+const filterStore = useFilterStore()
+const { showFilter } = storeToRefs(filterStore)
+const { toggleFilter, resetFilters } = filterStore
+
+// Map store
+const mapStore = useMapStore()
+const { setMapType } = mapStore
+const currentMapType = ref('satellite')
+
+// Sensor Detail store
+const sensorDetailStore = useSensorDetailStore()
+const { showSensorDetail, availableLocations } = storeToRefs(sensorDetailStore)
+
+// Dataset store
+const datasetStore = useDatasetStore()
+const { existingHubs, existingDatasets } = storeToRefs(datasetStore)
+const { updateExistingHubs, updateExistingDatasets } = datasetStore
+
+// Sensor Data store
+const sensorDataStore = useSensorDataStore()
+
+const isLoading = ref(false)
+const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
+const showDownloadPopup = ref(false)
+const selectedDownloadFilters = ref({})
+
+// Routing
+const router = useRouter()
+const goHome = () => router.push('/')
+
+function updateDateRange(newRange) {
+  selected.value = newRange
+  updateDataDashboardValues('dateRange', [newRange.start, newRange.end])
+  updateDateRangeUpdate(new Date())
+}
+
+const filterSections = computed(() => [
+  {
+    name: 'location',
+    label: 'Location Selection',
+    icon: 'i-heroicons-map-pin',
+    component: 'GenericCheckboxGroup',
+    props: {
+      items: availableLocations.value.map((location) => ({
+        label: location,
+        value: location,
+      })),
+      modelValue: Object.fromEntries(
+        availableLocations.value.map((location) => [location, true])
+      ),
+    },
+  },
+  {
+    name: 'datasets',
+    label: 'Data Selection',
+    icon: 'i-heroicons-chart-bar',
+    component: 'GenericCheckboxGroup',
+    props: {
+      items: Object.keys(existingDatasets.value).map((dataset) => ({
+        label: dataset,
+        value: dataset,
+      })),
+      modelValue: existingDatasets.value,
+    },
+  },
+  {
+    name: 'datetime',
+    label: 'Date & Time',
+    icon: 'i-heroicons-calendar',
+    component: 'GenericDateRangePicker',
+    props: {
+      modelValue: selected.value,
+    },
+  },
 ])
-const whyContent = ref('')
-const secondaryContent = ref('')
-const tertiaryContent = ref('')
-const tabItems = ref([])
-const accordionItems = ref([])
-const moreSeriesItems = ref([])
 
-onMounted(async () => {
+const downloadFilterSections = computed(() => [
+  {
+    name: 'location',
+    label: 'Location Selection',
+    icon: 'i-heroicons-map-pin',
+    component: 'GenericCheckboxGroup',
+    props: {
+      items: availableLocations.value.map((location) => ({
+        label: location,
+        value: location,
+      })),
+      modelValue: Object.fromEntries(
+        availableLocations.value.map((location) => [location, true])
+      ),
+    },
+  },
+  {
+    name: 'datasets',
+    label: 'Data Selection',
+    icon: 'i-heroicons-chart-bar',
+    component: 'GenericCheckboxGroup',
+    props: {
+      items: [
+        { label: 'Temperature', value: 'temperature' },
+        { label: 'Relative Humidity', value: 'relative_humidity' },
+        { label: 'VOC', value: 'voc' },
+        { label: 'NOx', value: 'nox' },
+        { label: 'PM1', value: 'pm1' },
+        { label: 'PM2.5', value: 'pm25' },
+        { label: 'PM4', value: 'pm4' },
+        { label: 'PM10', value: 'pm10' },
+      ],
+      modelValue: {
+        temperature: true,
+        relative_humidity: true,
+        voc: true,
+        nox: true,
+        pm1: true,
+        pm25: true,
+        pm4: true,
+        pm10: true,
+      },
+    },
+  },
+  {
+    name: 'datetime',
+    label: 'Date & Time',
+    icon: 'i-heroicons-calendar',
+    component: 'GenericDateRangePicker',
+    props: {
+      modelValue: selected.value,
+    },
+  },
+])
+
+const handleFilterChange = (filterData) => {
+  const { name, value } = filterData
+  switch (name) {
+    case 'location':
+      updateExistingHubs(value)
+      const selectedLocations = Object.entries(value)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([location]) => location)
+
+      sensorDetailStore.updateFilteredLocations(selectedLocations)
+      break
+    case 'datasets':
+      updateExistingDatasets(value)
+      break
+    case 'datetime':
+      if (value.isAllTime) {
+        updateDateRange({ start: null, end: null })
+      } else {
+        updateDateRange(value)
+      }
+      break
+  }
+  updateDateRangeUpdate(new Date())
+}
+
+const handleDownloadFilterChange = (filterData) => {
+  const { name, value } = filterData
+  selectedDownloadFilters.value[name] = value
+}
+
+const resetAllFilters = () => {
+  const resetValue = (obj) =>
+    Object.fromEntries(Object.keys(obj).map((key) => [key, true]))
+
+  const resetLocations = Object.fromEntries(
+    availableLocations.value.map((location) => [location, true])
+  )
+  updateExistingHubs(resetLocations)
+
+  sensorDetailStore.updateFilteredLocations(availableLocations.value)
+
+  updateExistingDatasets(resetValue(existingDatasets.value))
+  updateDataDashboardValues('dateRange', [])
+  updateDateRangeUpdate(new Date())
+}
+
+const sensorTools = [
+  { icon: 'i-heroicons-solid:home', tooltip: 'Home', action: goHome },
+  { icon: 'i-heroicons-solid:filter', tooltip: 'Filter', action: toggleFilter },
+  {
+    icon: 'i-heroicons-solid:squares-2x2',
+    tooltip: 'Dashboard',
+    action: toggleDashboard,
+  },
+  { icon: 'i-heroicons-solid:location-marker', tooltip: 'Location Info' },
+]
+
+const handleToolClick = (index: number) => {
+  console.log('Dashboard: Tool clicked:', sensorTools[index].tooltip)
+}
+
+const closeFilter = () => {
+  toggleFilter()
+}
+
+const handleDownloadData = async ({ filters, format }) => {
+  console.log('Download options:', filters)
+  console.log('File format:', format)
+
   try {
-    // Simulate API calls
-    await Promise.all([
-      loadContent(),
-      loadTabItems(),
-      loadAccordionItems(),
-      loadMoreSeriesItems(),
-    ])
+    const response = await $fetch('/api/download-sensor-data', {
+      method: 'POST',
+      body: {
+        datasets: filters.datasets,
+        dateRange: filters.datetime,
+        location: filters.location,
+        format: format,
+      },
+    })
+
+    if (response) {
+      // Handle download logic
+      const blob = new Blob(
+        [format === 'json' ? JSON.stringify(response) : response],
+        {
+          type: format === 'json' ? 'application/json' : 'text/csv',
+        }
+      )
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `sensor_data.${format}`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    }
   } catch (error) {
-    console.error('Error loading data:', error)
-  } finally {
-    isLoading.value = false
+    console.error('Error downloading data:', error)
+    alert(`Download failed: ${error.message || 'Unknown error'}`)
+  }
+
+  showDownloadPopup.value = false
+}
+
+const leftItems = ref([
+  {
+    label: 'Open Sensing',
+    variant: 'solid',
+    color: 'black',
+    onClick: () => toggleDashboard(),
+  },
+  {
+    label: 'Northeastern University',
+    variant: 'solid',
+    color: 'black',
+  },
+])
+
+const mapItems = [
+  [
+    {
+      label: 'Satellite',
+      icon: 'i-heroicons-globe-americas-20-solid',
+      click: () => setMapType('satellite'),
+    },
+    {
+      label: 'Light',
+      icon: 'i-heroicons-sun-20-solid',
+      click: () => setMapType('light'),
+    },
+  ],
+]
+
+const rightItems = ref([
+  {
+    label: computed(() =>
+      currentMapType.value === 'light' ? 'Satellite Map' : 'Vector Map'
+    ),
+    icon: computed(() =>
+      currentMapType.value === 'light'
+        ? 'i-heroicons:globe-americas-20-solid'
+        : 'i-heroicons:map'
+    ),
+    onClick: () => {
+      currentMapType.value =
+        currentMapType.value === 'light' ? 'satellite' : 'light'
+      setMapType(currentMapType.value)
+    },
+  },
+  {
+    label: 'Download',
+    icon: 'i-heroicons-arrow-down-tray-20-solid',
+    color: 'gray',
+    onClick: () => (showDownloadPopup.value = true),
+  },
+])
+
+const closeOverlay = () => {
+  if (showDashboard.value) {
+    toggleDashboard(false)
+  }
+  if (showSensorDetail.value) {
+    sensorDetailStore.toggleSensorDetail(false)
+  }
+}
+
+watch(showDashboard, (newValue) => {
+  if (newValue && showFilter.value) {
+    toggleFilter()
   }
 })
 
-async function loadContent() {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  whyContent.value = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat nisl, maximus et mollis vitae, vulputate vitae tortor. Nunc sed tortor mauris. Aliquam volutpat convallis nulla. Nullam in est sed purus efficitur condimentum eu eget mi. Cras consectetur semper magna eget luctus. Maecenas non elit non mauris varius tempor. Duis placerat luctus fringilla. Sed sit amet nisi a nunc aliquet tincidunt in eget erat. Curabitur quis dolor ac dui volutpat condimentum. Ut feugiat diam sit amet pharetra ultricies. Praesent et posuere nunc. Quisque pharetra facilisis commodo. Etiam id nibh scelerisque, pulvinar sapien a, tempor dolor. Donec suscipit efficitur lacus, vel convallis ligula pellentesque sed. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;`
+watch(showFilter, (newValue) => {
+  if (newValue && showDashboard.value) {
+    toggleDashboard()
+  }
+})
 
-  secondaryContent.value = `Quisque consequat diam dui, nec accumsan arcu laoreet a. Sed bibendum neque purus, ac interdum erat posuere dapibus. Quisque commodo felis at posuere imperdiet. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Etiam elementum, arcu id sagittis venenatis, eros nibh ornare ex, eu mollis nunc lectus dictum sem. Quisque eget laoreet elit. Sed egestas sodales odio, at euismod est pharetra non. Nam dui leo, mattis id convallis aliquet, fermentum sed quam. In porttitor, eros id iaculis sollicitudin, tellus augue fringilla nulla, eget suscipit justo sapien convallis erat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam accumsan et magna et molestie.`
-
-  tertiaryContent.value = `Donec pharetra lacus nisl, in pulvinar ante auctor non. Fusce fermentum metus sit amet neque malesuada, eu interdum diam consequat. Phasellus felis tortor, dictum ut augue non, placerat interdum libero. Quisque vitae mollis lectus, pellentesque aliquam urna. Mauris tincidunt aliquet fringilla. Nam malesuada mollis vestibulum. Curabitur malesuada erat sed imperdiet ultrices. Sed nibh turpis, porttitor ut semper eu, ornare eget quam. Nulla facilisi. Ut porta at elit in tempus. Sed quis dapibus eros, eu cursus ipsum. Nam eu libero rutrum, tincidunt nunc at, semper nisl. Sed ullamcorper massa nec est faucibus laoreet. Aliquam erat volutpat.`
-}
-
-async function loadTabItems() {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  tabItems.value = [
-    {
-      label: 'Diagram 1',
-      icon: 'i-heroicons-chart-bar',
-      content: 'Content for Diagram 1',
-    },
-    {
-      label: 'Diagram 2',
-      icon: 'i-heroicons-chart-pie',
-      content: 'Content for Diagram 2',
-    },
-    {
-      label: 'Diagram 3',
-      icon: 'i-heroicons-chart-square-bar',
-      content: 'Content for Diagram 3',
-    },
-    {
-      label: 'Diagram 4',
-      icon: 'i-heroicons-presentation-chart-line',
-      content: 'Content for Diagram 4',
-    },
-  ]
-}
-
-async function loadAccordionItems() {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  accordionItems.value = [
-    {
-      label: 'Reference 1',
-      icon: 'i-heroicons-document-text',
-      content:
-        'Phasellus felis tortor, dictum ut augue non, placerat interdum libero. Quisque vitae mollis lectus, pellentesque aliquam urna.',
-    },
-    {
-      label: 'Reference 2',
-      icon: 'i-heroicons-document-text',
-      content:
-        'Mauris tincidunt aliquet fringilla. Nam malesuada mollis vestibulum. Curabitur malesuada erat sed imperdiet ultrices.',
-    },
-    {
-      label: 'Reference 3',
-      icon: 'i-heroicons-document-text',
-      content:
-        'Sed nibh turpis, porttitor ut semper eu, ornare eget quam. Nulla facilisi. Ut porta at elit in tempus.',
-    },
-  ]
-}
-
-async function loadMoreSeriesItems() {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  moreSeriesItems.value = [
-    {
-      title: 'Why',
-      description: 'Explore the reasons behind our project',
-      icon: 'i-heroicons-question-mark-circle',
-    },
-    {
-      title: 'What',
-      description: 'Discover what our project offers',
-      icon: 'i-heroicons-information-circle',
-    },
-    {
-      title: 'How',
-      description: 'Learn how to use our tools effectively',
-      icon: 'i-heroicons-academic-cap',
-    },
-  ]
-}
+onMounted(async () => {
+  await sensorDetailStore.loadSensors()
+})
 </script>
+
+<style scoped>
+.top-\[calc\(4rem\+2vh\)\] {
+  top: calc(4rem + 2vh);
+}
+
+.h-\[calc\(100vh-8rem-4vh\)\] {
+  height: calc(100vh - 8rem - 4vh);
+}
+</style>

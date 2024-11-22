@@ -10,24 +10,31 @@
  -->
 
 <template>
-  <div class="sensor-stats grid grid-cols-5 gap-6">
-    <div
-      v-for="(value, key) in sensorStats"
-      :key="key"
-      class="stat-item bg-gray-100 rounded-lg p-4 text-center transform hover:scale-105 transition-transform cursor-pointer"
-      :data-testid="`stat-item-${key}`"
-      @click="$emit('show-stat-details', key)"
-    >
-      <h3
-        class="text-2xl font-bold"
-        :class="getValueColor(key, value)"
-        data-testid="stat-value"
+  <UCard>
+    <div class="sensor-stats grid grid-cols-5 gap-6">
+      <div
+        v-for="(value, key) in sensorStats"
+        :key="key"
+        class="stat-item bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-center transform hover:scale-105 transition-transform cursor-pointer"
+        :data-testid="`stat-item-${key}`"
+        @click="$emit('show-stat-details', key)"
       >
-        {{ value }}
-      </h3>
-      <p class="text-sm text-gray-600 mt-2" data-testid="stat-key">{{ key }}</p>
+        <h3
+          class="text-2xl font-bold"
+          :class="[getValueColor(key, value), 'dark:text-white']"
+          data-testid="stat-value"
+        >
+          {{ value }}
+        </h3>
+        <p
+          class="text-sm text-gray-600 dark:text-gray-300 mt-2"
+          data-testid="stat-key"
+        >
+          {{ key }}
+        </p>
+      </div>
     </div>
-  </div>
+  </UCard>
 </template>
 
 <script setup>

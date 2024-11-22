@@ -60,10 +60,22 @@
 <script setup lang="ts">
 import { computed, PropType } from 'vue'
 import { useSensorDetailStore } from '../../stores/sensorDetail'
+import type { Sensor } from '../../stores/sensorDetail'
 
 interface MarkerPosition {
   x: number
   y: number
+}
+
+interface FormattedSensor {
+  id: string
+  moduleid: string
+  location: string
+  temperature: number
+  humidity: number
+  airQuality: string
+  batteryLevel: number
+  timestamp: string
 }
 
 const props = defineProps({
@@ -75,7 +87,28 @@ const props = defineProps({
 
 const sensorDetailStore = useSensorDetailStore()
 
-const selectedSensor = computed(() => sensorDetailStore.selectedSensor)
+const selectedSensor = computed(() => {
+  const sensor = sensorDetailStore.selectedSensor
+  if (!sensor) return null
+
+  return {
+    id: sensor.moduleid,
+    moduleid: sensor.moduleid,
+    location: sensor.ecohub_location,
+    temperature: sensor.temperature,
+    humidity: sensor.relative_humidity,
+    airQuality: getAirQuality(sensor.temperature, sensor.relative_humidity),
+    batteryLevel: 100,
+    timestamp: new Date(sensor.timestamp).toLocaleString(),
+  }
+})
+
+function getAirQuality(temperature: number, humidity: number): string {
+  if (temperature === 0 && humidity === 0) return 'Inactive'
+  if (temperature > 30 || humidity > 80) return 'Poor'
+  if (temperature > 25 || humidity > 70) return 'Moderate'
+  return 'Good'
+}
 
 const {
   toggleSensorDetail,
@@ -84,10 +117,6 @@ const {
   selectPreviousSensor,
 } = sensorDetailStore
 
-/**
- * Computed style for positioning the sensor tag
- * @type {import('vue').ComputedRef<{ left: string, top: string }>}
- */
 const positionStyle = computed(() => {
   const { x, y } = props.markerPosition
   const offset = 10
@@ -97,12 +126,14 @@ const positionStyle = computed(() => {
   let left = x + offset
   let top = y + offset
 
-  const { innerWidth, innerHeight } = window
-  if (left + infoWidth > innerWidth) {
-    left = x - infoWidth - offset
-  }
-  if (top + infoHeight > innerHeight) {
-    top = y - infoHeight - offset
+  if (typeof window !== 'undefined') {
+    const { innerWidth, innerHeight } = window
+    if (left + infoWidth > innerWidth) {
+      left = x - infoWidth - offset
+    }
+    if (top + infoHeight > innerHeight) {
+      top = y - infoHeight - offset
+    }
   }
 
   return {
@@ -111,19 +142,12 @@ const positionStyle = computed(() => {
   }
 })
 
-/**
- * Style configuration for the card component
- * @type {Object}
- */
 const cardStyle = {
   base: 'bg-white dark:bg-gray-800 shadow-lg',
   body: 'p-0',
   header: 'p-3 border-b border-gray-200 dark:border-gray-700',
 }
 
-/**
- * Opens the detailed view of the selected sensor
- */
 const openSensorDetail = () => {
   sensorDetailStore.toggleSensorDetail()
 }
