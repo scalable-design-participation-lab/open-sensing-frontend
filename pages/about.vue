@@ -40,20 +40,20 @@
 
     <UDivider class="mt-24 mb-8" />
 
-    <div class="px-7 flex space-x-6">
-      <div class="p-8 border border-zinc-200 dark:border-zinc-600 w-56 min-h-full rounded-xl pb-32">
+    <div class="px-7 md:flex md:space-x-6 space-y-3">
+      <div class="p-8 border border-zinc-200 dark:border-zinc-600 md:w-56 min-h-full rounded-xl pb-32">
         <h2 class="font-semibold text-xl mb-2">Безпека</h2>
         <p class="text-sm leading-tight">Ми створили цифровий простір, де можна відверто ділитися думками й спогадами про місця, яких уникаєте. Це допоможе привернути увагу спільноти й запустити процес змін.</p>
       </div>
-      <div class="p-8 border border-zinc-200 dark:border-zinc-600 w-56 min-h-full rounded-xl">
+      <div class="p-8 border border-zinc-200 dark:border-zinc-600 md:w-56 min-h-full rounded-xl">
         <h2 class="font-semibold text-xl mb-2">Приналежність</h2>
         <p class="text-sm leading-tight">Стежка до річки, квітучий сквер, культурний центр — позначайте улюблені місця та дізнавайтеся, які локації обирають інші містяни.</p>
       </div>
-      <div class="p-8 border border-zinc-200 dark:border-zinc-600 w-56 min-h-full rounded-xl">
+      <div class="p-8 border border-zinc-200 dark:border-zinc-600 md:w-56 min-h-full rounded-xl">
         <h2 class="font-semibold text-xl mb-2">Середовище</h2>
         <p class="text-sm leading-tight">Завдяки згуртованості містян, онлайн мапа наочно відображає популярні локації та ділянки, які потребують відновлення для процвітання міста.</p>
       </div>
-      <div class="p-8 border border-zinc-200 dark:border-zinc-600 w-56 min-h-full rounded-xl">
+      <div class="p-8 border border-zinc-200 dark:border-zinc-600 md:w-56 min-h-full rounded-xl">
         <h2 class="font-semibold text-xl mb-2">Екологія</h2>
         <p class="text-sm leading-tight">Платформа збирає й систе-матизує дані про рослини та тварин, характерних для місцевості. А також фіксує засмічені зони, які гальмують розвиток міста. Поділитися своїми враженнями — перший крок до покращень.</p>
       </div>
@@ -85,15 +85,15 @@
     <UDivider class="mt-24 mb-8" />
 
     <div class="px-7">
-    <div class="flex justify-between">
+    <div class="md:flex justify-between space-y-6">
       <h1 class="text-2xl leading-tight">Drawing Participation<br>Гуртомá</h1>
       <div class="flex space-x-6 pr-2">
-        <img src="/neu-logo-text.svg" alt="">
-        <img src="/restart-logo-text.svg" alt="">
+        <a href="https://www.northeastern.edu" target="_blank"><img src="/neu-logo-text.svg" alt="" class="hover:scale-105"></a>
+        <a href="https://www.restartfuture.org" target="_blank"><img src="/restart-logo-text.svg" alt="" class="hover:scale-105"></a>
         <img src="/river-logo-text.svg" alt="">
       </div>
     </div>
-    <div class="mt-24 space-y-1 flex flex-col">
+    <div class="mt-12 md:mt-24 space-y-1 flex flex-col">
       <a href="/" class="hover:underline">Карта</a>
       <a href="/about/" class="hover:underline">Про проєкт</a>
       <a href="/map/" class="hover:underline">Допомога</a>
