@@ -11,10 +11,12 @@ const leftItems = ref([
   {
     label: 'Drawing Participation',
     color: 'black',
+    to: '/about/',
   },
   {
     label: 'Гуртомá',
     color: 'black',
+    to: '/about/',
   },
 ])
 
