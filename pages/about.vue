@@ -28,7 +28,7 @@
       Взяти участь
       </UButton>
       <UButton
-        class="my-2 py-3 px-6 rounded-full flex place-self-start bg-gray-300 dark:bg-black text-black hover:text-white dark:hover:bg-slate-600 dark:hover:text-white"
+        class="my-2 py-3 px-6 rounded-full flex place-self-start bg-gray-300 dark:bg-zinc-600 dark:text-white text-black hover:text-white dark:hover:bg-slate-600 dark:hover:text-white"
         color="black"
         to="/map/"
       >
@@ -88,9 +88,9 @@
     <div class="md:flex justify-between space-y-6">
       <h1 class="text-2xl leading-tight">Drawing Participation<br>Гуртомá</h1>
       <div class="flex space-x-6 pr-2 place-items-center">
-        <a href="https://www.northeastern.edu" target="_blank"><img src="/neu-logo-text.svg" alt="" class="hover:scale-105"></a>
-        <a href="https://www.restartfuture.org" target="_blank"><img src="/restart-logo-text.svg" alt="" class="hover:scale-105"></a>
-        <img src="/river-logo-text.svg" alt="">
+        <a href="https://www.northeastern.edu" target="_blank"><img src="/neu-logo-text.svg" alt="" class="hover:scale-105 dark:invert"></a>
+        <a href="https://www.restartfuture.org" target="_blank"><img src="/restart-logo-text.svg" alt="" class="hover:scale-105 dark:invert"></a>
+        <img src="/river-logo-text.svg" alt="" class="dark:invert">
       </div>
     </div>
     <div class="mt-12 md:mt-24 space-y-1 flex flex-col">
