@@ -40,7 +40,7 @@
 
     <UDivider class="mt-24 mb-8" />
 
-    <div class="px-7 md:flex md:space-x-6 space-y-3">
+    <div class="px-7 md:flex space-y-3 md:space-x-6 md:space-y-0">
       <div class="p-8 border border-zinc-200 dark:border-zinc-600 md:w-56 min-h-full rounded-xl pb-32">
         <h2 class="font-semibold text-xl mb-2">Безпека</h2>
         <p class="text-sm leading-tight">Ми створили цифровий простір, де можна відверто ділитися думками й спогадами про місця, яких уникаєте. Це допоможе привернути увагу спільноти й запустити процес змін.</p>
