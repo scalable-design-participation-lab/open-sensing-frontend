@@ -87,7 +87,7 @@
     <div class="px-7">
     <div class="md:flex justify-between space-y-6">
       <h1 class="text-2xl leading-tight">Drawing Participation<br>Гуртомá</h1>
-      <div class="flex space-x-6 pr-2">
+      <div class="flex space-x-6 pr-2 place-items-center">
         <a href="https://www.northeastern.edu" target="_blank"><img src="/neu-logo-text.svg" alt="" class="hover:scale-105"></a>
         <a href="https://www.restartfuture.org" target="_blank"><img src="/restart-logo-text.svg" alt="" class="hover:scale-105"></a>
         <img src="/river-logo-text.svg" alt="">
