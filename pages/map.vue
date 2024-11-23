@@ -4,7 +4,7 @@
       class="z-20"
       :left-items="leftItems"
       :right-items="rightItems"
-      logo-src="/restart-agency.svg"
+      logo-src="/restart-logo-icon.svg"
       logo-alt="Restart Agency Logo"
       logo-link="https://www.restartfuture.org/"
     />

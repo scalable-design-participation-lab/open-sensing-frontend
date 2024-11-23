@@ -7,7 +7,7 @@
       class="z-50"
       :left-items="leftItems"
       :right-items="rightItems"
-      logo-src="/neu-logo.svg"
+      logo-src="/neu-logo-icon.svg"
       logo-alt="Northeastern Logo"
       :show-icon="true"
     />
