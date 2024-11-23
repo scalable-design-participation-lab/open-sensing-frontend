@@ -1,12 +1,12 @@
 <template>
   <div class="map-container">
     <GeneralizedHeader
-      class="header-fixed"
+      class="z-20"
       :left-items="leftItems"
       :right-items="rightItems"
-      logo-src="/neu-logo.svg"
-      logo-alt="Northeastern University Logo"
-      :show-icon="true"
+      logo-src="/restart-logo-icon.svg"
+      logo-alt="Restart Agency Logo"
+      logo-link="https://www.restartfuture.org/"
     />
     <div class="map-wrapper">
       <BackgroundMap

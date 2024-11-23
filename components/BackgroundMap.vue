@@ -140,10 +140,10 @@ const mapboxStyleDark = 'restartukraine/cm3p4jqnj009y01s79ngdah4r'
 
 const mapboxUrl = computed(() => {
   let style
-  if (mapType.value === 'light' && isDark.value) {
+  if (mapType.value === 'vector' && isDark.value) {
     style = mapboxStyleDark
   }
-  else if (mapType.value === 'light' && !isDark.value) {
+  else if (mapType.value === 'vector' && !isDark.value) {
     style = mapboxStyleLight
   }
   else {
@@ -330,25 +330,34 @@ function calculatePopupPosition(feature: any): {
   transform: translateY(-50%) !important;
   left: 20px !important;
   bottom: unset !important;
-  background: transparent !important;
-  border-radius: 4px !important;
+  background: none !important;
   z-index: 1500 !important;
   box-shadow: none !important;
 }
 
-/* Customize zoom buttons */
+.ol-control button {
+  @apply text-black dark:text-white !important;
+}
+
 .ol-zoom .ol-zoom-in,
 .ol-zoom .ol-zoom-out {
-  background-color: transparent !important;
+  @apply bg-white dark:bg-black !important;
+  border-radius: 50px !important;
   border: none !important;
-  margin: 1px !important;
+  margin-top: 5px !important;
   width: 32px !important;
   height: 32px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  color: #374151 !important;
-  font-size: 20px !important;
+  font-size: 16px !important;
+}
+
+.ol-zoom .ol-zoom-in:hover,
+.ol-zoom .ol-zoom-out:hover {
+  @apply bg-black dark:bg-white !important;
+  @apply text-white dark:text-black !important;
+  outline: 0 !important;
 }
 </style>
