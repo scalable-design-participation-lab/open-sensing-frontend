@@ -85,9 +85,9 @@
     <UDivider class="mt-24 mb-8" />
 
     <div class="px-7">
-    <div class="md:flex justify-between space-y-6">
-      <h1 class="text-2xl leading-tight">Drawing Participation<br>Гуртомá</h1>
-      <div class="flex space-x-6 pr-2 place-items-center">
+    <div class="md:flex place-items-center justify-between">
+      <h1 class="text-2xl leading-tight text-zinc-900">Drawing Participation<br>Гуртомá</h1>
+      <div class="flex space-x-6 md:pr-2 !place-items-center">
         <a href="https://www.northeastern.edu" target="_blank"><img src="/neu-logo-text.svg" alt="" class="hover:scale-105 dark:invert"></a>
         <a href="https://www.restartfuture.org" target="_blank"><img src="/restart-logo-text.svg" alt="" class="hover:scale-105 dark:invert"></a>
         <img src="/river-logo-text.svg" alt="" class="dark:invert">
