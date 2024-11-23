@@ -5,35 +5,18 @@ import { useMapUIStore } from '../stores/mapUI'
 // Map store
 const mapUIStore = useMapUIStore()
 const { setMapType } = mapUIStore
-const currentMapType = ref('light')
+const currentMapType = ref('vector')
 
 const leftItems = ref([
   {
     label: 'Drawing Participation',
-    variant: 'solid',
     color: 'black',
   },
   {
     label: 'Гуртомá',
-    variant: 'solid',
     color: 'black',
   },
 ])
-
-const mapItems = [
-  [
-    {
-      label: 'Light',
-      icon: 'i-heroicons-sun-20-solid',
-      click: () => setMapType('satellite'),
-    },
-    {
-      label: 'Satellite',
-      icon: 'i-heroicons-globe-americas-20-solid',
-      click: () => setMapType('light'),
-    },
-  ],
-]
 
 const rightItems = ref([
   {
@@ -42,13 +25,13 @@ const rightItems = ref([
   },
   {
     icon: computed(() =>
-      currentMapType.value === 'light'
+      currentMapType.value === 'vector'
         ? 'i-heroicons:map'
         : 'i-heroicons:globe-americas-20-solid',
     ),
     onClick: () => {
       currentMapType.value =
-        currentMapType.value === 'light' ? 'satellite' : 'light'
+        currentMapType.value === 'vector' ? 'satellite' : 'vector'
       setMapType(currentMapType.value)
     },
   },

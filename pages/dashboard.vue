@@ -289,14 +289,12 @@ const leftItems = ref([
 const mapItems = [
   [
     {
-      label: 'Satellite',
       icon: 'i-heroicons-globe-americas-20-solid',
       click: () => setMapType('satellite'),
     },
     {
-      label: 'Light',
       icon: 'i-heroicons-sun-20-solid',
-      click: () => setMapType('light'),
+      click: () => setMapType('Vector'),
     },
   ],
 ]

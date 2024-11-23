@@ -140,10 +140,10 @@ const mapboxStyleDark = 'restartukraine/cm3p4jqnj009y01s79ngdah4r'
 
 const mapboxUrl = computed(() => {
   let style
-  if (mapType.value === 'light' && isDark.value) {
+  if (mapType.value === 'vector' && isDark.value) {
     style = mapboxStyleDark
   }
-  else if (mapType.value === 'light' && !isDark.value) {
+  else if (mapType.value === 'vector' && !isDark.value) {
     style = mapboxStyleLight
   }
   else {
