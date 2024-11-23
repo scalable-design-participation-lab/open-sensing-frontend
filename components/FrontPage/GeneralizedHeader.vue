@@ -48,7 +48,7 @@
           <img
             :src="logoSrc"
             :alt="logoAlt"
-            class="w-6 h-auto"
+            class="w-9/12 h-auto"
           />
         </UButton>
         <template v-for="(item, index) in leftItems" :key="index">

@@ -4,13 +4,12 @@
   </div>
   <div v-else class="flex overflow-hidden flex-col bg-white dark:bg-gray-900">
     <GeneralizedHeader
-      :left-items="headerLinks"
-      :right-items="[{ label: '→ Draw', to: '/draw' }]"
-      :show-color-mode-button="true"
-      :show-avatar="true"
-      avatar-src="https://avatars.githubusercontent.com/u/739984?v=4"
-      avatar-alt="User Avatar"
-      class="z-50"
+      class="z-20"
+      :left-items="leftItems"
+      :right-items="rightItems"
+      logo-src="/restart-agency.svg"
+      logo-alt="Restart Agency Logo"
+      logo-link="https://www.restartfuture.org/"
     />
 
     <UContainer class="flex-grow">

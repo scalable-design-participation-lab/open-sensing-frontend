@@ -131,7 +131,7 @@ const handleCloseRegistration = () => {
       :right-items="rightItems"
       logo-src="/restart-agency.svg"
       logo-alt="Restart Agency Logo"
-      :show-icon="true"
+      logo-link="https://www.restartfuture.org/"
     />
     <GeneralizedFooter class="z-20" />
     <OnboardingModal
