@@ -13,20 +13,44 @@
  * />
  -->
 <template>
-  <UCard class="w-[280px] z-[1000] pointer-events-auto absolute" :ui="cardStyle" :style="positionStyle">
+  <UCard
+    class="w-[280px] z-[1000] pointer-events-auto absolute"
+    :ui="cardStyle"
+    :style="positionStyle"
+  >
     <template #header>
       <div class="flex justify-between items-center">
         <div class="flex gap-2">
-          <UButton data-testid="previous-sensor" color="gray" variant="ghost" icon="i-heroicons-arrow-left"
-            @click="sensorDetailStore.selectPreviousSensor" />
-          <UButton data-testid="next-sensor" color="gray" variant="ghost" icon="i-heroicons-arrow-right"
-            @click="sensorDetailStore.selectNextSensor" />
+          <UButton
+            data-testid="previous-sensor"
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-arrow-left"
+            @click="sensorDetailStore.selectPreviousSensor"
+          />
+          <UButton
+            data-testid="next-sensor"
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-arrow-right"
+            @click="sensorDetailStore.selectNextSensor"
+          />
         </div>
         <div class="flex gap-2">
-          <UButton data-testid="open-detail" color="primary" variant="ghost"
-            icon="i-heroicons-arrow-top-right-on-square" @click="openSensorDetail" />
-          <UButton data-testid="close-info" color="gray" variant="ghost" icon="i-heroicons-x-mark"
-            @click="sensorDetailStore.closeSensorInfo" />
+          <UButton
+            data-testid="open-detail"
+            color="primary"
+            variant="ghost"
+            icon="i-heroicons-arrow-top-right-on-square"
+            @click="openSensorDetail"
+          />
+          <UButton
+            data-testid="close-info"
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-x-mark"
+            @click="sensorDetailStore.closeSensorInfo"
+          />
         </div>
       </div>
     </template>
@@ -91,6 +115,9 @@ const selectedSensor = computed(() => {
   const sensor = sensorDetailStore.selectedSensor
   if (!sensor) return null
 
+  const timestamp = new Date(sensor.timestamp)
+  timestamp.setHours(timestamp.getHours() - 5)
+
   return {
     id: sensor.moduleid,
     moduleid: sensor.moduleid,
@@ -99,7 +126,15 @@ const selectedSensor = computed(() => {
     humidity: sensor.relative_humidity,
     airQuality: getAirQuality(sensor.temperature, sensor.relative_humidity),
     batteryLevel: 100,
-    timestamp: new Date(sensor.timestamp).toLocaleString(),
+    timestamp: timestamp.toLocaleString('en-US', {
+      timeZone: 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }),
   }
 })
 
