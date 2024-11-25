@@ -138,11 +138,11 @@ const menuItems = [
   {
     label: 'Середовище',
     defaultOpen: true,
-    class: '!bg-zinc-900'
+    class: 'dark:bg-zinc-950'
   },
-  { label: 'Приналежність', class: '!bg-zinc-900' },
-  { label: 'Безпека', class: '!bg-zinc-900' },
-  { label: 'Екологія', class: '!bg-zinc-900' },
+  { label: 'Приналежність', class: 'dark:bg-zinc-950' },
+  { label: 'Безпека', class: 'dark:bg-zinc-950' },
+  { label: 'Екологія', class: 'dark:bg-zinc-950' },
 ]
 
 const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)

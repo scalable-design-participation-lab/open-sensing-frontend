@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="isOpen" :ui="{ width: 'w-96' }">
-    <div class="space-y-3 p-6">
+    <UCard class="p-6 dark:bg-black">
       <UButton
         v-for="(item, index) in menuItems"
         :key="index"
@@ -8,12 +8,12 @@
         color="white"
         variant="solid"
         :icon="item.icon"
-        class="dark:bg-black dark:text-white text-lg font-semibold rounded-full py-3"
+        class="dark:bg-black dark:text-white text-lg font-semibold rounded-full py-3 my-3"
         @click="handleItemClick(item)"
       >
         {{ item.label }}
       </UButton>
-    </div>
+    </UCard>
   </UModal>
 
   <SupportModal v-model="showSupportModal" />

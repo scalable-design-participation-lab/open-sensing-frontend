@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="isOpen" :ui="{ width: 'sm:max-w-lg' }">
-    <UCard>
+    <UCard class="dark:bg-black">
       <template #header>
         <div class="flex place-content-center">
           <h3 class="text-xl font-semibold">Доступ до відкритих даних</h3>

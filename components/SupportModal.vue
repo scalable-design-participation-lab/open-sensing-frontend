@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="isOpen" :ui="{ width: 'sm:max-w-xl' }">
-    <UCard>
+    <UCard class="dark:bg-black">
       <!-- Header -->
       <template #header>
         <div class="flex items-center justify-between">

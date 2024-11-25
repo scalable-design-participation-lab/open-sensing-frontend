@@ -106,7 +106,7 @@
               :color="item.color"
               :icon="item.icon"
               :class="[
-                `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
+                `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-slate-800 text-black dark:text-white hidden md:flex`,
                 shapeClass,
               ]"
               @click="navigate"
@@ -118,7 +118,7 @@
             v-else
             :icon="item.icon"
             :class="[
-              `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
+              `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-slate-800 text-black dark:text-white hidden md:flex`,
               shapeClass,
             ]"
             @click="item.onClick"
@@ -129,7 +129,7 @@
         <!-- Dark Mode Toggle -->
         <UColorModeButton
           :class="[
-            `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
+            `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-slate-800 text-black dark:text-white hidden md:flex`,
             shapeClass,
           ]"
           @click="isDark = !isDark"
@@ -137,7 +137,7 @@
         <!-- Menu -->
         <UButton
           :class="[
-            `h-full px-2 md:px-2 lg:px-3.5 text-lg !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white`,
+            `h-full px-2 md:px-2 lg:px-3.5 text-lg !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-slate-800 text-black dark:text-white`,
             shapeClass,
           ]"
           @click="showMenuModal = true"
