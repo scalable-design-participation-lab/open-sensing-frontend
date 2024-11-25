@@ -95,7 +95,7 @@ const moreSeriesItems = ref([])
 
 onMounted(async () => {
   try {
-    // Simulate API calls
+    // Simulate API calls.
     await Promise.all([
       loadContent(),
       loadTabItems(),
