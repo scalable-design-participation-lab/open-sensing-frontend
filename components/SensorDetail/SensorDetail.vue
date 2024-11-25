@@ -58,12 +58,20 @@
             </template>
 
             <div ref="scrollContainer" class="h-96 overflow-y-auto">
-              <div v-if="dataLoaded" class="p-4 space-y-6">
+              <div
+                v-if="dataLoaded && !loadingStates[selectedSensor?.moduleid]"
+                class="p-4 space-y-6"
+              >
                 <template
                   v-for="(metric, metricName) in metrics"
                   :key="metricName"
                 >
-                  <div v-if="selectedDatasets.includes(metricName)">
+                  <div
+                    v-if="
+                      selectedDatasets.includes(metricName) &&
+                      chartData[metricName]?.data?.length > 0
+                    "
+                  >
                     <LineChart
                       :metric="metric"
                       :data="chartData[metricName]"
@@ -80,7 +88,13 @@
                 class="flex flex-col items-center justify-center h-full"
               >
                 <USpinner class="mb-2" />
-                <p>Loading data...</p>
+                <p>
+                  {{
+                    loadingStates[selectedSensor?.moduleid]
+                      ? 'Loading data...'
+                      : 'No data available'
+                  }}
+                </p>
               </div>
             </div>
 
@@ -108,13 +122,16 @@
   </transition>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+<script setup lang="ts">
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSensorDetailStore } from '../../stores/sensorDetail'
 import { useDashboardStore } from '../../stores/dashboard'
 import { useDatasetStore } from '../../stores/datasets'
-import { useSensorDataStore } from '../../stores/sensorData'
+import {
+  useSensorDataStore,
+  type SensorDataStore,
+} from '../../stores/sensorData'
 import { useResizeObserver } from '@vueuse/core'
 
 /**
@@ -219,15 +236,7 @@ const margin = { top: 20, right: 20, bottom: 30, left: 40 }
  * Computed property to check if data is loaded and chart width is set
  * @type {import('vue').ComputedRef<boolean>}
  */
-const dataLoaded = computed(() => {
-  if (
-    !selectedSensor.value ||
-    !sensorData.value[selectedSensor.value.moduleid]
-  ) {
-    return false
-  }
-  return chartWidth.value > 0
-})
+const dataLoaded = ref(false)
 
 /**
  * Metrics configuration for charts
@@ -382,9 +391,65 @@ useResizeObserver(scrollContainer, (entries) => {
   }
 })
 
+// Modify the loading states and data loaded state
+const loadingStates = ref<Record<string, boolean>>({})
+
+// Add a function to load sensor data
+const loadSensorDataWithState = async (sensorId: string) => {
+  if (!sensorId) return
+
+  try {
+    loadingStates.value[sensorId] = true
+    dataLoaded.value = false
+
+    // Clear existing data first
+    if (sensorDataStore.clearSensorData) {
+      sensorDataStore.clearSensorData(sensorId)
+    }
+
+    // Load new data
+    await sensorDataStore.loadSensorData(sensorId)
+
+    // Wait for the next tick to ensure DOM updates
+    await nextTick()
+
+    // Reset charts only after data is loaded
+    if (sensorData.value[sensorId]) {
+      resetAllCharts()
+      dataLoaded.value = true
+    }
+  } catch (error) {
+    console.error(`Error loading data for sensor ${sensorId}:`, error)
+    dataLoaded.value = false
+  } finally {
+    loadingStates.value[sensorId] = false
+  }
+}
+
+// Modify the watch on selectedSensor
+watch(
+  selectedSensor,
+  async (newSensor, oldSensor) => {
+    if (newSensor?.moduleid) {
+      // If we already have data for this sensor and it's loading, don't reload
+      if (
+        sensorData.value[newSensor.moduleid] &&
+        loadingStates.value[newSensor.moduleid]
+      ) {
+        return
+      }
+
+      console.log('Loading data for sensor:', newSensor.moduleid)
+      await loadSensorDataWithState(newSensor.moduleid)
+    }
+  },
+  { immediate: true }
+)
+
+// Modify the onMounted hook
 onMounted(async () => {
-  if (selectedSensor.value) {
-    await loadSensorData()
+  if (selectedSensor.value?.moduleid) {
+    await loadSensorDataWithState(selectedSensor.value.moduleid)
   }
 })
 
@@ -502,22 +567,6 @@ const getSoilMoistureColor = (value) => {
   return 'text-green-500'
 }
 
-watch(
-  selectedSensor,
-  async (newSensor) => {
-    if (newSensor) {
-      try {
-        await sensorDataStore.loadSensorData(newSensor.moduleid)
-        console.log('Loaded sensor data:', sensorData.value[newSensor.moduleid])
-        resetAllCharts()
-      } catch (err) {
-        console.error('Error loading sensor data:', err)
-      }
-    }
-  },
-  { immediate: true }
-)
-
 /**
  * Initializes the mini map
  * This is a placeholder function that can be overridden by parent components
@@ -529,35 +578,34 @@ const initMiniMap = () => {}
  * @type {import('vue').ComputedRef<Object>}
  */
 const chartData = computed(() => {
-  if (
-    !selectedSensor.value ||
-    !sensorData.value[selectedSensor.value.moduleid]
-  ) {
+  const sensorId = selectedSensor.value?.moduleid
+  if (!sensorId || !sensorData.value[sensorId]) {
     return {}
   }
 
-  const sensorMetrics = sensorData.value[selectedSensor.value.moduleid]
+  const sensorMetrics = sensorData.value[sensorId]
   const result = {}
 
-  Object.keys(metrics.value).forEach((metricName) => {
+  Object.entries(metrics.value).forEach(([metricName, metric]) => {
     const metricData = sensorMetrics[metricName]
-    if (metricData) {
-      result[metricName] = {
-        data: metricData.data.map((d) => {
-          let dateStr
-          if (typeof d.date === 'string' && /^\d+$/.test(d.date)) {
-            dateStr = new Date(parseInt(d.date)).toISOString()
-          } else {
-            dateStr = typeof d.date === 'string' ? d.date : d.date.toISOString()
-          }
+    if (metricData?.data && Array.isArray(metricData.data)) {
+      const validData = metricData.data
+        .filter((d) => d && d.date && d.value !== undefined)
+        .map((d) => ({
+          date:
+            typeof d.date === 'string' && /^\d+$/.test(d.date)
+              ? new Date(parseInt(d.date)).toISOString()
+              : new Date(d.date).toISOString(),
+          value: Number(d.value),
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
-          return {
-            date: dateStr,
-            value: Number(d.value),
-          }
-        }),
-        min: metricData.min,
-        max: metricData.max,
+      if (validData.length > 0) {
+        result[metricName] = {
+          data: validData,
+          min: metricData.min,
+          max: metricData.max,
+        }
       }
     }
   })

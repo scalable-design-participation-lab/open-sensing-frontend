@@ -98,9 +98,11 @@ const overviewDescription = ref(
  */
 const lastUpdated = computed(() => {
   if (!sensors.value.length) return 'No data'
-  const dates = sensors.value.map((sensor) =>
-    new Date(sensor.timestamp).getTime()
-  )
+  const dates = sensors.value.map((sensor) => {
+    const timestamp = new Date(sensor.timestamp)
+    timestamp.setHours(timestamp.getHours() - 5)
+    return timestamp.getTime()
+  })
   const latestDate = new Date(Math.max(...dates))
   return latestDate.toLocaleString('en-US', {
     timeZone: 'America/New_York',
@@ -222,6 +224,10 @@ onMounted(async () => {
 })
 
 const formatSensorData = (sensor: Sensor): FormattedSensor => {
+  // Convert UTC timestamp to UTC-5
+  const timestamp = new Date(sensor.timestamp)
+  timestamp.setHours(timestamp.getHours() - 5)
+
   return {
     id: sensor.moduleid,
     moduleid: sensor.moduleid,
@@ -232,7 +238,7 @@ const formatSensorData = (sensor: Sensor): FormattedSensor => {
     nox: sensor.nox,
     pm25: sensor.pm25,
     coordinates: sensor.lon && sensor.lat ? [sensor.lon, sensor.lat] : null,
-    timestamp: new Date(sensor.timestamp).toLocaleString('en-US', {
+    timestamp: timestamp.toLocaleString('en-US', {
       timeZone: 'America/New_York',
     }),
     status:

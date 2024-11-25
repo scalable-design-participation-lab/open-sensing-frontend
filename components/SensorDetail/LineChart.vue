@@ -80,11 +80,17 @@ let line: d3.Line<DataPoint>
 let brush: d3.BrushBehavior<unknown>
 
 const createLineChart = () => {
-  if (!props.data?.data || !Array.isArray(props.data.data)) {
+  if (
+    !props.data?.data ||
+    !Array.isArray(props.data.data) ||
+    props.data.data.length === 0
+  ) {
+    console.warn('Invalid or empty data received:', props.data)
     return
   }
 
-  if (props.width <= 0 || props.data.data.length === 0) {
+  if (props.width <= 0) {
+    console.warn('Invalid chart width:', props.width)
     return
   }
 
@@ -100,44 +106,53 @@ const createLineChart = () => {
           d.value !== undefined &&
           d.value !== null &&
           !isNaN(Number(d.value))
+        if (!isValid) {
+          console.warn('Invalid data point:', d)
+        }
         return isValid
       })
       .map((d) => {
-        let parsedDate
         try {
-          if (typeof d.date === 'string') {
-            if (/^\d+$/.test(d.date)) {
-              parsedDate = new Date(parseInt(d.date))
-            } else {
-              parsedDate = new Date(d.date)
-            }
+          let parsedDate =
+            typeof d.date === 'string'
+              ? /^\d+$/.test(d.date)
+                ? new Date(parseInt(d.date))
+                : new Date(d.date)
+              : new Date(d.date)
 
-            if (
-              isNaN(parsedDate.getTime()) ||
-              parsedDate.getFullYear() < 2000
-            ) {
-              return null
-            }
-          } else if (typeof d.date === 'number') {
-            parsedDate = new Date(d.date)
-          } else {
-            parsedDate = d.date
+          if (isNaN(parsedDate.getTime()) || parsedDate.getFullYear() < 2000) {
+            console.warn('Invalid or too old date:', d.date)
+            return null
+          }
+
+          const value = Number(d.value)
+          if (isNaN(value) || !isFinite(value)) {
+            console.warn('Invalid value:', d.value)
+            return null
           }
 
           return {
             date: parsedDate,
-            value: Number(d.value),
+            value: value,
           }
         } catch (error) {
+          console.error('Error processing data point:', d, error)
           return null
         }
       })
-      .filter((d) => d !== null)
+      .filter((d): d is DataPoint => d !== null)
       .sort((a, b) => a.date.getTime() - b.date.getTime())
 
     if (data.length === 0) {
+      console.warn('No valid data points after processing')
       return
     }
+
+    console.log('Data range:', {
+      start: data[0].date.toISOString(),
+      end: data[data.length - 1].date.toISOString(),
+      points: data.length,
+    })
 
     const width = props.width - props.margin.left - props.margin.right
     const height = props.height - props.margin.top - props.margin.bottom
@@ -159,10 +174,30 @@ const createLineChart = () => {
     x = d3.scaleTime().range([0, width]).domain(xDomain)
     y = d3.scaleLinear().range([height, 0]).domain(yDomain).nice()
 
+    const timeSpan =
+      data[data.length - 1].date.getTime() - data[0].date.getTime()
+    const days = timeSpan / (1000 * 60 * 60 * 24)
+
+    let tickFormat
+    let tickCount
+    if (days <= 1) {
+      tickFormat = d3.timeFormat('%H:%M')
+      tickCount = 6
+    } else if (days <= 7) {
+      tickFormat = d3.timeFormat('%m/%d %H:%M')
+      tickCount = 5
+    } else if (days <= 31) {
+      tickFormat = d3.timeFormat('%m/%d')
+      tickCount = 5
+    } else {
+      tickFormat = d3.timeFormat('%Y-%m-%d')
+      tickCount = 5
+    }
+
     xAxis = d3
       .axisBottom(x)
-      .ticks(5)
-      .tickFormat(d3.timeFormat('%Y-%m-%d') as any)
+      .ticks(tickCount)
+      .tickFormat(tickFormat as any)
 
     yAxis = d3
       .axisLeft(y)
@@ -238,27 +273,39 @@ const createLineChart = () => {
   }
 }
 
-/**
- * Updates the chart based on brush selection
- * @param {d3.D3BrushEvent<any>} event - The brush event
- */
 const updateChart = (event: d3.D3BrushEvent<any>) => {
   if (!event.selection) return
   const [x0, x1] = event.selection.map(x.invert) as [Date, Date]
+
+  if (isNaN(x0.getTime()) || isNaN(x1.getTime())) {
+    console.warn('Invalid date range selected')
+    return
+  }
+
   updateDataDashboardValues('dateRange', [x0, x1])
   x.domain([x0, x1])
   svg.select('.x-axis').call(xAxis as any)
   svg.select('.line').attr('d', line)
 }
 
-/**
- * Resets the chart to its initial state
- */
 const resetChart = () => {
-  const data = props.data.data.map((d) => ({
-    ...d,
-    date: d3.isoParse(d.date) as Date,
-  }))
+  if (!props.data?.data || props.data.data.length === 0) return
+
+  const data = props.data.data
+    .map((d) => ({
+      ...d,
+      date:
+        typeof d.date === 'string'
+          ? /^\d+$/.test(d.date)
+            ? new Date(parseInt(d.date))
+            : new Date(d.date)
+          : new Date(d.date),
+    }))
+    .filter((d) => !isNaN(d.date.getTime()) && d.date.getFullYear() >= 2000)
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
+
+  if (data.length === 0) return
+
   const xDomain = d3.extent(data, (d) => d.date) as [Date, Date]
   x.domain(xDomain)
   y.domain([props.data.min, props.data.max]).nice()
@@ -267,7 +314,6 @@ const resetChart = () => {
   svg.select('.line').attr('d', line)
   svg.select('.brush').call(brush.move, null)
 
-  // Add this line to update the store's dateRange
   updateDataDashboardValues('dateRange', xDomain)
 }
 
