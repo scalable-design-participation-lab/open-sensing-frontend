@@ -1,6 +1,6 @@
 <template>
   <UCard 
-    class="fixed right-6 top-24 w-96 md:w-80 max-h-[calc(100vh-11rem)] z-40 shadow-xl dark:bg-slate-950 flex flex-col overflow-hidden"
+    class="fixed right-6 top-24 w-96 md:w-80 max-h-[calc(100vh-11rem)] z-40 shadow-xl dark:bg-black flex flex-col overflow-hidden"
   >
     <div 
       class="flex-1 overflow-y-scroll max-h-[calc(100vh-13rem)] px-1"
@@ -9,7 +9,7 @@
         color="white"
         variant="solid"
         :items="menuItems"
-        class="space-y-1"
+        class="space-y-1.5"
       >
         <template #item="{ item }">
           <SubWindow
@@ -76,7 +76,7 @@
       </UAccordion>
       
       <UButton
-        class="my-2 py-3 px-6 rounded-full flex place-self-end hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+        class="my-2 py-3 px-6 rounded-full flex place-self-end hover:bg-gray-300 hover:text-black dark:hover:bg-zinc-700 dark:hover:text-white"
         color="black"
         :loading="isSaving"
         :disabled="isSaving"
@@ -138,10 +138,11 @@ const menuItems = [
   {
     label: 'Середовище',
     defaultOpen: true,
+    class: 'dark:!bg-zinc-950 py-2'
   },
-  { label: 'Приналежність' },
-  { label: 'Безпека' },
-  { label: 'Екологія' },
+  { label: 'Приналежність', class: 'dark:!bg-zinc-950 py-2' },
+  { label: 'Безпека', class: 'dark:!bg-zinc-950 py-2' },
+  { label: 'Екологія', class: 'dark:!bg-zinc-950 py-2' },
 ]
 
 const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)
@@ -212,7 +213,7 @@ const spaceContent = computed(() => {
     4: {
       title: 'Позначте на мапі місця навколо р. Тяжилівка, де ви стикалися з перешкодами',
       description:
-        'За допомогою іконки нижче позначте місця, які на вашу думку потрібно заборонити.',
+        'За допомогою іконки нижче вкажіть, де ви зустрічали перепони на шляху на кшталт розбитої дороги, непрохідного лісу тощо. Після цього переходьте до розділу «Приналежність».',
     },
   }
   return contents[spaceSubwindow.value] || { title: '', description: '' }
@@ -257,7 +258,7 @@ const safetyContent = computed(() => {
       title:
         'Поділіться думкою про рівень безпеки навколо р. Тяжилівка',
       description:
-        "Оберіть іконку (навівши на неї, побачите підказку) та позначте на мапі місця, які вам подобаються, не подобаються або пов' язані із певними спогадами. Додайте коментар із поясненням, і після цього переходьте до розділу «Безпека».",
+        "Оберіть іконку (навівши на неї, побачите підказку) та позначте на мапі  місця, які вам подобаються, не подобаються або пов' язані із певними  спогадами. Додайте коментар із поясненням, і після цього переходьте до  розділу «Екологія».",
     },
   }
   return contents[safetySubwindow.value] || { title: '', description: '' }

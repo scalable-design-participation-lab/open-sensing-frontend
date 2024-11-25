@@ -1,5 +1,5 @@
 <template>
-  <UCard class="dark:bg-slate-950">
+  <UCard class="dark:bg-black">
     <div class="space-y-3">
       <UProgress
         :value="progressPercentage"
@@ -52,7 +52,7 @@
               padding: { sm: 'py-1.5', md: 'py-2', lg: 'py-2.5' },
             }"
             :class="[
-              'w-full justify-center hover:!bg-gray-50 dark:hover:!bg-slate-800',
+              'w-full justify-center hover:!bg-gray-50 dark:hover:!bg-zinc-800',
               {
                 'border-2 border-red-500': btn.color === 'red',
                 'border-2 border-green-500': btn.color === 'green',
@@ -70,7 +70,7 @@
 
       <div v-if="iconGrid">
         <p class="text-sm text-gray-400 mb-2">{{ iconGrid.title }}</p>
-        <UCard>
+        <UCard class="dark:!bg-zinc-950">
           <div class="grid grid-cols-3 gap-3">
             <UTooltip
               v-for="icon in iconGrid.icons"
@@ -97,7 +97,7 @@
           icon="i-heroicons-arrow-left-20-solid"
           color="white"
           variant="solid"
-          class="rounded-full p-2 hover:bg-gray-300 dark:hover:bg-slate-600"
+          class="rounded-full p-2 hover:bg-gray-300 dark:!bg-zinc-900 dark:hover:!bg-zinc-700"
           :disabled="currentSubwindow === 1"
           @click="$emit('prev')"
         />
@@ -105,7 +105,7 @@
           icon="i-heroicons-arrow-right-20-solid"
           color="white"
           variant="solid"
-          class="rounded-full p-2 hover:bg-gray-300 dark:hover:bg-slate-600"
+          class="rounded-full p-2 hover:bg-gray-300 dark:!bg-zinc-900 dark:hover:!bg-zinc-700"
           :disabled="currentSubwindow === maxSubwindow"
           @click="$emit('next')"
         />

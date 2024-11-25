@@ -45,23 +45,23 @@
           :enable-click="isMapPage"
           :is-map-page="isMapPage"
           :show-delete-button="!isMapPage"
-          @toggle-comment-popup="toggleCommentPopup"
-          @toggle-image-upload-popup="toggleImageUploadPopup"
+          @toggle-comment-popup="toggleCommentModal"
+          @toggle-image-upload-popup="toggleImageUploadModal"
           @show-comment-display="handleShowCommentDisplay"
         />
       </ol-source-vector>
     </ol-layer-vector>
 
     <ol-overlay
-      v-if="commentPopupVisible"
-      :position="commentPopupPosition"
-      :offset="commentPopupOffset"
+      v-if="CommentModalVisible"
+      :position="CommentModalPosition"
+      :offset="CommentModalOffset"
     >
-      <CommentPopup
-        :is-visible="commentPopupVisible"
+      <CommentModal
+        :is-visible="CommentModalVisible"
         :feature-id="selectedFeatureId"
         class="z-10"
-        @close="closeCommentPopup"
+        @close="closeCommentModal"
       />
     </ol-overlay>
 
@@ -86,7 +86,7 @@ import { useMapUIStore } from '@/stores/mapUI'
 import { useRuntimeConfig } from '#app'
 import { useRoute } from 'vue-router'
 import DrawingLayer from './DrawingLayer/DrawingLayer.vue'
-import CommentPopup from './CommentPopup.vue'
+import CommentModal from './CommentModal.vue'
 import CommentDisplay from './CommentDisplay.vue'
 import { Coordinate } from 'ol/coordinate'
 
@@ -115,14 +115,14 @@ const config = useRuntimeConfig()
 const route = useRoute()
 
 const projection = ref('EPSG:3857')
-const commentPopupVisible = ref(false)
+const CommentModalVisible = ref(false)
 const selectedFeatureId = ref(null)
-const commentPopupPosition = ref(null)
+const CommentModalPosition = ref(null)
 const commentDisplayPosition = ref<[number, number] | null>(null)
 const commentDisplayOffset = ref<[number, number]>([0, 0])
 const showCommentDisplay = ref(false)
 const selectedFeatureForDisplay = ref(null)
-const commentPopupOffset = ref([0, 0])
+const CommentModalOffset = ref([0, 0])
 
 const colorMode = useColorMode()
 const isDark = computed({
@@ -157,30 +157,30 @@ const mapboxAttribution =
 
 const isMapPage = computed(() => route.name === 'map')
 
-function toggleCommentPopup(feature) {
+function toggleCommentModal(feature) {
   console.log('Toggle comment popup:', feature)
-  if (commentPopupVisible.value && selectedFeatureId.value === feature.id) {
-    closeCommentPopup()
+  if (CommentModalVisible.value && selectedFeatureId.value === feature.id) {
+    closeCommentModal()
   } else {
-    openCommentPopup(feature)
+    openCommentModal(feature)
   }
 }
 
-function toggleImageUploadPopup(feature) {
+function toggleImageUploadModal(feature) {
   console.log('Toggle comment popup:', feature)
-  if (commentPopupVisible.value && selectedFeatureId.value === feature.id) {
-    closeCommentPopup()
+  if (CommentModalVisible.value && selectedFeatureId.value === feature.id) {
+    closeCommentModal()
   } else {
-    openCommentPopup(feature)
+    openCommentModal(feature)
   }
 }
 
-function openCommentPopup(feature) {
+function openCommentModal(feature) {
   selectedFeatureId.value = feature.id
-  commentPopupVisible.value = true
+  CommentModalVisible.value = true
   const { position, offset } = calculatePopupPosition(feature)
-  commentPopupPosition.value = position
-  commentPopupOffset.value = offset
+  CommentModalPosition.value = position
+  CommentModalOffset.value = offset
 }
 
 function getFeaturePosition(feature) {
@@ -199,8 +199,8 @@ function getFeaturePosition(feature) {
   return [0, 0]
 }
 
-function closeCommentPopup() {
-  commentPopupVisible.value = false
+function closeCommentModal() {
+  CommentModalVisible.value = false
   selectedFeatureId.value = null
 }
 
@@ -229,7 +229,7 @@ function updateShowCommentDisplay(value) {
 function handleShowCommentDisplay(data) {
   if (!isMapPage.value) return
 
-  closeCommentPopup()
+  closeCommentModal()
 
   if (
     selectedFeatureForDisplay.value?.id === data.feature.id &&

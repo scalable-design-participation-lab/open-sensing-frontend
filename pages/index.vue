@@ -23,7 +23,7 @@ const leftItems = ref([
 const rightItems = ref([
   {
     icon: 'i-heroicons-arrow-down-tray-20-solid',
-    onClick: () => (showDownloadPopup.value = true),
+    onClick: () => (showDownloadModal.value = true),
   },
   {
     icon: computed(() =>
@@ -41,7 +41,7 @@ const rightItems = ref([
 
 const isMapBlurred = computed(() => mapUIStore.showRegistration)
 
-const showDownloadPopup = ref(false)
+const showDownloadModal = ref(false)
 const showOnboarding = ref(true)
 const showRegistration = ref(false)
 
@@ -134,7 +134,7 @@ const handleCloseRegistration = () => {
     ></div>
     <Teleport to="body">
       <DownloadModalHurtoma
-        v-model="showDownloadPopup"
+        v-model="showDownloadModal"
         @download="handleDownload"
       />
     </Teleport>

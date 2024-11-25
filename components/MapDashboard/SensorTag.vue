@@ -140,7 +140,7 @@ const positionStyle = computed(() => {
  * @type {Object}
  */
 const cardStyle = {
-  base: 'bg-white dark:bg-gray-800 shadow-lg',
+  base: 'bg-white dark:bg-slate-800 shadow-lg',
   body: 'p-0',
   header: 'p-3 border-b border-gray-200 dark:border-gray-700',
 }

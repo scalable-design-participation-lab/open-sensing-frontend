@@ -29,8 +29,8 @@
         :enable-click="enableClick"
         :is-map-page="isMapPage"
         :show-delete-button="showDeleteButton"
-        @toggle-comment-popup="toggleCommentPopup"
-        @toggle-image-upload-popup="toggleImageUploadPopup"
+        @toggle-comment-popup="toggleCommentModal"
+        @toggle-image-upload-popup="toggleImageUploadModal"
         @show-comment-display="handleShowCommentDisplay"
       />
 
@@ -40,7 +40,7 @@
         :enable-click="enableClick"
         :is-map-page="isMapPage"
         :show-delete-button="showDeleteButton"
-        @toggle-comment-popup="toggleCommentPopup"
+        @toggle-comment-popup="toggleCommentModal"
         @show-comment-display="handleShowCommentDisplay"
       />
       <LineStringLayer
@@ -48,7 +48,7 @@
         :enable-click="enableClick"
         :is-map-page="isMapPage"
         :show-delete-button="showDeleteButton"
-        @toggle-comment-popup="toggleCommentPopup"
+        @toggle-comment-popup="toggleCommentModal"
         @show-comment-display="handleShowCommentDisplay"
       />
     </ol-source-vector>
@@ -138,11 +138,11 @@ const getDrawColor = computed(() => {
   return colorMap[drawType.value] || 'black'
 })
 
-function toggleCommentPopup(feature) {
+function toggleCommentModal(feature) {
   emit('toggle-comment-popup', feature)
 }
 
-function toggleImageUploadPopup(feature) {
+function toggleImageUploadModal(feature) {
   emit('toggle-image-upload-popup', feature)
 }
 

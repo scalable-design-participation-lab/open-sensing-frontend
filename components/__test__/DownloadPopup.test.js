@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import DownloadPopup from '../DownloadPopup.vue'
+import DownloadModal from '../DownloadModal.vue'
 import GenericFilterSidebar from '../FilterSidebar/GenericFilterSidebar.vue'
 
 const mockNuxtUI = {
@@ -42,7 +42,7 @@ const createWrapper = (props = {}) => {
   const pinia = createPinia()
   setActivePinia(pinia)
 
-  return mount(DownloadPopup, {
+  return mount(DownloadModal, {
     props: {
       filterSections: [
         { name: 'dateRange', props: { modelValue: [] } },
@@ -63,7 +63,7 @@ const createWrapper = (props = {}) => {
   })
 }
 
-describe('DownloadPopup', () => {
+describe('DownloadModal', () => {
   test('renders the component correctly', () => {
     const wrapper = createWrapper()
     expect(wrapper.exists()).toBe(true)

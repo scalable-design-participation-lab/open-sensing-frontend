@@ -12,7 +12,7 @@
         />
       </div>
       <div
-        class="relative w-full h-32 bg-gray-800 rounded overflow-hidden mb-3"
+        class="relative w-full h-32 bg-slate-800 rounded overflow-hidden mb-3"
       >
         <div
           class="absolute inset-0 flex flex-col items-center justify-center text-gray-400"

@@ -25,8 +25,8 @@ export default defineAppConfig({
       wrapper: 'lg:mb-0 lg:border-0',
       popover: {
         links: {
-          active: 'dark:bg-slate-950',
-          inactive: 'dark:hover:bg-slate-950',
+          active: 'dark:bg-black',
+          inactive: 'dark:hover:bg-black',
         },
       },
     },

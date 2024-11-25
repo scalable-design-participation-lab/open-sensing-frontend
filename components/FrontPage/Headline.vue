@@ -20,7 +20,7 @@
       <UTabs :items="content" />
     </UCard>
     <UCard v-else-if="type === 'chart'" class="p-4 text-center">
-      <div class="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg">
+      <div class="bg-gray-100 dark:bg-slate-800 p-8 rounded-lg">
         {{ content }}
       </div>
     </UCard>

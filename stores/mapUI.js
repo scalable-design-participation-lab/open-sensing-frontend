@@ -13,7 +13,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
   const spaceSubwindow = ref(1)
   const comment = ref('')
   const features = reactive([])
-  const isCommentPopupOpen = ref(false)
+  const isCommentModalOpen = ref(false)
   const currentBelongingIcon = ref(null)
   const currentSafetyIcon = ref(null)
   const currentEnvironmentIcon = ref(null)
@@ -246,8 +246,8 @@ export const useMapUIStore = defineStore('mapUI', () => {
     drawEnable.value = false
   }
 
-  function setCommentPopupOpen(isOpen) {
-    this.isCommentPopupOpen = isOpen
+  function setCommentModalOpen(isOpen) {
+    this.isCommentModalOpen = isOpen
   }
 
   function activateBelongingDrawing(iconName) {
@@ -505,8 +505,8 @@ export const useMapUIStore = defineStore('mapUI', () => {
     addComment,
     getColorForFrequency,
     addFeature,
-    isCommentPopupOpen,
-    setCommentPopupOpen,
+    isCommentModalOpen,
+    setCommentModalOpen,
     currentBelongingIcon,
     activateBelongingDrawing,
     currentSafetyIcon,

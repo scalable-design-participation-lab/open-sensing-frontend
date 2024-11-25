@@ -1,5 +1,5 @@
 <!--
- * DownloadPopup Component
+ * DownloadModal Component
  * 
  * This component provides a popup interface for configuring and initiating data downloads.
  * It includes filter options, file format selection, and download controls.
@@ -8,9 +8,9 @@
  * 
  * @component
  * @example
- * <DownloadPopup
+ * <DownloadModal
  *   :filter-sections="downloadFilterSections"
- *   @close="closeDownloadPopup"
+ *   @close="closeDownloadModal"
  *   @download="handleDataDownload"
  * />
  -->
@@ -84,13 +84,13 @@
 import { ref, watch } from 'vue'
 
 /**
- * Props for the DownloadPopup component
- * @typedef {Object} DownloadPopupProps
+ * Props for the DownloadModal component
+ * @typedef {Object} DownloadModalProps
  * @property {Array} filterSections - Configuration for the filter sections
  */
 
 /**
- * @type {import('vue').PropType<DownloadPopupProps>}
+ * @type {import('vue').PropType<DownloadModalProps>}
  */
 const props = defineProps({
   filterSections: {

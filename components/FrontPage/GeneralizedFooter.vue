@@ -38,25 +38,25 @@
           />
         </div>
         <button
-          class="w-12 h-12 rounded-full bg-white dark:bg-slate-950 flex items-center justify-center font-semibold text-lg md:text-xl cursor-pointer shadow-md hover:bg-slate-950 hover:text-white dark:hover:bg-slate-700"
+          class="w-12 h-12 rounded-full bg-white dark:bg-black flex items-center justify-center font-semibold text-lg md:text-xl cursor-pointer shadow-md hover:bg-black hover:text-white dark:text-white dark:hover:bg-slate-800"
           aria-label="Help"
-          @click="showAboutPopup = true"
+          @click="showSupportModal = true"
         >
           ?
         </button>
       </div>
     </footer>
 
-    <!-- Add AboutPopup -->
-    <AboutPopup v-model="showAboutPopup" />
+    <!-- Add SupportModal -->
+    <SupportModal v-model="showSupportModal" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { PropType, ref } from 'vue'
 
-// Add ref for AboutPopup
-const showAboutPopup = ref(false)
+// Add ref for SupportModal
+const showSupportModal = ref(false)
 
 /**
  * Props for the GeneralizedFooter component
