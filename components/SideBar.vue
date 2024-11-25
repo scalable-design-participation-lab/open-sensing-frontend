@@ -9,7 +9,7 @@
         color="white"
         variant="solid"
         :items="menuItems"
-        class="space-y-1"
+        class="space-y-1.5"
       >
         <template #item="{ item }">
           <SubWindow
@@ -138,11 +138,11 @@ const menuItems = [
   {
     label: 'Середовище',
     defaultOpen: true,
-    class: 'dark:bg-zinc-950'
+    class: 'dark:bg-zinc-950, py-2'
   },
-  { label: 'Приналежність', class: 'dark:bg-zinc-950' },
-  { label: 'Безпека', class: 'dark:bg-zinc-950' },
-  { label: 'Екологія', class: 'dark:bg-zinc-950' },
+  { label: 'Приналежність', class: 'dark:bg-zinc-950, py-2' },
+  { label: 'Безпека', class: 'dark:bg-zinc-950, py-2' },
+  { label: 'Екологія', class: 'dark:bg-zinc-950, py-2' },
 ]
 
 const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)
