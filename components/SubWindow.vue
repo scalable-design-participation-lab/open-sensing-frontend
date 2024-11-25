@@ -52,7 +52,7 @@
               padding: { sm: 'py-1.5', md: 'py-2', lg: 'py-2.5' },
             }"
             :class="[
-              'w-full justify-center hover:!bg-gray-50 dark:hover:!bg-slate-800',
+              'w-full justify-center hover:!bg-gray-50 dark:hover:!bg-zinc-800',
               {
                 'border-2 border-red-500': btn.color === 'red',
                 'border-2 border-green-500': btn.color === 'green',
@@ -70,7 +70,7 @@
 
       <div v-if="iconGrid">
         <p class="text-sm text-gray-400 mb-2">{{ iconGrid.title }}</p>
-        <UCard>
+        <UCard class="dark:!bg-zinc-950">
           <div class="grid grid-cols-3 gap-3">
             <UTooltip
               v-for="icon in iconGrid.icons"
