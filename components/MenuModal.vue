@@ -8,7 +8,7 @@
         color="white"
         variant="solid"
         :icon="item.icon"
-        class="dark:bg-slate-950 dark:text-white text-lg font-semibold rounded-full py-3"
+        class="dark:bg-black dark:text-white text-lg font-semibold rounded-full py-3"
         @click="handleItemClick(item)"
       >
         {{ item.label }}

@@ -1,5 +1,5 @@
 <template>
-  <UCard class="dark:bg-slate-950">
+  <UCard class="dark:bg-black">
     <div class="space-y-3">
       <UProgress
         :value="progressPercentage"
@@ -97,7 +97,7 @@
           icon="i-heroicons-arrow-left-20-solid"
           color="white"
           variant="solid"
-          class="rounded-full p-2 hover:bg-gray-300 dark:hover:bg-slate-600"
+          class="rounded-full p-2 hover:bg-gray-300 dark:!bg-zinc-900 dark:hover:!bg-zinc-700"
           :disabled="currentSubwindow === 1"
           @click="$emit('prev')"
         />
@@ -105,7 +105,7 @@
           icon="i-heroicons-arrow-right-20-solid"
           color="white"
           variant="solid"
-          class="rounded-full p-2 hover:bg-gray-300 dark:hover:bg-slate-600"
+          class="rounded-full p-2 hover:bg-gray-300 dark:!bg-zinc-900 dark:hover:!bg-zinc-700"
           :disabled="currentSubwindow === maxSubwindow"
           @click="$emit('next')"
         />

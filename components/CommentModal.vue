@@ -1,7 +1,7 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="dark:bg-slate-950 shadow-lg flex flex-col"
+    class="dark:bg-black shadow-lg flex flex-col"
   >
     <UTextarea
       v-model="localComment"
@@ -20,7 +20,7 @@
       </UButton>
       <UButton
         color="black"
-        class="px-5 py-2 rounded-full flex justify-center hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+        class="px-5 py-2 rounded-full flex justify-center hover:bg-gray-300 hover:text-black dark:hover:bg-zinc-700 dark:hover:text-white"
         @click="addComment"
       >
         {{ existingComment ? 'Оновити' : 'Додати' }}

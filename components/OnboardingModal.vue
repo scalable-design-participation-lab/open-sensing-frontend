@@ -1,7 +1,7 @@
 <template>
   <UCard
     v-if="isVisible"
-    class="onboarding-card max-w-[90vw] w-[500px] max-h-[90vh] overflow-y-auto z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl dark:bg-slate-950"
+    class="onboarding-card max-w-[90vw] w-[500px] max-h-[90vh] overflow-y-auto z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl dark:bg-black"
   >
     <template #header>
       <h3 class="text-xl md:text-2xl font-semibold text-center">
@@ -50,7 +50,7 @@
     <div class="flex justify-center my-8 mb-4">
       <UButton
         color="black"
-        class="px-6 py-3 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+        class="px-6 py-3 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-zinc-700 dark:hover:text-white"
         @click="handleSignup"
       >
         Розпочати реєстрацію

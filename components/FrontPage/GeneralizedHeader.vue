@@ -27,7 +27,7 @@
         <UButton
           v-if="showIcon"
           :class="[
-            `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:scale-105`,
+            `w-10 lg:w-12 text-xl sm:text-2xl !rounded-lg flex justify-center !bg-gray-50 dark:!bg-black shadow-lg hover:scale-105`,
             shapeClass,
           ]"
           alt="Scalable Design Participation Lab Logo"
@@ -39,7 +39,7 @@
         <UButton
           v-if="logoSrc"
           :class="[
-            `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg hover:scale-105`,
+            `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-black shadow-lg hover:scale-105`,
             shapeClass,
           ]"
           :to="logoLink" 
@@ -58,7 +58,7 @@
               :color="item.color || (item.primary ? 'black' : 'gray')"
               :icon="item.icon"
               :class="[
-                `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg text-black dark:text-white !bg-gray-50 dark:!bg-slate-950 hover:scale-105`,
+                `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg text-black dark:text-white !bg-gray-50 dark:!bg-black hover:scale-105`,
                 shapeClass,
               ]"
               @click="navigate"
@@ -72,7 +72,7 @@
             :color="item.color || (item.primary ? 'black' : 'gray')"
             :icon="item.icon"
             :class="[
-              `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg text-black dark:text-white !bg-gray-50 dark:!bg-slate-950 hover:scale-105`,
+              `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg text-black dark:text-white !bg-gray-50 dark:!bg-black hover:scale-105`,
               shapeClass,
             ]"
             @click="item.onClick"
@@ -88,7 +88,7 @@
             <UButton
               :icon="item.icon"
               :class="[
-                `h-full px-3 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-50 dark:!bg-slate-950 shadow-lg text-black dark:text-white hover:invert`,
+                `h-full px-3 md:px-5 lg:px-6 text-xs sm:text-sm md:text-base lg:text-lg rounded-full !bg-gray-50 dark:!bg-black shadow-lg text-black dark:text-white hover:invert`,
                 shapeClass,
               ]"
             >
@@ -106,7 +106,7 @@
               :color="item.color"
               :icon="item.icon"
               :class="[
-                `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 hover:!bg-slate-950 hover:!text-white dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
+                `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
                 shapeClass,
               ]"
               @click="navigate"
@@ -118,7 +118,7 @@
             v-else
             :icon="item.icon"
             :class="[
-              `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 hover:!bg-slate-950 hover:!text-white dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
+              `h-full px-2 md:px-3 lg:px-4 text-xs md:text-base lg:text-lg rounded-full !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
               shapeClass,
             ]"
             @click="item.onClick"
@@ -129,7 +129,7 @@
         <!-- Dark Mode Toggle -->
         <UColorModeButton
           :class="[
-            `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-gray-50 hover:!bg-slate-950 hover:!text-white dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
+            `h-full px-2 sm:px-4 md:px-5 lg:px-4 text-xs !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white hidden md:flex`,
             shapeClass,
           ]"
           @click="isDark = !isDark"
@@ -137,7 +137,7 @@
         <!-- Menu -->
         <UButton
           :class="[
-            `h-full px-2 md:px-2 lg:px-3.5 text-lg !bg-gray-50 hover:!bg-slate-950 hover:!text-white dark:!bg-slate-950 shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white`,
+            `h-full px-2 md:px-2 lg:px-3.5 text-lg !bg-gray-50 hover:!bg-black hover:!text-white dark:!bg-black shadow-lg dark:hover:!bg-gray-800 text-black dark:text-white`,
             shapeClass,
           ]"
           @click="showMenuModal = true"

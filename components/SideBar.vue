@@ -1,6 +1,6 @@
 <template>
   <UCard 
-    class="fixed right-6 top-24 w-96 md:w-80 max-h-[calc(100vh-11rem)] z-40 shadow-xl dark:bg-slate-950 flex flex-col overflow-hidden"
+    class="fixed right-6 top-24 w-96 md:w-80 max-h-[calc(100vh-11rem)] z-40 shadow-xl dark:bg-black flex flex-col overflow-hidden"
   >
     <div 
       class="flex-1 overflow-y-scroll max-h-[calc(100vh-13rem)] px-1"
@@ -76,7 +76,7 @@
       </UAccordion>
       
       <UButton
-        class="my-2 py-3 px-6 rounded-full flex place-self-end hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+        class="my-2 py-3 px-6 rounded-full flex place-self-end hover:bg-gray-300 hover:text-black dark:hover:bg-zinc-700 dark:hover:text-white"
         color="black"
         :loading="isSaving"
         :disabled="isSaving"
@@ -138,10 +138,11 @@ const menuItems = [
   {
     label: 'Середовище',
     defaultOpen: true,
+    class: '!bg-zinc-900'
   },
-  { label: 'Приналежність' },
-  { label: 'Безпека' },
-  { label: 'Екологія' },
+  { label: 'Приналежність', class: '!bg-zinc-900' },
+  { label: 'Безпека', class: '!bg-zinc-900' },
+  { label: 'Екологія', class: '!bg-zinc-900' },
 ]
 
 const spaceProgressPercentage = computed(() => (spaceSubwindow.value / 4) * 100)

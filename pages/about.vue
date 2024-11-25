@@ -21,14 +21,14 @@
       </div>
         <div class="flex space-x-2 mt-6">
           <UButton
-        class="my-2 py-3 px-6 rounded-full flex place-self-start hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+        class="my-2 py-3 px-6 rounded-full flex place-self-start hover:bg-gray-300 hover:text-black dark:hover:bg-zinc-700 dark:hover:text-white"
         color="black"
         to="/"
       >
       Взяти участь
       </UButton>
       <UButton
-        class="my-2 py-3 px-6 rounded-full flex place-self-start bg-gray-300 dark:bg-zinc-600 dark:text-white text-black hover:text-white dark:hover:bg-slate-600 dark:hover:text-white"
+        class="my-2 py-3 px-6 rounded-full flex place-self-start bg-gray-300 dark:bg-zinc-600 dark:text-white text-black hover:text-white dark:hover:bg-zinc-700 dark:hover:text-white"
         color="black"
         to="/map/"
       >
