@@ -48,10 +48,10 @@
     </main>
     <GeneralizedFooter class="z-20" />
     <Teleport to="body">
-      <DownloadPopup
-        v-if="showDownloadPopup"
+      <DownloadModal
+        v-if="showDownloadModal"
         :filter-sections="downloadFilterSections"
-        @close="showDownloadPopup = false"
+        @close="showDownloadModal = false"
         @download="handleDownloadData"
       />
     </Teleport>
@@ -99,7 +99,7 @@ const sensorDataStore = useSensorDataStore()
 
 const isLoading = ref(false)
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
-const showDownloadPopup = ref(false)
+const showDownloadModal = ref(false)
 const selectedDownloadFilters = ref({})
 
 function updateDateRange(newRange) {
@@ -274,7 +274,7 @@ const handleDownloadData = async ({ filters, format }) => {
     alert(`Download failed: ${error.message || 'Unknown error'}`)
   }
 
-  showDownloadPopup.value = false
+  showDownloadModal.value = false
 }
 
 const leftItems = ref([
@@ -315,7 +315,7 @@ const rightItems = ref([
     icon: 'i-heroicons-arrow-down-tray-20-solid',
     variant: 'outline',
     color: 'gray',
-    onClick: () => (showDownloadPopup.value = true),
+    onClick: () => (showDownloadModal.value = true),
   },
 ])
 

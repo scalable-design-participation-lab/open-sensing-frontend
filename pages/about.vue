@@ -88,9 +88,9 @@
     <div class="md:flex place-items-center justify-between">
       <h1 class="text-2xl leading-tight text-zinc-900">Drawing Participation<br>Гуртомá</h1>
       <div class="flex space-x-6 md:pr-2 !place-items-center">
-        <a href="https://www.northeastern.edu" target="_blank"><img src="/neu-logo-text.svg" alt="" class="hover:scale-105 dark:invert"></a>
-        <a href="https://www.restartfuture.org" target="_blank"><img src="/restart-logo-text.svg" alt="" class="hover:scale-105 dark:invert"></a>
-        <img src="/river-logo-text.svg" alt="" class="dark:invert">
+        <a href="https://www.northeastern.edu" target="_blank"><img src="/neu-logo-text.svg" alt="Northeastern University Logo" class="hover:scale-105 dark:invert"></a>
+        <a href="https://www.restartfuture.org" target="_blank"><img src="/restart-logo-text.svg" alt="Restart Agency Logo" class="hover:scale-105 dark:invert"></a>
+        <a href="https://www.facebook.com/SmallRiversVinnytsia" target="_blank"><img src="/river-logo-text.svg" alt="Small Rivers Vinnytsia Project Logo" class="hover:scale-105 dark:invert"></a>
       </div>
     </div>
     <div class="mt-12 md:mt-24 space-y-1 flex flex-col">

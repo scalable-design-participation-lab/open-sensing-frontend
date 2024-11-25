@@ -16,16 +16,16 @@
     </div>
   </UModal>
 
-  <AboutPopup v-model="showAboutPopup" />
+  <SupportModal v-model="showSupportModal" />
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import AboutPopup from './AboutPopup.vue'
+import SupportModal from './SupportModal.vue'
 
 const router = useRouter()
-const showAboutPopup = ref(false)
+const showSupportModal = ref(false)
 
 const props = defineProps({
   modelValue: {
@@ -85,7 +85,7 @@ const handleItemClick = (item) => {
       }
       break
     case 'help':
-      showAboutPopup.value = true
+      showSupportModal.value = true
       break
     case 'results':
       router.push('/map')

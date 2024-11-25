@@ -19,7 +19,7 @@
     :stopEvent="false"
     :positioning="'center-center'"
   >
-    <div class="polygon-plus-icon" @click.stop="toggleCommentPopup(feature)">
+    <div class="polygon-plus-icon" @click.stop="toggleCommentModal(feature)">
       <svg
         width="24"
         height="24"
@@ -133,7 +133,7 @@ function getFeatureIconPosition(feature) {
   return [centerX, centerY]
 }
 
-function toggleCommentPopup(feature) {
+function toggleCommentModal(feature) {
   emit('toggle-comment-popup', feature)
 }
 

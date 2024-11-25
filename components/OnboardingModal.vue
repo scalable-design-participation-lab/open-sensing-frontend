@@ -50,7 +50,7 @@
     <div class="flex justify-center my-8 mb-4">
       <UButton
         color="black"
-        class="px-6 py-2 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+        class="px-6 py-3 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
         @click="handleSignup"
       >
         Розпочати реєстрацію
@@ -59,7 +59,7 @@
 
     <template #footer>
       <p class="text-xs text-gray-500 px-6 py-3 leading-tight text-center">
-        Гуртомá – це спільний проєкт <a href="https://www.restartfuture.org/" target="_blank">Restart</a> та <a href="https://northeastern.edu" target="_blank">Northeastern University</a>
+        Гуртомá – це спільний проєкт <a href="https://www.restartfuture.org/" target="_blank" class="underline hover:no-underline">Restart</a> та <a href="https://northeastern.edu" target="_blank" class="underline hover:no-underline">Northeastern University</a>
       </p>
     </template>
   </UCard>

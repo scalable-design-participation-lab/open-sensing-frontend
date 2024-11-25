@@ -19,7 +19,7 @@
       <UFormGroup label="Прізвище" name="lastname">
         <UInput
           v-model="formState.lastname"
-          placeholder="Вкажіть своє ім'я"
+          placeholder="Вкажіть своє прізвище"
           color="blue"
           variant="outline"
           size="md"
@@ -28,7 +28,7 @@
       <UFormGroup label="Ім'я" name="firstname">
         <UInput
           v-model="formState.firstname"
-          placeholder="Введіть своє ім'я"
+          placeholder="Вкажіть своє ім'я"
           color="blue"
           variant="outline"
           size="md"

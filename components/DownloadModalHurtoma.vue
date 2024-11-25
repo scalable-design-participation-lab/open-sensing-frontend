@@ -20,7 +20,7 @@
       <div class="flex justify-center my-8 mb-4">
         <UButton
           color="black"
-          class="px-6 py-2 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+          class="px-6 py-3 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
           @click="closeModal"
         >
         Повернутися до карти

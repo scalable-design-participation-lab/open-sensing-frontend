@@ -4,7 +4,7 @@
       <!-- Header -->
       <template #header>
         <div class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold">Про проєкт</h3>
+          <h3 class="text-xl font-semibold">Допомога</h3>
           <UButton
             color="gray"
             variant="ghost"
@@ -34,17 +34,19 @@
           <p>
             Як долучитися: Використовуйте інструменти на лівій панелі збоку, щоб позначати місця та ділитися своїм досвідом. Ваш внесок дозволить краще зрозуміти, в якому стані міський простір та як його покращити.
           </p>
+          <p>Будь ласка, <a href="https://forms.gle/6d8GuBSPaingSR4L6" target="_blank" class="underline hover:no-underline">заповніть форму</a>, якщо бажаєте залишити відгук про платформу.</p>
         </div>
       </div>
 
-      <!-- Footer -->
-      <template #footer>
-        <div class="flex justify-end">
-          <UButton color="gray" variant="solid" @click="closeModal">
-            Close
+      <div class="flex justify-center mt-6 mb-2">
+          <UButton 
+            color="black"
+            @click="closeModal"
+            class="px-6 py-3 rounded-full hover:bg-gray-300 hover:text-black dark:hover:bg-slate-600 dark:hover:text-white"
+           >
+           Повернутися до карти
           </UButton>
         </div>
-      </template>
     </UCard>
   </UModal>
 </template>
