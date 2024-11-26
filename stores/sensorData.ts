@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { SENSOR_METRICS } from '../constants/metrics'
+import { processDataPoint, validateAndSortData } from '../utils/dataProcessing'
 
 export interface SensorDataPoint {
   date: string
@@ -27,90 +29,72 @@ export interface SensorDataStore {
 export const useSensorDataStore = defineStore('sensorData', () => {
   const sensorData = ref<Record<string, SensorMetrics>>({})
   const isLoading = ref(false)
+  const lastFetchTime = ref<Record<string, number>>({})
+  const cacheTime = 5400000 // 1h30m
 
-  const loadSensorData = async (sensorId: string) => {
+  const loadSensorData = async (moduleId: string, force = false) => {
     if (isLoading.value) return
-    if (!sensorId) {
-      console.warn('No sensor ID provided')
+
+    // Check cache
+    if (
+      !force &&
+      sensorData.value[moduleId] &&
+      lastFetchTime.value[moduleId] &&
+      Date.now() - lastFetchTime.value[moduleId] < cacheTime
+    ) {
       return
     }
 
     isLoading.value = true
     try {
-      const response = await $fetch(`/api/sensor-data/${sensorId}`)
+      const response = await $fetch('/api/sensor-data', {
+        params: { moduleId },
+      })
 
       if (!response || typeof response !== 'object') {
-        console.warn(`Invalid response for sensor ${sensorId}`)
+        console.warn(`Invalid response for sensor ${moduleId}`)
+        return
+      }
+
+      const { moduleInfo: info, sensorData: data } = response
+
+      if (!Array.isArray(data)) {
+        console.warn(`Invalid data format for sensor ${moduleId}`)
         return
       }
 
       const processedData: SensorMetrics = {}
 
-      Object.entries(response).forEach(([key, value]: [string, any]) => {
-        if (value && Array.isArray(value.data)) {
-          const validData = value.data
-            .filter((d: any) => {
-              if (!d || !d.date || d.value === undefined || d.value === null) {
-                return false
-              }
+      Object.entries(SENSOR_METRICS).forEach(([key, metric]) => {
+        const processedPoints = data
+          .map((d) => processDataPoint(d, metric.name))
+          .filter((d): d is ProcessedDataPoint => d !== null)
 
-              // Validate date
-              let date =
-                typeof d.date === 'string'
-                  ? /^\d+$/.test(d.date)
-                    ? new Date(parseInt(d.date))
-                    : new Date(d.date)
-                  : new Date(d.date)
+        if (processedPoints.length > 0) {
+          const sortedData = validateAndSortData(processedPoints)
+          const values = sortedData.map((d) => d.value)
 
-              if (isNaN(date.getTime()) || date.getFullYear() < 2000) {
-                return false
-              }
-
-              // Validate value
-              const numValue = Number(d.value)
-              return !isNaN(numValue) && isFinite(numValue)
-            })
-            .map((d: any) => {
-              let dateStr =
-                typeof d.date === 'string'
-                  ? /^\d+$/.test(d.date)
-                    ? new Date(parseInt(d.date)).toISOString()
-                    : new Date(d.date).toISOString()
-                  : new Date(d.date).toISOString()
-
-              return {
-                date: dateStr,
-                value: Number(d.value),
-              }
-            })
-            .sort(
-              (a: any, b: any) =>
-                new Date(a.date).getTime() - new Date(b.date).getTime()
-            )
-
-          if (validData.length > 0) {
-            const values = validData.map((d) => Number(d.value))
-            processedData[key] = {
-              data: validData,
-              min: Math.min(...values),
-              max: Math.max(...values),
-            }
+          processedData[key] = {
+            data: sortedData,
+            min: Math.min(...values),
+            max: Math.max(...values),
           }
         }
       })
 
       if (Object.keys(processedData).length > 0) {
-        sensorData.value[sensorId] = processedData
+        sensorData.value[moduleId] = processedData
+        lastFetchTime.value[moduleId] = Date.now()
         console.log(
           `Processed ${
             Object.keys(processedData).length
-          } metrics for sensor ${sensorId}`
+          } metrics for sensor ${moduleId}`
         )
       } else {
-        console.warn(`No valid data found for sensor ${sensorId}`)
+        console.warn(`No valid data found for sensor ${moduleId}`)
       }
     } catch (error) {
-      console.error(`Error loading data for sensor ${sensorId}:`, error)
+      console.error(`Error loading data for sensor ${moduleId}:`, error)
       throw error
     } finally {
       isLoading.value = false
@@ -120,11 +104,13 @@ export const useSensorDataStore = defineStore('sensorData', () => {
   const clearSensorData = (sensorId: string) => {
     if (sensorData.value[sensorId]) {
       delete sensorData.value[sensorId]
+      delete lastFetchTime.value[sensorId]
     }
   }
 
   const clearAllSensorData = () => {
     sensorData.value = {}
+    lastFetchTime.value = {}
   }
 
   return {
