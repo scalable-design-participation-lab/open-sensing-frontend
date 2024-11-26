@@ -116,7 +116,7 @@ const selectedSensor = computed(() => {
   if (!sensor) return null
 
   const timestamp = new Date(sensor.timestamp)
-  timestamp.setHours(timestamp.getHours() - 5)
+  timestamp.setHours(timestamp.getHours())
 
   return {
     id: sensor.moduleid,

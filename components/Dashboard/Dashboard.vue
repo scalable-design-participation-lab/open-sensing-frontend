@@ -226,7 +226,7 @@ onMounted(async () => {
 const formatSensorData = (sensor: Sensor): FormattedSensor => {
   // Convert UTC timestamp to UTC-5
   const timestamp = new Date(sensor.timestamp)
-  timestamp.setHours(timestamp.getHours() - 5)
+  timestamp.setHours(timestamp.getHours())
 
   return {
     id: sensor.moduleid,
