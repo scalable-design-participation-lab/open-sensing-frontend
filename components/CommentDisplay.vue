@@ -1,10 +1,21 @@
 <template>
-  <UCard v-if="isOpen" class="min-w-48 max-w-72 shadow-lg text-black dark:text-white">
+  <UCard
+    v-if="isOpen"
+    class="min-w-48 max-w-72 shadow-lg text-black dark:text-white"
+  >
     <template #header>
-        <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
           <h3 class="font-medium">
             {{ getFeatureTitle(feature) }}
           </h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <UAvatar
+            v-if="feature?.name?.firstname"
+            :alt="feature.name.firstname"
+            size="sm"
+          />
           <UButton
             icon="i-heroicons-x-mark"
             color="black"
@@ -13,29 +24,23 @@
             @click="closeModal"
           />
         </div>
+      </div>
 
-        <div class="text-xs text-gray-500 dark:text-gray-300">
-          <span v-if="feature?.name?.firstname && feature?.name?.lastname">
-            {{ feature.name.firstname }} {{ feature.name.lastname }}
-          </span>
-          <span v-if="feature?.name?.firstname && feature?.name?.lastname && feature?.timestamp">
-          • 
-          </span>
-          <span v-if="feature?.timestamp">
-            {{ formatDate(feature.timestamp) }}
-            </span>
-        </div>
-
+      <div class="text-xs text-gray-500 dark:text-gray-300">
+        <span v-if="feature?.timestamp">
+          {{ formatDate(feature.timestamp) }}
+        </span>
+      </div>
     </template>
 
-      <div>
-        <p v-if="feature?.comment?.length > 0" class="text-sm">
-          {{ feature.comment }}
-        </p>
-        <p v-else class="text-sm text-gray-700 dark:text-white italic">
-          Ще ніхто не залишив коментарів для цієї локації.
-        </p>
-      </div>
+    <div>
+      <p v-if="feature?.comment?.length > 0" class="text-sm">
+        {{ feature.comment }}
+      </p>
+      <p v-else class="text-sm text-gray-700 dark:text-white italic">
+        Ще ніхто не залишив коментарів для цієї локації.
+      </p>
+    </div>
   </UCard>
 </template>
 
