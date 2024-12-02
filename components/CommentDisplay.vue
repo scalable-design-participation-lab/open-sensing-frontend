@@ -104,49 +104,49 @@ function formatDate(timestamp: string): string {
 }
 
 function getFeatureTitle(feature: Feature | null) {
-  if (!feature) return 'Location Details'
+  if (!feature) return 'Деталі локації'
 
   if (feature.isProhibit) {
-    return 'Prohibited Area'
+    return 'Заборонена зона'
   }
 
   if (feature.iconName) {
-    // Convert iconName to display name
+    // Convert iconName to display name in Ukrainian
     const iconDisplayNames = {
-      pollution: 'Pollution Point',
-      leaf: 'Green Space',
-      'flora-fauna': 'Flora & Fauna',
-      lock: 'Safe Area',
-      great: 'Very Safe Area',
-      calm: 'Calm Area',
-      safe: 'Safe Zone',
-      broken: 'Unsafe Area',
-      unsafe: 'Danger Zone',
-      dislike: 'Dislike',
-      negative: 'Negative',
-      heart: 'Favorite',
-      love: 'Loved Place',
-      smile: 'Happy Place',
-      positive: 'Positive',
-      trash: 'Trash',
+      pollution: 'Точка забруднення',
+      leaf: 'Зелена зона',
+      'flora-fauna': 'Флора та фауна',
+      lock: 'Безпечна зона',
+      great: 'Дуже безпечна зона',
+      calm: 'Спокійна зона',
+      safe: 'Безпечна територія',
+      broken: 'Небезпечна зона',
+      unsafe: 'Небезпечна територія',
+      dislike: 'Не подобається',
+      negative: 'Негативне',
+      heart: 'Улюблене',
+      love: 'Улюблене місце',
+      smile: 'Щасливе місце',
+      positive: 'Позитивне',
+      trash: 'Сміття',
     }
-    return iconDisplayNames[feature.iconName] || 'Location'
+    return iconDisplayNames[feature.iconName] || 'Локація'
   } else if (feature.frequency) {
-    // Convert frequency to display name
+    // Convert frequency to display name in Ukrainian
     const frequencyDisplayNames = {
-      'every day': 'Daily Visit',
-      everyday: 'Daily Visit',
-      'every week': 'Weekly Visit',
-      everyweek: 'Weekly Visit',
-      sometimes: 'Occasional Visit',
-      'only once': 'One-time Visit',
-      once: 'One-time Visit',
-      never: 'Never Visited',
+      'every day': 'Щоденне відвідування',
+      everyday: 'Щоденне відвідування',
+      'every week': 'Щотижневе відвідування',
+      everyweek: 'Щотижневе відвідування',
+      sometimes: 'Випадкове відвідування',
+      'only once': 'Одноразове відвідування',
+      once: 'Одноразове відвідування',
+      never: 'Ніколи не відвідував',
     }
-    return frequencyDisplayNames[feature.frequency] || 'Location'
+    return frequencyDisplayNames[feature.frequency] || 'Локація'
   }
 
-  return 'Location Details'
+  return 'Деталі локації'
 }
 
 function closeModal() {
