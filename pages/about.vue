@@ -107,7 +107,7 @@ import { ref, onMounted } from 'vue'
 
 const isLoading = ref(true)
 const headerLinks = ref([
-  { label: 'Drawing Together', color: 'black', to: '/' },
+  { label: 'Drawing Participation', color: 'black', to: '/' },
   { label: 'Гуртомá', color: 'black', to: '/' },
 ])
 const whyContent = ref('')
