@@ -66,12 +66,7 @@
                   v-for="(metric, metricName) in metrics"
                   :key="metricName"
                 >
-                  <div
-                    v-if="
-                      selectedDatasets.includes(metricName) &&
-                      chartData[metricName]?.data?.length > 0
-                    "
-                  >
+                  <div v-if="shouldRenderChart(metricName)" class="relative">
                     <LineChart
                       :metric="metric"
                       :data="chartData[metricName]"
@@ -80,6 +75,14 @@
                       :height="chartHeight"
                       @date-range-update="updateGlobalDateRange"
                     />
+                  </div>
+                  <div
+                    v-else-if="selectedDatasets.includes(metricName)"
+                    class="flex items-center justify-center h-[350px] bg-gray-50 rounded-lg"
+                  >
+                    <p class="text-gray-500">
+                      No data available for {{ metric.label }}
+                    </p>
                   </div>
                 </template>
               </div>
@@ -219,7 +222,7 @@ const chartWidth = ref(0)
  * Height of each chart
  * @type {number}
  */
-const chartHeight = 180
+const chartHeight = 350
 
 /**
  * Global date range for all charts
@@ -578,8 +581,20 @@ const chartData = computed(() => {
   Object.entries(metrics.value).forEach(([metricName, metric]) => {
     const metricData = sensorMetrics[metricName]
     if (metricData?.data && Array.isArray(metricData.data)) {
+      // 确保数据有效性
       const validData = metricData.data
-        .filter((d) => d && d.date && d.value !== undefined)
+        .filter((d) => {
+          if (!d || !d.date || d.value === undefined || d.value === null) {
+            console.debug(`Invalid data point for ${metricName}:`, d)
+            return false
+          }
+          const value = Number(d.value)
+          if (isNaN(value)) {
+            console.debug(`NaN value for ${metricName}:`, d)
+            return false
+          }
+          return true
+        })
         .map((d) => ({
           date:
             typeof d.date === 'string' && /^\d+$/.test(d.date)
@@ -592,13 +607,23 @@ const chartData = computed(() => {
       if (validData.length > 0) {
         result[metricName] = {
           data: validData,
-          min: metricData.min,
-          max: metricData.max,
+          min: Math.min(...validData.map((d) => d.value)),
+          max: Math.max(...validData.map((d) => d.value)),
         }
+      } else {
+        console.debug(`No valid data for ${metricName}`)
       }
     }
   })
 
   return result
 })
+
+const shouldRenderChart = (metricName: string) => {
+  return (
+    selectedDatasets.value.includes(metricName) &&
+    chartData.value[metricName]?.data?.length > 0 &&
+    !loadingStates.value[selectedSensor.value?.moduleid]
+  )
+}
 </script>

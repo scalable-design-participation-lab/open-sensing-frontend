@@ -16,384 +16,336 @@
  -->
 
 <template>
-  <div :id="chartId" class="relative" data-testid="chart-container">
-    <UButton
-      data-testid="reset-button"
-      class="reset-button"
-      icon="i-heroicons-arrow-path"
-      @click="resetChart"
-      v-show="false"
-    >
-      Reset Chart
-    </UButton>
-    <div class="tooltip" />
-  </div>
+  <div
+    :id="chartId"
+    class="relative w-full"
+    :style="{ height: `${height}px` }"
+    data-testid="chart-container"
+    ref="chartContainer"
+  ></div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onUnmounted } from 'vue'
-import * as d3 from 'd3'
+import { ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
+import * as echarts from 'echarts'
 import { useDashboardStore } from '../../stores/dashboard'
 import { storeToRefs } from 'pinia'
+import { useResizeObserver } from '@vueuse/core'
 
-interface DataPoint {
-  date: Date
-  value: number
-}
-
-interface ChartData {
-  data: { date: string; value: number }[]
-  min: number
-  max: number
-}
-
-interface ChartProps {
-  metric: { label: string }
-  data: ChartData
-  width: number
-  height: number
-  margin: { top: number; right: number; bottom: number; left: number }
-}
-
-const props = withDefaults(defineProps<ChartProps>(), {
-  data: () => ({
-    data: [],
-    min: 0,
-    max: 100,
-  }),
-  width: 0,
-  height: 300,
-  margin: () => ({ top: 20, right: 20, bottom: 30, left: 40 }),
+const props = defineProps({
+  metric: {
+    type: Object,
+    required: true,
+    default: () => ({ label: '' }),
+  },
+  data: {
+    type: Object,
+    required: true,
+    default: () => ({
+      data: [],
+      min: 0,
+      max: 100,
+    }),
+  },
+  width: {
+    type: Number,
+    default: 0,
+  },
+  height: {
+    type: Number,
+    default: 300,
+  },
 })
+
+const emit = defineEmits(['date-range-update'])
 
 const store = useDashboardStore()
 const { dataDashboardValues, dateRangeUpdate } = storeToRefs(store)
 const { updateDataDashboardValues } = store
 
 const chartId = ref(`chart-${Date.now()}`)
-let svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>
-let x: d3.ScaleTime<number, number>
-let y: d3.ScaleLinear<number, number>
-let xAxis: d3.Axis<Date>
-let yAxis: d3.Axis<number>
-let line: d3.Line<DataPoint>
-let brush: d3.BrushBehavior<unknown>
+let chartInstance: echarts.ECharts | null = null
 
-const createLineChart = () => {
-  if (
-    !props.data?.data ||
-    !Array.isArray(props.data.data) ||
-    props.data.data.length === 0
-  ) {
+const chartContainer = ref<HTMLElement | null>(null)
+
+useResizeObserver(chartContainer, (entries) => {
+  const entry = entries[0]
+  if (entry && chartInstance) {
+    nextTick(() => {
+      chartInstance.resize()
+    })
+  }
+})
+
+const createChart = () => {
+  if (!props.data?.data || props.data.data.length === 0) {
     console.warn('Invalid or empty data received:', props.data)
     return
   }
 
-  if (props.width <= 0) {
-    console.warn('Invalid chart width:', props.width)
-    return
-  }
+  nextTick(async () => {
+    if (!chartContainer.value) return
 
-  try {
-    const chartDiv = d3.select(`#${chartId.value}`)
-    chartDiv.selectAll('*').remove()
+    if (chartInstance) {
+      chartInstance.dispose()
+    }
 
-    const data = props.data.data
+    await nextTick()
+
+    chartInstance = echarts.init(chartContainer.value)
+
+    const START_YEAR = 2020
+    const minValidDate = new Date(START_YEAR, 0, 1).getTime()
+
+    const chartData = props.data.data
       .filter((d) => {
-        const isValid =
-          d &&
-          d.date &&
-          d.value !== undefined &&
-          d.value !== null &&
-          !isNaN(Number(d.value))
-        if (!isValid) {
-          console.warn('Invalid data point:', d)
+        if (!d || !d.date || d.value === undefined || isNaN(Number(d.value))) {
+          return false
         }
-        return isValid
+
+        const date =
+          typeof d.date === 'string'
+            ? /^\d+$/.test(d.date)
+              ? new Date(parseInt(d.date))
+              : new Date(d.date)
+            : new Date(d.date)
+
+        return !isNaN(date.getTime()) && date.getTime() >= minValidDate
       })
       .map((d) => {
-        try {
-          let parsedDate =
-            typeof d.date === 'string'
-              ? /^\d+$/.test(d.date)
-                ? new Date(parseInt(d.date))
-                : new Date(d.date)
+        const date =
+          typeof d.date === 'string'
+            ? /^\d+$/.test(d.date)
+              ? new Date(parseInt(d.date))
               : new Date(d.date)
-
-          if (isNaN(parsedDate.getTime()) || parsedDate.getFullYear() < 2000) {
-            console.warn('Invalid or too old date:', d.date)
-            return null
-          }
-
-          const value = Number(d.value)
-          if (isNaN(value) || !isFinite(value)) {
-            console.warn('Invalid value:', d.value)
-            return null
-          }
-
-          return {
-            date: parsedDate,
-            value: value,
-          }
-        } catch (error) {
-          console.error('Error processing data point:', d, error)
-          return null
-        }
+            : new Date(d.date)
+        return [date.getTime(), d.value]
       })
-      .filter((d): d is DataPoint => d !== null)
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .sort((a, b) => a[0] - b[0])
 
-    if (data.length === 0) {
-      console.warn('No valid data points after processing')
+    if (chartData.length === 0) {
+      console.warn('No valid data after 2020')
       return
     }
 
-    console.log('Data range:', {
-      start: data[0].date.toISOString(),
-      end: data[data.length - 1].date.toISOString(),
-      points: data.length,
-    })
+    const startTime = chartData[0]?.[0]
+    const endTime = chartData[chartData.length - 1]?.[0]
 
-    const width = props.width - props.margin.left - props.margin.right
-    const height = props.height - props.margin.top - props.margin.bottom
-
-    svg = chartDiv
-      .append('svg')
-      .attr('width', width + props.margin.left + props.margin.right)
-      .attr('height', height + props.margin.top + props.margin.bottom)
-      .attr('data-testid', 'chart-svg')
-      .append('g')
-      .attr('transform', `translate(${props.margin.left},${props.margin.top})`)
-
-    const xDomain = d3.extent(data, (d) => new Date(d.date)) as [Date, Date]
-    const yDomain = [
-      Math.min(...data.map((d) => d.value)),
-      Math.max(...data.map((d) => d.value)),
-    ]
-
-    x = d3.scaleTime().range([0, width]).domain(xDomain)
-    y = d3.scaleLinear().range([height, 0]).domain(yDomain).nice()
-
-    const timeSpan =
-      data[data.length - 1].date.getTime() - data[0].date.getTime()
-    const days = timeSpan / (1000 * 60 * 60 * 24)
-
-    let tickFormat
-    let tickCount
-    if (days <= 1) {
-      tickFormat = d3.timeFormat('%H:%M')
-      tickCount = 6
-    } else if (days <= 7) {
-      tickFormat = d3.timeFormat('%m/%d %H:%M')
-      tickCount = 5
-    } else if (days <= 31) {
-      tickFormat = d3.timeFormat('%m/%d')
-      tickCount = 5
-    } else {
-      tickFormat = d3.timeFormat('%Y-%m-%d')
-      tickCount = 5
+    const option: echarts.EChartsOption = {
+      grid: {
+        top: 60,
+        right: 20,
+        bottom: 60,
+        left: 50,
+        containLabel: true,
+      },
+      tooltip: {
+        trigger: 'axis',
+        position: function (pt) {
+          return [pt[0], '10%']
+        },
+        formatter: function (params: any) {
+          const date = new Date(params[0].value[0])
+          const value = params[0].value[1]
+          return `${date.toLocaleString()}<br/>${
+            props.metric.label
+          }: ${value.toFixed(2)}`
+        },
+      },
+      title: {
+        left: 'center',
+        text: props.metric.label,
+      },
+      toolbox: {
+        feature: {
+          dataZoom: {
+            yAxisIndex: 'none',
+          },
+          restore: {},
+          saveAsImage: {},
+        },
+      },
+      xAxis: {
+        type: 'time',
+        boundaryGap: false,
+        min: startTime,
+        max: endTime,
+        axisLabel: {
+          formatter: function (value: number) {
+            const date = new Date(value)
+            return date.toLocaleDateString('en-US', {
+              month: '2-digit',
+              day: '2-digit',
+            })
+          },
+          interval: 'auto',
+          rotate: 0,
+        },
+        splitLine: {
+          show: false,
+        },
+        axisTick: {
+          alignWithLabel: true,
+          interval: 'auto',
+        },
+        axisPointer: {
+          label: {
+            formatter: function (params: any) {
+              const date = new Date(params.value)
+              return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            },
+          },
+        },
+      },
+      yAxis: {
+        type: 'value',
+        boundaryGap: [0, '100%'],
+        min: props.data.min,
+        max: props.data.max,
+        axisLabel: {
+          formatter: function (value: number) {
+            return value.toFixed(1)
+          },
+        },
+      },
+      dataZoom: [
+        {
+          type: 'inside',
+          start: 0,
+          end: 100,
+          onZoom: handleZoom,
+        },
+        {
+          type: 'slider',
+          start: 0,
+          end: 100,
+        },
+      ],
+      series: [
+        {
+          name: props.metric.label,
+          type: 'line',
+          smooth: true,
+          symbol: 'none',
+          areaStyle: {
+            opacity: 0.3,
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgb(55, 162, 255)',
+              },
+              {
+                offset: 1,
+                color: 'rgb(116, 21, 219)',
+              },
+            ]),
+          },
+          lineStyle: {
+            width: 1,
+          },
+          data: chartData,
+        },
+      ],
     }
 
-    xAxis = d3
-      .axisBottom(x)
-      .ticks(tickCount)
-      .tickFormat(tickFormat as any)
+    chartInstance.setOption(option)
 
-    yAxis = d3
-      .axisLeft(y)
-      .ticks(5)
-      .tickFormat((d) => d3.format('.2f')(d))
-
-    svg
-      .append('g')
-      .attr('class', 'x-axis')
-      .attr('transform', `translate(0,${height})`)
-      .call(xAxis)
-      .selectAll('text')
-      .style('text-anchor', 'end')
-      .attr('dx', '-.8em')
-      .attr('dy', '.15em')
-      .attr('transform', 'rotate(-45)')
-      .style('font-size', '10px')
-
-    svg
-      .append('text')
-      .attr('class', 'x-axis-label')
-      .attr('x', width / 2)
-      .attr('y', height + props.margin.bottom + 10)
-      .style('text-anchor', 'middle')
-      .style('font-size', '11px')
-      .style('font-weight', '500')
-      .text('Time')
-
-    svg
-      .append('g')
-      .attr('class', 'y-axis')
-      .call(yAxis)
-      .selectAll('text')
-      .style('font-size', '10px')
-
-    svg
-      .append('text')
-      .attr('class', 'y-axis-label')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', -props.margin.left + 12)
-      .attr('x', -height / 2)
-      .style('text-anchor', 'middle')
-      .style('font-size', '11px')
-      .style('font-weight', '500')
-      .text(props.metric.label || '')
-
-    line = d3
-      .line<DataPoint>()
-      .x((d) => x(d.date))
-      .y((d) => y(d.value))
-      .defined((d) => !isNaN(d.value))
-
-    svg
-      .append('path')
-      .datum(data)
-      .attr('class', 'line')
-      .attr('fill', 'none')
-      .attr('stroke', 'steelblue')
-      .attr('stroke-width', 1.5)
-      .attr('d', line)
-
-    brush = d3
-      .brushX()
-      .extent([
-        [0, 0],
-        [width, height],
-      ])
-      .on('end', updateChart)
-
-    svg.append('g').attr('class', 'brush').call(brush)
-  } catch (error) {
-    console.error('Error creating chart:', error)
-  }
+    nextTick(() => {
+      chartInstance?.resize()
+    })
+  })
 }
 
-const updateChart = (event: d3.D3BrushEvent<any>) => {
-  if (!event.selection) return
-  const [x0, x1] = event.selection.map(x.invert) as [Date, Date]
+const handleZoom = (params: any) => {
+  if (!chartInstance) return
 
-  if (isNaN(x0.getTime()) || isNaN(x1.getTime())) {
-    console.warn('Invalid date range selected')
-    return
+  const option = chartInstance.getOption()
+  const xAxis = option.xAxis as any
+  if (!xAxis?.[0]?.data) return
+
+  const startValue =
+    xAxis[0].data[Math.floor((params.start * xAxis[0].data.length) / 100)]
+  const endValue =
+    xAxis[0].data[Math.floor((params.end * xAxis[0].data.length) / 100)]
+
+  emit('date-range-update', [new Date(startValue), new Date(endValue)])
+  updateDataDashboardValues('dateRange', [
+    new Date(startValue),
+    new Date(endValue),
+  ])
+}
+
+const handleResize = () => {
+  if (chartInstance) {
+    nextTick(() => {
+      chartInstance.resize()
+    })
   }
-
-  updateDataDashboardValues('dateRange', [x0, x1])
-  x.domain([x0, x1])
-  svg.select('.x-axis').call(xAxis as any)
-  svg.select('.line').attr('d', line)
 }
 
 const resetChart = () => {
-  if (!props.data?.data || props.data.data.length === 0) return
+  if (!chartInstance) return
 
-  const data = props.data.data
-    .map((d) => ({
-      ...d,
-      date:
-        typeof d.date === 'string'
-          ? /^\d+$/.test(d.date)
-            ? new Date(parseInt(d.date))
-            : new Date(d.date)
-          : new Date(d.date),
-    }))
-    .filter((d) => !isNaN(d.date.getTime()) && d.date.getFullYear() >= 2000)
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
+  chartInstance.dispatchAction({
+    type: 'dataZoom',
+    start: 0,
+    end: 100,
+  })
 
-  if (data.length === 0) return
-
-  const xDomain = d3.extent(data, (d) => d.date) as [Date, Date]
-  x.domain(xDomain)
-  y.domain([props.data.min, props.data.max]).nice()
-  svg.select('.x-axis').call(xAxis as any)
-  svg.select('.y-axis').call(yAxis as any)
-  svg.select('.line').attr('d', line)
-  svg.select('.brush').call(brush.move, null)
-
-  updateDataDashboardValues('dateRange', xDomain)
+  updateDataDashboardValues('dateRange', [])
 }
 
 watch(
-  () => props.data,
-  (newData) => {
-    if (newData?.data) {
-      createLineChart()
+  [() => props.data, () => props.width, () => props.height],
+  () => {
+    if (props.data?.data) {
+      nextTick(() => {
+        createChart()
+      })
     }
   },
   { deep: true }
 )
-watch(() => props.width, createLineChart)
+
 watch(dateRangeUpdate, () => {
-  if (dataDashboardValues.value.dateRange.length === 2) {
-    x.domain(dataDashboardValues.value.dateRange as [Date, Date])
-    svg.select('.x-axis').call(xAxis as any)
-    svg.select('.line').attr('d', line)
+  if (chartInstance && dataDashboardValues.value.dateRange.length === 2) {
+    const dates = dataDashboardValues.value.dateRange
+    const option = chartInstance.getOption()
+    const data = (option.series as any)[0].data
+
+    const startIndex = data.findIndex((d: any) => d[0] >= dates[0].getTime())
+    const endIndex = data.findIndex((d: any) => d[0] >= dates[1].getTime())
+
+    const start = (startIndex / data.length) * 100
+    const end = (endIndex / data.length) * 100
+
+    chartInstance.dispatchAction({
+      type: 'dataZoom',
+      start,
+      end,
+    })
   }
 })
 
-onMounted(createLineChart)
+onMounted(() => {
+  nextTick(async () => {
+    await createChart()
+    setTimeout(() => {
+      chartInstance?.resize()
+    }, 100)
+  })
+})
+
 onUnmounted(() => {
-  d3.select(`#${chartId.value}`).selectAll('*').remove()
+  if (chartInstance) {
+    chartInstance.dispose()
+  }
+  window.removeEventListener('resize', handleResize)
 })
 </script>
-
-<style scoped>
-.tooltip {
-  position: absolute;
-  text-align: left;
-  padding: 5px;
-  font: 12px sans-serif;
-  background: lightsteelblue;
-  border: 0;
-  border-radius: 8px;
-  pointer-events: none;
-}
-
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
-
-.brush .selection {
-  fill: steelblue;
-  fill-opacity: 0.3;
-}
-
-.reset-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-}
-
-.x-axis text,
-.y-axis text {
-  font-size: 10px;
-  fill: #666;
-}
-
-.x-axis-label,
-.y-axis-label {
-  fill: #333;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.x-axis path,
-.y-axis path,
-.x-axis line,
-.y-axis line {
-  stroke: #ddd;
-}
-
-.x-axis .tick line,
-.y-axis .tick line {
-  stroke: #ddd;
-  stroke-width: 0.5;
-}
-</style>
