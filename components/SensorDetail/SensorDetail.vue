@@ -29,8 +29,25 @@
 
         <!-- Body -->
         <div class="p-6">
+          <div class="flex items-center gap-4 mb-4">
+            <span class="text-sm text-gray-600">Temperature Unit:</span>
+            <URadio
+              v-model="temperatureUnit"
+              name="temp-unit"
+              value="C"
+              label="Celsius (°C)"
+            />
+            <URadio
+              v-model="temperatureUnit"
+              name="temp-unit"
+              value="F"
+              label="Fahrenheit (°F)"
+            />
+          </div>
+
           <SensorStats
             :sensor-stats="sensorStats"
+            :temperature-unit="temperatureUnit"
             @show-stat-details="showStatDetails"
           />
 
@@ -73,6 +90,7 @@
                       :margin="margin"
                       :width="chartWidth"
                       :height="chartHeight"
+                      :temperature-unit="temperatureUnit"
                       @date-range-update="updateGlobalDateRange"
                     />
                   </div>
@@ -282,11 +300,19 @@ const sensorStats = computed(() => {
     if (value === null || value === undefined || isNaN(value)) {
       return 'N/A'
     }
+    if (unit === 'Temperature') {
+      const tempC = parseFloat(value)
+      if (temperatureUnit.value === 'F') {
+        const tempF = (tempC * 9) / 5 + 32
+        return `${tempF.toFixed(1)}°F`
+      }
+      return `${tempC.toFixed(1)}°C`
+    }
     return `${value.toFixed(1)}${unit}`
   }
 
   return {
-    Temperature: formatValue(selectedSensor.value.temperature, '°C'),
+    Temperature: formatValue(selectedSensor.value.temperature, 'Temperature'),
     'Relative Humidity': formatValue(
       selectedSensor.value.relative_humidity,
       '%'
@@ -626,4 +652,10 @@ const shouldRenderChart = (metricName: string) => {
     !loadingStates.value[selectedSensor.value?.moduleid]
   )
 }
+
+/**
+ * Temperature unit for sensor statistics
+ * @type {import('vue').Ref<string>}
+ */
+const temperatureUnit = ref('C')
 </script>

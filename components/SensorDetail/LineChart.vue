@@ -55,6 +55,10 @@ const props = defineProps({
     type: Number,
     default: 300,
   },
+  temperatureUnit: {
+    type: String,
+    default: 'C',
+  },
 })
 
 const emit = defineEmits(['date-range-update'])
@@ -77,6 +81,13 @@ useResizeObserver(chartContainer, (entries) => {
   }
 })
 
+const convertTemperature = (value: number, unit: string) => {
+  if (unit === 'F') {
+    return (value * 9) / 5 + 32
+  }
+  return value
+}
+
 const createChart = () => {
   if (!props.data?.data || props.data.data.length === 0) {
     console.warn('Invalid or empty data received:', props.data)
@@ -97,7 +108,7 @@ const createChart = () => {
     const START_YEAR = 2020
     const minValidDate = new Date(START_YEAR, 0, 1).getTime()
 
-    const chartData = props.data.data
+    let chartData = props.data.data
       .filter((d) => {
         if (!d || !d.date || d.value === undefined || isNaN(Number(d.value))) {
           return false
@@ -119,7 +130,12 @@ const createChart = () => {
               ? new Date(parseInt(d.date))
               : new Date(d.date)
             : new Date(d.date)
-        return [date.getTime(), d.value]
+
+        const value = props.metric.label.toLowerCase().includes('temperature')
+          ? convertTemperature(d.value, props.temperatureUnit)
+          : d.value
+
+        return [date.getTime(), value]
       })
       .sort((a, b) => a[0] - b[0])
 
@@ -130,6 +146,13 @@ const createChart = () => {
 
     const startTime = chartData[0]?.[0]
     const endTime = chartData[chartData.length - 1]?.[0]
+
+    const getMetricLabel = () => {
+      if (props.metric.label.toLowerCase().includes('temperature')) {
+        return props.metric.label.replace('(°C)', `(°${props.temperatureUnit})`)
+      }
+      return props.metric.label
+    }
 
     const option: echarts.EChartsOption = {
       grid: {
@@ -147,14 +170,17 @@ const createChart = () => {
         formatter: function (params: any) {
           const date = new Date(params[0].value[0])
           const value = params[0].value[1]
-          return `${date.toLocaleString()}<br/>${
-            props.metric.label
-          }: ${value.toFixed(2)}`
+          const unit = props.metric.label.toLowerCase().includes('temperature')
+            ? `°${props.temperatureUnit}`
+            : ''
+          return `${date.toLocaleString()}<br/>${getMetricLabel()}: ${value.toFixed(
+            2
+          )}${unit}`
         },
       },
       title: {
         left: 'center',
-        text: props.metric.label,
+        text: getMetricLabel(),
       },
       toolbox: {
         feature: {
@@ -206,11 +232,20 @@ const createChart = () => {
       yAxis: {
         type: 'value',
         boundaryGap: [0, '100%'],
-        min: props.data.min,
-        max: props.data.max,
+        min: props.metric.label.toLowerCase().includes('temperature')
+          ? convertTemperature(props.data.min, props.temperatureUnit)
+          : props.data.min,
+        max: props.metric.label.toLowerCase().includes('temperature')
+          ? convertTemperature(props.data.max, props.temperatureUnit)
+          : props.data.max,
         axisLabel: {
           formatter: function (value: number) {
-            return value.toFixed(1)
+            const unit = props.metric.label
+              .toLowerCase()
+              .includes('temperature')
+              ? `°${props.temperatureUnit}`
+              : ''
+            return `${value.toFixed(1)}${unit}`
           },
         },
       },
@@ -332,6 +367,13 @@ watch(dateRangeUpdate, () => {
     })
   }
 })
+
+watch(
+  () => props.temperatureUnit,
+  () => {
+    createChart()
+  }
+)
 
 onMounted(() => {
   nextTick(async () => {

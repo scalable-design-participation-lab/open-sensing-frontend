@@ -37,7 +37,7 @@
   </UCard>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /**
  * Props for the SensorStats component
  * @typedef {Object} SensorStatsProps
@@ -52,6 +52,10 @@ const props = defineProps({
   sensorStats: {
     type: Object,
     required: true,
+  },
+  temperatureUnit: {
+    type: String,
+    default: 'C',
   },
 })
 
