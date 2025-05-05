@@ -4,12 +4,12 @@
   </div>
   <div v-else class="flex overflow-hidden flex-col bg-white dark:bg-gray-900">
     <GeneralizedHeader
-      :left-items="headerLinks"
-      :right-items="[{ label: '→ Draw', to: '/draw' }]"
-      :show-color-mode-button="true"
-      :show-avatar="true"
-      avatar-src="https://avatars.githubusercontent.com/u/739984?v=4"
-      avatar-alt="User Avatar"
+      class="z-20"
+      :left-items="leftItems"
+      :right-items="rightItems"
+      logo-src="/arboretum_logo.svg"
+      logo-alt="Northeastern University Arboretum Logo"
+      :show-icon="true"
     />
 
     <UContainer class="flex-grow">
@@ -24,11 +24,6 @@
             color: 'primary',
           },
         ]"
-        :headline-button="{
-          label: 'See what\'s new in our latest release',
-          to: '/releases',
-          icon: 'i-heroicons-arrow-right',
-        }"
         image-src="/northeastern.jpg"
         image-alt="Illustration of Drawing Together"
       />
@@ -64,34 +59,26 @@
       <MoreInThisSeries :items="moreSeriesItems" :cols="3" />
     </UContainer>
 
-    <GeneralizedFooter
-      title="Drawing Participation"
-      :links="[
-        { to: '#about', label: 'About' },
-        { to: '#support', label: 'Support' },
-        { to: '#more', label: 'More' },
-        { to: '#evenmore', label: 'Even More' },
-      ]"
-      :buttons="[{ label: 'Logo 1' }, { label: 'Logo 2' }]"
-    />
+    <GeneralizedFooter />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+defineOptions({
+  name: 'AboutPage',
+})
+
 const isLoading = ref(true)
-const headerLinks = ref([
-  { label: 'Drawing Together', to: '/', primary: true },
-  { label: 'Project Name', to: '/project' },
-  { label: 'Learn', to: '/learn' },
-])
+
 const whyContent = ref('')
 const secondaryContent = ref('')
 const tertiaryContent = ref('')
-const tabItems = ref([])
-const accordionItems = ref([])
-const moreSeriesItems = ref([])
+
+const tabItems = ref<any>([])
+const accordionItems = ref<any>([])
+const moreSeriesItems = ref<any>([])
 
 onMounted(async () => {
   try {
@@ -143,6 +130,27 @@ async function loadTabItems() {
     },
   ]
 }
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const leftItems = ref([
+  {
+    label: 'Open Sensing',
+    variant: 'solid',
+    color: 'black',
+    onClick: () => {
+      router.push('/')
+    },
+  },
+  {
+    label: 'Northeastern University',
+    variant: 'solid',
+    color: 'black',
+  },
+])
+
+const rightItems = ref([])
 
 async function loadAccordionItems() {
   await new Promise((resolve) => setTimeout(resolve, 300))

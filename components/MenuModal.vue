@@ -41,24 +41,36 @@ const isOpen = computed({
   set: (value) => emit('update:modelValue', value),
 })
 
-const menuItems = [
+const allItems = [
   {
     label: 'Dashboard',
+    endpoint: '/',
     action: 'home',
   },
   {
     label: 'About',
+    endpoint: '/about',
     action: 'about',
   },
   {
     label: 'Help',
     action: 'help',
   },
-  {
-    label: 'Sensor Map',
-    action: 'results',
-  },
 ]
+
+const currentRoute = computed(() =>
+  router.currentRoute.value.path.toLowerCase()
+)
+
+const menuItems = computed(() => {
+  return allItems.filter((item) => {
+    // Skip check if item has no endpoint
+    if (!item.endpoint) return true
+
+    // Filter out the current route
+    return item.endpoint.toLowerCase() !== currentRoute.value
+  })
+})
 
 const closeModal = () => {
   isOpen.value = false
