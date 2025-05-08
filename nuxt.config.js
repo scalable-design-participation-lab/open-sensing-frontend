@@ -29,8 +29,10 @@ module.exports = defineNuxtConfig({
       MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
     },
   },
-  externals: {
-    external: ['pg-native'],
+  nitro: {
+    externals: {
+      external: ['pg-native'],
+    },
   },
   compatibilityDate: '2024-08-15',
   plugins: [{ src: '~/plugins/vue3-openlayers.js', mode: 'client' }],
