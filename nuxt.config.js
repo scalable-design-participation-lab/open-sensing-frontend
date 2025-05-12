@@ -31,7 +31,12 @@ module.exports = defineNuxtConfig({
   },
   nitro: {
     rollupConfig: {
-      external: ['pg-native', 'cloudflare:sockets', 'oracledb'],
+      external: [
+        'pg-native',
+        'cloudflare:sockets',
+        'oracledb',
+        'pg-query-stream',
+      ],
     },
     externals: {
       external: [],
