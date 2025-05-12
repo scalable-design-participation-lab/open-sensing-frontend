@@ -36,6 +36,7 @@ module.exports = defineNuxtConfig({
         'cloudflare:sockets',
         'oracledb',
         'pg-query-stream',
+        'better-sqlite3',
       ],
     },
     externals: {
