@@ -40,6 +40,7 @@ module.exports = defineNuxtConfig({
         'sqlite3',
         'mysql2',
         'tedious',
+        'mysql',
       ],
     },
     externals: {
