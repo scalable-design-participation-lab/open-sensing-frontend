@@ -37,6 +37,7 @@ module.exports = defineNuxtConfig({
         'oracledb',
         'pg-query-stream',
         'better-sqlite3',
+        'sqlite3',
       ],
     },
     externals: {
