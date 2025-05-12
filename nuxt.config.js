@@ -31,7 +31,7 @@ module.exports = defineNuxtConfig({
   },
   nitro: {
     externals: {
-      external: ['pg-native'],
+      external: [],
     },
   },
   compatibilityDate: '2024-08-15',
