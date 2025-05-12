@@ -8,10 +8,14 @@ module.exports = defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  extends: ['@nuxt/ui-pro'],
 
   modules: ['@pinia/nuxt', '@nuxt/ui'],
-
+  icon: {
+    clientBundle: {
+      scan: true,
+      sizeLimitKb: 256,
+    },
+  },
   components: [
     {
       path: '~/components',

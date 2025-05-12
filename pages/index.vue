@@ -252,10 +252,14 @@ const resetAllFilters = () => {
 }
 
 const sensorTools = [
-  { icon: 'i-heroicons-solid:home', tooltip: 'Home', action: goHome },
-  { icon: 'i-heroicons-solid:filter', tooltip: 'Filter', action: toggleFilter },
   {
-    icon: 'i-heroicons-solid:squares-2x2',
+    icon: 'i-heroicons-solid:building-library',
+    tooltip: 'Home',
+    action: goHome,
+  },
+  { icon: 'i-heroicons-solid:funnel', tooltip: 'Filter', action: toggleFilter },
+  {
+    icon: 'i-heroicons-solid:squares-plus',
     tooltip: 'Dashboard',
     action: toggleDashboard,
   },
