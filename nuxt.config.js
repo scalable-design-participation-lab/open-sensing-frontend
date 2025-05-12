@@ -38,6 +38,7 @@ module.exports = defineNuxtConfig({
         'pg-query-stream',
         'better-sqlite3',
         'sqlite3',
+        'mysql2',
       ],
     },
     externals: {
