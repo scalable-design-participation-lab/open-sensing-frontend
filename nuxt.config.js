@@ -30,6 +30,9 @@ module.exports = defineNuxtConfig({
     },
   },
   nitro: {
+    rollupConfig: {
+      external: ['pg-native'],
+    },
     externals: {
       external: [],
     },
