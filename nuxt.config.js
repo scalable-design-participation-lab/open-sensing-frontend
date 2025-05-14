@@ -47,6 +47,7 @@ module.exports = defineNuxtConfig({
         // 'mysql',
       ],
     },
+    preset: 'cloudflare',
     externals: {
       external: [],
     },
