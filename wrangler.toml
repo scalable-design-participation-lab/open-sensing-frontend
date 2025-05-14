@@ -1,5 +1,4 @@
-# wrangler.toml
-pages_build_output_dir = "./dist"  # or wherever your output folder is
-
+name = "pg-worker"
+pages_build_output_dir = "./dist" 
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat_v2"]
