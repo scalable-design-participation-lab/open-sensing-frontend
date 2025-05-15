@@ -26,7 +26,7 @@ module.exports = defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'cloudflare_workers',
+    preset: 'cloudflare_worker',
     compatibilityDate: '2025-05-15',
     cloudflare: {
       nodeCompat: true, // enable Node.js polyfills (e.g. TCP sockets)
