@@ -27,7 +27,7 @@ module.exports = defineNuxtConfig({
 
   nitro: {
     preset: 'cloudflare_workers',
-    compatibilityDate: '2024-09-23', // Cloudflare compatibility date
+    compatibilityDate: '2025-05-15',
     cloudflare: {
       nodeCompat: true, // enable Node.js polyfills (e.g. TCP sockets)
       deployConfig: true, // auto-generate wrangler config
@@ -45,6 +45,6 @@ module.exports = defineNuxtConfig({
     },
   },
 
-  compatibilityDate: '2024-09-23',
+  compatibilityDate: '2025-05-15',
   plugins: [{ src: '~/plugins/vue3-openlayers.js', mode: 'client' }],
 })
