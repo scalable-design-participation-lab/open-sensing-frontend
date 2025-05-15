@@ -1,33 +1,31 @@
 // utils/getDb.ts
+import postgres, { Sql } from 'postgres'
 import { useRuntimeConfig } from '#imports'
-import type { Sql } from 'postgres'
 
 let sqlClient: Sql | null = null
 
-export default async function getDb(): Promise<Sql> {
+export default function getDb(): Sql {
   if (sqlClient) return sqlClient
 
-  // dynamically load postgres at runtime
-  const postgresMod = await import('postgres')
-  const postgres: typeof postgresMod.default = postgresMod.default
+  // 1️⃣ Are we in a CF Worker with Hyperdrive?
+  const hyper = (globalThis as any).env?.HYPERDRIVE
 
-  const config = useRuntimeConfig()
-  sqlClient = postgres({
-    host: config.dbHost,
-    port: Number(config.dbPort),
-    database: config.dbName,
-    username: config.dbUser,
-    password: config.dbPassword,
-    ssl: !!config.dbSsl,
-    // you can add pool here, etc.
+  // 2️⃣ Choose the right connection string:
+  //    – Worker: use the injected hyper.connectionString
+  //    – Local/SSR: use your own NUXT_POSTGRES_URL env var
+  const connectionString = hyper
+    ? hyper.connectionString
+    : useRuntimeConfig().dbURL
+
+  sqlClient = postgres(connectionString, {
+    max: 5,
+    fetch_types: false,
   })
 
-  // verify connectivity once (optional)
-  try {
-    await sqlClient`SELECT 1`
-  } catch (err) {
-    console.error('Postgres connection failed:', err)
-  }
+  // fire‐and‐forget a health check
+  sqlClient`SELECT 1`.catch((err) =>
+    console.error('Postgres health check failed:', err)
+  )
 
   return sqlClient
 }

@@ -10,5 +10,6 @@
   "include": [
     // ... 其他包含的文件
     // "knexfile.js"
+    "types/**/*.d.ts",
   ]
 }

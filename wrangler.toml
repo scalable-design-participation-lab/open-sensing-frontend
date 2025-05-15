@@ -2,3 +2,8 @@ name = "open-sensing-frontend"
 main = "./.output/server/index.mjs"
 compatibility_date = "2025-05-15"
 compatibility_flags = ["nodejs_compat_v2"]
+
+[[hyperdrive]]
+type = "hyperdrive"
+binding = "HYPERDRIVE"
+id = "ffb692c564664909b408c77050ff8a43"

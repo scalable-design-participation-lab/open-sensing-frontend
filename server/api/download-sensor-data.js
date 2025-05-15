@@ -1,7 +1,7 @@
 // server/api/download-sensor-data.js
 
 import { defineEventHandler, readBody, createError } from 'h3'
-import postgres from 'postgres'
+import useDb from '../../utils/db'
 import { parse } from 'json2csv'
 import { useRuntimeConfig } from '#imports'
 
@@ -30,14 +30,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 1) Initialize postgres.js client
-  const sql = postgres({
-    host: config.dbHost,
-    port: Number(config.dbPort),
-    database: config.dbName,
-    username: config.dbUser,
-    password: config.dbPassword,
-    ssl: !!config.dbSsl, // if you use SSL
-  })
+  const sql = await useDb()
 
   try {
     // 2) Determine which fields to select
