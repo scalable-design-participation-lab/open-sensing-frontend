@@ -28,14 +28,15 @@ module.exports = defineNuxtConfig({
   nitro: {
     preset: 'cloudflare_worker',
     compatibilityDate: '2025-05-15',
+    bundler: 'esbuild',
     cloudflare: {
       nodeCompat: true, // enable Node.js polyfills (e.g. TCP sockets)
       deployConfig: true, // auto-generate wrangler config
     },
-    rollupConfig: {
-      // (optional) mark some imports as external to reduce bundle size
-      external: ['cloudflare:sockets'],
-    },
+    // rollupConfig: {
+    //   // (optional) mark some imports as external to reduce bundle size
+    //   external: ['cloudflare:sockets'],
+    // },
   },
 
   vite: {
