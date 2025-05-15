@@ -4,6 +4,7 @@ import getDb from '../../utils/db'
 import { logger } from '../../utils/logger'
 
 export default defineEventHandler(async (event) => {
+  console.log('🔍 DB_URL is:', process.env.DB_URL)
   const sql = await getDb()
   try {
     const { moduleId } = getQuery(event)
