@@ -1,23 +1,17 @@
-import { defineEventHandler, getQuery } from 'h3'
-import db from '../../utils/db'
+// server/api/get-sensor-data.ts
+import { defineEventHandler, getQuery, createError } from 'h3'
+import sql from '../../utils/db'
+import { logger } from '../../utils/logger'
 
-/**
- * API endpoint for retrieving sensor data by moduleId
- *
- * @async
- * @function
- * @param {Object} event - The H3 event object
- * @returns {Promise<Object>} Sensor data and location information
- */
 export default defineEventHandler(async (event) => {
   try {
-    const query = getQuery(event)
-    const moduleId = query.moduleId
+    const { moduleId } = getQuery(event)
+    logger.info('Fetching sensor data for moduleId:', moduleId ?? 'ALL')
 
-    // If no moduleId is provided, return all sensors basic info
+    // 1) If no moduleId, return all modules with latest SEN55 reading
     if (!moduleId) {
-      const allSensorsQuery = await db.raw(`
-        SELECT DISTINCT 
+      const allSensors = await sql`
+        SELECT DISTINCT
           m.moduleid,
           m.ecohub_location,
           m.lat,
@@ -46,33 +40,27 @@ export default defineEventHandler(async (event) => {
             timestamp
           FROM sen55
           ORDER BY moduleid, timestamp DESC
-        ) s ON m.moduleid = s.moduleid
+        ) AS s
+          ON m.moduleid = s.moduleid
         ORDER BY m.moduleid
-      `)
-
-      return allSensorsQuery.rows
+      `
+      return allSensors
     }
 
-    // First get the module location info
-    const locationQuery = await db.raw(
-      `
+    // 2) Fetch module metadata
+    const moduleRows = await sql`
       SELECT moduleid, ecohub_location, lat, lon
       FROM modules
-      WHERE moduleid = ?
-    `,
-      [moduleId]
-    )
-
-    const moduleInfo = locationQuery.rows[0]
-
-    if (!moduleInfo) {
-      return { error: 'Module not found' }
+      WHERE moduleid = ${moduleId}
+    `
+    if (moduleRows.length === 0) {
+      throw createError({ statusCode: 404, statusMessage: 'Module not found' })
     }
+    const moduleInfo = moduleRows[0]
 
-    // Then get the sensor data
-    const result = await db.raw(
-      `
-      SELECT 
+    // 3) Fetch full sensor history for that module
+    const sensorData = await sql`
+      SELECT
         timestamp,
         temperature,
         relative_humidity,
@@ -83,22 +71,18 @@ export default defineEventHandler(async (event) => {
         pm4,
         pm10
       FROM sen55
-      WHERE moduleid = ?
+      WHERE moduleid = ${moduleId}
       ORDER BY timestamp DESC
-    `,
-      [moduleId]
-    )
+    `
+    logger.debug(`Returned ${sensorData.length} rows for module ${moduleId}`)
 
-    console.log(
-      `Query executed. Returned ${result.rows.length} rows for module ${moduleId}`
-    )
-
-    return {
-      moduleInfo,
-      sensorData: result.rows,
-    }
+    return { moduleInfo, sensorData }
   } catch (err) {
-    console.error('Error executing query', err)
-    return { error: 'Internal server error', details: err.message }
+    logger.error('Error executing query', err)
+    throw createError({
+      statusCode: err.statusCode ?? 500,
+      statusMessage: err.statusMessage ?? 'Internal server error',
+      data: { message: err.message },
+    })
   }
 })

@@ -1,168 +1,129 @@
-import { defineEventHandler, readBody } from 'h3'
-import db from '../../utils/db'
+// server/api/ingest-sensor-data.ts
+import { defineEventHandler, readBody, createError } from 'h3'
+import sql from '../../utils/db'
 import { logger } from '../../utils/logger'
 
 export default defineEventHandler(async (event) => {
+  // 1) parse & validate payload
+  const body = await readBody(event)
+  logger.info('Received sensor data request with body:', body)
+
+  if (!body || typeof body.ID !== 'string') {
+    logger.error('Missing or invalid body.ID')
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Request body.ID is required',
+    })
+  }
+
+  // 2) extract moduleId
+  const [, integerPart] = body.ID.split(':')
+  const moduleId = integerPart ?? null
+  logger.debug('Parsed ModuleID:', moduleId)
+
+  // 3) build normalized data object
+  const timestamp = body.timestamp
+    ? new Date(body.timestamp * 1000)
+    : new Date()
+
+  const data = {
+    moduleId,
+    temperature: body.Temperature ?? null,
+    humidity: body.Relative_Humidity ?? null,
+    voc: body.VOC ?? null,
+    nox: body.NOx ?? null,
+    pm1: body.PM1 ?? null,
+    pm25: body.PM25 ?? null,
+    pm4: body.PM4 ?? null,
+    pm10: body.PM10 ?? null,
+    soilMoisture: body.Soil_Moisture ?? null,
+    solarInputCurrent: body.Solar_Input_Current ?? null,
+    batteryLevel: body.Battery_Level ?? null,
+    lat: body.Lat ?? null,
+    lon: body.Lon ?? null,
+    localTemp: body.Local_Temp ?? null,
+    voltage: body.Voltage ?? null,
+    bmeTemp: body['BME-Temp'] ?? null,
+    timestamp,
+  }
+  logger.debug('Processed data:', data)
+
   try {
-    const body = await readBody(event)
-    logger.info('Received sensor data request with body:', body)
-
-    if (!body) {
-      logger.error('Missing request body')
-      throw createError({
-        statusCode: 400,
-        message: 'Request body is required',
-      })
-    }
-
-    // Parse ModuleID from ID string
-    const str = body.ID
-    const parts = str.split(':')
-    const integerPart = parts[1]
-
-    logger.debug('Parsed ModuleID:', integerPart)
-
-    // Extract and validate data from request body
-    const data = {
-      ModuleID: integerPart || null,
-      Temperature: body.Temperature ?? null,
-      Relative_Humidity: body.Relative_Humidity ?? null,
-      VOC: body.VOC ?? null,
-      NOx: body.NOx ?? null,
-      PM1: body.PM1 ?? null,
-      PM25: body.PM25 ?? null,
-      PM4: body.PM4 ?? null,
-      PM10: body.PM10 ?? null,
-      Soil_Moisture: body.Soil_Moisture ?? null,
-      Solar_Input_Current: body.Solar_Input_Current ?? null,
-      Battery_Level: body.Battery_Level ?? null,
-      Lat: body.Lat ?? null,
-      Lon: body.Lon ?? null,
-      Local_Temp: body.Local_Temp ?? null,
-      Voltage: body.Voltage ?? null,
-      timestamp: body.timestamp ? new Date(body.timestamp * 1000) : new Date(),
-      bme_temp: body['BME-Temp'] ?? null,
-    }
-
-    logger.debug('Processed data:', data)
-
-    // Begin transaction
-    const trx = await db.transaction()
-    logger.info('Started database transaction')
-
-    try {
-      // Check and insert ModuleID
-      await trx.raw(
-        `
+    // 4) run in a transaction
+    const result = await sql.begin(async (tx) => {
+      // a) upsert module
+      await tx`
         INSERT INTO Modules (ModuleId)
-        SELECT ?
+        SELECT ${data.moduleId}
         WHERE NOT EXISTS (
-          SELECT 1 FROM Modules WHERE ModuleId = ?
+          SELECT 1 FROM Modules WHERE ModuleId = ${data.moduleId}
         )
-      `,
-        [data.ModuleID, data.ModuleID]
-      )
-      logger.debug('Module ID checked/inserted')
+      `
+      logger.debug('Module ID ensured in Modules table')
 
-      // Insert sensor data
-      const insertPromises = [
-        // SEN55 data
-        trx.raw(
-          `
-          INSERT INTO SEN55(ModuleID, Temperature, Relative_Humidity, VOC, NOx, PM1, PM25, PM4, PM10, timestamp) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      // b) insert into each sensor table
+      await Promise.all([
+        tx`
+          INSERT INTO SEN55 (
+            ModuleID, Temperature, Relative_Humidity, VOC, NOx,
+            PM1, PM25, PM4, PM10, timestamp
+          ) VALUES (
+            ${data.moduleId}, ${data.temperature}, ${data.humidity},
+            ${data.voc}, ${data.nox}, ${data.pm1}, ${data.pm25},
+            ${data.pm4}, ${data.pm10}, ${data.timestamp}
+          )
         `,
-          [
-            data.ModuleID,
-            data.Temperature,
-            data.Relative_Humidity,
-            data.VOC,
-            data.NOx,
-            data.PM1,
-            data.PM25,
-            data.PM4,
-            data.PM10,
-            data.timestamp,
-          ]
-        ),
-
-        // Soil data
-        trx.raw(
-          `
-          INSERT INTO Soil(ModuleID, Soil_Moisture, timestamp) 
-          VALUES (?, ?, ?)
+        tx`
+          INSERT INTO Soil (ModuleID, Soil_Moisture, timestamp)
+          VALUES (${data.moduleId}, ${data.soilMoisture}, ${data.timestamp})
         `,
-          [data.ModuleID, data.Soil_Moisture, data.timestamp]
-        ),
-
-        // Current_Sensor data
-        trx.raw(
-          `
-          INSERT INTO Current_Sensor(ModuleID, Solar_Input_Current, timestamp) 
-          VALUES (?, ?, ?)
+        tx`
+          INSERT INTO Current_Sensor (
+            ModuleID, Solar_Input_Current, timestamp
+          ) VALUES (
+            ${data.moduleId}, ${data.solarInputCurrent}, ${data.timestamp}
+          )
         `,
-          [data.ModuleID, data.Solar_Input_Current, data.timestamp]
-        ),
-
-        // Microcontroller data
-        trx.raw(
-          `
-          INSERT INTO Microcontroller(ModuleID, Battery_Level, timestamp) 
-          VALUES (?, ?, ?)
+        tx`
+          INSERT INTO Microcontroller (
+            ModuleID, Battery_Level, timestamp
+          ) VALUES (
+            ${data.moduleId}, ${data.batteryLevel}, ${data.timestamp}
+          )
         `,
-          [data.ModuleID, data.Battery_Level, data.timestamp]
-        ),
-
-        // GPS data
-        trx.raw(
-          `
-          INSERT INTO GPS(ModuleID, Lat, Lon, timestamp) 
-          VALUES (?, ?, ?, ?)
+        tx`
+          INSERT INTO GPS (ModuleID, Lat, Lon, timestamp)
+          VALUES (${data.moduleId}, ${data.lat}, ${data.lon}, ${data.timestamp})
         `,
-          [data.ModuleID, data.Lat, data.Lon, data.timestamp]
-        ),
-
-        // Blues_Notecard data
-        trx.raw(
-          `
-          INSERT INTO Blues_Notecard(ModuleID, temperature, voltage, timestamp) 
-          VALUES (?, ?, ?, ?)
+        tx`
+          INSERT INTO Blues_Notecard (
+            ModuleID, temperature, voltage, timestamp
+          ) VALUES (
+            ${data.moduleId}, ${data.localTemp}, ${data.voltage}, ${data.timestamp}
+          )
         `,
-          [data.ModuleID, data.Local_Temp, data.Voltage, data.timestamp]
-        ),
-
-        // BME_280 data
-        trx.raw(
-          `
-          INSERT INTO bme_280(ModuleID, bme_temp, timestamp) 
-          VALUES (?, ?, ?)
+        tx`
+          INSERT INTO bme_280 (ModuleID, bme_temp, timestamp)
+          VALUES (${data.moduleId}, ${data.bmeTemp}, ${data.timestamp})
         `,
-          [data.ModuleID, data.bme_temp, data.timestamp]
-        ),
-      ]
-
-      await Promise.all(insertPromises)
-      await trx.commit()
-      logger.info('Successfully inserted all sensor data')
+      ])
 
       return {
-        statusCode: 200,
-        body: {
-          message: 'Data inserted successfully',
-          moduleId: data.ModuleID,
-        },
+        message: 'Data inserted successfully',
+        moduleId: data.moduleId,
       }
-    } catch (error) {
-      await trx.rollback()
-      logger.error('Database transaction failed:', error)
-      throw error
-    }
-  } catch (error) {
-    logger.error('Error processing sensor data:', error)
+    })
+
+    logger.info('Successfully inserted all sensor data')
+    return result
+  } catch (err) {
+    // postgres.js auto-rolls back on error
+    logger.error('Error processing sensor data:', err)
+    const error = err as { code?: string; message?: string }
     throw createError({
-      statusCode: 500,
-      message: 'Failed to insert sensor data',
-      cause: error,
+      statusCode: error.code === '23505' ? 409 : 500,
+      statusMessage: 'Failed to insert sensor data',
+      data: { message: error.message },
     })
   }
 })

@@ -1,73 +1,46 @@
-import { defineEventHandler } from 'h3'
-import pg from 'pg'
-import { parse } from 'json2csv' // Import json2csv for CSV conversion
-const { Pool } = pg
+// server/api/download-sensor-data.js
 
-/**
- * API endpoint for downloading sensor data
- *
- * This endpoint allows clients to request specific sensor data within a given date range.
- * It connects to a PostgreSQL database, executes a query based on the provided parameters,
- * and returns the requested sensor data.
- *
- * @async
- * @function
- * @param {Object} event - The H3 event object
- * @returns {Promise<Array>} An array of sensor data objects
- * @throws {Error} 400 if the request body is invalid
- * @throws {Error} 500 if there's an internal server error
- *
- * @example
- * // Request body
- * {
- *   datasets: { temperature: true, humidity: true },
- *   dateRange: { start: '2023-01-01', end: '2023-01-31' },
- *   format: 'csv' // Optional, for CSV format response
- * }
- *
- * // Response
- * [
- *   { timestamp: '2023-01-01T00:00:00Z', temperature: 22.5, humidity: 45 },
- *   // ... more data points
- * ]
- */
+import { defineEventHandler, readBody, createError } from 'h3'
+import postgres from 'postgres'
+import { parse } from 'json2csv'
+import { useRuntimeConfig } from '#imports'
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const body = await readBody(event)
+  const {
+    datasets,
+    dateRange,
+    format,
+    location: locationMap = {},
+  } = await readBody(event)
 
-  console.log('Received request body:', body)
-
-  if (!body || !body.datasets || !body.dateRange || !body.format) {
-    console.error('Invalid request body:', body)
+  if (
+    !datasets ||
+    !dateRange ||
+    !format ||
+    typeof datasets !== 'object' ||
+    !dateRange.start ||
+    !dateRange.end
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Bad Request',
-      data: {
-        message:
-          'Invalid request body. Missing datasets, dateRange, or format.',
-      },
+      data: { message: 'Missing datasets, dateRange, or format.' },
     })
   }
 
-  const pool = new Pool({
-    user: config.dbUser,
+  // 1) Initialize postgres.js client
+  const sql = postgres({
     host: config.dbHost,
+    port: Number(config.dbPort),
     database: config.dbName,
+    username: config.dbUser,
     password: config.dbPassword,
-    port: config.dbPort,
+    ssl: !!config.dbSsl, // if you use SSL
   })
 
   try {
-    console.log('Connecting to database for download...')
-    const client = await pool.connect()
-
-    // Build the query
-    let query = 'SELECT s.timestamp'
-    const selectedDatasets = Object.entries(body.datasets)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([key]) => key)
-
-    // Map frontend field names to database field names
+    // 2) Determine which fields to select
     const fieldMapping = {
       temperature: 'temperature',
       relative_humidity: 'relative_humidity',
@@ -78,55 +51,51 @@ export default defineEventHandler(async (event) => {
       pm4: 'pm4',
       pm10: 'pm10',
     }
+    const selectedDatasets = Object.entries(datasets)
+      .filter(([, on]) => on)
+      .map(([k]) => fieldMapping[k])
+      .filter(Boolean)
 
-    // Add selected fields to query
-    selectedDatasets.forEach((dataset) => {
-      const dbField = fieldMapping[dataset]
-      if (dbField) {
-        query += `, s.${dbField}`
+    // Build an array of `sql.unsafe('s.col')` for each column
+    const columnExpressions = selectedDatasets.map((col) =>
+      sql.unsafe(`s.${col}`)
+    )
+
+    // 3) Build location filter if needed
+    const selectedLocations = Object.entries(locationMap)
+      .filter(([, on]) => on)
+      .map(([loc]) => loc)
+
+    // 4) Run the query with tagged template
+    const rows = await sql`
+      SELECT
+        s.timestamp,
+        ${sql.join(columnExpressions, sql`, `)}
+      FROM sen55 s
+      JOIN modules m ON s.moduleid = m.moduleid
+      WHERE s.timestamp BETWEEN ${dateRange.start} AND ${dateRange.end}
+      ${
+        selectedLocations.length
+          ? sql`AND m.ecohub_location = ANY(${selectedLocations})`
+          : sql``
       }
-    })
+      ORDER BY s.timestamp DESC
+    `
 
-    // Add location join and filter if locations are selected
-    query += ' FROM sen55 s JOIN modules m ON s.moduleid = m.moduleid'
-    query += ' WHERE s.timestamp BETWEEN $1 AND $2'
-
-    const queryParams = [body.dateRange.start, body.dateRange.end]
-
-    // Add location filter if locations are selected
-    const selectedLocations = Object.entries(body.location)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([location]) => location)
-
-    if (selectedLocations.length > 0) {
-      query += ` AND m.ecohub_location = ANY($3)`
-      queryParams.push(selectedLocations)
-    }
-
-    query += ' ORDER BY s.timestamp DESC'
-
-    console.log('Executing query:', query)
-    console.log('Query parameters:', queryParams)
-
-    const result = await client.query(query, queryParams)
-    client.release()
-    console.log(`Query executed. Returned ${result.rows.length} rows.`)
-
-    if (body.format === 'csv') {
-      const csv = parse(result.rows)
-      return csv
+    // 5) Return CSV or JSON
+    if (format === 'csv') {
+      return parse(rows)
     } else {
-      return result.rows
+      return rows
     }
   } catch (err) {
-    console.error('Error executing query for download', err)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal server error',
-      data: {
-        message: 'Failed to retrieve data',
-        details: err.message,
-      },
+      statusMessage: 'Internal Server Error',
+      data: { message: 'Failed to retrieve data', details: err.message },
     })
+  } finally {
+    // close the connection (in serverless environments you often want this)
+    await sql.end()
   }
 })
