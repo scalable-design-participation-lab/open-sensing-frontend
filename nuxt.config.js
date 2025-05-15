@@ -26,7 +26,7 @@ module.exports = defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'cloudflare-worker',
+    preset: 'cloudflare-module',
     cloudflare: {
       nodeCompat: true, // polyfill require()/net under the hood
       deployConfig: true, // auto-generate wrangler.toml
