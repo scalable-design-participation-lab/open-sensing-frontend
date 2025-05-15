@@ -35,27 +35,19 @@ module.exports = defineNuxtConfig({
   },
   nitro: {
     rollupConfig: {
-      external: [
-        'cloudflare:sockets',
-        'oracledb',
-        'pg-query-stream',
-        'better-sqlite3',
-        'sqlite3',
-        'mysql2',
-        'tedious',
-        'mysql',
-      ],
+      external: ['postgres', '/^postgres/.*/'],
     },
     preset: 'cloudflare',
     externals: {
       external: [],
     },
   },
-  compatibilityDate: '2024-08-15',
+  compatibilityDate: '2024-09-15',
   plugins: [{ src: '~/plugins/vue3-openlayers.js', mode: 'client' }],
   vite: {
-    optimizeDeps: {
-      include: ['knex', 'pg'],
+    ssr: {
+      // also ensure Vite’s SSR bundler leaves it alone
+      external: ['postgres', /^postgres\/.*/],
     },
   },
 })
