@@ -30,8 +30,7 @@ module.exports = defineNuxtConfig({
     compatibilityDate: '2025-05-15',
 
     // ← switch to esbuild only:
-    bundler: 'esbuild',
-    sourceMap: false,
+    bundler: 'rollup',
 
     // leave postgres + cloudflare:sockets imports untouched
     externals: {
@@ -43,9 +42,6 @@ module.exports = defineNuxtConfig({
       deployConfig: true, // generates your wrangler.toml
     },
   },
-
-  // you don’t need any rollupConfig at all now:
-  // rollupConfig: { … }  ← remove
 
   vite: {
     ssr: {
