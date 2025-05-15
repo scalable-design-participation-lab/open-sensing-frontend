@@ -25,7 +25,7 @@ module.exports = defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'cloudflare-pages',
+    preset: 'cloudflare-worker',
     bundler: 'esbuild',
     externals: {
       // This is the new Nitro‐native externals API
