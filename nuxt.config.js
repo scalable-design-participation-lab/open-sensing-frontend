@@ -19,13 +19,14 @@ module.exports = defineNuxtConfig({
     dbName: process.env.DB_NAME,
     dbPassword: process.env.DB_PASSWORD,
     dbPort: process.env.DB_PORT,
+    dbURL: process.env.DB_URL,
     public: {
       MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
     },
   },
 
   nitro: {
-    preset: 'cloudflare_module',
+    preset: 'cloudflare_workers',
     compatibilityDate: '2024-09-23', // Cloudflare compatibility date
     cloudflare: {
       nodeCompat: true, // enable Node.js polyfills (e.g. TCP sockets)
