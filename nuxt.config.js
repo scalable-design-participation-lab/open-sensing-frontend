@@ -25,19 +25,15 @@ module.exports = defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'cloudflare-worker',
-    bundler: 'esbuild',
-    externals: {
-      // This is the new Nitro‐native externals API
-      external: [
-        'postgres', // exact package
-        /^postgres\/.*/, // anything under postgres/*
-      ],
-      // inline: [],         // you can leave inline empty
+    preset: 'cloudflare_module',
+    compatibilityDate: '2024-09-23', // Cloudflare compatibility date
+    cloudflare: {
+      nodeCompat: true, // enable Node.js polyfills (e.g. TCP sockets)
+      deployConfig: true, // auto-generate wrangler config
     },
-    // legacy Rollup config (harmless if you leave it in sync)
     rollupConfig: {
-      external: ['postgres', /^postgres\/.*/],
+      // (optional) mark some imports as external to reduce bundle size
+      external: ['cloudflare:sockets'],
     },
   },
 
