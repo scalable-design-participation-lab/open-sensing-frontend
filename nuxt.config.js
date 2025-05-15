@@ -33,17 +33,6 @@ module.exports = defineNuxtConfig({
       nodeCompat: true, // enable Node.js polyfills (e.g. TCP sockets)
       deployConfig: true, // auto-generate wrangler config
     },
-    externals: {
-      external: [
-        'postgres', // leave pg client out of the bundle
-        /^postgres\/.*/, // anything under postgres/*
-        'cloudflare:sockets', // leave the native sockets module external
-      ],
-    },
-    // rollupConfig: {
-    //   // (optional) mark some imports as external to reduce bundle size
-    //   external: ['cloudflare:sockets'],
-    // },
   },
 
   vite: {
