@@ -33,6 +33,12 @@ module.exports = defineNuxtConfig({
       nodeCompat: true, // enable Node.js polyfills (e.g. TCP sockets)
       deployConfig: true, // auto-generate wrangler config
     },
+    bundler: 'rollup',
+    rollupConfig: {
+      external: [
+        'cloudflare:sockets', // leave this import alone
+      ],
+    },
   },
 
   vite: {
