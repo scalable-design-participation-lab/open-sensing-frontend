@@ -26,7 +26,7 @@ export default defineEventHandler(async () => {
         port: process.env.DB_PORT,
       },
     }
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Database connection test failed:', error)
 
     const errorDetails = {
