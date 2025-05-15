@@ -1,9 +1,10 @@
 // server/api/get-sensor-data.ts
 import { defineEventHandler, getQuery, createError } from 'h3'
-import sql from '../../utils/db'
+import getDb from '../../utils/db'
 import { logger } from '../../utils/logger'
 
 export default defineEventHandler(async (event) => {
+  const sql = await getDb()
   try {
     const { moduleId } = getQuery(event)
     logger.info('Fetching sensor data for moduleId:', moduleId ?? 'ALL')

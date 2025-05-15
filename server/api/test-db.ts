@@ -1,10 +1,12 @@
 // server/api/db-test.ts
 import { defineEventHandler, createError } from 'h3'
-import sql from '../../utils/db'
+
+import getDB from '../../utils/db'
 import { logger } from '../../utils/logger'
 
 export default defineEventHandler(async () => {
   logger.info('Starting database connection test')
+  const sql = await getDB()
 
   try {
     // 1) Ping the database

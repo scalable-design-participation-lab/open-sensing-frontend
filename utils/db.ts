@@ -1,23 +1,33 @@
-// db.ts
-import postgres from 'postgres'
-import { logger } from './logger'
+// utils/getDb.ts
+import { useRuntimeConfig } from '#imports'
+import type { Sql } from 'postgres'
 
-const sql = postgres({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  database: process.env.DB_NAME,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-})
+let sqlClient: Sql | null = null
 
-// Immediately verify connection:
-;(async () => {
+export default async function getDb(): Promise<Sql> {
+  if (sqlClient) return sqlClient
+
+  // dynamically load postgres at runtime
+  const postgresMod = await import('postgres')
+  const postgres: typeof postgresMod.default = postgresMod.default
+
+  const config = useRuntimeConfig()
+  sqlClient = postgres({
+    host: config.dbHost,
+    port: Number(config.dbPort),
+    database: config.dbName,
+    username: config.dbUser,
+    password: config.dbPassword,
+    ssl: !!config.dbSsl,
+    // you can add pool here, etc.
+  })
+
+  // verify connectivity once (optional)
   try {
-    await sql`SELECT 1` // tagged‐template => parameterized
-    logger.info('Database connection established successfully')
+    await sqlClient`SELECT 1`
   } catch (err) {
-    logger.error('Failed to establish database connection:', err)
+    console.error('Postgres connection failed:', err)
   }
-})()
 
-export default sql
+  return sqlClient
+}

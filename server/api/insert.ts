@@ -1,9 +1,10 @@
 // server/api/ingest-sensor-data.ts
 import { defineEventHandler, readBody, createError } from 'h3'
-import sql from '../../utils/db'
 import { logger } from '../../utils/logger'
+import getDb from '../../utils/db'
 
 export default defineEventHandler(async (event) => {
+  const sql = await getDb()
   // 1) parse & validate payload
   const body = await readBody(event)
   logger.info('Received sensor data request with body:', body)
