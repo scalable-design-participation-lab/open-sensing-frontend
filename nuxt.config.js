@@ -27,24 +27,21 @@ module.exports = defineNuxtConfig({
 
   nitro: {
     preset: 'cloudflare-worker',
-    compatibilityDate: '2025-05-15',
-
-    // ← switch to esbuild only:
-    bundler: 'rollup',
-
-    rollupConfig: {
-      external: ['postgres', /^postgres\/.*/, 'cloudflare:sockets'],
+    bundler: 'esbuild',
+    externals: {
+      external: [
+        'cloudflare:sockets', // ← leave only the native sockets import external
+      ],
     },
-
     cloudflare: {
-      nodeCompat: true, // enables the sockets polyfill
-      deployConfig: true, // generates your wrangler.toml
+      nodeCompat: true, // polyfill require()/net under the hood
+      deployConfig: true, // auto-generate wrangler.toml
     },
   },
 
   vite: {
     ssr: {
-      external: ['postgres', /^postgres\/.*/],
+      external: [],
     },
   },
 
