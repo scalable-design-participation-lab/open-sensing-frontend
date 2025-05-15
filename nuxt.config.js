@@ -32,8 +32,7 @@ module.exports = defineNuxtConfig({
     // ← switch to esbuild only:
     bundler: 'rollup',
 
-    // leave postgres + cloudflare:sockets imports untouched
-    externals: {
+    rollupConfig: {
       external: ['postgres', /^postgres\/.*/, 'cloudflare:sockets'],
     },
 
