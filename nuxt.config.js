@@ -43,7 +43,12 @@ module.exports = defineNuxtConfig({
       external: ['postgres', /^postgres\/.*/],
     },
   },
+  ssr: true,
 
   compatibilityDate: '2024-09-15',
   plugins: [{ src: '~/plugins/vue3-openlayers.js', mode: 'client' }],
+  runtimeConfig: {
+    // server‑only key; no need for a “public” entry here
+    dbUrl: process.env.DB_URL || '',
+  },
 })
