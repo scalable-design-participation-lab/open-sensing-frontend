@@ -84,7 +84,7 @@
           <UDivider class="my-10" />
           <div class="grid grid-flow-col-dense">
             <div class="inline-grid">
-              <h2>Open Sensing</h2>
+              <h3>Open Sensing</h3>
               <div>
                 <p class="m-0">Dashboard</p>
                 <p class="m-0">Support</p>
@@ -92,7 +92,7 @@
               </div>
             </div>
             <div class="inline-grid justify-end">
-              <h2>Northeastern University</h2>
+              <h3>Northeastern University</h3>
               <img
                 src="/arboretum_logo.svg"
                 alt="Northeastern University
