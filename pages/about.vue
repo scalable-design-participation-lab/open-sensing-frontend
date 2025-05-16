@@ -12,7 +12,7 @@
       :show-icon="true"
     />
 
-    <UContainer class="flex-grow max-w-[50rem] p-5">
+    <UContainer class="flex-grow max-w-[50rem] p-5 pt-20">
       <!-- <HeroSection
         title="WHO ARE WE ?"
         description=""
@@ -55,7 +55,7 @@
             title="WHERE ARE WE WORKING ? "
             type="paragraph"
             content="We are working in Boston, Oakland, New York City, and Monterrey, Mexico. The sensors at each site help us understand how open spaces and urban farms can work together to promote jobs, clean air, grow community, and food! Our work also helps us understand where the best new open spaces could be."
-            image-src="/where.png"
+            image-src="/where.svg"
             image-alt="Illustration of Where"
           />
           <UDivider class="my-10" />
@@ -168,19 +168,25 @@ async function loadMoreSeriesItems() {
   await new Promise((resolve) => setTimeout(resolve, 300))
   moreSeriesItems.value = [
     {
-      title: 'Why',
-      description: 'Explore the reasons behind our project',
+      title: 'Drawing Participation',
+      description:
+        'Real-time collaboration for interactive mapping participation with version control',
       icon: 'i-heroicons-question-mark-circle',
+      image: 'drawing-participation.jpg',
     },
     {
-      title: 'What',
-      description: 'Discover what our project offers',
+      title: 'Restart Ukraine',
+      description:
+        'Interactive mapping for residents to restore neighborhoods and rivers in Ukraine',
       icon: 'i-heroicons-information-circle',
+      image: 'hurtoma.jpg',
     },
     {
-      title: 'How',
-      description: 'Learn how to use our tools effectively',
+      title: 'Reblocking 1 Million Neightborhoods',
+      description:
+        'Creating parcel data from satellite imagery for data-scarce environments through generative ensemble learning.',
       icon: 'i-heroicons-academic-cap',
+      image: 'reblocking.jpg',
     },
   ]
 }
