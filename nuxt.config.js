@@ -27,16 +27,6 @@ module.exports = defineNuxtConfig({
 
   nitro: {
     preset: 'cloudflare-pages',
-    cloudflare: {
-      nodeCompat: true, // enable Node.js polyfills
-      compatibility_flags: [
-        // name may depend on your Wrangler version
-        'nodejs_compat_v2',
-      ],
-    },
-    rollupConfig: {
-      external: ['postgres'],
-    },
   },
 
   vite: {
