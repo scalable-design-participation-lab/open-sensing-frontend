@@ -12,10 +12,10 @@
       :show-icon="true"
     />
 
-    <UContainer class="flex-grow">
-      <HeroSection
-        title="Drawing Together"
-        description="Collaborate in real-time with your team on creative projects. Experience a new way of visual communication and idea sharing."
+    <UContainer class="flex-grow max-w-[50rem] p-5">
+      <!-- <HeroSection
+        title="WHO ARE WE ?"
+        description=""
         :links="[
           {
             label: 'Start Drawing',
@@ -26,37 +26,62 @@
         ]"
         image-src="/northeastern.jpg"
         image-alt="Illustration of Drawing Together"
-      />
-
+      /> -->
       <UPage>
         <UPageBody prose>
           <Headline
-            title="Why are we doing this?"
+            title="WHO ARE WE ?"
             type="paragraph"
-            :content="whyContent"
+            content="We are a team
+        from MIT and Northeastern University working together with Northeastern’s
+        Sustainability Initiative, Northeastern’s Arboretum, and Green City Force
+        (GCF) in open spaces. Our work helps open spaces, and the Eco-Hubs they're
+        part of, produce more food and better serve the our communities."
+            image-src="/who_are_we.png"
+            image-alt="Illustration of Who We Are"
           />
+          <UDivider class="my-10" />
 
           <Headline
-            title="This is a Secondary Headline"
-            type="diagram"
-            :content="tabItems"
+            title="WHAT DO WE MEASURE ? "
+            type="paragraph"
+            content="We measure humidity, temperature, air quality (a measurement called PMF), sun intensity, soil moisture, and CO2—what we breathe out and plants breathe in. The environmental information that we gather helps us keep our open spaces healthy and make a case for more spaces like these; creating more jobs, food and community."
+            image-src="/measure.png"
+            image-alt="Illustration of What We Measure"
           />
-          <p>{{ secondaryContent }}</p>
+          <UDivider class="my-10" />
 
           <Headline
-            title="This is Another Secondary Headline"
-            type="chart"
-            content="Chart placeholder"
+            title="WHERE ARE WE WORKING ? "
+            type="paragraph"
+            content="We are working in Boston, Oakland, New York City, and Monterrey, Mexico. The sensors at each site help us understand how open spaces and urban farms can work together to promote jobs, clean air, grow community, and food! Our work also helps us understand where the best new open spaces could be."
+            image-src="/where.png"
+            image-alt="Illustration of Where"
           />
-          <p>{{ tertiaryContent }}</p>
+          <UDivider class="my-10" />
+
+          <Headline
+            title="WHAT IS INSIDE ? "
+            type="paragraph"
+            content="We have co-designed a monitoring system for community open spaces that measures the environment at each site. The system helps us keep track of what sites need water, clean air, or nutrients using different kinds of sensors that you can see here."
+            image-src="/what_inside.png"
+            image-alt="Illustration of What is Inside"
+          />
+
+          <UDivider class="my-10" />
+
+          <Headline
+            title="HOW DO WE MEASURE ? "
+            type="paragraph"
+            content="This is an air sensor, it counts the amount of particles floating in the air using a very tiny fan and a laser! The particies block the laser and get counted. The sensor transmits the readings into electrical pulses that get stored as data and get visualized on our dashboards."
+            image-src="/how_measure.png"
+            image-alt="Illustration of How We Measure"
+          />
 
           <Reference :items="accordionItems" />
+          <MoreInThisSeries :items="moreSeriesItems" :cols="3" />
         </UPageBody>
       </UPage>
-
-      <UDivider class="my-10" />
-
-      <MoreInThisSeries :items="moreSeriesItems" :cols="3" />
     </UContainer>
 
     <GeneralizedFooter />
@@ -72,23 +97,13 @@ defineOptions({
 
 const isLoading = ref(true)
 
-const whyContent = ref('')
-const secondaryContent = ref('')
-const tertiaryContent = ref('')
-
-const tabItems = ref<any>([])
 const accordionItems = ref<any>([])
 const moreSeriesItems = ref<any>([])
 
 onMounted(async () => {
   try {
     // Simulate API calls.
-    await Promise.all([
-      loadContent(),
-      loadTabItems(),
-      loadAccordionItems(),
-      loadMoreSeriesItems(),
-    ])
+    await Promise.all([loadAccordionItems(), loadMoreSeriesItems()])
   } catch (error) {
     console.error('Error loading data:', error)
   } finally {
@@ -96,40 +111,6 @@ onMounted(async () => {
   }
 })
 
-async function loadContent() {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  whyContent.value = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat nisl, maximus et mollis vitae, vulputate vitae tortor. Nunc sed tortor mauris. Aliquam volutpat convallis nulla. Nullam in est sed purus efficitur condimentum eu eget mi. Cras consectetur semper magna eget luctus. Maecenas non elit non mauris varius tempor. Duis placerat luctus fringilla. Sed sit amet nisi a nunc aliquet tincidunt in eget erat. Curabitur quis dolor ac dui volutpat condimentum. Ut feugiat diam sit amet pharetra ultricies. Praesent et posuere nunc. Quisque pharetra facilisis commodo. Etiam id nibh scelerisque, pulvinar sapien a, tempor dolor. Donec suscipit efficitur lacus, vel convallis ligula pellentesque sed. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;`
-
-  secondaryContent.value = `Quisque consequat diam dui, nec accumsan arcu laoreet a. Sed bibendum neque purus, ac interdum erat posuere dapibus. Quisque commodo felis at posuere imperdiet. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Etiam elementum, arcu id sagittis venenatis, eros nibh ornare ex, eu mollis nunc lectus dictum sem. Quisque eget laoreet elit. Sed egestas sodales odio, at euismod est pharetra non. Nam dui leo, mattis id convallis aliquet, fermentum sed quam. In porttitor, eros id iaculis sollicitudin, tellus augue fringilla nulla, eget suscipit justo sapien convallis erat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam accumsan et magna et molestie.`
-
-  tertiaryContent.value = `Donec pharetra lacus nisl, in pulvinar ante auctor non. Fusce fermentum metus sit amet neque malesuada, eu interdum diam consequat. Phasellus felis tortor, dictum ut augue non, placerat interdum libero. Quisque vitae mollis lectus, pellentesque aliquam urna. Mauris tincidunt aliquet fringilla. Nam malesuada mollis vestibulum. Curabitur malesuada erat sed imperdiet ultrices. Sed nibh turpis, porttitor ut semper eu, ornare eget quam. Nulla facilisi. Ut porta at elit in tempus. Sed quis dapibus eros, eu cursus ipsum. Nam eu libero rutrum, tincidunt nunc at, semper nisl. Sed ullamcorper massa nec est faucibus laoreet. Aliquam erat volutpat.`
-}
-
-async function loadTabItems() {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  tabItems.value = [
-    {
-      label: 'Diagram 1',
-      icon: 'i-heroicons-chart-bar',
-      content: 'Content for Diagram 1',
-    },
-    {
-      label: 'Diagram 2',
-      icon: 'i-heroicons-chart-pie',
-      content: 'Content for Diagram 2',
-    },
-    {
-      label: 'Diagram 3',
-      icon: 'i-heroicons-chart-square-bar',
-      content: 'Content for Diagram 3',
-    },
-    {
-      label: 'Diagram 4',
-      icon: 'i-heroicons-presentation-chart-line',
-      content: 'Content for Diagram 4',
-    },
-  ]
-}
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -156,22 +137,9 @@ async function loadAccordionItems() {
   await new Promise((resolve) => setTimeout(resolve, 300))
   accordionItems.value = [
     {
-      label: 'Reference 1',
+      label: 'Check back for our manuscript',
       icon: 'i-heroicons-document-text',
-      content:
-        'Phasellus felis tortor, dictum ut augue non, placerat interdum libero. Quisque vitae mollis lectus, pellentesque aliquam urna.',
-    },
-    {
-      label: 'Reference 2',
-      icon: 'i-heroicons-document-text',
-      content:
-        'Mauris tincidunt aliquet fringilla. Nam malesuada mollis vestibulum. Curabitur malesuada erat sed imperdiet ultrices.',
-    },
-    {
-      label: 'Reference 3',
-      icon: 'i-heroicons-document-text',
-      content:
-        'Sed nibh turpis, porttitor ut semper eu, ornare eget quam. Nulla facilisi. Ut porta at elit in tempus.',
+      content: 'We are working on a manuscript that will be published soon.',
     },
   ]
 }
