@@ -26,7 +26,7 @@ module.exports = defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'netlify-edge',
+    preset: 'cloudflare-pages',
     rollupConfig: {
       external: ['postgres'],
     },
