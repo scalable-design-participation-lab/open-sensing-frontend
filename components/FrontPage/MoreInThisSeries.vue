@@ -12,6 +12,7 @@
 <template>
   <section>
     <h2>More in this series</h2>
+
     <ULandingCard
       v-for="(item, index) in items"
       :key="index"
@@ -20,7 +21,7 @@
       color="primary"
       orientation="horizontal"
       class="m-5"
-      :icon="item.icon"
+      :to="item.link"
     >
       <img :src="item.image" class="w-full rounded-md" />
     </ULandingCard>

@@ -97,6 +97,7 @@
                 src="/arboretum_logo.svg"
                 alt="Northeastern University
                 Logo"
+                class="dark:invert"
               />
             </div>
           </div>
@@ -173,6 +174,7 @@ async function loadMoreSeriesItems() {
         'Real-time collaboration for interactive mapping participation with version control',
       icon: 'i-heroicons-question-mark-circle',
       image: 'drawing-participation.jpg',
+      link: 'https://scalabledesignparticipation.org/',
     },
     {
       title: 'Restart Ukraine',
@@ -180,6 +182,7 @@ async function loadMoreSeriesItems() {
         'Interactive mapping for residents to restore neighborhoods and rivers in Ukraine',
       icon: 'i-heroicons-information-circle',
       image: 'hurtoma.jpg',
+      link: 'https://hurtoma.drawing-participation.org/',
     },
     {
       title: 'Reblocking 1 Million Neightborhoods',
@@ -187,6 +190,7 @@ async function loadMoreSeriesItems() {
         'Creating parcel data from satellite imagery for data-scarce environments through generative ensemble learning.',
       icon: 'i-heroicons-academic-cap',
       image: 'reblocking.jpg',
+      link: 'https://drawing-participation.org/',
     },
   ]
 }
