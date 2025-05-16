@@ -27,6 +27,14 @@ module.exports = defineNuxtConfig({
 
   nitro: {
     preset: 'cloudflare-pages',
+    cloudflare: {
+      deployConfig: true, // ← tell Nitro to write a wrangler.toml for Pages
+      nodeCompat: true, // ← polyfill node:buffer, etc. for your Worker
+    },
+    rollupConfig: {
+      // still externalize postgres so it doesn’t try to bundle "cloudflare:sockets"
+      external: ['postgres'],
+    },
   },
 
   vite: {
