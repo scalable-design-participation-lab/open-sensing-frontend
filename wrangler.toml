@@ -1,3 +1,8 @@
 name = "open-sensing-frontend"
+pages_build_output_dir = "./dist"
 compatibility_date = "2025-05-15"
 compatibility_flags = ["nodejs_compat"]
+
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "ffb692c564664909b408c77050ff8a43"
