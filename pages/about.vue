@@ -13,20 +13,6 @@
     />
 
     <UContainer class="flex-grow max-w-[50rem] p-5 pt-20">
-      <!-- <HeroSection
-        title="WHO ARE WE ?"
-        description=""
-        :links="[
-          {
-            label: 'Start Drawing',
-            icon: 'i-heroicons-pencil',
-            to: '/draw',
-            color: 'primary',
-          },
-        ]"
-        image-src="/northeastern.jpg"
-        image-alt="Illustration of Drawing Together"
-      /> -->
       <UPage>
         <UPageBody prose>
           <Headline
@@ -84,21 +70,36 @@
           <UDivider class="my-10" />
           <div class="grid grid-flow-col-dense">
             <div class="inline-grid">
-              <h3>Open Sensing</h3>
-              <div>
-                <p class="m-0">Dashboard</p>
-                <p class="m-0">Support</p>
-                <p class="m-0">Github</p>
+              <h3>
+                <NuxtLink to="/" class="w-1 h-1"> Open Sensing </NuxtLink>
+              </h3>
+              <div class="flex flex-col">
+                <NuxtLink to="/" class="m-0 w-0">Dashboard</NuxtLink>
+                <NuxtLink
+                  to="https://scalabledesignparticipation.org"
+                  class="m-0 w-0"
+                >
+                  Support
+                </NuxtLink>
+                <NuxtLink
+                  to="https://github.com/scalable-design-participation-lab/open-sensing-frontend"
+                  class="m-0 w-0"
+                >
+                  Github
+                </NuxtLink>
               </div>
             </div>
             <div class="inline-grid justify-end">
-              <h3>Northeastern University</h3>
-              <img
-                src="/arboretum_logo.svg"
-                alt="Northeastern University
-                Logo"
-                class="dark:invert"
-              />
+              <NuxtLink to="https://www.northeastern.edu/">
+                <h3>Northeastern University</h3>
+              </NuxtLink>
+              <NuxtLink to="https://www.northeastern.edu/sustainability/">
+                <img
+                  src="/arboretum_logo.svg"
+                  alt="Northeastern University Logo"
+                  class="dark:invert"
+                />
+              </NuxtLink>
             </div>
           </div>
         </UPageBody>
