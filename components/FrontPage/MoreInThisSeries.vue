@@ -11,19 +11,20 @@
 
 <template>
   <section>
-    <h2 class="text-2xl text-black dark:text-white mb-5">
-      More in this series
-    </h2>
-    <ULandingGrid :cols="cols" :gap="5">
-      <ULandingCard
-        v-for="(item, index) in items"
-        :key="index"
-        :title="item.title"
-        :description="item.description"
-        :icon="item.icon"
-        class="col-span-6 row-span-2"
-      />
-    </ULandingGrid>
+    <h2>More in this series</h2>
+
+    <ULandingCard
+      v-for="(item, index) in items"
+      :key="index"
+      :title="item.title"
+      :description="item.description"
+      color="primary"
+      orientation="horizontal"
+      class="m-5"
+      :to="item.link"
+    >
+      <img :src="item.image" class="w-full rounded-md" />
+    </ULandingCard>
   </section>
 </template>
 

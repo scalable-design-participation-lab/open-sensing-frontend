@@ -27,15 +27,20 @@
         <UButton
           v-if="logoSrc"
           :class="[
-            `w-10 lg:w-12 !rounded-lg flex justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg`,
+            'relative w-12 h-12 !rounded-lg overflow-hidden p-0 flex items-center justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg',
             shapeClass,
           ]"
         >
-          <img
-            :src="logoSrc"
-            :alt="logoAlt"
-            class="w-full h-auto dark:!invert"
-          />
+          <NuxtLink
+            to="https://pref.northeastern.edu/arboretum/"
+            class="absolute inset-0 flex items-center justify-center"
+          >
+            <img
+              :src="logoSrc"
+              :alt="logoAlt"
+              class="scale-[3] transform dark:invert"
+            />
+          </NuxtLink>
         </UButton>
         <UButton
           v-if="showIcon"
@@ -44,7 +49,7 @@
             shapeClass,
           ]"
         >
-          🤲
+          <NuxtLink to="https://scalabledesignparticipation.org"> 🤲 </NuxtLink>
         </UButton>
         <template v-for="(item, index) in leftItems" :key="index">
           <NuxtLink v-if="item.to" v-slot="{ navigate }" :to="item.to" custom>

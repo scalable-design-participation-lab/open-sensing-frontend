@@ -16,9 +16,14 @@
 <template>
   <div>
     <h2>{{ title }}</h2>
+
+    <div class="flex flex-col items-center justify-center">
+      <img :src="imageSrc" :alt="imageAlt" class="rounded-md" />
+    </div>
     <UCard v-if="type === 'diagram'">
       <UTabs :items="content" />
     </UCard>
+
     <UCard v-else-if="type === 'chart'" class="p-4 text-center">
       <div class="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg">
         {{ content }}
@@ -49,5 +54,7 @@ defineProps({
       ['diagram', 'chart', 'paragraph'].includes(value),
   },
   content: [Array, String],
+  imageSrc: String,
+  imageAlt: String,
 })
 </script>

@@ -11,7 +11,7 @@
 
 <template>
   <div>
-    <h2>References</h2>
+    <h2>Publication</h2>
     <UAccordion :items="items" />
   </div>
 </template>

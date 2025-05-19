@@ -18,7 +18,7 @@
 
 <template>
   <ULandingHero :title="title" :description="description" :links="links">
-    <template #headline>
+    <!-- <template #headline>
       <UButton
         color="gray"
         :to="headlineButton.to"
@@ -27,7 +27,7 @@
         size="xs"
         class="rounded-full"
       />
-    </template>
+    </template> -->
     <template #default>
       <img
         :src="imageSrc"
@@ -58,7 +58,7 @@ defineProps({
   title: String,
   description: String,
   links: Array,
-  headlineButton: Object,
+  // headlineButton: Object,
   imageSrc: String,
   imageAlt: String,
 })

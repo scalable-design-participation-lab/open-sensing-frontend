@@ -7,8 +7,8 @@
       class="z-20"
       :left-items="leftItems"
       :right-items="rightItems"
-      logo-src="/neu-logo.svg"
-      logo-alt="Northeastern University Logo"
+      logo-src="/arboretum_logo.svg"
+      logo-alt="Northeastern University Arboretum Logo"
       :show-icon="true"
     />
 
@@ -259,7 +259,6 @@ const sensorTools = [
     tooltip: 'Dashboard',
     action: toggleDashboard,
   },
-  { icon: 'i-heroicons-solid:location-marker', tooltip: 'Location Info' },
 ]
 
 const handleToolClick = (index: number) => {
