@@ -93,7 +93,7 @@
               <NuxtLink to="https://www.northeastern.edu/">
                 <h3>Northeastern University</h3>
               </NuxtLink>
-              <NuxtLink to="https://www.northeastern.edu/sustainability/">
+              <NuxtLink to="https://pref.northeastern.edu/arboretum/">
                 <img
                   src="/arboretum_logo.svg"
                   alt="Northeastern University Logo"
