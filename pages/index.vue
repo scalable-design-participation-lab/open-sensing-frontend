@@ -13,7 +13,7 @@
     />
 
     <main class="flex-grow relative overflow-hidden pt-16">
-      <MapDashboard class="absolute inset-0" />
+      <MapDashboard class="absolute inset-0" :center-on="selectedMapCenter" />
       <GenericFilterSidebar
         v-if="showFilter && !showDashboard"
         :is-visible="showFilter && !showDashboard"
@@ -41,6 +41,13 @@
         class="fixed inset-0 bg-black bg-opacity-50 z-10"
         @click="closeOverlay"
       ></div>
+
+      <LocationSelectorModal
+        v-if="showLocationSelector"
+        :locations="listOfLocation"
+        @select="handleLocationSelect"
+        @close="showLocationSelector = false"
+      />
     </main>
     <GeneralizedFooter class="z-20" />
     <Teleport to="body">
@@ -109,6 +116,20 @@ function updateDateRange(newRange) {
   updateDataDashboardValues('dateRange', [newRange.start, newRange.end])
   updateDateRangeUpdate(new Date())
 }
+const selectedMapCenter = ref<[number, number] | null>(null)
+const showLocationSelector = ref(false)
+
+const listOfLocation = [
+  {
+    label: 'Boston',
+    value: 'boston',
+    location: [-71.084, 42.339],
+  },
+  { label: 'Cambridge', value: 'cambridge', location: [-71.105, 42.373] },
+  { label: 'Brookline', value: 'brookline', location: [-70.121, 41.331] },
+  { label: 'Newton', value: 'newton', location: [-71.207, 42.337] },
+  { label: 'Somerville', value: 'somerville', location: [-71.105, 42.387] },
+]
 
 const filterSections = computed(() => [
   {
@@ -229,6 +250,10 @@ const handleFilterChange = (filterData) => {
   }
   updateDateRangeUpdate(new Date())
 }
+function handleLocationSelect(coords: [number, number]) {
+  selectedMapCenter.value = coords
+  showLocationSelector.value = false
+}
 
 const handleDownloadFilterChange = (filterData) => {
   const { name, value } = filterData
@@ -258,6 +283,13 @@ const sensorTools = [
     icon: 'i-heroicons-solid:squares-2x2',
     tooltip: 'Dashboard',
     action: toggleDashboard,
+  },
+  {
+    icon: 'i-heroicons-solid-map-pin',
+    tooltip: 'Jump to Location',
+    action: () => {
+      showLocationSelector.value = true
+    },
   },
 ]
 

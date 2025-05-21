@@ -83,6 +83,10 @@ import type { View } from 'ol'
 
 useGeographic()
 
+const props = defineProps<{
+  centerOn: [number, number]
+}>()
+
 interface FormattedSensor {
   moduleid: string
   coordinates: [number, number]
@@ -315,6 +319,20 @@ watch(formattedSensors, (newSensors) => {
     })
   }
 })
+watch(
+  () => props.centerOn,
+  (newCenter) => {
+    if (newCenter && view.value) {
+      console.log('Centering map on props:', newCenter)
+      view.value.animate({
+        center: newCenter,
+        duration: 1000,
+        zoom: 18,
+      })
+    }
+  },
+  { immediate: true }
+)
 
 onMounted(async () => {
   console.log('MapDashboard mounted')
