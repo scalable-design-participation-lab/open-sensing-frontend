@@ -98,8 +98,13 @@ interface FormattedSensor {
 const sensorDetailStore = useSensorDetailStore()
 const mapStore = useMapStore()
 
-const { sensors, selectedSensorId, showSensorInfo, selectedSensor } =
-  storeToRefs(sensorDetailStore)
+const {
+  sensors,
+  selectedSensorId,
+  showSensorInfo,
+  selectedSensor,
+  densityBasedSensorClusters,
+} = storeToRefs(sensorDetailStore)
 const { mapType } = storeToRefs(mapStore)
 const { updateSelectedSensor, updateClickPosition } = sensorDetailStore
 
@@ -166,19 +171,19 @@ const formattedSensors = computed(() => {
 function createColoredLocationIcon(color: string) {
   const svgContent = `<?xml version="1.0" encoding="utf-8"?>
     <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z" 
-        stroke="#000000" 
-        stroke-width="1" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" 
-        fill="${color}" 
+      <path d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z"
+        stroke="#000000"
+        stroke-width="1"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="${color}"
         fill-opacity="1"/>
-      <circle 
-        cx="12" 
-        cy="10" 
-        r="2.5" 
-        fill="white"  
-        stroke="#000000" 
+      <circle
+        cx="12"
+        cy="10"
+        r="2.5"
+        fill="white"
+        stroke="#000000"
         stroke-width="1"/>
     </svg>`
 
@@ -271,6 +276,35 @@ watch(selectedSensorId, (newId) => {
     }
   }
 })
+watch(
+  densityBasedSensorClusters,
+  (newDbscanClusters) => {
+    if (newDbscanClusters && newDbscanClusters.features) {
+      console.log('DBSCAN Clusters updated:', newDbscanClusters)
+      let clusterCount = 0
+      const clusterIds = new Set()
+      newDbscanClusters.features.forEach((feature) => {
+        if (feature.properties) {
+          console.log(
+            `Sensor ID: ${feature.properties.moduleid}, DBSCAN type: ${feature.properties.dbscan}, Cluster ID: ${feature.properties.cluster}`
+          )
+          if (feature.properties.cluster !== -1) {
+            // Count actual clusters, excluding noise
+            clusterIds.add(feature.properties.cluster)
+          }
+        }
+      })
+      console.log(
+        'Discovered DBSCAN cluster IDs (excluding noise):',
+        Array.from(clusterIds)
+      )
+      console.log(
+        `Total actual clusters found (excluding noise): ${clusterIds.size}`
+      )
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 const calculateMapBounds = computed(() => {
   if (!formattedSensors.value || formattedSensors.value.length === 0) {

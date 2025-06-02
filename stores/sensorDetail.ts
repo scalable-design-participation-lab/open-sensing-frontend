@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useDashboardStore } from './dashboard'
+import * as turf from '@turf/turf'
 
 export interface Sensor {
   moduleid: string
@@ -17,6 +18,8 @@ export interface Sensor {
   pm10: number
   timestamp: string
 }
+const DBSCAN_MAX_DISTANCE_KM = 1
+const DBSCAN_MIN_POINTS = 1
 
 export const useSensorDetailStore = defineStore('sensorDetail', () => {
   const dashboardStore = useDashboardStore()
@@ -177,6 +180,45 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
       filteredLocations.value.includes(sensor.ecohub_location)
     )
   })
+  const densityBasedSensorClusters = computed(() => {
+    const sensorsWithCoords = filteredSensors.value.filter(
+      (s) =>
+        s.lon != null &&
+        s.lat != null &&
+        !isNaN(Number(s.lon)) &&
+        !isNaN(Number(s.lat))
+    )
+
+    if (sensorsWithCoords.length === 0) {
+      return turf.featureCollection([])
+    }
+
+    const features = sensorsWithCoords.map((sensor) =>
+      turf.point([Number(sensor.lon), Number(sensor.lat)], { ...sensor })
+    )
+    const pointFeatureCollection = turf.featureCollection(features)
+
+    try {
+      const pointsToCluster = turf.clone(pointFeatureCollection)
+
+      const clusteredCollection = turf.clustersDbscan(
+        pointsToCluster,
+        DBSCAN_MAX_DISTANCE_KM,
+        {
+          minPoints: DBSCAN_MIN_POINTS,
+          units: 'kilometers',
+        }
+      )
+
+      return clusteredCollection
+    } catch (error) {
+      console.error(
+        'Error during DBSCAN clustering in sensorDetail store:',
+        error
+      )
+      return turf.featureCollection([])
+    }
+  })
 
   return {
     showSensorInfo,
@@ -198,5 +240,6 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
     filteredSensors,
     updateFilteredLocations,
     initialFilteredLocations,
+    densityBasedSensorClusters,
   }
 })
