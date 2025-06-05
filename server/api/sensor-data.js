@@ -93,8 +93,8 @@ export default defineEventHandler(async (event) => {
         LIMIT 1
       ) b ON true
       WHERE s.moduleid = ?
+      AND s.timestamp >= NOW() - INTERVAL '1 month'
       ORDER BY s.timestamp DESC
-      LIMIT 100
     `,
       [moduleId]
     )
