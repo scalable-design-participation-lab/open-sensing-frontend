@@ -281,9 +281,12 @@ const sensorStats = computed(() => {
       'VOC (ppb)': 'N/A',
       'NOx (ppb)': 'N/A',
       pm1: 'N/A',
-      pm2_5: 'N/A',
+      pm25: 'N/A',
       pm4: 'N/A',
       pm10: 'N/A',
+      bme_humid: 'N/A',
+      bme_temp: 'N/A',
+      bme_pressure: 'N/A',
     }
   }
 
@@ -320,9 +323,12 @@ const sensorStats = computed(() => {
     'VOC (ppb)': formatValue(selectedSensor.value.voc, ' ppb'),
     'NOx (ppb)': formatValue(selectedSensor.value.nox, ' ppb'),
     pm1: formatValue(selectedSensor.value.pm1, ' µg/m³'),
-    pm2_5: formatValue(selectedSensor.value.pm25, ' µg/m³'),
+    pm25: formatValue(selectedSensor.value.pm25, ' µg/m³'),
     pm4: formatValue(selectedSensor.value.pm4, ' µg/m³'),
     pm10: formatValue(selectedSensor.value.pm10, ' µg/m³'),
+    bme_humid: formatValue(selectedSensor.value.bme_humid, ' %'),
+    bme_temp: formatValue(selectedSensor.value.bme_temp, 'Temperature'),
+    bme_pressure: formatValue(selectedSensor.value.bme_pressure, ' hPa'),
   }
 })
 

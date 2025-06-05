@@ -104,9 +104,15 @@ const {
   showSensorInfo,
   selectedSensor,
   densityBasedSensorClusters,
+  processedDBSCANClusters,
+  clusterDetailsWithLabels,
 } = storeToRefs(sensorDetailStore)
 const { mapType } = storeToRefs(mapStore)
-const { updateSelectedSensor, updateClickPosition } = sensorDetailStore
+const {
+  updateSelectedSensor,
+  updateClickPosition,
+  fetchAndSetLabelForCluster,
+} = sensorDetailStore
 
 const view = ref<View | null>(null)
 const map = ref(null)
@@ -366,6 +372,66 @@ watch(
     }
   },
   { immediate: true }
+)
+
+watch(
+  processedDBSCANClusters,
+  (newProcessedClustersMap) => {
+    console.log(
+      'Processed DBSCAN clusters changed, updating labels structure...'
+    )
+
+    const newOverallLabelState: Record<number, ClusterDetail> = {}
+
+    for (const clusterIdStr in newProcessedClustersMap) {
+      const clusterId = parseInt(clusterIdStr, 10)
+      const newClusterData = newProcessedClustersMap[clusterId]
+      const existingLabelEntry = clusterDetailsWithLabels.value[clusterId]
+
+      let labelToPreserve: string | undefined = undefined
+      let isLoadingToPreserve: boolean = false
+      let errorToPreserve: string | undefined = undefined
+
+      if (
+        existingLabelEntry &&
+        JSON.stringify(existingLabelEntry.centroidCoords) ===
+          JSON.stringify(newClusterData.centroidCoords)
+      ) {
+        labelToPreserve = existingLabelEntry.label
+        isLoadingToPreserve = existingLabelEntry.isLoadingLabel
+        errorToPreserve = existingLabelEntry.labelError
+      }
+
+      newOverallLabelState[clusterId] = {
+        id: clusterId,
+        centroidCoords: newClusterData.centroidCoords,
+        points: newClusterData.points,
+        pointCount: newClusterData.pointCount,
+        label: labelToPreserve,
+        isLoadingLabel: isLoadingToPreserve,
+        labelError: errorToPreserve,
+      }
+    }
+
+    clusterDetailsWithLabels.value = newOverallLabelState
+
+    for (const clusterIdStr in clusterDetailsWithLabels.value) {
+      const clusterId = parseInt(clusterIdStr, 10)
+      const entry = clusterDetailsWithLabels.value[clusterId]
+
+      if (
+        entry.centroidCoords &&
+        !entry.isLoadingLabel &&
+        (!entry.label || entry.labelError)
+      ) {
+        console.log(
+          `Watcher: Queuing fetch for cluster ${clusterId} with centroid: ${entry.centroidCoords}`
+        )
+        fetchAndSetLabelForCluster(clusterId, entry.centroidCoords)
+      }
+    }
+  },
+  { deep: true }
 )
 
 onMounted(async () => {

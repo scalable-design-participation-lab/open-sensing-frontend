@@ -23,7 +23,7 @@ describe('SensorStats.vue', () => {
     Humidity: 50,
     VOC: 300,
     NOx: 40,
-    PM2_5: 12,
+    PM25: 12,
   }
 
   it('renders the correct number of statistics', () => {
