@@ -106,6 +106,20 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
 
         console.log('\nTotal Sensors:', sensors.value.length)
         console.log('=== End of Sensors Data ===\n')
+        // Sync processed clusters to clusterDetailsWithLabels
+        clusterDetailsWithLabels.value = {}
+        const processed = processedDBSCANClusters.value
+        for (const id in processed) {
+          const cluster = processed[id]
+          clusterDetailsWithLabels.value[cluster.id] = {
+            ...cluster,
+            label: 'Loading...',
+            isLoadingLabel: true,
+          }
+
+          // Fetch label asynchronously
+          fetchAndSetLabelForCluster(cluster.id, cluster.centroidCoords)
+        }
       } else {
         console.error('Unexpected response format:', response)
         sensors.value = []
