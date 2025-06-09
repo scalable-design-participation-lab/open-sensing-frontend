@@ -414,10 +414,7 @@ onMounted(async () => {
     )
   }
 
-  console.log(
-    '✅ Labels with clusters:',
-    sensorDetailStore.clusterDetailsWithLabels
-  )
+  showLocationSelector.value = true
 })
 </script>
 
