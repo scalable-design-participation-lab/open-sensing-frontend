@@ -28,7 +28,7 @@ export const useDatasetStore = defineStore('dataset', () => {
     'VOC (ppb)': true,
     'NOx (ppb)': true,
     pm1: true,
-    pm2_5: true,
+    pm25: true,
     pm4: true,
     pm10: true,
   })

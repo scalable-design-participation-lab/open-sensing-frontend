@@ -13,7 +13,7 @@
     />
 
     <main class="flex-grow relative overflow-hidden pt-16">
-      <MapDashboard class="absolute inset-0" />
+      <MapDashboard class="absolute inset-0" :center-on="selectedMapCenter" />
       <GenericFilterSidebar
         v-if="showFilter && !showDashboard"
         :is-visible="showFilter && !showDashboard"
@@ -41,6 +41,13 @@
         class="fixed inset-0 bg-black bg-opacity-50 z-10"
         @click="closeOverlay"
       ></div>
+
+      <LocationSelectorModal
+        v-if="showLocationSelector"
+        :locations="listOfLocations"
+        @select="handleLocationSelect"
+        @close="showLocationSelector = false"
+      />
     </main>
     <GeneralizedFooter class="z-20" />
     <Teleport to="body">
@@ -68,15 +75,14 @@ import { sub } from 'date-fns'
 
 // Dashboard store
 const dashboardStore = useDashboardStore()
-const { showDashboard, dataDashboardValues, dateRangeUpdate } =
-  storeToRefs(dashboardStore)
+const { showDashboard } = storeToRefs(dashboardStore)
 const { toggleDashboard, updateDataDashboardValues, updateDateRangeUpdate } =
   dashboardStore
 
 // Filter store
 const filterStore = useFilterStore()
 const { showFilter } = storeToRefs(filterStore)
-const { toggleFilter, resetFilters } = filterStore
+const { toggleFilter } = filterStore
 
 // Map store
 const mapStore = useMapStore()
@@ -86,14 +92,14 @@ const currentMapType = ref('satellite')
 // Sensor Detail store
 const sensorDetailStore = useSensorDetailStore()
 const { showSensorDetail, availableLocations } = storeToRefs(sensorDetailStore)
+const { clusterDetailsWithLabels } = sensorDetailStore
 
 // Dataset store
 const datasetStore = useDatasetStore()
-const { existingHubs, existingDatasets } = storeToRefs(datasetStore)
+const { existingDatasets } = storeToRefs(datasetStore)
 const { updateExistingHubs, updateExistingDatasets } = datasetStore
 
 // Sensor Data store
-const sensorDataStore = useSensorDataStore()
 
 const isLoading = ref(false)
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
@@ -109,6 +115,19 @@ function updateDateRange(newRange) {
   updateDataDashboardValues('dateRange', [newRange.start, newRange.end])
   updateDateRangeUpdate(new Date())
 }
+const selectedMapCenter = ref<[number, number] | null>(null)
+const showLocationSelector = ref(false)
+
+const listOfLocations = computed(() =>
+  Object.keys(sensorDetailStore.clusterDetailsWithLabels).map((key) => {
+    const cluster = sensorDetailStore.clusterDetailsWithLabels[key]
+    return {
+      label: cluster.label || `Cluster ${cluster.id}`,
+      value: cluster.id,
+      location: cluster.centroidCoords,
+    }
+  })
+)
 
 const filterSections = computed(() => [
   {
@@ -178,7 +197,7 @@ const downloadFilterSections = computed(() => [
         { label: 'VOC', value: 'voc' },
         { label: 'NOx', value: 'nox' },
         { label: 'PM1', value: 'pm1' },
-        { label: 'PM2.5', value: 'pm25' },
+        { label: 'PM25', value: 'pm25' },
         { label: 'PM4', value: 'pm4' },
         { label: 'PM10', value: 'pm10' },
       ],
@@ -229,10 +248,9 @@ const handleFilterChange = (filterData) => {
   }
   updateDateRangeUpdate(new Date())
 }
-
-const handleDownloadFilterChange = (filterData) => {
-  const { name, value } = filterData
-  selectedDownloadFilters.value[name] = value
+function handleLocationSelect(coords: [number, number]) {
+  selectedMapCenter.value = coords
+  showLocationSelector.value = false
 }
 
 const resetAllFilters = () => {
@@ -258,6 +276,13 @@ const sensorTools = [
     icon: 'i-heroicons-solid:squares-2x2',
     tooltip: 'Dashboard',
     action: toggleDashboard,
+  },
+  {
+    icon: 'i-heroicons-solid-map-pin',
+    tooltip: 'Jump to Location',
+    action: () => {
+      showLocationSelector.value = true
+    },
   },
 ]
 
@@ -323,21 +348,6 @@ const leftItems = ref([
   },
 ])
 
-const mapItems = [
-  [
-    {
-      label: 'Satellite',
-      icon: 'i-heroicons-globe-americas-20-solid',
-      click: () => setMapType('satellite'),
-    },
-    {
-      label: 'Light',
-      icon: 'i-heroicons-sun-20-solid',
-      click: () => setMapType('light'),
-    },
-  ],
-]
-
 const rightItems = ref([
   {
     label: computed(() =>
@@ -385,6 +395,26 @@ watch(showFilter, (newValue) => {
 
 onMounted(async () => {
   await sensorDetailStore.loadSensors()
+
+  const processed = sensorDetailStore.processedDBSCANClusters
+  sensorDetailStore.clusterDetailsWithLabels = {}
+
+  for (const id in processed) {
+    const cluster = processed[id]
+    sensorDetailStore.clusterDetailsWithLabels[cluster.id] = {
+      ...cluster,
+      label: 'Loading...',
+      isLoadingLabel: true,
+    }
+
+    // Start label lookup
+    sensorDetailStore.fetchAndSetLabelForCluster(
+      cluster.id,
+      cluster.centroidCoords
+    )
+  }
+
+  showLocationSelector.value = true
 })
 </script>
 
