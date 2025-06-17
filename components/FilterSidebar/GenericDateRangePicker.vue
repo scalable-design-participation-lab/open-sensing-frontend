@@ -25,10 +25,10 @@
       >
         <div
           v-if="isOpen"
-          class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+          class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center w-full"
         >
           <div
-            class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-2xl w-full mx-4"
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-3xl w-full"
           >
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-lg font-semibold">Select Date Range</h3>
@@ -39,7 +39,7 @@
                 @click="isOpen = false"
               />
             </div>
-            <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
               <div class="flex flex-col space-y-2">
                 <UButton
                   label="All Time"
@@ -73,9 +73,6 @@
                 range
                 @update:model-value="handleDateChange"
               />
-            </div>
-            <div class="mt-4 flex justify-end">
-              <UButton color="primary" @click="applyDateRange">Apply</UButton>
             </div>
           </div>
         </div>
@@ -192,6 +189,7 @@ function selectRange(duration: Duration) {
  */
 function handleDateChange(value) {
   if (value && isValid(value.start) && isValid(value.end)) {
+    isOpen.value = false
     isAllTimeSelected.value = false
     selected.value = value
     emitChange()
