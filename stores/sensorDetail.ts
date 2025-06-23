@@ -21,7 +21,7 @@ export interface Sensor {
   bme_pressure: number
   timestamp: string
 }
-const DBSCAN_MAX_DISTANCE_KM = 1
+const DBSCAN_MAX_DISTANCE_KM = 0.5
 const DBSCAN_MIN_POINTS = 1
 interface ClusterDetail {
   id: number
@@ -42,6 +42,16 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
   const sensors = ref<Sensor[]>([])
   const isLoading = ref(false)
   const clusterDetailsWithLabels = ref<Record<number, ClusterDetail>>({})
+  const sensorsSortedByLat = computed(() =>
+    sensors.value
+      .filter((s) => s.lat != null)
+      .sort((a, b) => (a.lat! > b.lat! ? 1 : -1))
+  )
+  const currentSortedIndex = computed(() =>
+    sensorsSortedByLat.value.findIndex(
+      (s) => s.moduleid === selectedSensorId.value
+    )
+  )
 
   const loadSensors = async () => {
     if (isLoading.value) return
@@ -153,28 +163,31 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
     dashboardStore.showDashboard = false
   }
 
-  const getNextSensorId = () => {
-    const currentIndex = sensors.value.findIndex(
-      (sensor) => sensor.moduleid === selectedSensorId.value
-    )
-    return sensors.value[(currentIndex + 1) % sensors.value.length].moduleid
+  function getNextSensorId(): string | null {
+    const sorted = sensorsSortedByLat.value
+    const len = sorted.length
+    if (len === 0) return null
+
+    const idx = currentSortedIndex.value
+    if (idx < 0) return sorted[0].moduleid
+
+    return sorted[(idx + 1) % len].moduleid
   }
 
-  const getPreviousSensorId = () => {
-    const currentIndex = sensors.value.findIndex(
-      (sensor) => sensor.moduleid === selectedSensorId.value
-    )
-    return sensors.value[
-      (currentIndex - 1 + sensors.value.length) % sensors.value.length
-    ].moduleid
+  const getPreviousSensorId = (): string | null => {
+    const sorted = sensorsSortedByLat.value
+    const idx = sorted.findIndex((s) => s.moduleid === selectedSensorId.value)
+    if (idx === -1) return null
+    const prev = sorted[(idx - 1 + sorted.length) % sorted.length]
+    return prev.moduleid
   }
-
   const selectNextSensor = () => {
-    selectedSensorId.value = getNextSensorId()
+    const next = getNextSensorId()
+    if (next) selectedSensorId.value = next
   }
-
   const selectPreviousSensor = () => {
-    selectedSensorId.value = getPreviousSensorId()
+    const prev = getPreviousSensorId()
+    if (prev) selectedSensorId.value = prev
   }
 
   const closeSensorInfo = () => {
