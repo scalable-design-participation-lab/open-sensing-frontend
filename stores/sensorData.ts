@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { SENSOR_METRICS } from '../constants/metrics'
 import { processDataPoint, validateAndSortData } from '../utils/dataProcessing'
+import { subMonths } from 'date-fns'
 
 export interface SensorDataPoint {
   date: string
@@ -21,7 +22,11 @@ export interface SensorMetrics {
 export interface SensorDataStore {
   sensorData: Record<string, SensorMetrics>
   isLoading: boolean
-  loadSensorData: (sensorId: string) => Promise<void>
+  loadSensorData: (
+    sensorId: string,
+    dateRange?: { start: Date; end: Date },
+    force?: boolean
+  ) => Promise<void>
   clearSensorData: (sensorId: string) => void
   clearAllSensorData: () => void
 }
@@ -32,7 +37,14 @@ export const useSensorDataStore = defineStore('sensorData', () => {
   const lastFetchTime = ref<Record<string, number>>({})
   const cacheTime = 5400000 // 1h30m
 
-  const loadSensorData = async (moduleId: string, force = false) => {
+  const loadSensorData = async (
+    moduleId: string,
+    dateRange: { start: Date; end: Date } = {
+      start: subMonths(new Date(), 1),
+      end: new Date(),
+    },
+    force = false
+  ) => {
     if (isLoading.value) return
 
     // Check cache
@@ -48,7 +60,11 @@ export const useSensorDataStore = defineStore('sensorData', () => {
     isLoading.value = true
     try {
       const response = await $fetch('/api/sensor-data', {
-        params: { moduleId },
+        params: {
+          moduleId,
+          start: dateRange.start.toISOString(),
+          end: dateRange.end.toISOString(),
+        },
       })
 
       if (!response || typeof response !== 'object') {

@@ -1,5 +1,6 @@
 import { defineEventHandler, getQuery } from 'h3'
 import db from '../../utils/db'
+import { sub, subMonths } from 'date-fns'
 
 /**
  * API endpoint for retrieving sensor data by moduleId
@@ -11,8 +12,9 @@ import db from '../../utils/db'
  */
 export default defineEventHandler(async (event) => {
   try {
-    const query = getQuery(event)
-    const moduleId = query.moduleId
+    const { moduleId, start, end } = getQuery(event)
+    const startDate = start ? new Date(start) : subMonths(new Date(), 1)
+    const endDate = end ? new Date(end) : new Date()
 
     if (!moduleId) {
       // Lastest readings for all modules
@@ -93,10 +95,10 @@ export default defineEventHandler(async (event) => {
         LIMIT 1
       ) b ON true
       WHERE s.moduleid = ?
-      AND s.timestamp >= NOW() - INTERVAL '1 month'
+      AND s.timestamp BETWEEN ? AND ?
       ORDER BY s.timestamp DESC
     `,
-      [moduleId]
+      [moduleId, startDate.toISOString(), endDate.toISOString()]
     )
 
     return {

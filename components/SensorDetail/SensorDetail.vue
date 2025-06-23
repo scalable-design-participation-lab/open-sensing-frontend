@@ -45,11 +45,25 @@
             />
           </div>
 
-          <SensorStats
-            :sensor-stats="sensorStats"
-            :temperature-unit="temperatureUnit"
-            @show-stat-details="showStatDetails"
-          />
+          <!-- Stats or Skeleton -->
+          <div v-if="!loadingStates[selectedSensor.moduleid]">
+            <SensorStats
+              :sensor-stats="sensorStats"
+              :temperature-unit="temperatureUnit"
+              @show-stat-details="showStatDetails"
+            />
+          </div>
+          <div
+            v-else
+            class="grid grid-cols-2 md:grid-cols-4 gap-4 my-4"
+            data-testid="stats-skeleton"
+          >
+            <USkeleton
+              v-for="n in Object.keys(sensorStats).length"
+              :key="n"
+              class="h-16 w-full rounded animate-pulse"
+            />
+          </div>
 
           <div class="flex flex-col md:flex-row gap-6 mt-8">
             <UCard class="flex-1">
@@ -69,14 +83,17 @@
 
           <UCard class="mt-8">
             <template #header>
-              <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
-                Sensor Data
-              </h2>
+              <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                  Sensor Data
+                </h2>
+                <GenericDateRangePicker v-model="dateRangeForSensorQuery" />
+              </div>
             </template>
 
             <div ref="scrollContainer" class="h-96 overflow-y-auto">
               <div
-                v-if="dataLoaded && !loadingStates[selectedSensor?.moduleid]"
+                v-if="dataLoaded && !loadingStates[selectedSensor.moduleid]"
                 class="p-4 space-y-6"
               >
                 <template
@@ -104,18 +121,13 @@
                   </div>
                 </template>
               </div>
-              <div
-                v-else
-                class="flex flex-col items-center justify-center h-full"
-              >
-                <USpinner class="mb-2" />
-                <p>
-                  {{
-                    loadingStates[selectedSensor?.moduleid]
-                      ? 'Loading data...'
-                      : 'No data available'
-                  }}
-                </p>
+              <div v-else class="p-4 space-y-6">
+                <template
+                  v-for="(metric, metricName) in metrics"
+                  :key="metricName"
+                >
+                  <USkeleton class="h-[350px] w-full rounded animate-pulse" />
+                </template>
               </div>
             </div>
 
@@ -155,6 +167,8 @@ import {
 } from '../../stores/sensorData'
 import { useResizeObserver } from '@vueuse/core'
 import { SENSOR_METRICS } from '../../constants/metrics'
+import GenericDateRangePicker from '../FilterSidebar/GenericDateRangePicker.vue'
+import { sub } from 'date-fns'
 
 /**
  * Store for managing sensor detail state
@@ -414,7 +428,10 @@ useResizeObserver(scrollContainer, (entries) => {
     chartWidth.value = entry.contentRect.width - margin.left - margin.right
   }
 })
-
+const dateRangeForSensorQuery = ref({
+  start: sub(new Date(), { days: 30 }),
+  end: new Date(),
+})
 // Modify the loading states and data loaded state
 const loadingStates = ref<Record<string, boolean>>({})
 
@@ -432,7 +449,10 @@ const loadSensorDataWithState = async (sensorId: string) => {
     }
 
     // Load new data
-    await sensorDataStore.loadSensorData(sensorId)
+    await sensorDataStore.loadSensorData(
+      sensorId,
+      dateRangeForSensorQuery.value
+    )
 
     // Wait for the next tick to ensure DOM updates
     await nextTick()
@@ -449,6 +469,15 @@ const loadSensorDataWithState = async (sensorId: string) => {
     loadingStates.value[sensorId] = false
   }
 }
+watch(
+  dateRangeForSensorQuery,
+  async (newRange, oldRange) => {
+    if (selectedSensor.value?.moduleid) {
+      await loadSensorDataWithState(selectedSensor.value.moduleid)
+    }
+  },
+  { deep: true }
+)
 
 // Modify the watch on selectedSensor
 watch(
