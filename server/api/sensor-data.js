@@ -1,6 +1,6 @@
 import { defineEventHandler, getQuery } from 'h3'
 import db from '../../utils/db'
-import { sub, subMonths } from 'date-fns'
+import { subMonths } from 'date-fns'
 
 /**
  * API endpoint for retrieving sensor data by moduleId
@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
     const endDate = end ? new Date(end) : new Date()
 
     if (!moduleId) {
-      // Lastest readings for all modules
       const allSensorsQuery = await db.raw(`
         SELECT 
           m.moduleid,
@@ -57,56 +56,88 @@ export default defineEventHandler(async (event) => {
         ) b ON m.moduleid = b.moduleid
         ORDER BY m.moduleid;
       `)
-
       return allSensorsQuery.rows
     }
+
+    // === DYNAMIC QUERY SECTION ===
 
     const locationQuery = await db.raw(
       `SELECT moduleid, ecohub_location, lat, lon FROM modules WHERE moduleid = ?`,
       [moduleId]
     )
     const moduleInfo = locationQuery.rows[0]
+    if (!moduleInfo) return { error: 'Module not found' }
 
-    if (!moduleInfo) {
-      return { error: 'Module not found' }
+    const sensorListQuery = await db.raw(
+      `SELECT sensors FROM modulesensors WHERE moduleid = ?`,
+      [moduleId]
+    )
+    const sensors = sensorListQuery.rows[0]?.sensors ?? []
+    const validSensors = ['bme_280', 'scd_41']
+    const filteredSensors = sensors.filter((s) => validSensors.includes(s))
+
+    const baseTable = 'sen55'
+    const baseAlias = 's'
+
+    const selectFields = [
+      `${baseAlias}.timestamp`,
+      `${baseAlias}.temperature`,
+      `${baseAlias}.relative_humidity`,
+      `${baseAlias}.voc`,
+      `${baseAlias}.nox`,
+      `${baseAlias}.pm1`,
+      `${baseAlias}.pm25`,
+      `${baseAlias}.pm4`,
+      `${baseAlias}.pm10`,
+    ]
+
+    const lateralJoins = []
+    const bindParams = []
+
+    for (const sensor of filteredSensors) {
+      const alias = sensor
+      const fields = {
+        bme_280: ['bme_temp', 'bme_humid', 'bme_pressure'],
+        scd_41: ['scd_temp', 'scd_humid', 'scd_co2'],
+      }[sensor] || ['value']
+
+      for (const field of fields) {
+        selectFields.push(`${alias}.${field} AS ${field}`)
+      }
+
+      lateralJoins.push(`
+        LEFT JOIN LATERAL (
+          SELECT ${fields.join(', ')}
+          FROM ${sensor}
+          WHERE moduleid = ${baseAlias}.moduleid
+          AND timestamp BETWEEN ? AND ?
+          ORDER BY timestamp DESC
+          LIMIT 1
+        ) ${alias} ON true
+      `)
+
+      bindParams.push(startDate.toISOString(), endDate.toISOString())
     }
 
-    const result = await db.raw(
-      `
-      SELECT 
-        s.timestamp,
-        s.temperature,
-        s.relative_humidity,
-        s.voc,
-        s.nox,
-        s.pm1,
-        s.pm25,
-        s.pm4,
-        s.pm10,
-        b.bme_humid,
-        b.bme_temp,
-        b.bme_pressure
-      FROM sen55 s
-      LEFT JOIN LATERAL (
-        SELECT bme_humid, bme_temp, bme_pressure
-        FROM bme_280 b
-        WHERE b.moduleid = s.moduleid
-        ORDER BY b.timestamp DESC
-        LIMIT 1
-      ) b ON true
-      WHERE s.moduleid = ?
-      AND s.timestamp BETWEEN ? AND ?
-      ORDER BY s.timestamp DESC
-    `,
-      [moduleId, startDate.toISOString(), endDate.toISOString()]
-    )
+    const dynamicQuery = `
+      SELECT ${selectFields.join(',\n')}
+      FROM ${baseTable} ${baseAlias}
+      ${lateralJoins.join('\n')}
+      WHERE ${baseAlias}.moduleid = ?
+      AND ${baseAlias}.timestamp BETWEEN ? AND ?
+      ORDER BY ${baseAlias}.timestamp DESC
+    `
+
+    bindParams.push(moduleId, startDate.toISOString(), endDate.toISOString())
+
+    const result = await db.raw(dynamicQuery, bindParams)
 
     return {
       moduleInfo,
       sensorData: result.rows,
     }
   } catch (err) {
-    console.error('Error executing query', err)
+    console.error('Error executing dynamic query', err)
     return { error: 'Internal server error', details: err.message }
   }
 })

@@ -301,11 +301,15 @@ const sensorStats = computed(() => {
       bme_humid: 'N/A',
       bme_temp: 'N/A',
       bme_pressure: 'N/A',
+      'SCD Temperature': 'N/A',
+      'SCD Humidity': 'N/A',
+      'SCD CO₂': 'N/A',
     }
   }
 
   const data = sensorData.value[selectedSensor.value.moduleid]
   console.log('Sensor data:', data)
+  console.log('Selected sensor raw:', selectedSensor.value)
 
   /**
    * Formats a sensor value with its unit
@@ -343,6 +347,12 @@ const sensorStats = computed(() => {
     bme_humid: formatValue(selectedSensor.value.bme_humid, ' %'),
     bme_temp: formatValue(selectedSensor.value.bme_temp, 'Temperature'),
     bme_pressure: formatValue(selectedSensor.value.bme_pressure, ' hPa'),
+    'SCD Temperature': formatValue(
+      selectedSensor.value.scd_temp,
+      'Temperature'
+    ),
+    'SCD Humidity': formatValue(selectedSensor.value.scd_humid, ' %'),
+    'SCD CO₂': formatValue(selectedSensor.value.scd_co2, ' ppm'),
   }
 })
 

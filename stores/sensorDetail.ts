@@ -4,6 +4,9 @@ import { useDashboardStore } from './dashboard'
 import * as turf from '@turf/turf'
 
 export interface Sensor {
+  scd_41_scd_temp(scd_41_scd_temp: any, arg1: string): string
+  scd_41_scd_humid(scd_41_scd_humid: any, arg1: string): string
+  scd_41_scd_co2(scd_41_scd_co2: any, arg1: string): string
   moduleid: string
   ecohub_location: string
   lat: number | null
@@ -19,6 +22,9 @@ export interface Sensor {
   bme_humid: number
   bme_temp: number
   bme_pressure: number
+  scd_temp: number
+  scd_humid: number
+  scd_co2: number
   timestamp: string
 }
 const DBSCAN_MAX_DISTANCE_KM = 0.5
@@ -75,6 +81,9 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
           bme_humid: Number(sensor.bme_humid) || 0,
           bme_temp: Number(sensor.bme_temp) || 0,
           bme_pressure: Number(sensor.bme_pressure) || 0,
+          scd_temp: Number(sensor.scd_temp) || 0,
+          scd_humid: Number(sensor.scd_humid) || 0,
+          scd_co2: Number(sensor.scd_co2) || 0,
         }))
 
         filteredLocations.value = Array.from(
@@ -107,6 +116,9 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
           console.log('BME HUMID:', sensor.bme_humid)
           console.log('BME TEMP:', sensor.bme_temp)
           console.log('BME PRESSURE:', sensor.bme_pressure)
+          console.log('SCD TEMP:', sensor.scd_temp)
+          console.log('SCD HUMID:', sensor.scd_humid)
+          console.log('SCD CO2:', sensor.scd_co2)
           console.log(
             'Last Updated:',
             new Date(sensor.timestamp).toLocaleString()
