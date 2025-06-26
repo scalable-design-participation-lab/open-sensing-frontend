@@ -19,6 +19,9 @@ export interface Sensor {
   bme_humid: number
   bme_temp: number
   bme_pressure: number
+  scd_temp: number
+  scd_humid: number
+  scd_co2: number
   timestamp: string
 }
 const DBSCAN_MAX_DISTANCE_KM = 0.5
@@ -60,22 +63,25 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
     try {
       const response = await $fetch('/api/sensor-data')
       if (Array.isArray(response)) {
-        sensors.value = response.map((sensor) => ({
-          ...sensor,
-          lat: sensor.lat || null,
-          lon: sensor.lon || null,
-          temperature: Number(sensor.temperature) || 0,
-          relative_humidity: Number(sensor.relative_humidity) || 0,
-          voc: Number(sensor.voc) || 0,
-          nox: Number(sensor.nox) || 0,
-          pm1: Number(sensor.pm1) || 0,
-          pm25: Number(sensor.pm25) || 0,
-          pm4: Number(sensor.pm4) || 0,
-          pm10: Number(sensor.pm10) || 0,
-          bme_humid: Number(sensor.bme_humid) || 0,
-          bme_temp: Number(sensor.bme_temp) || 0,
-          bme_pressure: Number(sensor.bme_pressure) || 0,
-        }))
+        sensors.value = response.map((sensor) => {
+          console.log('Sensor data:', sensor.value)
+          return {
+            ...sensor,
+            lat: sensor.lat || null,
+            lon: sensor.lon || null,
+            temperature: Number(sensor.temperature) || 0,
+            relative_humidity: Number(sensor.relative_humidity) || 0,
+            voc: Number(sensor.voc) || 0,
+            nox: Number(sensor.nox) || 0,
+            pm1: Number(sensor.pm1) || 0,
+            pm25: Number(sensor.pm25) || 0,
+            pm4: Number(sensor.pm4) || 0,
+            pm10: Number(sensor.pm10) || 0,
+            bme_humid: Number(sensor.bme_humid) || 0,
+            bme_temp: Number(sensor.bme_temp) || 0,
+            bme_pressure: Number(sensor.bme_pressure) || 0,
+          }
+        })
 
         filteredLocations.value = Array.from(
           new Set(
@@ -107,6 +113,9 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
           console.log('BME HUMID:', sensor.bme_humid)
           console.log('BME TEMP:', sensor.bme_temp)
           console.log('BME PRESSURE:', sensor.bme_pressure)
+          console.log('SCD TEMP:', sensor.scd_temp)
+          console.log('SCD HUMID:', sensor.scd_humid)
+          console.log('SCD CO2:', sensor.scd_co2)
           console.log(
             'Last Updated:',
             new Date(sensor.timestamp).toLocaleString()

@@ -205,6 +205,15 @@ export const useDashboardUIStore = defineStore('dashboardUI', () => {
           'pm2.5': { name: 'pm25', label: 'PM2.5 (µg/m³)' },
           pm4: { name: 'pm4', label: 'PM4 (µg/m³)' },
           pm10: { name: 'pm10', label: 'PM10 (µg/m³)' },
+          scd_temp: {
+            name: 'scd_temp',
+            label: 'SCD Temperature (°C)',
+          },
+          scd_humid: {
+            name: 'scd_humid',
+            label: 'SCD Humidity (%)',
+          },
+          scd_co2: { name: 'scd_co2', label: 'SCD CO2 (ppm)' },
         }
 
         const metricData = {}

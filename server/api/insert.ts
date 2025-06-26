@@ -42,6 +42,9 @@ export default defineEventHandler(async (event) => {
       Voltage: body.Voltage ?? null,
       timestamp: body.timestamp ? new Date(body.timestamp * 1000) : new Date(),
       bme_temp: body['BME-Temp'] ?? null,
+      scd_temp: body.scd_temp ?? null,
+      scd_humid: body.scd_humid ?? null,
+      scd_co2: body.scd_co2 ?? null,
     }
 
     logger.debug('Processed data:', data)
