@@ -80,9 +80,6 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
             bme_humid: Number(sensor.bme_humid) || 0,
             bme_temp: Number(sensor.bme_temp) || 0,
             bme_pressure: Number(sensor.bme_pressure) || 0,
-            scd_temp: Number(sensor.scd_temp) || 0,
-            scd_humid: Number(sensor.scd_humid) || 0,
-            scd_co2: Number(sensor.scd_co2) || 0,
           }
         })
 

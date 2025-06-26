@@ -111,14 +111,6 @@
                       @date-range-update="updateGlobalDateRange"
                     />
                   </div>
-                  <div
-                    v-else-if="selectedDatasets.includes(metricName)"
-                    class="flex items-center justify-center h-[350px] bg-gray-50 rounded-lg"
-                  >
-                    <p class="text-gray-500">
-                      No data available for {{ metric.label }}
-                    </p>
-                  </div>
                 </template>
               </div>
               <div v-else class="p-4 space-y-6">
@@ -333,25 +325,31 @@ const sensorStats = computed(() => {
     return `${value.toFixed(1)}${unit}`
   }
 
-  return {
-    Temperature: formatValue(selectedSensor.value.temperature, 'Temperature'),
-    'Relative Humidity': formatValue(
-      selectedSensor.value.relative_humidity,
-      '%'
-    ),
-    'VOC (ppb)': formatValue(selectedSensor.value.voc, ' ppb'),
-    'NOx (ppb)': formatValue(selectedSensor.value.nox, ' ppb'),
-    pm1: formatValue(selectedSensor.value.pm1, ' µg/m³'),
-    pm25: formatValue(selectedSensor.value.pm25, ' µg/m³'),
-    pm4: formatValue(selectedSensor.value.pm4, ' µg/m³'),
-    pm10: formatValue(selectedSensor.value.pm10, ' µg/m³'),
-    bme_humid: formatValue(selectedSensor.value.bme_humid, ' %'),
-    bme_temp: formatValue(selectedSensor.value.bme_temp, 'Temperature'),
-    bme_pressure: formatValue(selectedSensor.value.bme_pressure, ' hPa'),
-    scd_temp: formatValue(data.scd_temp?.data?.at(-1)?.value, 'Temperature'),
-    scd_humid: formatValue(data.scd_humid?.data?.at(-1)?.value, ' %'),
-    scd_co2: formatValue(data.scd_co2?.data?.at(-1)?.value, ' ppm'),
+  const stats = {}
+
+  const addStat = (key, value, unit) => {
+    if (value !== null && value !== undefined && !isNaN(value)) {
+      stats[key] = formatValue(value, unit)
+    }
   }
+
+  addStat('Temperature', selectedSensor.value.temperature, 'Temperature')
+  addStat('Relative Humidity', selectedSensor.value.relative_humidity, '%')
+  addStat('VOC (ppb)', selectedSensor.value.voc, ' ppb')
+  addStat('NOx (ppb)', selectedSensor.value.nox, ' ppb')
+  addStat('pm1', selectedSensor.value.pm1, ' µg/m³')
+  addStat('pm25', selectedSensor.value.pm25, ' µg/m³')
+  addStat('pm4', selectedSensor.value.pm4, ' µg/m³')
+  addStat('pm10', selectedSensor.value.pm10, ' µg/m³')
+  addStat('bme_humid', selectedSensor.value.bme_humid, ' %')
+  addStat('bme_temp', selectedSensor.value.bme_temp, 'Temperature')
+  addStat('bme_pressure', selectedSensor.value.bme_pressure, ' hPa')
+
+  addStat('scd_temp', data.scd_temp?.data?.at(-1)?.value, 'Temperature')
+  addStat('scd_humid', data.scd_humid?.data?.at(-1)?.value, ' %')
+  addStat('scd_co2', data.scd_co2?.data?.at(-1)?.value, ' ppm')
+
+  return stats
 })
 
 /**

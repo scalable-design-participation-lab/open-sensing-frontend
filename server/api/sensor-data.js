@@ -129,8 +129,6 @@ export default defineEventHandler(async (event) => {
 
     bindParams.push(moduleId, startDate.toISOString(), endDate.toISOString())
 
-    console.log('Executing dynamic query:', dynamicQuery)
-
     const result = await db.raw(dynamicQuery, bindParams)
 
     return {
