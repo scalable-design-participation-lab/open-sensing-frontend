@@ -31,6 +31,9 @@ export const useDatasetStore = defineStore('dataset', () => {
     pm25: true,
     pm4: true,
     pm10: true,
+    scd_temp: true,
+    scd_humid: true,
+    scd_co2: true,
   })
 
   const updateExistingHubs = (newHubs) => {

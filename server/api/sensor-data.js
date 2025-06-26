@@ -104,17 +104,16 @@ export default defineEventHandler(async (event) => {
       for (const field of fields) {
         selectFields.push(`${alias}.${field} AS ${field}`)
       }
-
       lateralJoins.push(`
-        LEFT JOIN LATERAL (
-          SELECT ${fields.join(', ')}
-          FROM ${sensor}
-          WHERE moduleid = ${baseAlias}.moduleid
-          AND timestamp BETWEEN ? AND ?
-          ORDER BY timestamp DESC
-          LIMIT 1
-        ) ${alias} ON true
-      `)
+    LEFT JOIN LATERAL (
+      SELECT ${fields.join(', ')}
+      FROM ${sensor}
+      WHERE moduleid = ${baseAlias}.moduleid
+      AND timestamp BETWEEN ? AND ?
+      ORDER BY timestamp DESC
+      LIMIT 1
+    ) ${alias} ON true
+  `)
 
       bindParams.push(startDate.toISOString(), endDate.toISOString())
     }
@@ -129,6 +128,8 @@ export default defineEventHandler(async (event) => {
     `
 
     bindParams.push(moduleId, startDate.toISOString(), endDate.toISOString())
+
+    console.log('Executing dynamic query:', dynamicQuery)
 
     const result = await db.raw(dynamicQuery, bindParams)
 

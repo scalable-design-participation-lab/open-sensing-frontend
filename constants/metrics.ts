@@ -13,7 +13,7 @@ export const SENSOR_METRICS = {
   bme_humid: { name: 'bme_humid', label: 'BME Humidity (%)' },
   bme_temp: { name: 'bme_temp', label: 'BME Temperature (°C)' },
   bme_pressure: { name: 'bme_pressure', label: 'BME Pressure (hPa)' },
-  'SCD Temperature': { name: 'scd_temp', label: 'SCD Temperature (°C)' },
-  'SCD Humidity': { name: 'scd_humid', label: 'SCD Humidity (%)' },
-  'SCD CO₂': { name: 'scd_co2', label: 'SCD CO₂ (ppm)' },
+  scd_temp: { name: 'scd_temp', label: 'SCD Temperature (°C)' },
+  scd_humid: { name: 'scd_humid', label: 'SCD Humidity (%)' },
+  scd_co2: { name: 'scd_co2', label: 'SCD CO₂ (ppm)' },
 } as const

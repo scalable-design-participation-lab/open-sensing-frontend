@@ -202,6 +202,9 @@ interface Sensor {
   pm25: number
   pm4: number
   pm10: number
+  scd_temp: number
+  scd_humid: number
+  scd_co2: number
   timestamp: string
 }
 
@@ -214,6 +217,9 @@ interface FormattedSensor {
   voc: number
   nox: number
   pm25: number
+  scd_temp: number
+  scd_humid: number
+  scd_co2: number
   coordinates: [number, number] | null
   timestamp: string
   status: 'Active' | 'Inactive'
@@ -237,6 +243,9 @@ const formatSensorData = (sensor: Sensor): FormattedSensor => {
     voc: sensor.voc,
     nox: sensor.nox,
     pm25: sensor.pm25,
+    scd_temp: sensor.scd_temp,
+    scd_humid: sensor.scd_humid,
+    scd_co2: sensor.scd_co2,
     coordinates: sensor.lon && sensor.lat ? [sensor.lon, sensor.lat] : null,
     timestamp: timestamp.toLocaleString('en-US', {
       timeZone: 'America/New_York',
