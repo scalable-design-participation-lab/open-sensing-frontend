@@ -4,9 +4,6 @@ import { useDashboardStore } from './dashboard'
 import * as turf from '@turf/turf'
 
 export interface Sensor {
-  scd_41_scd_temp(scd_41_scd_temp: any, arg1: string): string
-  scd_41_scd_humid(scd_41_scd_humid: any, arg1: string): string
-  scd_41_scd_co2(scd_41_scd_co2: any, arg1: string): string
   moduleid: string
   ecohub_location: string
   lat: number | null
@@ -66,25 +63,28 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
     try {
       const response = await $fetch('/api/sensor-data')
       if (Array.isArray(response)) {
-        sensors.value = response.map((sensor) => ({
-          ...sensor,
-          lat: sensor.lat || null,
-          lon: sensor.lon || null,
-          temperature: Number(sensor.temperature) || 0,
-          relative_humidity: Number(sensor.relative_humidity) || 0,
-          voc: Number(sensor.voc) || 0,
-          nox: Number(sensor.nox) || 0,
-          pm1: Number(sensor.pm1) || 0,
-          pm25: Number(sensor.pm25) || 0,
-          pm4: Number(sensor.pm4) || 0,
-          pm10: Number(sensor.pm10) || 0,
-          bme_humid: Number(sensor.bme_humid) || 0,
-          bme_temp: Number(sensor.bme_temp) || 0,
-          bme_pressure: Number(sensor.bme_pressure) || 0,
-          scd_temp: Number(sensor.scd_temp) || 0,
-          scd_humid: Number(sensor.scd_humid) || 0,
-          scd_co2: Number(sensor.scd_co2) || 0,
-        }))
+        sensors.value = response.map((sensor) => {
+          console.log('Sensor data:', sensor.value)
+          return {
+            ...sensor,
+            lat: sensor.lat || null,
+            lon: sensor.lon || null,
+            temperature: Number(sensor.temperature) || 0,
+            relative_humidity: Number(sensor.relative_humidity) || 0,
+            voc: Number(sensor.voc) || 0,
+            nox: Number(sensor.nox) || 0,
+            pm1: Number(sensor.pm1) || 0,
+            pm25: Number(sensor.pm25) || 0,
+            pm4: Number(sensor.pm4) || 0,
+            pm10: Number(sensor.pm10) || 0,
+            bme_humid: Number(sensor.bme_humid) || 0,
+            bme_temp: Number(sensor.bme_temp) || 0,
+            bme_pressure: Number(sensor.bme_pressure) || 0,
+            scd_temp: Number(sensor.scd_temp) || 0,
+            scd_humid: Number(sensor.scd_humid) || 0,
+            scd_co2: Number(sensor.scd_co2) || 0,
+          }
+        })
 
         filteredLocations.value = Array.from(
           new Set(

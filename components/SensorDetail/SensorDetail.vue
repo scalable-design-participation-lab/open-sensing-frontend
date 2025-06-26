@@ -91,7 +91,7 @@
               </div>
             </template>
 
-            <div ref="scrollContainer" class="h-96 overflow-y-auto">
+            <div ref="scrollContainer">
               <div
                 v-if="dataLoaded && !loadingStates[selectedSensor.moduleid]"
                 class="p-4 space-y-6"
@@ -100,7 +100,7 @@
                   v-for="(metric, metricName) in metrics"
                   :key="metricName"
                 >
-                  <div v-if="shouldRenderChart(metricName)" class="relative">
+                  <div v-if="shouldRenderChart(metricName)">
                     <LineChart
                       :metric="metric"
                       :data="chartData[metricName]"
@@ -169,6 +169,7 @@ import { useResizeObserver } from '@vueuse/core'
 import { SENSOR_METRICS } from '../../constants/metrics'
 import GenericDateRangePicker from '../FilterSidebar/GenericDateRangePicker.vue'
 import { sub } from 'date-fns'
+import { isNumber } from 'util'
 
 /**
  * Store for managing sensor detail state
@@ -301,9 +302,9 @@ const sensorStats = computed(() => {
       bme_humid: 'N/A',
       bme_temp: 'N/A',
       bme_pressure: 'N/A',
-      'SCD Temperature': 'N/A',
-      'SCD Humidity': 'N/A',
-      'SCD CO₂': 'N/A',
+      scd_temp: 'N/A',
+      scd_humid: 'N/A',
+      scd_co2: 'N/A',
     }
   }
 
@@ -347,12 +348,9 @@ const sensorStats = computed(() => {
     bme_humid: formatValue(selectedSensor.value.bme_humid, ' %'),
     bme_temp: formatValue(selectedSensor.value.bme_temp, 'Temperature'),
     bme_pressure: formatValue(selectedSensor.value.bme_pressure, ' hPa'),
-    'SCD Temperature': formatValue(
-      selectedSensor.value.scd_temp,
-      'Temperature'
-    ),
-    'SCD Humidity': formatValue(selectedSensor.value.scd_humid, ' %'),
-    'SCD CO₂': formatValue(selectedSensor.value.scd_co2, ' ppm'),
+    scd_temp: formatValue(data.scd_temp?.data?.at(-1)?.value, 'Temperature'),
+    scd_humid: formatValue(data.scd_humid?.data?.at(-1)?.value, ' %'),
+    scd_co2: formatValue(data.scd_co2?.data?.at(-1)?.value, ' ppm'),
   }
 })
 
