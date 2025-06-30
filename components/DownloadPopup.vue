@@ -146,8 +146,6 @@ const handleFilterChange = (filterData: { name: string; value: any }) => {
  * Emits a 'download' event with selected filters and file format
  */
 const handleDownload = () => {
-  console.log('Selected filters:', selectedFilters.value)
-  console.log('File format:', fileFormat.value)
   emit('download', { filters: selectedFilters.value, format: fileFormat.value })
 }
 

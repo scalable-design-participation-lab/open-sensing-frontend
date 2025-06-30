@@ -301,8 +301,6 @@ const sensorStats = computed(() => {
   }
 
   const data = sensorData.value[selectedSensor.value.moduleid]
-  console.log('Sensor data:', data)
-  console.log('Selected sensor raw:', selectedSensor.value)
 
   /**
    * Formats a sensor value with its unit
@@ -498,7 +496,6 @@ watch(
         return
       }
 
-      console.log('Loading data for sensor:', newSensor.moduleid)
       await loadSensorDataWithState(newSensor.moduleid)
     }
   },
@@ -576,9 +573,7 @@ const formatDateRange = (range) => {
  * Shows details for a specific stat
  * @param {string} statKey - The key of the stat to show details for
  */
-const showStatDetails = (statKey) => {
-  console.log(`Showing details for ${statKey}`)
-}
+const showStatDetails = (statKey) => {}
 
 /**
  * Gets the color for a value based on its key and value

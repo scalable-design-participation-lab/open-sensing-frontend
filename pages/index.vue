@@ -249,8 +249,8 @@ const handleFilterChange = (filterData) => {
   updateDateRangeUpdate(new Date())
 }
 function handleLocationSelect(coords: [number, number]) {
-  selectedMapCenter.value = coords
   showLocationSelector.value = false
+  selectedMapCenter.value = coords
 }
 
 const resetAllFilters = () => {
@@ -286,18 +286,13 @@ const sensorTools = [
   },
 ]
 
-const handleToolClick = (index: number) => {
-  console.log('Dashboard: Tool clicked:', sensorTools[index].tooltip)
-}
+const handleToolClick = (index: number) => {}
 
 const closeFilter = () => {
   toggleFilter()
 }
 
 const handleDownloadData = async ({ filters, format }) => {
-  console.log('Download options:', filters)
-  console.log('File format:', format)
-
   try {
     const response = await $fetch('/api/download-sensor-data', {
       method: 'POST',
@@ -407,13 +402,21 @@ onMounted(async () => {
       isLoadingLabel: true,
     }
 
-    // Start label lookup
     sensorDetailStore.fetchAndSetLabelForCluster(
       cluster.id,
       cluster.centroidCoords
     )
   }
 
+  // ✅ Instead of first sensor, center on first cluster
+  const firstCluster = Object.values(processed)[0]
+  if (firstCluster?.centroidCoords) {
+    selectedMapCenter.value = firstCluster.centroidCoords
+  } else {
+    console.warn('[Init] No cluster centroid found to center on.')
+  }
+
+  // Optionally show selector after initial centering
   showLocationSelector.value = true
 })
 </script>

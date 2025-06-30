@@ -35,8 +35,6 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
 
-  console.log('Received request body:', body)
-
   if (!body || !body.datasets || !body.dateRange || !body.format) {
     console.error('Invalid request body:', body)
     throw createError({
@@ -58,7 +56,6 @@ export default defineEventHandler(async (event) => {
   })
 
   try {
-    console.log('Connecting to database for download...')
     const client = await pool.connect()
 
     // Build the query
@@ -105,12 +102,8 @@ export default defineEventHandler(async (event) => {
 
     query += ' ORDER BY s.timestamp DESC'
 
-    console.log('Executing query:', query)
-    console.log('Query parameters:', queryParams)
-
     const result = await client.query(query, queryParams)
     client.release()
-    console.log(`Query executed. Returned ${result.rows.length} rows.`)
 
     if (body.format === 'csv') {
       const csv = parse(result.rows)

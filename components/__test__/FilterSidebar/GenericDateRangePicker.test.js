@@ -66,7 +66,6 @@ describe('GenericDateRangePicker', () => {
     await wrapper.vm.$nextTick()
 
     const emitted = wrapper.emitted('update:modelValue')
-    console.log('Emitted events:', wrapper.emitted())
     expect(emitted).toBeTruthy()
     if (emitted) {
       expect(emitted[emitted.length - 1][0]).toEqual({

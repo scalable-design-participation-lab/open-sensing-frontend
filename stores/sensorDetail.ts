@@ -64,7 +64,6 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
       const response = await $fetch('/api/sensor-data')
       if (Array.isArray(response)) {
         sensors.value = response.map((sensor) => {
-          console.log('Sensor data:', sensor.value)
           return {
             ...sensor,
             lat: sensor.lat || null,
@@ -91,40 +90,6 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
           )
         )
 
-        console.log('=== All Sensors Data ===')
-        sensors.value.forEach((sensor, index) => {
-          console.log(`\nSensor ${index + 1}:`)
-          console.log('Module ID:', sensor.moduleid)
-          console.log('Location:', sensor.ecohub_location)
-          console.log(
-            'Coordinates:',
-            sensor.lat && sensor.lon
-              ? `lat: ${sensor.lat}, lon: ${sensor.lon}`
-              : 'No coordinates'
-          )
-          console.log('Temperature:', sensor.temperature)
-          console.log('Relative Humidity:', sensor.relative_humidity)
-          console.log('VOC:', sensor.voc)
-          console.log('NOx:', sensor.nox)
-          console.log('PM1:', sensor.pm1)
-          console.log('PM25:', sensor.pm25)
-          console.log('PM4:', sensor.pm4)
-          console.log('PM10:', sensor.pm10)
-          console.log('BME HUMID:', sensor.bme_humid)
-          console.log('BME TEMP:', sensor.bme_temp)
-          console.log('BME PRESSURE:', sensor.bme_pressure)
-          console.log('SCD TEMP:', sensor.scd_temp)
-          console.log('SCD HUMID:', sensor.scd_humid)
-          console.log('SCD CO2:', sensor.scd_co2)
-          console.log(
-            'Last Updated:',
-            new Date(sensor.timestamp).toLocaleString()
-          )
-          console.log('------------------------')
-        })
-
-        console.log('\nTotal Sensors:', sensors.value.length)
-        console.log('=== End of Sensors Data ===\n')
         // Sync processed clusters to clusterDetailsWithLabels
         clusterDetailsWithLabels.value = {}
         const processed = processedDBSCANClusters.value

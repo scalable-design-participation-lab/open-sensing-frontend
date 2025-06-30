@@ -101,11 +101,6 @@ export const useSensorDataStore = defineStore('sensorData', () => {
       if (Object.keys(processedData).length > 0) {
         sensorData.value[moduleId] = processedData
         lastFetchTime.value[moduleId] = Date.now()
-        console.log(
-          `Processed ${
-            Object.keys(processedData).length
-          } metrics for sensor ${moduleId}`
-        )
       } else {
         console.warn(`No valid data found for sensor ${moduleId}`)
       }
