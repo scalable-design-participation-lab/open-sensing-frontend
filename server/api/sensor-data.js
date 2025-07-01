@@ -104,7 +104,8 @@ export default defineEventHandler(async (event) => {
       for (const field of fields) {
         selectFields.push(`${alias}.${field} AS ${field}`)
       }
-      lateralJoins.push(`
+if (sensor === 'scd_41') {
+  lateralJoins.push(`
     LEFT JOIN LATERAL (
       SELECT ${fields.join(', ')}
       FROM ${sensor}
@@ -113,7 +114,20 @@ export default defineEventHandler(async (event) => {
       LIMIT 1
     ) ${alias} ON true
   `)
-    }
+} else {
+  lateralJoins.push(`
+    LEFT JOIN LATERAL (
+      SELECT ${fields.join(', ')}
+      FROM ${sensor}
+      WHERE moduleid = ${baseAlias}.moduleid
+      AND timestamp BETWEEN ? AND ?
+      ORDER BY timestamp DESC
+      LIMIT 1
+    ) ${alias} ON true
+  `)
+  bindParams.push(startDate.toISOString(), endDate.toISOString())
+      }
+    
 
     const dynamicQuery = `
       SELECT ${selectFields.join(',\n')}
