@@ -291,12 +291,6 @@ const sensorStats = computed(() => {
       pm25: 'N/A',
       pm4: 'N/A',
       pm10: 'N/A',
-      bme_humid: 'N/A',
-      bme_temp: 'N/A',
-      bme_pressure: 'N/A',
-      scd_temp: 'N/A',
-      scd_humid: 'N/A',
-      scd_co2: 'N/A',
     }
   }
 
@@ -339,9 +333,9 @@ const sensorStats = computed(() => {
   addStat('pm25', selectedSensor.value.pm25, ' µg/m³')
   addStat('pm4', selectedSensor.value.pm4, ' µg/m³')
   addStat('pm10', selectedSensor.value.pm10, ' µg/m³')
-  addStat('bme_humid', selectedSensor.value.bme_humid, ' %')
-  addStat('bme_temp', selectedSensor.value.bme_temp, 'Temperature')
-  addStat('bme_pressure', selectedSensor.value.bme_pressure, ' hPa')
+  addStat('Humidity (BME)', selectedSensor.value.bme_humid, ' %')
+  addStat('Temperature (BME)', selectedSensor.value.bme_temp, 'Temperature')
+  addStat('Pressure (BME)', selectedSensor.value.bme_pressure, ' hPa')
   addStat(
     'Temperature (SCD)',
     data.scd_temp?.data?.at(-1)?.value,
