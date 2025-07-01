@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
     const startDate = start ? new Date(start) : subMonths(new Date(), 1)
     const endDate = end ? new Date(end) : new Date()
 
+    // === ALL SENSORS LATEST SNAPSHOT ===
     if (!moduleId) {
       const allSensorsQuery = await db.raw(`
         SELECT 
@@ -37,30 +38,21 @@ export default defineEventHandler(async (event) => {
           b.bme_pressure
         FROM modules m
         LEFT JOIN (
-          SELECT s.*
-          FROM sen55 s
-          INNER JOIN (
-            SELECT moduleid, MAX(timestamp) AS max_ts
-            FROM sen55
-            GROUP BY moduleid
-          ) latest ON s.moduleid = latest.moduleid AND s.timestamp = latest.max_ts
+          SELECT DISTINCT ON (moduleid) *
+          FROM sen55
+          ORDER BY moduleid, timestamp DESC
         ) s ON m.moduleid = s.moduleid
         LEFT JOIN (
-          SELECT b.*
-          FROM bme_280 b
-          INNER JOIN (
-            SELECT moduleid, MAX(timestamp) AS max_ts
-            FROM bme_280
-            GROUP BY moduleid
-          ) latest ON b.moduleid = latest.moduleid AND b.timestamp = latest.max_ts
+          SELECT DISTINCT ON (moduleid) *
+          FROM bme_280
+          ORDER BY moduleid, timestamp DESC
         ) b ON m.moduleid = b.moduleid
         ORDER BY m.moduleid;
       `)
       return allSensorsQuery.rows
     }
 
-    // === DYNAMIC QUERY SECTION ===
-
+    // === MODULE METADATA ===
     const locationQuery = await db.raw(
       `SELECT moduleid, ecohub_location, lat, lon FROM modules WHERE moduleid = ?`,
       [moduleId]
@@ -68,79 +60,63 @@ export default defineEventHandler(async (event) => {
     const moduleInfo = locationQuery.rows[0]
     if (!moduleInfo) return { error: 'Module not found' }
 
+    // === FETCH ENABLED SENSOR TABLES ===
     const sensorListQuery = await db.raw(
       `SELECT sensors FROM modulesensors WHERE moduleid = ?`,
       [moduleId]
     )
     const sensors = sensorListQuery.rows[0]?.sensors ?? []
-    const validSensors = ['bme_280', 'scd_41']
-    const filteredSensors = sensors.filter((s) => validSensors.includes(s))
-
-    const baseTable = 'sen55'
-    const baseAlias = 's'
+    const sensorFields: Record<string, string[]> = {
+      bme_280: ['bme_temp', 'bme_humid', 'bme_pressure'],
+      scd_41: ['scd_temp', 'scd_humid', 'scd_co2'],
+    }
+    const filteredSensors = sensors.filter((s) => s in sensorFields)
 
     const selectFields = [
-      `${baseAlias}.timestamp`,
-      `${baseAlias}.temperature`,
-      `${baseAlias}.relative_humidity`,
-      `${baseAlias}.voc`,
-      `${baseAlias}.nox`,
-      `${baseAlias}.pm1`,
-      `${baseAlias}.pm25`,
-      `${baseAlias}.pm4`,
-      `${baseAlias}.pm10`,
+      's.timestamp',
+      's.temperature',
+      's.relative_humidity',
+      's.voc',
+      's.nox',
+      's.pm1',
+      's.pm25',
+      's.pm4',
+      's.pm10',
     ]
+    const joinClauses: string[] = []
 
-    const lateralJoins = []
-    const bindParams = []
-
+    // === BUILD UNIFIED LATERAL JOINS FOR ALL SENSORS ===
     for (const sensor of filteredSensors) {
-      const alias = sensor
-      const fields = {
-        bme_280: ['bme_temp', 'bme_humid', 'bme_pressure'],
-        scd_41: ['scd_temp', 'scd_humid', 'scd_co2'],
-      }[sensor] || ['value']
+      const fields = sensorFields[sensor]
+      fields.forEach((f) => {
+        selectFields.push(`${sensor}.${f} AS ${f}`)
+      })
 
-      for (const field of fields) {
-        selectFields.push(`${alias}.${field} AS ${field}`)
-      }
-if (sensor === 'scd_41') {
-  lateralJoins.push(`
-    LEFT JOIN LATERAL (
-      SELECT ${fields.join(', ')}
-      FROM ${sensor}
-      WHERE moduleid = ${baseAlias}.moduleid
-      ORDER BY ABS(EXTRACT(EPOCH FROM (${baseAlias}.timestamp - timestamp))) ASC
-      LIMIT 1
-    ) ${alias} ON true
-  `)
-} else {
-  lateralJoins.push(`
-    LEFT JOIN LATERAL (
-      SELECT ${fields.join(', ')}
-      FROM ${sensor}
-      WHERE moduleid = ${baseAlias}.moduleid
-      AND timestamp BETWEEN ? AND ?
-      ORDER BY timestamp DESC
-      LIMIT 1
-    ) ${alias} ON true
-  `)
-  bindParams.push(startDate.toISOString(), endDate.toISOString())
-      }
-    
+      joinClauses.push(`
+        LEFT JOIN LATERAL (
+          SELECT ${fields.join(', ')}
+          FROM ${sensor}
+          WHERE moduleid = s.moduleid
+          ORDER BY ABS(EXTRACT(EPOCH FROM (s.timestamp - timestamp)))
+          LIMIT 1
+        ) ${sensor} ON true
+      `)
+    }
 
     const dynamicQuery = `
       SELECT ${selectFields.join(',\n')}
-      FROM ${baseTable} ${baseAlias}
-      ${lateralJoins.join('\n')}
-      WHERE ${baseAlias}.moduleid = ?
-      AND ${baseAlias}.timestamp BETWEEN ? AND ?
-      ORDER BY ${baseAlias}.timestamp DESC
+      FROM sen55 s
+      ${joinClauses.join('\n')}
+      WHERE s.moduleid = ?
+        AND s.timestamp BETWEEN ? AND ?
+      ORDER BY s.timestamp DESC
     `
 
-    bindParams.push(moduleId, startDate.toISOString(), endDate.toISOString())
-
-    const result = await db.raw(dynamicQuery, bindParams)
+    const result = await db.raw(dynamicQuery, [
+      moduleId,
+      startDate.toISOString(),
+      endDate.toISOString(),
+    ])
 
     return {
       moduleInfo,
