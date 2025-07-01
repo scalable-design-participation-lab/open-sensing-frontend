@@ -342,10 +342,13 @@ const sensorStats = computed(() => {
   addStat('bme_humid', selectedSensor.value.bme_humid, ' %')
   addStat('bme_temp', selectedSensor.value.bme_temp, 'Temperature')
   addStat('bme_pressure', selectedSensor.value.bme_pressure, ' hPa')
-
-  addStat('scd_temp', data.scd_temp?.data?.at(-1)?.value, 'Temperature')
-  addStat('scd_humid', data.scd_humid?.data?.at(-1)?.value, ' %')
-  addStat('scd_co2', data.scd_co2?.data?.at(-1)?.value, ' ppm')
+  addStat(
+    'Temperature (SCD)',
+    data.scd_temp?.data?.at(-1)?.value,
+    'Temperature'
+  )
+  addStat('Humidity (SCD)', data.scd_humid?.data?.at(-1)?.value, ' %')
+  addStat('CO2 (SCD)', data.scd_co2?.data?.at(-1)?.value, ' ppm')
 
   return stats
 })

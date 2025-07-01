@@ -30,7 +30,9 @@
     >
       <template #header>
         <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold text-gray-800">{{ title }}</h2>
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+            {{ title }}
+          </h2>
           <UButton
             icon="i-heroicons-x-mark"
             color="gray"
@@ -79,7 +81,7 @@
             <UButton
               color="blue"
               variant="soft"
-              class="transition-colors duration-200 hover:bg-blue-600 hover:text-white"
+              class="transition-colors duration-200 hover:bg-blue-600 hover:text-white dark:text-white"
               @click="onReset"
             >
               <template #leading>

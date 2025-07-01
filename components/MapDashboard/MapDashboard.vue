@@ -80,6 +80,7 @@ import { useGeographic } from 'ol/proj'
 import type { Sensor } from '../../stores/sensorDetail'
 import * as turf from '@turf/turf'
 import * as d3 from 'd3'
+import { useMapZoom } from '../../composables/useMapZoom'
 import type { View } from 'ol'
 
 useGeographic()
@@ -126,6 +127,8 @@ const initialZoom = ref(0)
 function onViewReady(viewInstance: View) {
   view.value = viewInstance
 }
+
+const { zoomToCoords, zoomToCenter } = useMapZoom(view)
 
 const mapboxToken =
   'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
@@ -269,11 +272,7 @@ watch([selectedSensorId, formattedSensors], ([newId, sensors]) => {
     const sensor = sensors.find((s) => s.moduleid === newId)
     if (sensor) {
       updateSensorOverlay(newId)
-      view.value.animate({
-        center: sensor.coordinates,
-        zoom: 15,
-        duration: 1000,
-      })
+      zoomToCenter(sensor.coordinates, 20)
     }
   }
 })
@@ -295,93 +294,21 @@ watch(
   { deep: true, immediate: true }
 )
 
-const calculateMapBounds = computed(() => {
-  const sensors = formattedSensors.value
-  if (!sensors || sensors.length === 0) {
-    return {
-      center: initialCenter.value,
-      zoom: initialZoom.value,
-    }
-  }
-
-  try {
-    const features = sensors.map((sensor) => ({
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Point',
-        coordinates: sensor.coordinates,
-      },
-    }))
-    const collection = turf.featureCollection(features)
-
-    // True centroid
-    const center = turf.centroid(collection).geometry.coordinates as [
-      number,
-      number
-    ]
-
-    // Bounding box and rough zoom calculation
-    const bbox = turf.bbox(collection) // [minX, minY, maxX, maxY]
-    const latDiff = Math.abs(bbox[3] - bbox[1])
-    const lonDiff = Math.abs(bbox[2] - bbox[0])
-    const maxDiff = Math.max(latDiff, lonDiff)
-
-    // Dynamic zoom: rough heuristic (tune these values if needed)
-    let zoom = 18
-    if (maxDiff > 20) zoom = 3
-    else if (maxDiff > 10) zoom = 5
-    else if (maxDiff > 5) zoom = 7
-    else if (maxDiff > 1) zoom = 10
-    else if (maxDiff > 0.2) zoom = 14
-    else if (maxDiff > 0.05) zoom = 16
-    else zoom = 18
-
-    return {
-      center,
-      zoom,
-    }
-  } catch (error) {
-    console.error('[Bounds Error] Failed to calculate:', error)
-    return {
-      center: initialCenter.value,
-      zoom: initialZoom.value,
-    }
-  }
-})
-
 let hasCenteredFromSensors = false
 
 watch(formattedSensors, (newSensors) => {
-  if (!hasCenteredFromSensors && newSensors.length > 0 && view.value) {
+  if (!hasCenteredFromSensors && newSensors.length > 0) {
     hasCenteredFromSensors = true
-    const { center, zoom } = calculateMapBounds.value
-    view.value?.animate({
-      center,
-      zoom,
-      duration: 1000,
-    })
+    const coords = newSensors.map((s) => s.coordinates)
+    zoomToCoords(coords)
   }
 })
-let lastCenter: [number, number] | null = null
 
 watch(
   () => props.centerOn,
   (newCenter) => {
-    if (
-      newCenter &&
-      view.value &&
-      (!lastCenter ||
-        newCenter[0] !== lastCenter[0] ||
-        newCenter[1] !== lastCenter[1])
-    ) {
-      lastCenter = newCenter
-      view.value.animate({
-        center: newCenter,
-        duration: 1000,
-        zoom: 15,
-      })
-    }
+    showSensorInfo.value = false
+    zoomToCenter(newCenter, 15)
   },
   { immediate: true }
 )
