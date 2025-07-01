@@ -407,16 +407,6 @@ onMounted(async () => {
       cluster.centroidCoords
     )
   }
-
-  // ✅ Instead of first sensor, center on first cluster
-  const firstCluster = Object.values(processed)[0]
-  if (firstCluster?.centroidCoords) {
-    selectedMapCenter.value = firstCluster.centroidCoords
-  } else {
-    console.warn('[Init] No cluster centroid found to center on.')
-  }
-
-  // Optionally show selector after initial centering
   showLocationSelector.value = true
 })
 </script>

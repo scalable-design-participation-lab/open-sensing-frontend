@@ -26,6 +26,7 @@
         :center="initialCenter"
         :zoom="initialZoom"
         :projection="projection"
+        @ready="onViewReady"
       />
 
       <ol-tile-layer>
@@ -120,8 +121,11 @@ const projection = ref('EPSG:4326')
 const markerPosition = ref({ x: 0, y: 0 })
 const selectedSensorPosition = ref<[number, number] | null>(null)
 
-const initialCenter = ref(null)
-const initialZoom = ref(18)
+const initialCenter = ref<[number, number] | null>(null)
+const initialZoom = ref(0)
+function onViewReady(viewInstance: View) {
+  view.value = viewInstance
+}
 
 const mapboxToken =
   'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
@@ -260,18 +264,16 @@ function updateSelectedSensorOverlay(event) {
   }
 }
 
-watch(selectedSensorId, (newId) => {
-  if (newId) {
-    updateSensorOverlay(newId)
-    if (view.value) {
-      const sensor = formattedSensors.value.find((s) => s.moduleid === newId)
-      if (sensor) {
-        view.value.animate({
-          center: sensor.coordinates,
-          zoom: 15,
-          duration: 1000,
-        })
-      }
+watch([selectedSensorId, formattedSensors], ([newId, sensors]) => {
+  if (newId && view.value) {
+    const sensor = sensors.find((s) => s.moduleid === newId)
+    if (sensor) {
+      updateSensorOverlay(newId)
+      view.value.animate({
+        center: sensor.coordinates,
+        zoom: 15,
+        duration: 1000,
+      })
     }
   }
 })
@@ -348,32 +350,36 @@ const calculateMapBounds = computed(() => {
   }
 })
 
-// Update the view when sensors are loaded
-watch(
-  formattedSensors,
-  (newSensors) => {
-    if (newSensors.length > 0 && view.value) {
-      requestAnimationFrame(() => {
-        const { center, zoom } = calculateMapBounds.value
-        view.value?.animate({
-          center,
-          zoom,
-          duration: 1000,
-        })
-      })
-    } else {
-    }
-  },
-  { immediate: false }
-)
+let hasCenteredFromSensors = false
+
+watch(formattedSensors, (newSensors) => {
+  if (!hasCenteredFromSensors && newSensors.length > 0 && view.value) {
+    hasCenteredFromSensors = true
+    const { center, zoom } = calculateMapBounds.value
+    view.value?.animate({
+      center,
+      zoom,
+      duration: 1000,
+    })
+  }
+})
+let lastCenter: [number, number] | null = null
+
 watch(
   () => props.centerOn,
   (newCenter) => {
-    if (newCenter && view.value) {
+    if (
+      newCenter &&
+      view.value &&
+      (!lastCenter ||
+        newCenter[0] !== lastCenter[0] ||
+        newCenter[1] !== lastCenter[1])
+    ) {
+      lastCenter = newCenter
       view.value.animate({
         center: newCenter,
         duration: 1000,
-        zoom: 18,
+        zoom: 15,
       })
     }
   },
@@ -383,7 +389,7 @@ watch(
 watch(
   processedDBSCANClusters,
   (newProcessedClustersMap) => {
-    const newOverallLabelState: Record<number, ClusterDetail> = {}
+    const newOverallLabelState = {}
 
     for (const clusterIdStr in newProcessedClustersMap) {
       const clusterId = parseInt(clusterIdStr, 10)

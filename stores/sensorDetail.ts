@@ -55,6 +55,40 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
       (s) => s.moduleid === selectedSensorId.value
     )
   )
+  function getClusterIdForSensor(sensorId: string | null): number | null {
+    if (!sensorId) {
+      return null
+    }
+
+    const clusterEntries = Object.entries(processedDBSCANClusters.value)
+    for (const [clusterIdStr, cluster] of clusterEntries) {
+      const found = cluster.points.some(
+        (point: any) => point.properties.moduleid === sensorId
+      )
+      if (found) {
+        return Number(clusterIdStr)
+      }
+    }
+
+    return null
+  }
+  function getSortedSensorsInCluster(sensorId: string | null): Sensor[] {
+    const clusterId = getClusterIdForSensor(sensorId)
+    if (clusterId === null) {
+      return []
+    }
+
+    const cluster = processedDBSCANClusters.value[clusterId]
+    const sensorIdsInCluster = new Set(
+      cluster.points.map((p: any) => p.properties.moduleid)
+    )
+
+    const sorted = sensorsSortedByLat.value.filter((s) =>
+      sensorIdsInCluster.has(s.moduleid)
+    )
+
+    return sorted
+  }
 
   const loadSensors = async () => {
     if (isLoading.value) return
@@ -76,9 +110,6 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
             pm25: Number(sensor.pm25) || 0,
             pm4: Number(sensor.pm4) || 0,
             pm10: Number(sensor.pm10) || 0,
-            bme_humid: Number(sensor.bme_humid) || 0,
-            bme_temp: Number(sensor.bme_temp) || 0,
-            bme_pressure: Number(sensor.bme_pressure) || 0,
           }
         })
 
@@ -138,22 +169,31 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
   }
 
   function getNextSensorId(): string | null {
-    const sorted = sensorsSortedByLat.value
-    const len = sorted.length
-    if (len === 0) return null
+    const currentId = selectedSensorId.value
+    const sorted = getSortedSensorsInCluster(currentId)
 
-    const idx = currentSortedIndex.value
-    if (idx < 0) return sorted[0].moduleid
+    const idx = sorted.findIndex((s) => s.moduleid === currentId)
+    if (idx === -1) {
+      return null
+    }
 
-    return sorted[(idx + 1) % len].moduleid
+    const nextIdx = (idx + 1) % sorted.length
+
+    return sorted[nextIdx].moduleid
   }
 
-  const getPreviousSensorId = (): string | null => {
-    const sorted = sensorsSortedByLat.value
-    const idx = sorted.findIndex((s) => s.moduleid === selectedSensorId.value)
-    if (idx === -1) return null
-    const prev = sorted[(idx - 1 + sorted.length) % sorted.length]
-    return prev.moduleid
+  function getPreviousSensorId(): string | null {
+    const currentId = selectedSensorId.value
+    const sorted = getSortedSensorsInCluster(currentId)
+
+    const idx = sorted.findIndex((s) => s.moduleid === currentId)
+    if (idx === -1) {
+      return null
+    }
+
+    const prevIdx = (idx - 1 + sorted.length) % sorted.length
+
+    return sorted[prevIdx].moduleid
   }
   const selectNextSensor = () => {
     const next = getNextSensorId()
