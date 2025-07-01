@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
       [moduleId]
     )
     const sensors = sensorListQuery.rows[0]?.sensors ?? []
-    const sensorFields: Record<string, string[]> = {
+    const sensorFields = {
       bme_280: ['bme_temp', 'bme_humid', 'bme_pressure'],
       scd_41: ['scd_temp', 'scd_humid', 'scd_co2'],
     }
@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
       's.pm4',
       's.pm10',
     ]
-    const joinClauses: string[] = []
+    const joinClauses = []
 
     // === BUILD UNIFIED LATERAL JOINS FOR ALL SENSORS ===
     for (const sensor of filteredSensors) {
