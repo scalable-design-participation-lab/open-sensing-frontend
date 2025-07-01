@@ -314,6 +314,9 @@ const sensorStats = computed(() => {
       }
       return `${tempC.toFixed(1)}°C`
     }
+    if (unit === 'Pa') {
+      return `${(value / 1000).toFixed(1)} kPa`
+    }
     return `${value.toFixed(1)}${unit}`
   }
 
@@ -335,7 +338,7 @@ const sensorStats = computed(() => {
   addStat('pm10', selectedSensor.value.pm10, ' µg/m³')
   addStat('Humidity (BME)', selectedSensor.value.bme_humid, ' %')
   addStat('Temperature (BME)', selectedSensor.value.bme_temp, 'Temperature')
-  addStat('Pressure (BME)', selectedSensor.value.bme_pressure, ' hPa')
+  addStat('Pressure (BME)', selectedSensor.value.bme_pressure, 'Pa')
   addStat(
     'Temperature (SCD)',
     data.scd_temp?.data?.at(-1)?.value,
