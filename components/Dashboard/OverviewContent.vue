@@ -14,7 +14,7 @@
  -->
 <template>
   <div class="overview-content">
-    <p class="text-sm text-gray-600 mb-4">{{ description }}</p>
+    <p class="text-sm text-gray-600 mb-4 dark:text-white">{{ description }}</p>
     <div class="grid grid-cols-3 gap-4">
       <UCard
         v-for="(stat, index) in stats"
@@ -22,7 +22,7 @@
         class="text-center p-4 bg-white hover:shadow-lg transition-shadow duration-300"
       >
         <h3 class="text-2xl font-bold text-blue-500">{{ stat.value }}</h3>
-        <p class="text-sm text-gray-600">{{ stat.label }}</p>
+        <p class="text-sm text-gray-600 dark:text-white">{{ stat.label }}</p>
       </UCard>
     </div>
   </div>

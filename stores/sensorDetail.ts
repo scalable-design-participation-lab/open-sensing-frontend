@@ -19,6 +19,9 @@ export interface Sensor {
   bme_humid: number
   bme_temp: number
   bme_pressure: number
+  scd_temp: number
+  scd_humid: number
+  scd_co2: number
   timestamp: string
 }
 const DBSCAN_MAX_DISTANCE_KM = 0.5
@@ -52,6 +55,40 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
       (s) => s.moduleid === selectedSensorId.value
     )
   )
+  function getClusterIdForSensor(sensorId: string | null): number | null {
+    if (!sensorId) {
+      return null
+    }
+
+    const clusterEntries = Object.entries(processedDBSCANClusters.value)
+    for (const [clusterIdStr, cluster] of clusterEntries) {
+      const found = cluster.points.some(
+        (point: any) => point.properties.moduleid === sensorId
+      )
+      if (found) {
+        return Number(clusterIdStr)
+      }
+    }
+
+    return null
+  }
+  function getSortedSensorsInCluster(sensorId: string | null): Sensor[] {
+    const clusterId = getClusterIdForSensor(sensorId)
+    if (clusterId === null) {
+      return []
+    }
+
+    const cluster = processedDBSCANClusters.value[clusterId]
+    const sensorIdsInCluster = new Set(
+      cluster.points.map((p: any) => p.properties.moduleid)
+    )
+
+    const sorted = sensorsSortedByLat.value.filter((s) =>
+      sensorIdsInCluster.has(s.moduleid)
+    )
+
+    return sorted
+  }
 
   const loadSensors = async () => {
     if (isLoading.value) return
@@ -60,22 +97,21 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
     try {
       const response = await $fetch('/api/sensor-data')
       if (Array.isArray(response)) {
-        sensors.value = response.map((sensor) => ({
-          ...sensor,
-          lat: sensor.lat || null,
-          lon: sensor.lon || null,
-          temperature: Number(sensor.temperature) || 0,
-          relative_humidity: Number(sensor.relative_humidity) || 0,
-          voc: Number(sensor.voc) || 0,
-          nox: Number(sensor.nox) || 0,
-          pm1: Number(sensor.pm1) || 0,
-          pm25: Number(sensor.pm25) || 0,
-          pm4: Number(sensor.pm4) || 0,
-          pm10: Number(sensor.pm10) || 0,
-          bme_humid: Number(sensor.bme_humid) || 0,
-          bme_temp: Number(sensor.bme_temp) || 0,
-          bme_pressure: Number(sensor.bme_pressure) || 0,
-        }))
+        sensors.value = response.map((sensor) => {
+          return {
+            ...sensor,
+            lat: sensor.lat || null,
+            lon: sensor.lon || null,
+            temperature: Number(sensor.temperature) || 0,
+            relative_humidity: Number(sensor.relative_humidity) || 0,
+            voc: Number(sensor.voc) || 0,
+            nox: Number(sensor.nox) || 0,
+            pm1: Number(sensor.pm1) || 0,
+            pm25: Number(sensor.pm25) || 0,
+            pm4: Number(sensor.pm4) || 0,
+            pm10: Number(sensor.pm10) || 0,
+          }
+        })
 
         filteredLocations.value = Array.from(
           new Set(
@@ -85,37 +121,6 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
           )
         )
 
-        console.log('=== All Sensors Data ===')
-        sensors.value.forEach((sensor, index) => {
-          console.log(`\nSensor ${index + 1}:`)
-          console.log('Module ID:', sensor.moduleid)
-          console.log('Location:', sensor.ecohub_location)
-          console.log(
-            'Coordinates:',
-            sensor.lat && sensor.lon
-              ? `lat: ${sensor.lat}, lon: ${sensor.lon}`
-              : 'No coordinates'
-          )
-          console.log('Temperature:', sensor.temperature)
-          console.log('Relative Humidity:', sensor.relative_humidity)
-          console.log('VOC:', sensor.voc)
-          console.log('NOx:', sensor.nox)
-          console.log('PM1:', sensor.pm1)
-          console.log('PM25:', sensor.pm25)
-          console.log('PM4:', sensor.pm4)
-          console.log('PM10:', sensor.pm10)
-          console.log('BME HUMID:', sensor.bme_humid)
-          console.log('BME TEMP:', sensor.bme_temp)
-          console.log('BME PRESSURE:', sensor.bme_pressure)
-          console.log(
-            'Last Updated:',
-            new Date(sensor.timestamp).toLocaleString()
-          )
-          console.log('------------------------')
-        })
-
-        console.log('\nTotal Sensors:', sensors.value.length)
-        console.log('=== End of Sensors Data ===\n')
         // Sync processed clusters to clusterDetailsWithLabels
         clusterDetailsWithLabels.value = {}
         const processed = processedDBSCANClusters.value
@@ -164,22 +169,31 @@ export const useSensorDetailStore = defineStore('sensorDetail', () => {
   }
 
   function getNextSensorId(): string | null {
-    const sorted = sensorsSortedByLat.value
-    const len = sorted.length
-    if (len === 0) return null
+    const currentId = selectedSensorId.value
+    const sorted = getSortedSensorsInCluster(currentId)
 
-    const idx = currentSortedIndex.value
-    if (idx < 0) return sorted[0].moduleid
+    const idx = sorted.findIndex((s) => s.moduleid === currentId)
+    if (idx === -1) {
+      return null
+    }
 
-    return sorted[(idx + 1) % len].moduleid
+    const nextIdx = (idx + 1) % sorted.length
+
+    return sorted[nextIdx].moduleid
   }
 
-  const getPreviousSensorId = (): string | null => {
-    const sorted = sensorsSortedByLat.value
-    const idx = sorted.findIndex((s) => s.moduleid === selectedSensorId.value)
-    if (idx === -1) return null
-    const prev = sorted[(idx - 1 + sorted.length) % sorted.length]
-    return prev.moduleid
+  function getPreviousSensorId(): string | null {
+    const currentId = selectedSensorId.value
+    const sorted = getSortedSensorsInCluster(currentId)
+
+    const idx = sorted.findIndex((s) => s.moduleid === currentId)
+    if (idx === -1) {
+      return null
+    }
+
+    const prevIdx = (idx - 1 + sorted.length) % sorted.length
+
+    return sorted[prevIdx].moduleid
   }
   const selectNextSensor = () => {
     const next = getNextSensorId()

@@ -105,9 +105,6 @@ describe('SensorDetail', () => {
   it('renders the sensor detail modal correctly', async () => {
     await nextTick()
 
-    console.log('showSensorDetail:', sensorDetailStore.showSensorDetail)
-    console.log('selectedSensor:', sensorDetailStore.selectedSensor)
-
     expect(wrapper.find('[data-testid="sensor-detail-modal"]').exists()).toBe(
       true
     )

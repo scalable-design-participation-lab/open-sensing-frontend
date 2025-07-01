@@ -41,9 +41,7 @@ export const useMapUIStore = defineStore('mapUI', () => {
     drawEnable.value = true
   }
 
-  function handleDrawStart(event) {
-    console.log('Draw started:', event)
-  }
+  function handleDrawStart(event) {}
 
   function handleDrawEnd(event) {
     const feature = event.feature
@@ -110,7 +108,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
     if (spaceSubwindow.value < 4) {
       spaceSubwindow.value++
       resetOtherSubwindows('space')
-      console.log('Current space subwindow:', spaceSubwindow.value)
     }
   }
 
@@ -168,7 +165,6 @@ export const useMapUIStore = defineStore('mapUI', () => {
     if (feature) {
       feature.comment = newComment
     }
-    console.log('Comment added:', newComment)
   }
 
   function getColorForFrequency(frequency) {

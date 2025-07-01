@@ -25,7 +25,7 @@
     <div class="flex flex-col h-full">
       <div class="flex justify-between items-start mb-4">
         <div>
-          <h3 class="text-lg font-semibold text-gray-800">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
             {{ sensor.location }}
           </h3>
           <UBadge :color="getStatusColor(sensor.status)" class="mt-1">
@@ -55,7 +55,9 @@
             >
               {{ formatValue(field, sensor[field]) }}
             </span>
-            <p class="text-xs text-gray-600">{{ formatLabel(field) }}</p>
+            <p class="text-xs text-gray-600 dark:text-white">
+              {{ formatLabel(field) }}
+            </p>
           </div>
         </div>
       </UCard>

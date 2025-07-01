@@ -91,7 +91,7 @@
               </div>
             </template>
 
-            <div ref="scrollContainer" class="h-96 overflow-y-auto">
+            <div ref="scrollContainer">
               <div
                 v-if="dataLoaded && !loadingStates[selectedSensor.moduleid]"
                 class="p-4 space-y-6"
@@ -100,7 +100,7 @@
                   v-for="(metric, metricName) in metrics"
                   :key="metricName"
                 >
-                  <div v-if="shouldRenderChart(metricName)" class="relative">
+                  <div v-if="shouldRenderChart(metricName)">
                     <LineChart
                       :metric="metric"
                       :data="chartData[metricName]"
@@ -110,14 +110,6 @@
                       :temperature-unit="temperatureUnit"
                       @date-range-update="updateGlobalDateRange"
                     />
-                  </div>
-                  <div
-                    v-else-if="selectedDatasets.includes(metricName)"
-                    class="flex items-center justify-center h-[350px] bg-gray-50 rounded-lg"
-                  >
-                    <p class="text-gray-500">
-                      No data available for {{ metric.label }}
-                    </p>
                   </div>
                 </template>
               </div>
@@ -169,6 +161,7 @@ import { useResizeObserver } from '@vueuse/core'
 import { SENSOR_METRICS } from '../../constants/metrics'
 import GenericDateRangePicker from '../FilterSidebar/GenericDateRangePicker.vue'
 import { sub } from 'date-fns'
+import { isNumber } from 'util'
 
 /**
  * Store for managing sensor detail state
@@ -298,14 +291,10 @@ const sensorStats = computed(() => {
       pm25: 'N/A',
       pm4: 'N/A',
       pm10: 'N/A',
-      bme_humid: 'N/A',
-      bme_temp: 'N/A',
-      bme_pressure: 'N/A',
     }
   }
 
   const data = sensorData.value[selectedSensor.value.moduleid]
-  console.log('Sensor data:', data)
 
   /**
    * Formats a sensor value with its unit
@@ -325,25 +314,40 @@ const sensorStats = computed(() => {
       }
       return `${tempC.toFixed(1)}°C`
     }
+    if (unit === 'Pa') {
+      return `${(value / 1000).toFixed(1)} kPa`
+    }
     return `${value.toFixed(1)}${unit}`
   }
 
-  return {
-    Temperature: formatValue(selectedSensor.value.temperature, 'Temperature'),
-    'Relative Humidity': formatValue(
-      selectedSensor.value.relative_humidity,
-      '%'
-    ),
-    'VOC (ppb)': formatValue(selectedSensor.value.voc, ' ppb'),
-    'NOx (ppb)': formatValue(selectedSensor.value.nox, ' ppb'),
-    pm1: formatValue(selectedSensor.value.pm1, ' µg/m³'),
-    pm25: formatValue(selectedSensor.value.pm25, ' µg/m³'),
-    pm4: formatValue(selectedSensor.value.pm4, ' µg/m³'),
-    pm10: formatValue(selectedSensor.value.pm10, ' µg/m³'),
-    bme_humid: formatValue(selectedSensor.value.bme_humid, ' %'),
-    bme_temp: formatValue(selectedSensor.value.bme_temp, 'Temperature'),
-    bme_pressure: formatValue(selectedSensor.value.bme_pressure, ' hPa'),
+  const stats = {}
+
+  const addStat = (key, value, unit) => {
+    if (value !== null && value !== undefined && !isNaN(value)) {
+      stats[key] = formatValue(value, unit)
+    }
   }
+
+  addStat('Temperature', selectedSensor.value.temperature, 'Temperature')
+  addStat('Relative Humidity', selectedSensor.value.relative_humidity, '%')
+  addStat('VOC (ppb)', selectedSensor.value.voc, ' ppb')
+  addStat('NOx (ppb)', selectedSensor.value.nox, ' ppb')
+  addStat('pm1', selectedSensor.value.pm1, ' µg/m³')
+  addStat('pm25', selectedSensor.value.pm25, ' µg/m³')
+  addStat('pm4', selectedSensor.value.pm4, ' µg/m³')
+  addStat('pm10', selectedSensor.value.pm10, ' µg/m³')
+  addStat('Humidity (BME)', selectedSensor.value.bme_humid, ' %')
+  addStat('Temperature (BME)', selectedSensor.value.bme_temp, 'Temperature')
+  addStat('Pressure (BME)', selectedSensor.value.bme_pressure, 'Pa')
+  addStat(
+    'Temperature (SCD)',
+    data.scd_temp?.data?.at(-1)?.value,
+    'Temperature'
+  )
+  addStat('Humidity (SCD)', data.scd_humid?.data?.at(-1)?.value, ' %')
+  addStat('CO2 (SCD)', data.scd_co2?.data?.at(-1)?.value, ' ppm')
+
+  return stats
 })
 
 /**
@@ -492,7 +496,6 @@ watch(
         return
       }
 
-      console.log('Loading data for sensor:', newSensor.moduleid)
       await loadSensorDataWithState(newSensor.moduleid)
     }
   },
@@ -570,9 +573,7 @@ const formatDateRange = (range) => {
  * Shows details for a specific stat
  * @param {string} statKey - The key of the stat to show details for
  */
-const showStatDetails = (statKey) => {
-  console.log(`Showing details for ${statKey}`)
-}
+const showStatDetails = (statKey) => {}
 
 /**
  * Gets the color for a value based on its key and value

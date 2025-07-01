@@ -26,6 +26,7 @@
         :center="initialCenter"
         :zoom="initialZoom"
         :projection="projection"
+        @ready="onViewReady"
       />
 
       <ol-tile-layer>
@@ -79,6 +80,7 @@ import { useGeographic } from 'ol/proj'
 import type { Sensor } from '../../stores/sensorDetail'
 import * as turf from '@turf/turf'
 import * as d3 from 'd3'
+import { useMapZoom } from '../../composables/useMapZoom'
 import type { View } from 'ol'
 
 useGeographic()
@@ -120,8 +122,13 @@ const projection = ref('EPSG:4326')
 const markerPosition = ref({ x: 0, y: 0 })
 const selectedSensorPosition = ref<[number, number] | null>(null)
 
-const initialCenter = ref([-71.084671875, 42.339787500000014])
-const initialZoom = ref(18)
+const initialCenter = ref<[number, number] | null>(null)
+const initialZoom = ref(0)
+function onViewReady(viewInstance: View) {
+  view.value = viewInstance
+}
+
+const { zoomToCoords, zoomToCenter } = useMapZoom(view)
 
 const mapboxToken =
   'pk.eyJ1IjoiY2VzYW5kb3ZhbDA5IiwiYSI6ImNsdHl3OXI0eTBoamkya3MzamprbmlsMTUifQ.bIy013nDKsteOtWQRZMjqw'
@@ -139,7 +146,6 @@ const formattedSensors = computed(() => {
     !sensorDetailStore.filteredSensors ||
     !Array.isArray(sensorDetailStore.filteredSensors)
   ) {
-    console.log('No valid sensors data')
     return []
   }
 
@@ -152,7 +158,7 @@ const formattedSensors = computed(() => {
         !isNaN(Number(sensor.lat))
 
       if (!hasValidCoords) {
-        console.log('Sensor without valid coordinates:', sensor?.moduleid)
+        console.error('Sensor without valid coordinates:', sensor?.moduleid)
       }
       return hasValidCoords
     })
@@ -229,8 +235,6 @@ function getIconUrl(sensor: FormattedSensor) {
 function updateSensorOverlay(sensorId: string) {
   const sensor = formattedSensors.value.find((s) => s.moduleid === sensorId)
   if (sensor?.coordinates) {
-    console.log('Updating sensor overlay position:', sensor.coordinates)
-
     selectedSensorPosition.value = [...sensor.coordinates] as [number, number]
   }
 }
@@ -244,11 +248,9 @@ function handleMapClick(event: any) {
   if (feature) {
     const sensorId = feature.get('id')
     if (sensorId) {
-      console.log('Clicked sensor:', sensorId)
       const coordinate = feature.getGeometry().getCoordinates()
 
       if (Array.isArray(coordinate) && coordinate.length === 2) {
-        console.log('Clicked coordinates:', coordinate)
         updateSelectedSensor(sensorId)
         updateClickPosition({ x: coordinate[0], y: coordinate[1] })
         selectedSensorPosition.value = [...coordinate] as [number, number]
@@ -265,20 +267,12 @@ function updateSelectedSensorOverlay(event) {
   }
 }
 
-watch(selectedSensorId, (newId) => {
-  if (newId) {
-    console.log('Selected sensor changed:', newId)
-    updateSensorOverlay(newId)
-    if (view.value) {
-      const sensor = formattedSensors.value.find((s) => s.moduleid === newId)
-      if (sensor) {
-        console.log('Animating to sensor:', sensor.coordinates)
-        view.value.animate({
-          center: sensor.coordinates,
-          zoom: 18,
-          duration: 1000,
-        })
-      }
+watch([selectedSensorId, formattedSensors], ([newId, sensors]) => {
+  if (newId && view.value) {
+    const sensor = sensors.find((s) => s.moduleid === newId)
+    if (sensor) {
+      updateSensorOverlay(newId)
+      zoomToCenter(sensor.coordinates, 20)
     }
   }
 })
@@ -286,90 +280,35 @@ watch(
   densityBasedSensorClusters,
   (newDbscanClusters) => {
     if (newDbscanClusters && newDbscanClusters.features) {
-      console.log('DBSCAN Clusters updated:', newDbscanClusters)
-      let clusterCount = 0
       const clusterIds = new Set()
       newDbscanClusters.features.forEach((feature) => {
         if (feature.properties) {
-          console.log(
-            `Sensor ID: ${feature.properties.moduleid}, DBSCAN type: ${feature.properties.dbscan}, Cluster ID: ${feature.properties.cluster}`
-          )
           if (feature.properties.cluster !== -1) {
             // Count actual clusters, excluding noise
             clusterIds.add(feature.properties.cluster)
           }
         }
       })
-      console.log(
-        'Discovered DBSCAN cluster IDs (excluding noise):',
-        Array.from(clusterIds)
-      )
-      console.log(
-        `Total actual clusters found (excluding noise): ${clusterIds.size}`
-      )
     }
   },
   { deep: true, immediate: true }
 )
 
-const calculateMapBounds = computed(() => {
-  if (!formattedSensors.value || formattedSensors.value.length === 0) {
-    return {
-      center: initialCenter.value,
-      zoom: initialZoom.value,
-    }
-  }
+let hasCenteredFromSensors = false
 
-  try {
-    const features = formattedSensors.value.map((sensor) => ({
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Point',
-        coordinates: sensor.coordinates,
-      },
-    }))
-
-    const collection = turf.featureCollection(features)
-    const bbox = turf.bbox(collection)
-
-    const center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]
-
-    return {
-      center,
-      zoom: 18,
-    }
-  } catch (error) {
-    console.error('Error calculating map bounds:', error)
-    return {
-      center: initialCenter.value,
-      zoom: initialZoom.value,
-    }
-  }
-})
-
-// Update the view when sensors are loaded
 watch(formattedSensors, (newSensors) => {
-  if (newSensors.length > 0 && view.value) {
-    const { center, zoom } = calculateMapBounds.value
-    view.value.animate({
-      center,
-      zoom,
-      duration: 1000,
-    })
+  if (!hasCenteredFromSensors && newSensors.length > 0) {
+    hasCenteredFromSensors = true
+    const coords = newSensors.map((s) => s.coordinates)
+    zoomToCoords(coords)
   }
 })
+
 watch(
   () => props.centerOn,
   (newCenter) => {
-    if (newCenter && view.value) {
-      console.log('Centering map on props:', newCenter)
-      view.value.animate({
-        center: newCenter,
-        duration: 1000,
-        zoom: 18,
-      })
-    }
+    showSensorInfo.value = false
+    zoomToCenter(newCenter, 15)
   },
   { immediate: true }
 )
@@ -377,11 +316,7 @@ watch(
 watch(
   processedDBSCANClusters,
   (newProcessedClustersMap) => {
-    console.log(
-      'Processed DBSCAN clusters changed, updating labels structure...'
-    )
-
-    const newOverallLabelState: Record<number, ClusterDetail> = {}
+    const newOverallLabelState = {}
 
     for (const clusterIdStr in newProcessedClustersMap) {
       const clusterId = parseInt(clusterIdStr, 10)
@@ -424,9 +359,6 @@ watch(
         !entry.isLoadingLabel &&
         (!entry.label || entry.labelError)
       ) {
-        console.log(
-          `Watcher: Queuing fetch for cluster ${clusterId} with centroid: ${entry.centroidCoords}`
-        )
         fetchAndSetLabelForCluster(clusterId, entry.centroidCoords)
       }
     }
@@ -435,10 +367,7 @@ watch(
 )
 
 onMounted(async () => {
-  console.log('MapDashboard mounted')
   await sensorDetailStore.loadSensors()
-
-  console.log('Formatted sensors:', formattedSensors.value)
 })
 </script>
 
