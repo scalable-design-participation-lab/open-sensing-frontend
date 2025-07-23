@@ -24,7 +24,7 @@ export interface Sensor {
   scd_co2: number
   timestamp: string
 }
-const DBSCAN_MAX_DISTANCE_KM = 0.5
+const DBSCAN_MAX_DISTANCE_KM = 20
 const DBSCAN_MIN_POINTS = 1
 interface ClusterDetail {
   id: number
