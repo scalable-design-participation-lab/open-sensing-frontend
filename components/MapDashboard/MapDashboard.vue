@@ -309,6 +309,7 @@ watch(
   (newCenter) => {
     showSensorInfo.value = false
     zoomToCenter(newCenter, 15)
+    selectedSensorId.value = null
   },
   { immediate: true }
 )
