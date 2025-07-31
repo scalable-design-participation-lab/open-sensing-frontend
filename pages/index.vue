@@ -251,6 +251,7 @@ const handleFilterChange = (filterData) => {
 function handleLocationSelect(coords: [number, number]) {
   showLocationSelector.value = false
   selectedMapCenter.value = coords
+  showSensorDetail.value = false
 }
 
 const resetAllFilters = () => {
