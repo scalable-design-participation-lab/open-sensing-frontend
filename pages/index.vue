@@ -72,12 +72,17 @@ import { useSensorDetailStore } from '@/stores/sensorDetail'
 import { useDatasetStore } from '@/stores/datasets'
 import { useSensorDataStore } from '@/stores/sensorData'
 import { sub } from 'date-fns'
+import { useAqiStore } from '~/stores/useAqi'
 
 // Dashboard store
 const dashboardStore = useDashboardStore()
 const { showDashboard } = storeToRefs(dashboardStore)
 const { toggleDashboard, updateDataDashboardValues, updateDateRangeUpdate } =
   dashboardStore
+
+const { fetchAQI } = useAqiStore()
+
+console.log(await fetchAQI('864622040811271'))
 
 // Filter store
 const filterStore = useFilterStore()
