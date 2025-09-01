@@ -80,10 +80,6 @@ const { showDashboard } = storeToRefs(dashboardStore)
 const { toggleDashboard, updateDataDashboardValues, updateDateRangeUpdate } =
   dashboardStore
 
-const { fetchAQI } = useAqiStore()
-
-console.log(await fetchAQI('864622040811271'))
-
 // Filter store
 const filterStore = useFilterStore()
 const { showFilter } = storeToRefs(filterStore)
