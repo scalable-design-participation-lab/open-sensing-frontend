@@ -70,9 +70,7 @@ import { useFilterStore } from '@/stores/filter'
 import { useMapStore } from '@/stores/map'
 import { useSensorDetailStore } from '@/stores/sensorDetail'
 import { useDatasetStore } from '@/stores/datasets'
-import { useSensorDataStore } from '@/stores/sensorData'
 import { sub } from 'date-fns'
-import { useAqiStore } from '~/stores/useAqi'
 
 // Dashboard store
 const dashboardStore = useDashboardStore()
