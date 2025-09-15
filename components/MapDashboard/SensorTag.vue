@@ -70,7 +70,14 @@
         </div>
         <div class="flex items-center">
           <UIcon name="i-heroicons-sparkles" class="mr-2 text-gray-600" />
-          <span>{{ selectedSensor.airQuality }}</span>
+          <span v-if="aqiStore.loading">Loading…</span>
+          <span
+            v-else-if="aqi && aqi.aqi !== null"
+            :style="{ color: aqi.color ?? undefined }"
+          >
+            {{ aqi.aqi }} <span class="text-xs">({{ aqi.category }})</span>
+          </span>
+          <span v-else>—</span>
         </div>
         <div class="flex items-center">
           <UIcon name="i-heroicons-battery-50" class="mr-2 text-gray-600" />
@@ -82,9 +89,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, PropType } from 'vue'
+import { computed, PropType, watch } from 'vue'
 import { useSensorDetailStore } from '../../stores/sensorDetail'
 import type { Sensor } from '../../stores/sensorDetail'
+import { useAqiStore } from '../../stores/useAQI'
 
 interface MarkerPosition {
   x: number
@@ -110,13 +118,13 @@ const props = defineProps({
 })
 
 const sensorDetailStore = useSensorDetailStore()
+const aqiStore = useAqiStore()
 
 const selectedSensor = computed(() => {
   const sensor = sensorDetailStore.selectedSensor
   if (!sensor) return null
 
-  const timestamp = new Date(sensor.timestamp)
-  timestamp.setHours(timestamp.getHours())
+  const ts = new Date(sensor.timestamp)
 
   return {
     id: sensor.moduleid,
@@ -124,9 +132,8 @@ const selectedSensor = computed(() => {
     location: sensor.ecohub_location,
     temperature: sensor.temperature,
     humidity: sensor.relative_humidity,
-    airQuality: getAirQuality(sensor.temperature, sensor.relative_humidity),
     batteryLevel: 100,
-    timestamp: timestamp.toLocaleString('en-US', {
+    timestamp: ts.toLocaleString('en-US', {
       timeZone: 'America/New_York',
       year: 'numeric',
       month: '2-digit',
@@ -138,12 +145,18 @@ const selectedSensor = computed(() => {
   }
 })
 
-function getAirQuality(temperature: number, humidity: number): string {
-  if (temperature === 0 && humidity === 0) return 'Inactive'
-  if (temperature > 30 || humidity > 80) return 'Poor'
-  if (temperature > 25 || humidity > 70) return 'Moderate'
-  return 'Good'
-}
+const aqi = computed(() => {
+  const m = selectedSensor.value?.moduleid
+  return m ? aqiStore.getAQI(m) : undefined
+})
+
+watch(
+  () => selectedSensor.value?.moduleid,
+  (moduleId) => {
+    if (moduleId) aqiStore.fetchAQI(moduleId)
+  },
+  { immediate: true }
+)
 
 const {
   toggleSensorDetail,
