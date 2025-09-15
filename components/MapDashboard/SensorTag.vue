@@ -92,7 +92,7 @@
 import { computed, PropType, watch } from 'vue'
 import { useSensorDetailStore } from '../../stores/sensorDetail'
 import type { Sensor } from '../../stores/sensorDetail'
-import { useAqiStore } from '../../stores/useAQI'
+import { useAqiStore } from '../../stores/useAqi'
 
 interface MarkerPosition {
   x: number
