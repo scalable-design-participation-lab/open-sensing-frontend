@@ -13,7 +13,50 @@
  * />
  -->
 <template>
+  <!-- Compact tag for the mobile layout (Figma: Mobile / 01-sensor-overview) -->
+  <div
+    v-if="compact"
+    class="w-[225px] rounded-[10px] bg-[#FAFAFA] p-3 text-[13px] leading-[1.15] text-black shadow-[0_0_5px_rgba(0,0,0,0.15)] pointer-events-auto"
+    data-testid="sensor-tag-compact"
+  >
+    <div class="flex items-center gap-1 border-b border-black/15 pb-1">
+      <button
+        class="-m-1 p-2"
+        aria-label="Previous sensor"
+        @click="sensorDetailStore.selectPreviousSensor"
+      >
+        <UIcon name="i-heroicons-arrow-left" class="block" />
+      </button>
+      <button
+        class="p-2"
+        aria-label="Next sensor"
+        @click="sensorDetailStore.selectNextSensor"
+      >
+        <UIcon name="i-heroicons-arrow-right" class="block" />
+      </button>
+      <button
+        class="-m-1 ml-auto p-2"
+        aria-label="Open sensor details"
+        @click="openSensorDetail"
+      >
+        <UIcon name="i-heroicons-arrow-up-right" class="block" />
+      </button>
+    </div>
+    <p class="mt-2">
+      {{ selectedSensor.location }}
+      <span class="text-black/30">{{ selectedSensor.updatedAgo }}</span>
+    </p>
+    <p class="mt-1">
+      {{ selectedSensor.temperature.toFixed(1) }}°C ·
+      {{ selectedSensor.humidity.toFixed(0) }}% humidity<template
+        v-if="aqi && aqi.aqi !== null"
+      >
+        · AQI {{ aqi.aqi }} ({{ aqi.category }})</template
+      >
+    </p>
+  </div>
   <UCard
+    v-else
     class="w-[280px] z-[1000] pointer-events-auto absolute"
     :ui="cardStyle"
     :style="positionStyle"
@@ -90,6 +133,7 @@
 
 <script setup lang="ts">
 import { computed, PropType, watch } from 'vue'
+import { formatDistanceToNowStrict, isValid } from 'date-fns'
 import { useSensorDetailStore } from '../../stores/sensorDetail'
 import type { Sensor } from '../../stores/sensorDetail'
 import { useAqiStore } from '../../stores/useAqi'
@@ -115,6 +159,10 @@ const props = defineProps({
     type: Object as PropType<MarkerPosition>,
     required: true,
   },
+  compact: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const sensorDetailStore = useSensorDetailStore()
@@ -133,6 +181,7 @@ const selectedSensor = computed(() => {
     temperature: sensor.temperature,
     humidity: sensor.relative_humidity,
     batteryLevel: 100,
+    updatedAgo: isValid(ts) ? formatDistanceToNowStrict(ts) : '',
     timestamp: ts.toLocaleString('en-US', {
       timeZone: 'America/New_York',
       year: 'numeric',

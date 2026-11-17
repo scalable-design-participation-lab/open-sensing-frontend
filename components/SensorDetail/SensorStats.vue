@@ -11,7 +11,7 @@
 
 <template>
   <UCard>
-    <div class="sensor-stats grid grid-cols-5 gap-6">
+    <div class="sensor-stats grid grid-cols-2 md:grid-cols-5 gap-6">
       <div
         v-for="(value, key) in sensorStats"
         :key="key"

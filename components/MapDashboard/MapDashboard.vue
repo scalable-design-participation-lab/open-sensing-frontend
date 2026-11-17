@@ -61,10 +61,10 @@
       <ol-overlay
         v-if="showSensorInfo && selectedSensorPosition"
         :position="selectedSensorPosition"
-        :offset="[0, 0]"
-        positioning="top-left"
+        :offset="compactTag ? [0, 8] : [0, 0]"
+        :positioning="compactTag ? 'top-center' : 'top-left'"
       >
-        <SensorTag :marker-position="markerPosition" />
+        <SensorTag :marker-position="markerPosition" :compact="compactTag" />
       </ol-overlay>
     </ol-map>
   </div>
@@ -87,6 +87,7 @@ useGeographic()
 
 const props = defineProps<{
   centerOn: [number, number]
+  compactTag?: boolean
 }>()
 
 interface FormattedSensor {
