@@ -37,9 +37,10 @@
       >
         <GenericToolbar :tools="sensorTools" @tool-click="handleToolClick" />
       </div>
+      <!-- Half the window, but never narrower than 720px (or 90% on small windows) -->
       <SensorDetail
         v-if="showSensorDetail"
-        class="fixed z-20 overflow-hidden md:top-[calc(4rem+2vh)] md:left-1/2 md:-translate-x-1/2 md:w-[50%] md:h-[calc(100vh-8rem-4vh)]"
+        class="fixed z-20 overflow-hidden md:top-[calc(4rem+2vh)] md:left-1/2 md:-translate-x-1/2 md:w-[max(50%,min(90%,720px))] md:h-[calc(100vh-8rem-4vh)]"
       />
 
       <div
