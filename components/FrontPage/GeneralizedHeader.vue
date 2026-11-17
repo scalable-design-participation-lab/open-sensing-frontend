@@ -27,7 +27,7 @@
         <UButton
           v-if="logoSrc"
           :class="[
-            'relative w-12 h-12 !rounded-lg overflow-hidden p-0 flex items-center justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg',
+            'relative w-10 lg:w-12 h-full !rounded-lg overflow-hidden p-0 flex items-center justify-center !bg-gray-50 dark:!bg-slate-950 shadow-lg',
             shapeClass,
           ]"
         >
@@ -49,7 +49,12 @@
             shapeClass,
           ]"
         >
-          <NuxtLink to="https://scalabledesignparticipation.org"> 🤲 </NuxtLink>
+          <NuxtLink
+            to="https://scalabledesignparticipation.org"
+            target="_blank"
+          >
+            🤲
+          </NuxtLink>
         </UButton>
         <!-- Only the first label fits next to the logo on a phone -->
         <template v-for="(item, index) in leftItems" :key="index">

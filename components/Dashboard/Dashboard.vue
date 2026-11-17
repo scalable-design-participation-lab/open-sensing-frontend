@@ -89,7 +89,7 @@ const { sensors } = storeToRefs(sensorDetailStore)
  * @type {import('vue').Ref<string>}
  */
 const overviewDescription = ref(
-  'This dashboard provides an overview of all sensor data across the Northeastern University campus.'
+  'This dashboard provides an overview of all sensor data across the world.'
 )
 
 /**

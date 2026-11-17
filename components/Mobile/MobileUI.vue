@@ -27,6 +27,8 @@
   >
     <a
       href="https://scalabledesignparticipation.org"
+      target="_blank"
+      rel="noopener"
       aria-label="Scalable Design Participation Lab"
       class="fixed left-1/2 top-4 z-[5] -translate-x-1/2 text-4xl leading-none"
     >
@@ -63,9 +65,8 @@
         </div>
         <p>
           Open Sensing shows real-time environmental data from open sensor
-          modules across the Northeastern University campus. Tap a sensor on the
-          map to see its latest readings, or pick a location above to jump
-          there.
+          modules across the world. Tap a sensor on the map to see its latest
+          readings, or pick a location above to jump there.
         </p>
         <button
           class="self-center rounded-full border border-black/60 px-5 py-3"
@@ -136,10 +137,7 @@
             Northeastern University
             <span class="text-[13px] text-black/30">Open Sensing</span>
           </h2>
-          <p class="mt-2">
-            An overview of all sensor data across the Northeastern University
-            campus.
-          </p>
+          <p class="mt-2">An overview of all sensor data across the world.</p>
         </section>
         <div
           class="no-scrollbar pointer-events-auto -mx-2 flex shrink-0 snap-x gap-2 overflow-x-auto px-2 py-1"

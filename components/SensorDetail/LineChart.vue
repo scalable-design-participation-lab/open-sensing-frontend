@@ -166,6 +166,8 @@ const createChart = () => {
       },
       tooltip: {
         trigger: 'axis',
+        // Keep the popup inside the chart instead of running off its edge.
+        confine: true,
         position: function (pt) {
           return [pt[0], '10%']
         },
