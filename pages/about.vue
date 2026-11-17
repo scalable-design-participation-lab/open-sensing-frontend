@@ -68,7 +68,7 @@
           <MoreInThisSeries :items="moreSeriesItems" :cols="3" />
 
           <UDivider class="my-10" />
-          <div class="grid grid-flow-col-dense">
+          <div class="grid grid-flow-col-dense gap-6">
             <div class="inline-grid">
               <h3>
                 <NuxtLink to="/" class="w-1 h-1"> Open Sensing </NuxtLink>

@@ -14,12 +14,15 @@
  -->
 <template>
   <div class="overview-content">
-    <p class="text-sm text-gray-600 mb-4 dark:text-white">{{ description }}</p>
-    <div class="grid grid-cols-3 gap-4">
+    <p class="hidden md:block text-sm text-gray-600 mb-4 dark:text-white">
+      {{ description }}
+    </p>
+    <div class="grid grid-cols-3 gap-2 md:gap-4">
       <UCard
         v-for="(stat, index) in stats"
         :key="index"
-        class="text-center p-4 bg-white hover:shadow-lg transition-shadow duration-300"
+        :ui="{ body: { padding: 'px-1 py-2 sm:p-6' } }"
+        class="text-center md:p-4 bg-white hover:shadow-lg transition-shadow duration-300"
       >
         <h3 class="text-2xl font-bold text-blue-500">{{ stat.value }}</h3>
         <p class="text-sm text-gray-600 dark:text-white">{{ stat.label }}</p>

@@ -21,9 +21,9 @@
   <div v-if="isVisible" class="pointer-events-auto">
     <UCard
       :ui="{
-        base: 'overflow-visible bg-white shadow-lg rounded-lg w-[340px] sm:w-[360px] max-h-[85vh]',
+        base: 'flex flex-col overflow-visible bg-white shadow-lg rounded-lg w-[340px] max-w-[calc(100vw-1rem)] sm:w-[360px] max-h-[85vh]',
         header: { padding: 'px-6 py-4' },
-        body: { base: 'overflow-y-auto px-6 py-4' },
+        body: { base: 'overflow-y-auto min-h-0 px-6 py-4' },
         footer: { padding: 'px-6 py-4' },
       }"
       class="filter-sidebar"

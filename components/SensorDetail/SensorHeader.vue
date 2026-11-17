@@ -16,7 +16,10 @@
  -->
 
 <template>
-  <UCard class="border-b border-grey-100 dark:border-gray-700">
+  <UCard
+    :ui="{ body: { padding: 'p-2 sm:p-6' } }"
+    class="border-b border-grey-100 dark:border-gray-700"
+  >
     <div class="flex items-center">
       <UButton
         icon="i-heroicons-arrow-left"
@@ -27,20 +30,21 @@
         @click="$emit('go-back')"
       />
       <h1
-        class="text-2xl font-bold text-gray-800 dark:text-white"
+        class="min-w-0 text-base leading-tight md:text-2xl font-bold text-gray-800 dark:text-white"
         data-testid="sensor-location"
       >
         {{ selectedSensor.ecohub_location }}
       </h1>
       <UBadge
         :color="getStatusColor(selectedSensor.status)"
-        class="h-5 w-5 rounded-full mx-2"
+        class="h-5 w-5 shrink-0 rounded-full mx-2"
         data-testid="sensor-status"
       >
       </UBadge>
       <div class="flex-grow"></div>
       <div class="flex" data-testid="sensor-info">
         <div
+          v-if="selectedSensor.batteryLevel != null"
           class="battery-indicator flex items-center bg-gray-100 dark:bg-gray-800 rounded-full px-3 py-1"
           data-testid="battery-indicator"
         >
@@ -55,14 +59,14 @@
         </div>
       </div>
       <div
-        class="navigation-buttons ml-4 flex"
+        class="navigation-buttons ml-1 md:ml-4 flex shrink-0"
         data-testid="navigation-buttons"
       >
         <UButton
           icon="i-heroicons-arrow-up"
           color="primary"
           variant="ghost"
-          class="mr-2 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          class="md:mr-2 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           data-testid="select-previous-button"
           @click="$emit('select-previous')"
         />
@@ -79,7 +83,7 @@
         icon="i-heroicons-x-mark"
         color="gray"
         variant="ghost"
-        class="ml-4 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        class="ml-1 md:ml-4 shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
         data-testid="close-button"
         @click="$emit('close')"
       />

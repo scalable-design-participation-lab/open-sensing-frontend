@@ -19,7 +19,7 @@
  -->
 <template>
   <UCard
-    class="flex flex-col h-full min-h-[250px] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg"
+    class="flex flex-col h-full md:min-h-[250px] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg"
     hover
   >
     <div class="flex flex-col h-full">
@@ -32,7 +32,7 @@
             {{ sensor.status }}
           </UBadge>
         </div>
-        <div class="flex items-center">
+        <div v-if="sensor.batteryLevel != null" class="flex items-center">
           <UIcon
             name="i-heroicons-battery-50"
             class="w-6 h-6 mr-1"
@@ -45,7 +45,7 @@
       <UCard class="bg-gray-50 p-3 flex-grow">
         <div class="grid grid-cols-2 gap-4 text-sm h-full">
           <div
-            v-for="field in displayFields"
+            v-for="field in displayFields.filter((f) => sensor[f] != null)"
             :key="field"
             class="text-center flex flex-col justify-center"
           >

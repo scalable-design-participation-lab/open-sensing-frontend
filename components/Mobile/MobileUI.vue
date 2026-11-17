@@ -18,7 +18,13 @@
  * />
  -->
 <template>
-  <div class="md:hidden">
+  <!-- The dashboard and sensor detail overlays fill the screen on phones -->
+  <div
+    v-show="
+      !dashboardStore.showDashboard && !sensorDetailStore.showSensorDetail
+    "
+    class="md:hidden"
+  >
     <a
       href="https://scalabledesignparticipation.org"
       aria-label="Scalable Design Participation Lab"

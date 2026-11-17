@@ -30,7 +30,7 @@
       />
       <Dashboard
         v-if="showDashboard"
-        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[90%] h-[calc(100vh-8rem-4vh)] overflow-hidden bg-transparent"
+        class="fixed z-20 overflow-hidden bg-transparent md:top-[calc(4rem+2vh)] md:left-1/2 md:-translate-x-1/2 md:w-[90%] md:h-[calc(100vh-8rem-4vh)]"
       />
       <div
         class="hidden md:block absolute left-5 top-1/2 transform -translate-y-1/2 z-20"
@@ -39,7 +39,7 @@
       </div>
       <SensorDetail
         v-if="showSensorDetail"
-        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[94%] md:w-[50%] h-[calc(100vh-8rem-4vh)] overflow-hidden"
+        class="fixed z-20 overflow-hidden md:top-[calc(4rem+2vh)] md:left-1/2 md:-translate-x-1/2 md:w-[50%] md:h-[calc(100vh-8rem-4vh)]"
       />
 
       <div
@@ -431,13 +431,3 @@ onMounted(async () => {
   if (!isMobile.value) showLocationSelector.value = true
 })
 </script>
-
-<style scoped>
-.top-\[calc\(4rem\+2vh\)\] {
-  top: calc(4rem + 2vh);
-}
-
-.h-\[calc\(100vh-8rem-4vh\)\] {
-  height: calc(100vh - 8rem - 4vh);
-}
-</style>

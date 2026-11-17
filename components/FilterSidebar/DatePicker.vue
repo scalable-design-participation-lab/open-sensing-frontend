@@ -19,6 +19,10 @@ import type {
   DatePickerRangeObject,
 } from 'v-calendar/dist/types/src/use/datePicker'
 import 'v-calendar/dist/style.css'
+import { useMediaQuery } from '@vueuse/core'
+
+// Two months side by side don't fit a phone.
+const isWide = useMediaQuery('(min-width: 768px)')
 
 /**
  * Props for the DatePicker component
@@ -70,7 +74,8 @@ const attrs = {
   <VCalendarDatePicker
     v-if="date && typeof date === 'object'"
     v-model.range="date"
-    :columns="2"
+    :columns="isWide ? 2 : 1"
+    :expanded="!isWide"
     v-bind="{ ...attrs, ...$attrs }"
   />
   <VCalendarDatePicker v-else v-model="date" v-bind="{ ...attrs, ...$attrs }" />

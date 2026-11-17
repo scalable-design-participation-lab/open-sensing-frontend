@@ -51,6 +51,7 @@
         >
           <NuxtLink to="https://scalabledesignparticipation.org"> 🤲 </NuxtLink>
         </UButton>
+        <!-- Only the first label fits next to the logo on a phone -->
         <template v-for="(item, index) in leftItems" :key="index">
           <NuxtLink v-if="item.to" v-slot="{ navigate }" :to="item.to" custom>
             <UButton
@@ -60,6 +61,7 @@
               :class="[
                 `h-full px-3 sm:px-4 md:px-5 text-xs sm:text-sm md:text-base lg:text-lg rounded-full`,
                 shapeClass,
+                index > 0 && 'hidden sm:flex',
               ]"
               @click="navigate"
             >
@@ -74,6 +76,7 @@
             :class="[
               `h-full px-3 sm:px-4 !rounded-lg text-xs sm:text-sm md:text-base lg:text-lg shadow-lg text-black dark:text-white !bg-gray-50 dark:!bg-slate-950`,
               shapeClass,
+              index > 0 && 'hidden sm:flex',
             ]"
             @click="item.onClick"
           >
