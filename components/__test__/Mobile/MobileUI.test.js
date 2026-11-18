@@ -16,6 +16,10 @@ const sensor = (id, location, temperature, relative_humidity) => ({
   timestamp: new Date().toISOString(),
 })
 
+// Nuxt auto-import, not available under plain vitest
+const colorMode = { value: 'light', preference: 'system' }
+vi.stubGlobal('useColorMode', () => colorMode)
+
 const createWrapper = () => {
   setActivePinia(createPinia())
   const store = useSensorDetailStore()
@@ -28,7 +32,13 @@ const createWrapper = () => {
     props: {
       locations: [{ label: 'Boston', value: 0, location: [-71.09, 42.34] }],
     },
-    global: { stubs: { UIcon: { template: '<i />', props: ['name'] } } },
+    global: {
+      stubs: {
+        UIcon: { template: '<i />', props: ['name'] },
+        NuxtLink: true,
+        AboutPopup: true,
+      },
+    },
   })
   return { wrapper, store }
 }
@@ -46,6 +56,11 @@ describe('MobileUI', () => {
     await wrapper.find('[data-testid="welcome"] .tag').trigger('click')
     expect(wrapper.emitted('select-location')[0]).toEqual([[-71.09, 42.34]])
     expect(wrapper.find('[data-testid="welcome"]').exists()).toBe(false)
+
+    // The location list stays reachable from the menu
+    await dock(wrapper, 'More').trigger('click')
+    await wrapper.find('[aria-label="Jump to location"]').trigger('click')
+    expect(wrapper.find('[data-testid="welcome"] .tag').exists()).toBe(true)
   })
 
   it('lists filtered sensors and selects one', async () => {
@@ -88,6 +103,9 @@ describe('MobileUI', () => {
   it('emits filter changes, reset and download from the menu', async () => {
     const { wrapper } = createWrapper()
     await dock(wrapper, 'More').trigger('click')
+    await wrapper.find('[aria-label="Toggle dark mode"]').trigger('click')
+    expect(colorMode.preference).toBe('dark')
+
     await wrapper.find('[aria-label="Download data"]').trigger('click')
     expect(wrapper.emitted('download')).toHaveLength(1)
 

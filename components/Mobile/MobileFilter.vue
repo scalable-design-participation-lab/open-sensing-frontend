@@ -23,7 +23,7 @@
       >
         <input
           type="checkbox"
-          class="h-3 w-3 shrink-0 appearance-none rounded-full border border-black bg-none p-0 text-black checked:bg-black focus:ring-0 focus:ring-offset-0"
+          class="h-3 w-3 shrink-0 appearance-none rounded-full border border-black bg-none p-0 text-black checked:bg-black focus:ring-0 focus:ring-offset-0 dark:border-white dark:text-white dark:checked:bg-white"
           :checked="item.checked"
           @change="toggle(group, item.label)"
         />
@@ -140,12 +140,16 @@ function setDate(edge, value) {
 <style scoped>
 .chip {
   height: 28px;
-  border: 1px solid rgb(0 0 0 / 0.6);
+  border: 1px solid color-mix(in srgb, currentColor 60%, transparent);
   border-radius: 6px;
   background: transparent;
   padding: 0 8px;
   font-size: 13px;
   line-height: 1;
   text-align: center;
+}
+/* Light calendar icon on the native date inputs */
+.dark .chip {
+  color-scheme: dark;
 }
 </style>

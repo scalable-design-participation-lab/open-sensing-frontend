@@ -16,10 +16,12 @@
   <!-- Compact tag for the mobile layout (Figma: Mobile / 01-sensor-overview) -->
   <div
     v-if="compact"
-    class="w-[225px] rounded-[10px] bg-[#FAFAFA] p-3 text-[13px] leading-[1.15] text-black shadow-[0_0_5px_rgba(0,0,0,0.15)] pointer-events-auto"
+    class="w-[225px] rounded-[10px] bg-[#FAFAFA] p-3 text-[13px] leading-[1.15] text-black shadow-[0_0_5px_rgba(0,0,0,0.15)] pointer-events-auto dark:bg-gray-900 dark:text-white"
     data-testid="sensor-tag-compact"
   >
-    <div class="flex items-center gap-1 border-b border-black/15 pb-1">
+    <div
+      class="flex items-center gap-1 border-b border-black/15 pb-1 dark:border-white/15"
+    >
       <button
         class="-m-1 p-2"
         aria-label="Previous sensor"
@@ -44,7 +46,9 @@
     </div>
     <p class="mt-2">
       {{ selectedSensor.location }}
-      <span class="text-black/30">{{ selectedSensor.updatedAgo }}</span>
+      <span class="text-black/30 dark:text-white/40">{{
+        selectedSensor.updatedAgo
+      }}</span>
     </p>
     <p class="mt-1">
       {{ selectedSensor.temperature.toFixed(1) }}°C ·

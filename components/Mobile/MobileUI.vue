@@ -25,18 +25,32 @@
     "
     class="md:hidden"
   >
-    <a
-      href="https://scalabledesignparticipation.org"
-      target="_blank"
-      rel="noopener"
-      aria-label="Scalable Design Participation Lab"
-      class="fixed left-1/2 top-4 z-[5] -translate-x-1/2 text-4xl leading-none"
+    <!-- The same two logos as the desktop header -->
+    <div
+      class="fixed left-1/2 top-4 z-[5] flex -translate-x-1/2 items-center gap-3"
     >
-      🤲
-    </a>
+      <a
+        href="https://pref.northeastern.edu/arboretum/"
+        target="_blank"
+        rel="noopener"
+        aria-label="Northeastern University Arboretum"
+        class="grid h-9 w-9 place-items-center overflow-hidden rounded-lg bg-gray-50 shadow-lg dark:bg-slate-950"
+      >
+        <img src="/arboretum_logo.svg" alt="" class="scale-[3] dark:invert" />
+      </a>
+      <a
+        href="https://scalabledesignparticipation.org"
+        target="_blank"
+        rel="noopener"
+        aria-label="Scalable Design Participation Lab"
+        class="text-4xl leading-none"
+      >
+        🤲
+      </a>
+    </div>
 
     <div
-      class="pointer-events-none fixed inset-x-2 bottom-[17px] top-[74px] z-[5] flex flex-col justify-end gap-2.5 text-[13px] leading-[1.15] text-black"
+      class="pointer-events-none fixed inset-x-2 bottom-[17px] top-[74px] z-[5] flex flex-col justify-end gap-2.5 text-[13px] leading-[1.15] text-black dark:text-white"
     >
       <section
         v-if="sheet === 'welcome'"
@@ -49,7 +63,7 @@
             <UIcon name="i-heroicons-x-mark" />
           </button>
         </header>
-        <hr class="border-black/15" />
+        <hr class="border-black/15 dark:border-white/15" />
         <div
           v-if="locations.length"
           class="flex flex-wrap justify-center gap-2"
@@ -68,12 +82,19 @@
           modules across the world. Tap a sensor on the map to see its latest
           readings, or pick a location above to jump there.
         </p>
-        <button
-          class="self-center rounded-full border border-black/60 px-5 py-3"
-          @click="sheet = null"
-        >
-          Get started
-        </button>
+        <!-- About and Help: what the desktop "⋯" menu and "?" button offer -->
+        <div class="flex items-center justify-center gap-1">
+          <NuxtLink to="/about" class="px-4 py-3 underline">About</NuxtLink>
+          <button
+            class="rounded-full border border-black/60 px-5 py-3 dark:border-white/60"
+            @click="sheet = null"
+          >
+            Get started
+          </button>
+          <button class="px-4 py-3 underline" @click="showAbout = true">
+            Help
+          </button>
+        </div>
       </section>
 
       <section v-else-if="sheet === 'assistant'" class="card sheet">
@@ -83,7 +104,7 @@
             <UIcon name="i-heroicons-arrow-down" />
           </button>
         </header>
-        <hr class="border-black/15" />
+        <hr class="border-black/15 dark:border-white/15" />
         <button
           class="orb h-[60px] w-[60px] self-center"
           :class="{ 'animate-pulse': listening }"
@@ -117,7 +138,7 @@
             />
             <span class="min-w-0">
               <span class="block truncate">{{ sensor.ecohub_location }}</span>
-              <span class="block truncate text-black/30">
+              <span class="block truncate text-black/30 dark:text-white/40">
                 {{
                   isActive(sensor)
                     ? `${sensor.temperature.toFixed(1)}°C · ${Math.round(
@@ -135,7 +156,9 @@
         <section class="card pointer-events-auto p-4">
           <h2 class="text-[15px]">
             Northeastern University
-            <span class="text-[13px] text-black/30">Open Sensing</span>
+            <span class="text-[13px] text-black/30 dark:text-white/40"
+              >Open Sensing</span
+            >
           </h2>
           <p class="mt-2">An overview of all sensor data across the world.</p>
         </section>
@@ -186,7 +209,7 @@
             <UIcon name="i-heroicons-arrow-up-right" />
           </button>
         </header>
-        <hr class="border-black/15" />
+        <hr class="border-black/15 dark:border-white/15" />
         <MobileFilter
           class="min-h-0"
           :date-range="dateRange"
@@ -234,6 +257,7 @@
         </button>
       </nav>
     </div>
+    <AboutPopup v-model="showAbout" />
   </div>
 </template>
 
@@ -244,6 +268,7 @@ import { useSensorDetailStore } from '../../stores/sensorDetail'
 import { useDashboardStore } from '../../stores/dashboard'
 import { useMapStore } from '../../stores/map'
 import MobileFilter from './MobileFilter.vue'
+import AboutPopup from '../AboutPopup.vue'
 
 defineProps({
   locations: { type: Array, default: () => [] },
@@ -264,6 +289,7 @@ const { sensors, filteredSensors, showSensorInfo } =
 
 // 'welcome' | 'assistant' | 'list' | 'report' | 'filter' | 'menu' | null
 const sheet = ref('welcome')
+const showAbout = ref(false)
 
 const dockItems = [
   { icon: 'i-heroicons-map', label: 'Map', sheet: null },
@@ -290,8 +316,19 @@ const mapStyleButton = {
   label: 'Toggle map style',
   action: toggleMapStyle,
 }
+// The header's UColorModeButton is hidden on phones. useColorMode is a Nuxt auto-import.
+const colorMode = useColorMode()
+const colorModeButton = {
+  get icon() {
+    return colorMode.value === 'dark' ? 'i-heroicons-moon' : 'i-heroicons-sun'
+  },
+  label: 'Toggle dark mode',
+  action: () =>
+    (colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'),
+}
 const trays = {
   menu: [
+    colorModeButton,
     {
       icon: 'i-heroicons-clock',
       label: 'Filters',
@@ -302,6 +339,12 @@ const trays = {
       icon: 'i-heroicons-arrow-down-tray',
       label: 'Download data',
       action: () => emit('download'),
+    },
+    {
+      // The welcome sheet doubles as the desktop toolbar's "Jump to Location"
+      icon: 'i-heroicons-map-pin',
+      label: 'Jump to location',
+      action: () => (sheet.value = 'welcome'),
     },
   ],
   filter: [
@@ -399,6 +442,13 @@ function listen() {
   background: #fafafa;
   box-shadow: 0 0 5px rgb(0 0 0 / 0.15);
 }
+/* Dark mode: same surfaces as the UCard overlays (gray-900 / gray-800) */
+.dark .card {
+  background: rgb(var(--color-gray-900));
+}
+.dark .bubble {
+  background: rgb(var(--color-gray-800));
+}
 .sheet {
   display: flex;
   flex-direction: column;
@@ -412,7 +462,7 @@ function listen() {
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border: 1px solid rgb(0 0 0 / 0.6);
+  border: 1px solid color-mix(in srgb, currentColor 60%, transparent);
   border-radius: 50%;
 }
 .bubble {
@@ -423,6 +473,7 @@ function listen() {
 .tag {
   border-radius: 50px;
   background: #4dd3ff;
+  color: #000;
   box-shadow: 0 0 5px rgb(0 0 0 / 0.15);
   padding: 8px 16px;
   font-size: 12px;
