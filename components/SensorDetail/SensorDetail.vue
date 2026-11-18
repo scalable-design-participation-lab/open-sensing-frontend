@@ -7,12 +7,21 @@
   >
     <div
       v-if="showSensorDetail && selectedSensor"
-      class="fixed inset-0 flex justify-center items-center z-[20]"
+      class="fixed inset-0 flex justify-center items-center z-[20] p-2 md:p-0"
       data-testid="sensor-detail-modal"
       @click="closeSensorDetail"
     >
+      <!-- On phones the card fills the screen, so the header (close button) stays pinned -->
       <UCard
-        class="h-[80vh] w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
+        :ui="{
+          header: {
+            base: 'max-md:sticky max-md:top-0 max-md:z-10',
+            background: 'max-md:bg-white max-md:dark:bg-gray-900',
+            padding: 'p-2 sm:px-6 sm:py-5',
+          },
+          body: { padding: 'p-2 sm:p-6' },
+        }"
+        class="h-full md:h-[80vh] w-full max-w-[1200px] max-h-[100%] overflow-y-auto"
         data-testid="sensor-detail-content"
         @click.stop
       >
@@ -28,8 +37,8 @@
         </template>
 
         <!-- Body -->
-        <div class="p-6">
-          <div class="flex items-center gap-4 mb-4">
+        <div class="p-1 md:p-6">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
             <span class="text-sm text-gray-600">Temperature Unit:</span>
             <URadio
               v-model="temperatureUnit"
@@ -65,15 +74,15 @@
             />
           </div>
 
-          <div class="flex flex-col md:flex-row gap-6 mt-8">
-            <UCard class="flex-1">
+          <div class="flex flex-col md:flex-row gap-3 mt-4 md:gap-6 md:mt-8">
+            <UCard class="flex-1" :ui="nestedCardUi">
               <SensorInfo
                 :selected-sensor="selectedSensor"
                 :sensor-info-items="sensorInfoItems"
               />
             </UCard>
 
-            <UCard class="flex-1">
+            <UCard class="flex-1" :ui="nestedCardUi">
               <SensorLocation
                 :selected-sensor="selectedSensor"
                 @init-map="initMiniMap"
@@ -81,9 +90,9 @@
             </UCard>
           </div>
 
-          <UCard class="mt-8">
+          <UCard class="mt-4 md:mt-8" :ui="{ body: { padding: 'p-2 sm:p-6' } }">
             <template #header>
-              <div class="flex justify-between items-center">
+              <div class="flex flex-wrap justify-between items-center gap-2">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
                   Sensor Data
                 </h2>
@@ -94,7 +103,7 @@
             <div ref="scrollContainer">
               <div
                 v-if="dataLoaded && !loadingStates[selectedSensor.moduleid]"
-                class="p-4 space-y-6"
+                class="md:p-4 space-y-6"
               >
                 <template
                   v-for="(metric, metricName) in metrics"
@@ -113,7 +122,7 @@
                   </div>
                 </template>
               </div>
-              <div v-else class="p-4 space-y-6">
+              <div v-else class="md:p-4 space-y-6">
                 <template
                   v-for="(metric, metricName) in metrics"
                   :key="metricName"
@@ -124,7 +133,9 @@
             </div>
 
             <template #footer>
-              <div class="flex justify-between items-center py-2">
+              <div
+                class="flex flex-wrap justify-between items-center gap-2 py-2"
+              >
                 <UButton
                   class="hover:bg-blue-600 transition-colors"
                   data-testid="reset-charts-button"
@@ -236,6 +247,9 @@ const { loadSensorData } = sensorDataStore
  * @type {import('vue').Ref<HTMLElement | null>}
  */
 const scrollContainer = ref(null)
+
+// SensorInfo / SensorLocation bring their own card; drop the wrapper's padding on phones.
+const nestedCardUi = { body: { padding: 'p-0 sm:p-6' } }
 
 /**
  * Width of the chart, reactive to container size changes

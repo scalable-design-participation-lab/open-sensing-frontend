@@ -154,6 +154,8 @@ const createChart = () => {
       return props.metric.label
     }
 
+    const narrow = chartContainer.value.clientWidth < 500
+
     const option: echarts.EChartsOption = {
       grid: {
         top: 60,
@@ -164,6 +166,8 @@ const createChart = () => {
       },
       tooltip: {
         trigger: 'axis',
+        // Keep the popup inside the chart instead of running off its edge.
+        confine: true,
         position: function (pt) {
           return [pt[0], '10%']
         },
@@ -178,9 +182,11 @@ const createChart = () => {
           )}${unit}`
         },
       },
+      // On a phone a centered title runs under the toolbox icons.
       title: {
-        left: 'center',
+        left: narrow ? 'left' : 'center',
         text: getMetricLabel(),
+        ...(narrow && { textStyle: { fontSize: 14 } }),
       },
       toolbox: {
         feature: {
@@ -206,6 +212,7 @@ const createChart = () => {
           },
           interval: 'auto',
           rotate: 0,
+          hideOverlap: true,
         },
         splitLine: {
           show: false,

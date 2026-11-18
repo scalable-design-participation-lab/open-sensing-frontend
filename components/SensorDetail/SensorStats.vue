@@ -10,17 +10,17 @@
  -->
 
 <template>
-  <UCard>
-    <div class="sensor-stats grid grid-cols-5 gap-6">
+  <UCard :ui="{ body: { padding: 'p-2 sm:p-6' } }">
+    <div class="sensor-stats grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-6">
       <div
         v-for="(value, key) in sensorStats"
         :key="key"
-        class="stat-item bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-center transform hover:scale-105 transition-transform cursor-pointer"
+        class="stat-item bg-gray-100 dark:bg-gray-800 rounded-lg p-2 md:p-4 text-center transform hover:scale-105 transition-transform cursor-pointer"
         :data-testid="`stat-item-${key}`"
         @click="$emit('show-stat-details', key)"
       >
         <h3
-          class="text-2xl font-bold"
+          class="text-lg md:text-2xl font-bold"
           :class="[getValueColor(key, value), 'dark:text-white']"
           data-testid="stat-value"
         >

@@ -4,7 +4,7 @@
   </div>
   <div v-else class="flex flex-col min-h-screen">
     <GeneralizedHeader
-      class="z-20"
+      class="z-20 hidden md:block"
       :left-items="leftItems"
       :right-items="rightItems"
       logo-src="/arboretum_logo.svg"
@@ -12,8 +12,12 @@
       :show-icon="true"
     />
 
-    <main class="flex-grow relative overflow-hidden pt-16">
-      <MapDashboard class="absolute inset-0" :center-on="selectedMapCenter" />
+    <main class="flex-grow relative overflow-hidden md:pt-16">
+      <MapDashboard
+        class="absolute inset-0"
+        :center-on="selectedMapCenter"
+        :compact-tag="isMobile"
+      />
       <GenericFilterSidebar
         v-if="showFilter && !showDashboard"
         :is-visible="showFilter && !showDashboard"
@@ -26,14 +30,17 @@
       />
       <Dashboard
         v-if="showDashboard"
-        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[90%] h-[calc(100vh-8rem-4vh)] overflow-hidden bg-transparent"
+        class="fixed z-20 overflow-hidden bg-transparent md:top-[calc(4rem+2vh)] md:left-1/2 md:-translate-x-1/2 md:w-[90%] md:h-[calc(100vh-8rem-4vh)]"
       />
-      <div class="absolute left-5 top-1/2 transform -translate-y-1/2 z-20">
+      <div
+        class="hidden md:block absolute left-5 top-1/2 transform -translate-y-1/2 z-20"
+      >
         <GenericToolbar :tools="sensorTools" @tool-click="handleToolClick" />
       </div>
+      <!-- Half the window, but never narrower than 720px (or 90% on small windows) -->
       <SensorDetail
         v-if="showSensorDetail"
-        class="fixed top-[calc(4rem+2vh)] left-1/2 transform -translate-x-1/2 z-20 w-[50%] h-[calc(100vh-8rem-4vh)] overflow-hidden"
+        class="fixed z-20 overflow-hidden md:top-[calc(4rem+2vh)] md:left-1/2 md:-translate-x-1/2 md:w-[max(50%,min(90%,720px))] md:h-[calc(100vh-8rem-4vh)]"
       />
 
       <div
@@ -49,7 +56,15 @@
         @close="showLocationSelector = false"
       />
     </main>
-    <GeneralizedFooter class="z-20" />
+    <GeneralizedFooter class="z-20 hidden md:block" />
+    <MobileUI
+      :locations="listOfLocations"
+      :date-range="selected"
+      @select-location="handleLocationSelect"
+      @filter-change="handleFilterChange"
+      @reset="resetAllFilters"
+      @download="showDownloadPopup = true"
+    />
     <Teleport to="body">
       <DownloadPopup
         v-if="showDownloadPopup"
@@ -86,7 +101,7 @@ const { toggleFilter } = filterStore
 // Map store
 const mapStore = useMapStore()
 const { setMapType } = mapStore
-const currentMapType = ref('satellite')
+const { mapType: currentMapType } = storeToRefs(mapStore)
 
 // Sensor Detail store
 const sensorDetailStore = useSensorDetailStore()
@@ -101,6 +116,8 @@ const { updateExistingHubs, updateExistingDatasets } = datasetStore
 // Sensor Data store
 
 const isLoading = ref(false)
+// Mobile layout is CSS-driven (md: breakpoint); this only gates behavior.
+const isMobile = ref(false)
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
 const showDownloadPopup = ref(false)
 const selectedDownloadFilters = ref({})
@@ -389,6 +406,10 @@ watch(showFilter, (newValue) => {
 })
 
 onMounted(async () => {
+  const mobileQuery = window.matchMedia('(max-width: 767px)')
+  isMobile.value = mobileQuery.matches
+  mobileQuery.addEventListener('change', (e) => (isMobile.value = e.matches))
+
   await sensorDetailStore.loadSensors()
 
   const processed = sensorDetailStore.processedDBSCANClusters
@@ -407,16 +428,7 @@ onMounted(async () => {
       cluster.centroidCoords
     )
   }
-  showLocationSelector.value = true
+  // On mobile the welcome sheet offers the locations instead.
+  if (!isMobile.value) showLocationSelector.value = true
 })
 </script>
-
-<style scoped>
-.top-\[calc\(4rem\+2vh\)\] {
-  top: calc(4rem + 2vh);
-}
-
-.h-\[calc\(100vh-8rem-4vh\)\] {
-  height: calc(100vh - 8rem - 4vh);
-}
-</style>

@@ -17,7 +17,7 @@
     @click="closeDashboard"
   >
     <div
-      class="w-[85%] h-[73vh] max-w-[1800px] flex flex-col gap-5 overflow-hidden rounded-lg"
+      class="w-full h-full p-2 gap-2 md:p-0 md:gap-5 md:w-[85%] md:h-[73vh] max-w-[1800px] flex flex-col overflow-hidden rounded-lg"
       @click.stop
     >
       <UCard
@@ -39,7 +39,7 @@
 
       <div class="flex-grow overflow-y-auto">
         <div
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6"
         >
           <SensorTile
             v-for="sensor in sensors"
@@ -89,7 +89,7 @@ const { sensors } = storeToRefs(sensorDetailStore)
  * @type {import('vue').Ref<string>}
  */
 const overviewDescription = ref(
-  'This dashboard provides an overview of all sensor data across the Northeastern University campus.'
+  'This dashboard provides an overview of all sensor data across the world.'
 )
 
 /**

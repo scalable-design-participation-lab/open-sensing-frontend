@@ -16,15 +16,16 @@
  -->
 
 <template>
-  <div class="flex justify-between items-center">
-    <h2 class="text-xl font-semibold">{{ title }}</h2>
-    <div class="flex items-center">
+  <div class="flex items-center gap-2">
+    <!-- Badge wraps under the title on narrow screens -->
+    <div class="flex flex-1 flex-wrap items-center justify-between gap-x-3 gap-y-1">
+      <h2 class="text-xl font-semibold">{{ title }}</h2>
       <UBadge :color="badgeColor" size="sm">
         {{ badgeText }}
       </UBadge>
-      <UButton icon="i-heroicons-x-mark" color="gray" variant="ghost" size="sm" @click="$emit('close')"
-        aria-label="Close dashboard" />
     </div>
+    <UButton icon="i-heroicons-x-mark" color="gray" variant="ghost" size="sm" @click="$emit('close')"
+      aria-label="Close dashboard" />
   </div>
 </template>
 

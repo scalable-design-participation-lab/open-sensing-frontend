@@ -28,7 +28,7 @@
           class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center w-full"
         >
           <div
-            class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-3xl w-full"
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-lg m-2 p-4 md:p-6 max-w-3xl w-full max-h-[calc(100dvh-1rem)] overflow-y-auto"
           >
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-lg font-semibold">Select Date Range</h3>
@@ -40,7 +40,9 @@
               />
             </div>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
-              <div class="flex flex-col space-y-2">
+              <div
+                class="grid grid-cols-2 gap-1 md:flex md:flex-col md:gap-0 md:space-y-2"
+              >
                 <UButton
                   label="All Time"
                   color="gray"

@@ -18,7 +18,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-4">
+        <div class="flex flex-wrap gap-4">
           <UButton
             color="blue"
             :loading="isLoading"
